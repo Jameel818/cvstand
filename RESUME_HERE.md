@@ -1,4 +1,73 @@
-# RESUME HERE — paused 2026-09-14b (rename SHIPPED · internal namespace SHIPPED · deploy prepped)
+# RESUME HERE — paused 2026-09-14c (CODE IS ON GITHUB · Railway blocked on a payment decision)
+
+## ⏸ EXACTLY WHERE THIS STOPPED
+
+**The code is pushed to GitHub and the deploy is one decision away.**
+
+- **Repo: https://github.com/Jameel818/cvstand** — 7 commits, `main`, verified
+  present on the remote (`Dockerfile`, `railway.json`, `requirements.txt`,
+  `.dockerignore`, `run.py` all confirmed in `origin/main`).
+- Local `main` is in sync with `origin/main`. Nothing uncommitted.
+- **Railway is NOT free.** The user reached the plan wall — Hobby is ~$5/month.
+  **They left before choosing.** Nothing is deployed. No Railway project was
+  successfully created.
+
+### THE ONE OPEN QUESTION — ask it first
+
+**Pay ~$5/mo for Railway, or switch to Google Cloud Run (free at this
+volume)?** The options were laid out and the user had to go. Do not re-derive
+them:
+
+| Option | Cost | Note |
+|---|---|---|
+| **Railway Hobby** | ~$5/mo | Already configured — `railway.json`, volume, vars |
+| **Google Cloud Run** | Free at preview volume | Docker-native, ~30-45 min of setup, **no persistent disk** so accounts would not survive a redeploy (fine for a preview — the account features ship dark) |
+| **Render free** | Free | **Rejected: 512 MB.** The PDF export launches a real Chromium and needs ~1 GB, so the one feature that matters would OOM |
+
+Recommendation given: pay the $5, because the Docker image has never been
+built anywhere and debugging it on the already-configured platform is faster
+than debugging it while also configuring a new one.
+
+### The GitHub push was the hard part, and it is DONE
+
+Two hours went into it; do not repeat the dead ends:
+
+- **Git Credential Manager's device-code flow is broken on this machine.** The
+  browser shows "This site can't be reached" on the OAuth callback after the
+  verification code is entered. GitHub authorises, Git never receives the
+  token, nothing is stored.
+- **A push CANNOT be run from inside Claude Code.** It needs an interactive
+  credential prompt; every attempt hangs and has to be killed with TaskStop.
+  `git -c credential.interactive=never push` fails fast and is the safe way to
+  TEST whether a credential exists.
+- What finally worked: the user ran `git push -u origin main` themselves from
+  their own terminal.
+- If a future push fails the same way, the reliable path is a Personal Access
+  Token (`https://github.com/settings/tokens/new`, scope `repo`) used as
+  `git push https://TOKEN@github.com/Jameel818/cvstand.git main`. **Never let
+  a token into the repo, a file, or the transcript.**
+
+### When deployment resumes
+
+`DEPLOY.md` is the runbook and every claim in it was checked against the
+running app. The checklist page for the user is
+https://claude.ai/code/artifact/0f844ccb-0d8f-4b5c-87dc-186ef9c9be45
+
+Three things that cause SILENT damage, in priority order:
+
+1. **Mount the `/data` volume BEFORE the first signup.** Container disks are
+   ephemeral; without it every deploy deletes every account.
+2. **`CVSTAND_SERVER_STORE=0`** or two visitors overwrite each other's résumé.
+3. **DNS later: A/CNAME only, never MX or the SPF/DKIM TXT records** — that
+   breaks the mailbox. Not started; nothing has touched cvstand.com.
+
+⚠ **The Docker image has still never been built.** No Docker on this machine.
+Expect the first build to fail; the likely order is Chromium install, then
+memory, then port binding.
+
+---
+
+# Previous entry — 2026-09-14b (rename SHIPPED · internal namespace SHIPPED · deploy prepped)
 
 **This IS a git repo now.** Two commits on `main`, clean tree, **no remote** —
 pushing to GitHub needs the user's account (there is no `gh` CLI here).
