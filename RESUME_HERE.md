@@ -1,4 +1,80 @@
-# RESUME HERE — session paused 2026-09-14 (the CVStand rename SHIPPED — all 4 phases)
+# RESUME HERE — paused 2026-09-14b (rename SHIPPED · internal namespace SHIPPED · deploy prepped)
+
+**This IS a git repo now.** Two commits on `main`, clean tree, **no remote** —
+pushing to GitHub needs the user's account (there is no `gh` CLI here).
+
+| | start of day | now |
+|---|---|---|
+| fast suite | 1692 passed, 0 errors | **1745 passed, 0 errors** |
+| full `--e2e` | 2136 | **2175 passed, 0 errors** (11m21s, junit: 2199 cases) |
+
+## Read these first, in this order
+
+1. **`DEPLOY.md`** — the Railway + Hostinger runbook. Every claim in it was
+   checked against the running app, not the docs.
+2. **`NAMING.md` §7a** — the seven things the rename plan got wrong once
+   measured. §7 is kept verbatim as the record of the plan.
+3. `.env.example` — the canonical list of every setting the code reads.
+
+## What happened, in two parts
+
+### Part 1 — the four rename phases (see the previous entry below)
+`app/brand.py`, six surfaces, the three brand defects, the label gate widened,
+the tagline, `MONETIZATION.md` §8a. Four dead catalogue rows deleted.
+
+### Part 2 — internal namespace + deployment prep
+
+- **`RESUMECRAFT_*` → `CVSTAND_*`** across 16 files, plus `data/cvstand.db`
+  and the `cvstand:*` localStorage keys. **The old DO-NOT-TOUCH rule was
+  inverted, deliberately** — it protected DEPLOYED users and there were none,
+  so the rename was free exactly once and permanently expensive afterwards.
+  **That window is now CLOSED**: `app/brand.py` says so, and after launch
+  renaming those keys really would wipe documents.
+- Three sites keep the old spelling ON PURPOSE (`app/brand.py:11`,
+  `tests/test_brand.py:15`, `tests/test_labels.py:73`) — they are statements
+  ABOUT the 2026-09-12 grep trap and stop being true if renamed.
+- `sw.js` still sweeps the `resumecraft-` cache prefix. A cleanup filter only
+  deletes keys it recognises, so dropping it strands old caches forever.
+- **`Dockerfile`, `.dockerignore`, `.env.example`, `gunicorn`, git repo.**
+- **`CVSTAND_SERVER_STORE` now refuses ambiguous values.** It was `!= "0"`, so
+  `false` / `no` / `off` all meant TRUE — the operator typing the word they
+  mean got the opposite, on the one setting that decides whether two visitors
+  overwrite each other's résumé. Beyond the plan, added deliberately.
+
+## ⚠ THE UNVERIFIED THING
+
+**The Docker image has never been built.** There is no Docker on this machine.
+`tools/verify_docker_context.py` statically checks `.dockerignore` against the
+app's real runtime needs (and was mutation-tested by excluding `data/`
+wholesale — the trap being that `data/` holds local state AND the shipped
+showcase samples). **A static check is not a build.** The first real build on
+Railway is the open risk; expect to iterate on the Dockerfile there.
+
+## Blocked on the USER — all of it is clicking, none of it is code
+
+| Blocked on | Note |
+|---|---|
+| **Create the mailbox** | The PLAN is bought; the ADDRESS `info@cvstand.com` does not exist yet. Every page footer already links to it. |
+| **Push to GitHub** | Repo is committed, no remote, no `gh` CLI |
+| **Railway** | Mount the `/data` volume BEFORE the first signup or every deploy deletes every account |
+| **DNS at Hostinger** | A/CNAME only. **Never MX or the SPF/DKIM TXT records** — that breaks the mailbox |
+| `ANTHROPIC_API_KEY` | AI Phase 2; app answers 503 without it, by design |
+| Trademark cls. 9/42 KSA/UAE/UK | Does not block code |
+
+## Verified facts a future session should not re-derive
+
+- Hostinger holds exactly two subscriptions: `.COM Domain` (expires
+  2027-09-13) and `Starter Business Email`. **No web hosting** — and shared
+  hosting could not run this app anyway: the PDF export launches a real
+  Chromium per request.
+- `git config user.name` is set repo-locally to "Jamal Jameel" — a guess from
+  the account email. Change it if wrong.
+- The builder page renders NO wordmark, deliberately (`builder.html:4-5`
+  empties the chrome and footer blocks). It carries the brand in `<title>`.
+
+---
+
+# Previous entry — 2026-09-14a (the CVStand rename SHIPPED — all 4 phases)
 
 Everything is saved to disk (this is **not a git repo** — no commit needed).
 No dev server or background process is running. This file + BUILD.md +
