@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Builder') }} — {{ brand_name }}{% endblock %}
+{% block body_class %}builder-body{% endblock %}
+{% block chrome %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="builder">
+  <div class="builder-bar">
+    <a class="back" href="{{ url_for('main.templates_gallery') }}"><span class="dir-flip" aria-hidden="true">←</span> {{ t('Templates') }}</a>
+    <button type="button" class="tpl-name" id="open-drawer">
+      <span class="chip chip-{{ template.category if template else 'modern' }}"><span class="dot"></span>{{ 'Modern' if template and template.category == 'modern' else 'ATS' }}</span>
+      <span id="tpl-label">{{ template.label if template else 'Choose a template' }}</span>
+      <span aria-hidden="true">▾</span>
+    </button>
+    <span class="spacer"></span>
+    <span class="save-state" id="save-state">{{ t('Saved') }}</span>
+    <div class="dl-wrap">
+      <button type="button" class="btn btn-primary btn-sm" id="dl-toggle">{{ t('Download') }} ▾</button>
+      <div class="dl-menu" id="dl-menu">
+        <a href="{{ url_for('main.export_pdf') }}" id="dl-pdf">{{ t('PDF') }}<small>{{ t('Pixel-accurate, for sending') }}</small></a>
+        <a href="{{ url_for('main.export_docx') }}" id="dl-docx">{{ t('Word (.docx)') }}<small>{{ t('Editable, for job portals') }}</small></a>
+      </div>
+    </div>
+  </div>
+
+  <form class="builder-form" id="resume-form" autocomplete="off">
+    <p class="form-intro">{{ t('Fill in what applies. Empty sections are hidden from the résumé automatically.') }}</p>
+    <div class="form-errors" id="form-errors"></div>
+    <!-- sections injected by builder.js -->
+  </form>
+
+  <div class="builder-preview">
+    <div class="preview-toolbar">
+      <span style="font-size:12.5px;font-weight:600;color:var(--muted)">{{ t('Live preview') }}</span>
+      <div class="zoom">
+        <button type="button" data-zoom="out" aria-label="{{ t('Zoom out') }}">−</button>
+        <span class="lvl" id="zoom-lvl">{{ t('Fit') }}</span>
+        <button type="button" data-zoom="in" aria-label="{{ t('Zoom in') }}">+</button>
+        <button type="button" data-zoom="fit" aria-label="{{ t('Fit') }}" style="width:auto;padding:0 8px;font-size:11px">{{ t('Fit') }}</button>
+      </div>
+    </div>
+    <div class="preview-scroll" id="preview-scroll">
+      <div class="preview-stage" id="preview-stage">
+        <iframe id="preview-frame" title="{{ t('Résumé preview') }}"></iframe>
+        <div class="page-warn" id="page-warn" hidden>{{ t('Content runs past one page — trim to fit, or pick a denser layout.') }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer-scrim" id="drawer-scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <header>
+    <h3>{{ t('Choose a template') }}</h3>
+    <button type="button" class="x" id="close-drawer" aria-label="{{ t('Close') }}">×</button>
+  </header>
+  <!-- The scrim covers #form-errors while the drawer is open, so a failed
+       template switch has to report itself here or nowhere. -->
+  <p class="drawer-error" id="drawer-error" hidden></p>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script id="resume-data" type="application/json">{{ resume | tojson }}</script>
+<script id="catalogue-data" type="application/json">{{ catalogue | tojson }}</script>
+<script id="i18n-data" type="application/json">{{ i18n | tojson }}</script>
+<script>
+  window.__STATE__ = {
+    templateKey: {{ meta.template_key | tojson }},
+    /* Does the SERVER keep the résumé too? The browser is the store either
+       way — this only says whether autosave ALSO mirrors to data/resume.json,
+       which is the local single-user workflow and what the browser suite
+       drives. Off for any deployment more than one person can reach; see
+       app/config.py::SERVER_STORE. */
+    serverStore: {{ server_store | tojson }},
+    endpoints: {
+      render: {{ url_for('main.api_render') | tojson }},
+      saveResume: {{ url_for('main.put_resume') | tojson }},
+      setTemplate: {{ url_for('main.post_template') | tojson }},
+      previewBase: {{ url_for('main.preview') | tojson }},
+      pdf: {{ url_for('main.export_pdf') | tojson }},
+      docx: {{ url_for('main.export_docx') | tojson }},
+      photo: {{ url_for('main.upload_photo') | tojson }}
+    }
+  };
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/builder.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,208 @@
+{#
+  Shared building blocks for the HTML resume templates.
+
+  Every macro takes already-normalized data (see schema.normalize):
+    - r.achievements is pre-filtered (blank metric dropped) and capped at 4
+    - each skill carries .dots (0-5) and .dot_total (5)
+
+  Compliance invariants baked in here so every template inherits them:
+    - skill name AND level are real selectable text, never dots alone
+    - a stat chip is metric + caption siblings; the band hides if 0 chips
+    - repeating entries are emitted by one loop => identical sibling structure
+    - no CSS pseudo-element content anywhere
+#}
+
+{# --- stat-chip band -------------------------------------------------- #}
+{% macro stat_band(achievements, opts={}) %}
+  {% if achievements %}
+  {% set metric_css = opts.get('metric_css') or "font-family:Archivo,sans-serif; font-weight:900; font-size:30px; line-height:1;" %}
+  {% set cap_css = opts.get('caption_css') or "font-size:9px; letter-spacing:1.4px; font-weight:700; text-transform:uppercase; color:#5C5C66; margin-top:6px;" %}
+  <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; {{ opts.get('band_css') or 'border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;' }}">
+    {% for a in achievements %}
+    <div>
+      <div style="{{ metric_css }}">{{ a.metric }}</div>
+      <div style="{{ cap_css }}">{{ a.label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{# --- one experience entry (true sibling; used inside a loop) -------- #}
+{% macro experience_entry(job, opts={}) %}
+  <div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+      <span style="{{ opts.get('role_css') or 'font-family:Archivo,sans-serif; font-weight:800; font-size:16px;' }}">{{ job.role }}</span>
+      {% if job.start or job.end %}
+      <span style="font-size:11.5px; color:#6A6A74; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} — {% endif %}{{ job.end }}</span>
+      {% endif %}
+    </div>
+    {% if job.company or job.location %}
+    <div style="font-size:13px; color:#3A3A42; margin:3px 0 8px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>
+    {% endif %}
+    {% if job.bullets %}
+    <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.6; color:#2C2C34;">
+      {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# --- one education entry ------------------------------------------- #}
+{% macro education_entry(ed, opts={}) %}
+  <div>
+    <div style="{{ opts.get('degree_css') or 'font-family:Archivo,sans-serif; font-weight:800; font-size:14px;' }}">{{ ed.degree }}</div>
+    {% if ed.school or ed.end %}
+    <div style="color:#5C5C66;">{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}</div>
+    {% endif %}
+    {% if ed.gpa %}<div style="color:#5C5C66;">{{ t('GPA') }} {{ ed.gpa }}</div>{% endif %}
+    {% if ed.bullets %}
+    <ul style="margin:4px 0 0; padding-inline-start:16px; font-size:12px; line-height:1.55; color:#2C2C34;">
+      {% for b in ed.bullets %}<li>{{ b }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# --- unrated skill: name only, never a graphic --------------------
+   A skill with no level word AND no explicit percent is UNRATED. Every graphic
+   here would assert something false about it — an empty dot row reads "0 of 5",
+   a 0%-filled bar or slider reads "none", and the ring prints a literal "0%" —
+   colour and shape making a claim the user never made, with no text beside it.
+   That is exactly what the standing rule forbids ("skill graphics carry name
+   AND level as real selectable text, never colour/shape alone"), and it is the
+   same degrade path `dots_for()` already takes: no mapped level, text only. #}
+{% macro _unrated(skill, css) %}
+  <div><span style="{{ css }}">{{ skill.name }}</span></div>
+{% endmacro %}
+
+{# --- dot-grid skill row (name + level as text, then the dots) ------ #}
+{% macro skill_dotrow(skill, opts={}) %}
+  {% set dot = opts.get('dot_size') or 9 %}
+  {% set on = opts.get('dot_on') or "#16161A" %}
+  {% set off_border = opts.get('dot_off_border') or "#B8B8BE" %}
+  {# name_css / level_css let a dark-sidebar template recolour the text; the
+     defaults reproduce the original light-background output exactly. #}
+  {% set name_css = opts.get('name_css') or "font-weight:600;" %}
+  {% set level_css = opts.get('level_css') or "font-size:10.5px; color:#5C5C66;" %}
+  {% if not skill.level %}{{ _unrated(skill, name_css) }}{% else %}
+  <div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12.5px;">
+      <span style="{{ name_css }}">{{ skill.name }}</span>
+      <span style="{{ level_css }}">{{ skill.level }}</span>
+    </div>
+    <div style="display:flex; gap:5px; margin-top:5px;">
+      {% for i in range(skill.dot_total) %}
+      {% if i < skill.dots %}
+      <span style="width:{{ dot }}px; height:{{ dot }}px; border-radius:50%; background:{{ on }};"></span>
+      {% else %}
+      <span style="width:{{ dot }}px; height:{{ dot }}px; border-radius:50%; border:1px solid {{ off_border }}; box-sizing:border-box;"></span>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{# --- bar skill row (track + fill + percent/level text) ------------
+   Level is ALWAYS real text: the percent value if given, else the level word. #}
+{% macro skill_bar(skill, opts={}) %}
+  {% set _pc = skill.get('percent') %}
+  {% set pct = _pc if _pc is not none else (skill.dots / skill.dot_total * 100) | round | int %}
+  {% set label_txt = (_pc ~ '%') if _pc is not none else skill.level %}
+  {% set track = opts.get('track') or '#E0E0E0' %}
+  {% set fill = opts.get('fill') or '#FFD700' %}
+  {% set name_css = opts.get('name_css') or 'flex:1; font-size:12px; color:#ffffff;' %}
+  {% set label_css = opts.get('label_css') or 'width:40px; font-size:10px; color:#FFD700; text-align:end; flex-shrink:0;' %}
+  {% set radius = opts.get('radius') or '4px' %}
+  {% if _pc is none and not skill.level %}{{ _unrated(skill, name_css) }}
+  {% elif opts.get('stacked') %}
+  <div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; {{ name_css }}"><span>{{ skill.name }}</span><span style="{{ label_css }}">{{ label_txt }}</span></div>
+    <div style="height:{{ opts.get('track_h') or 7 }}px; border-radius:{{ radius }}; background:{{ track }}; overflow:hidden; margin-top:5px;"><div style="height:100%; border-radius:{{ radius }}; width:{{ pct }}%; background:{{ fill }};"></div></div>
+  </div>
+  {% else %}
+  <div style="display:flex; align-items:center; gap:8px;">
+    <span style="{{ name_css }}">{{ skill.name }}</span>
+    <span style="width:{{ opts.get('track_w') or 74 }}px; height:{{ opts.get('track_h') or 7 }}px; border-radius:{{ radius }}; background:{{ track }}; overflow:hidden; flex-shrink:0;"><span style="display:block; width:{{ pct }}%; height:100%; background:{{ fill }};"></span></span>
+    <span style="{{ label_css }}">{{ label_txt }}</span>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{# --- slider skill row (track + fill + a draggable-looking knob) ----------
+   The knob is decorative and positioned by percent; the value is ALWAYS shown
+   as real text (the percent if given, else the level word) beside the name. #}
+{% macro skill_slider(skill, opts={}) %}
+  {% set _pc = skill.get('percent') %}
+  {% set pct = _pc if _pc is not none else (skill.dots / skill.dot_total * 100) | round | int %}
+  {% set label_txt = (_pc ~ '%') if _pc is not none else skill.level %}
+  {% set track = opts.get('track') or '#d5e8f5' %}
+  {% set fill = opts.get('fill') or '#38bdf8' %}
+  {% set th = opts.get('track_h') or 6 %}
+  {% set knob = opts.get('knob') or 16 %}
+  {% set name_css = opts.get('name_css') or 'font-size:11.5px; color:#111111; line-height:1.3;' %}
+  {% set label_css = opts.get('label_css') or 'font-size:12px; color:#111111; font-weight:700; flex-shrink:0;' %}
+  {% if _pc is none and not skill.level %}{{ _unrated(skill, name_css) }}{% else %}
+  <div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:8px; min-height:{{ opts.get('row_min') or 30 }}px;">
+      <span style="{{ name_css }}">{{ skill.name }}</span>
+      <span style="{{ label_css }}">{{ label_txt }}</span>
+    </div>
+    <div style="position:relative; height:{{ th }}px; background:{{ track }}; border-radius:{{ th }}px;">
+      <div style="width:{{ pct }}%; height:100%; background:{{ fill }}; border-radius:{{ th }}px;"></div>
+      <div style="position:absolute; inset-inline-start:calc({{ pct }}% - {{ (knob // 2) }}px); top:50%; transform:translateY(-50%); width:{{ knob }}px; height:{{ knob }}px; border-radius:50%; background:#ffffff; border:3px solid {{ fill }}; box-sizing:border-box;"></div>
+    </div>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{# --- conic-gradient skill ring (percent in the centre, name + level below) ---
+   Compliance: the ring shows the percent as real text in its centre and the
+   name AND level word as real text under it — never colour/shape alone. #}
+{% macro skill_ring(skill, opts={}) %}
+  {% set _pc = skill.get('percent') %}
+  {% set pct = _pc if _pc is not none else (skill.dots / skill.dot_total * 100) | round | int %}
+  {% set size = opts.get('size') or 76 %}
+  {% set hole = opts.get('hole') or (size - 22) %}
+  {% set ring = opts.get('ring') or '#003366' %}
+  {% set track = opts.get('track') or '#DCE6F5' %}
+  {% set ink = opts.get('ink') or '#111111' %}
+  {# hole_bg matches the card colour behind the ring; default white for a
+     light page. name_css / level_css recolour the text for a dark sidebar. #}
+  {% set hole_bg = opts.get('hole_bg') or '#ffffff' %}
+  {% set name_css = opts.get('name_css') or 'font-size:12px; color:#333333; text-align:center;' %}
+  {% set level_css = opts.get('level_css') or 'font-size:10px; color:#777777; text-align:center;' %}
+  {% if _pc is none and not skill.level %}{{ _unrated(skill, name_css) }}{% else %}
+  <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+    <div style="width:{{ size }}px; height:{{ size }}px; border-radius:50%; background:conic-gradient({{ ring }} 0% {{ pct }}%, {{ track }} {{ pct }}% 100%); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+      <div style="width:{{ hole }}px; height:{{ hole }}px; border-radius:50%; background:{{ hole_bg }}; display:flex; align-items:center; justify-content:center; font-size:{{ opts.get('pct_size') or 13 }}px; font-weight:700; color:{{ ink }};">{{ pct }}%</div>
+    </div>
+    <div>
+      <div style="{{ name_css }}">{{ skill.name }}</div>
+      <div style="{{ level_css }}">{{ skill.level }}</div>
+    </div>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{# --- section head with a trailing hairline rule ------------------- #}
+{% macro rule_head(title, opts={}) %}
+  <div style="display:flex; align-items:center; gap:{{ opts.get('gap') or 14 }}px; margin-bottom:{{ opts.get('mb') or 10 }}px;">
+    <span style="{{ opts.get('label_css') or 'font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;' }}">{{ title }}</span>
+    <div style="flex:1; height:1px; background:{{ opts.get('rule') or '#64748B' }};"></div>
+  </div>
+{% endmacro %}
+
+{# --- contact lines ----------------------------------------------- #}
+{% macro contact_lines(contact, opts={}) %}
+  <div style="{{ opts.get('css') or 'font-size:12.5px; line-height:1.85; color:#3A3A42;' }}">
+    {% set parts = [] %}
+    {% if contact.email %}{% set _ = parts.append(contact.email) %}{% endif %}
+    {% if contact.phone %}{% set _ = parts.append(contact.phone) %}{% endif %}
+    {% if contact.address %}{% set _ = parts.append(contact.address) %}{% endif %}
+    {% if contact.site %}{% set _ = parts.append(contact.site) %}{% endif %}
+    {% for s in contact.social %}{% if s.label %}{% set _ = parts.append(s.label) %}{% endif %}{% endfor %}
+    {{ parts | br_join }}
+  </div>
+{% endmacro %}

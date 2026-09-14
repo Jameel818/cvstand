@@ -1,0 +1,177 @@
+{# Modern Template 20 — Cotton & Cherry · two-column · cotton sidebar, right-hand cherry rail, dot-grid
+   Ported from block <!-- 20 --> / id="t20" of "Resume Templates Coded.dc.html".
+   Locked spec: #EDEBDD cotton sidebar (322px) on white, cherry #810100 accent
+   (kickers, dots, stat numerals, title), deep cherry #630000 for dates/level
+   words. Archivo throughout: 900 for the name and role/school lines, light 400
+   for the tracked sidebar and centred body headings. Sidebar carries the
+   portrait, Contact (kicker/value tiles), Expertise (dot-grid, 9px cherry dots,
+   name + level as real text), then any Languages / Tools / Certifications /
+   References. The white body opens with the name, a justified summary and a
+   four-up stat band (1px #d9d5c4 rules), then WORK EXPERIENCE and EDUCATION as
+   centred headings over entry stacks hung off a right-hand 2px cotton rail with
+   cherry node dots.
+
+   Divergences from the supplied reference:
+     1. Palette — cotton #EDEBDD + cherry #810100 / #630000 on white, locked here.
+     2. Type — one Archivo family (900 / 700 / 400 weights).
+     3. Expertise level words render grey (the shared skill_dotrow macro) rather
+        than cherry; still real selectable text next to the dots.
+     4. Optional Languages / Tools / Certifications get their own tracked sidebar
+        blocks (the reference has only References there).
+     5. `.tpl` is a plain flex two-column; sidebar gap 26->18 and body gap
+        22->16 to seat the shared sample. Rail-dot offset trimmed so the nodes
+        do not cross the page edge. #}
+{% import "_macros.j2" as m %}
+{% set SH = "font-size:21px; font-weight:400; color:#1B1717; letter-spacing:3px; margin-bottom:12px;" %}
+{% set KICK = "font-size:9.5px; color:#810100; letter-spacing:1.5px; font-weight:700;" %}
+{% set BH = "text-align:center; font-size:23px; font-weight:400; color:#1B1717; letter-spacing:4px; margin-bottom:22px;" %}
+{% set RAIL = "display:flex; flex-direction:column; gap:22px; padding-inline-end:22px; border-inline-end:2px solid #EDEBDD;" %}
+{% set NODE = "position:absolute; inset-inline-end:-27px; top:4px; width:11px; height:11px; border-radius:50%; background:#810100;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; display:flex; background:#ffffff; font-family:Archivo,sans-serif;">
+
+  <div style="width:322px; flex-shrink:0; background:#EDEBDD; padding:32px 30px; display:flex; flex-direction:column; gap:18px; box-sizing:border-box;">
+    <div style="width:100%; height:214px; background:#dcd9c8; border:1px solid #cfcbb6; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; font-size:11px; color:#6a6455; letter-spacing:1px;">
+      {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% else %}{{ t('PORTRAIT<br>PLACEHOLDER') }}{% endif %}
+    </div>
+
+    {% set c = r.contact %}
+    {% if c.email or c.phone or c.address or c.site or c.social %}
+    <div>
+      <div style="{{ SH }}">{{ t('CONTACT') }}</div>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        {% if c.email %}<div><div style="{{ KICK }}">{{ t('EMAIL') }}</div><div style="font-size:12px; color:#1B1717; overflow-wrap:anywhere;">{{ c.email }}</div></div>{% endif %}
+        {% if c.phone %}<div><div style="{{ KICK }}">{{ t('PHONE') }}</div><div style="font-size:12px; color:#1B1717;">{{ c.phone }}</div></div>{% endif %}
+        {% if c.address %}<div><div style="{{ KICK }}">{{ t('LOCATION') }}</div><div style="font-size:12px; color:#1B1717;">{{ c.address }}</div></div>{% endif %}
+        {% if c.site %}<div><div style="{{ KICK }}">{{ t('PORTFOLIO') }}</div><div style="font-size:12px; color:#1B1717; overflow-wrap:anywhere;">{{ c.site }}</div></div>{% endif %}
+        {% for s in c.social %}{% if s.label %}<div><div style="{{ KICK }}">{{ t('LINK') }}</div><div style="font-size:12px; color:#1B1717; overflow-wrap:anywhere;">{{ s.label }}</div></div>{% endif %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div>
+      <div style="{{ SH }}">{{ t('EXPERTISE') }}</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for sk in r.skills %}
+        {{ m.skill_dotrow(sk, {'dot_size': 9, 'dot_on': '#810100', 'dot_off_border': '#b3ae99'}) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.languages %}
+    <div>
+      <div style="{{ SH }}">{{ t('LANGUAGES') }}</div>
+      <div style="display:flex; flex-direction:column; gap:6px; font-size:12px; color:#1B1717;">
+        {% for l in r.languages %}<div>{{ l.name }} — <span style="color:#630000; font-weight:700;">{{ l.level }}</span></div>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.tools %}
+    <div>
+      <div style="{{ SH }}">{{ t('TOOLS') }}</div>
+      <div style="font-size:12px; color:#1B1717; line-height:1.6;">{{ r.tools | join(" · ") }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.recognition %}
+    <div>
+      <div style="{{ SH }}">{{ t('CERTIFICATIONS') }}</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for rec in r.recognition %}
+        <div>
+          <div style="font-size:12.5px; font-weight:700; color:#1B1717;">{{ rec.title }}</div>
+          {% if rec.detail %}<div style="font-size:11.5px; color:#4a453c;">{{ rec.detail }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.references %}
+    <div>
+      <div style="{{ SH }}">{{ t('REFERENCES') }}</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        {% for ref in r.references %}
+        <div>
+          <div style="font-size:13px; font-weight:700; color:#1B1717;">{{ ref.name }}</div>
+          {% if ref.title %}<div style="font-size:11.5px; color:#4a453c;">{{ ref.title }}</div>{% endif %}
+          {% if ref.phone %}<div style="font-size:11.5px; color:#4a453c;">{{ ref.phone }}</div>{% endif %}
+          {% if ref.email %}<div style="font-size:11.5px; color:#4a453c; overflow-wrap:anywhere;">{{ ref.email }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="flex:1; min-width:0; padding:40px 38px 34px; display:flex; flex-direction:column; gap:26px; box-sizing:border-box;">
+    <div>
+      <div style="font-size:42px; font-weight:900; color:#1B1717; letter-spacing:0.5px; line-height:1;">{{ r.name }}</div>
+      {% if r.title %}<div style="font-size:18px; font-weight:700; color:#810100; margin-top:10px;">{{ r.title }}</div>{% endif %}
+    </div>
+
+    {% if r.summary %}<p style="font-size:12.5px; color:#33302b; line-height:1.7; margin:0; text-align:justify;">{{ r.summary }}</p>{% endif %}
+
+    {% if r.achievements %}
+    <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px; border-top:1px solid #d9d5c4; border-bottom:1px solid #d9d5c4; padding:16px 0;">
+      {% for a in r.achievements %}
+      {% if a.metric %}
+      <div style="text-align:center;">
+        <div style="font-weight:900; font-size:25px; line-height:1; color:#810100;">{{ a.metric }}</div>
+        <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#4a453c; margin-top:5px;">{{ a.label }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.experience and (r.summary or r.achievements) %}<div style="height:1px; background:#d9d5c4;"></div>{% endif %}
+
+    {% if r.experience %}
+    <div>
+      <div style="{{ BH }}">{{ t('WORK EXPERIENCE') }}</div>
+      <div style="{{ RAIL }}">
+        {% for job in r.experience %}
+        <div style="position:relative;">
+          <span style="{{ NODE }}"></span>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+            <span style="font-size:14px; font-weight:900; color:#1B1717; letter-spacing:0.5px; text-transform:uppercase;">{{ job.role }}</span>
+            {% if job.start or job.end %}<span style="font-size:11.5px; font-weight:700; color:#630000; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+          </div>
+          {% if job.company or job.location %}<div style="font-size:12px; color:#4a453c; margin-top:2px;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
+          {% if job.bullets %}
+          <ul style="margin:6px 0 0; padding-inline-start:16px; font-size:11.5px; color:#33302b; line-height:1.55;">
+            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.education and r.experience %}<div style="height:1px; background:#d9d5c4;"></div>{% endif %}
+
+    {% if r.education %}
+    <div>
+      <div style="{{ BH }}">{{ t('EDUCATION') }}</div>
+      <div style="{{ RAIL }}">
+        {% for ed in r.education %}
+        <div style="position:relative;">
+          <span style="{{ NODE }}"></span>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+            <span style="font-size:13.5px; font-weight:900; color:#1B1717; text-transform:uppercase;">{{ ed.school or ed.degree }}</span>
+            {% if ed.start or ed.end %}<span style="font-size:11.5px; font-weight:700; color:#630000; white-space:nowrap;">{{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}</span>{% endif %}
+          </div>
+          {% if ed.school %}<div style="font-size:12px; color:#33302b; margin-top:3px;">{{ ed.degree }}</div>{% endif %}
+          {% if ed.gpa %}<div style="font-size:11.5px; color:#4a453c; margin-top:2px;">{{ t('GPA') }} {{ ed.gpa }}</div>{% endif %}
+          {% if ed.bullets %}<div style="font-size:11.5px; color:#4a453c; margin-top:2px;">{{ ed.bullets | join(" · ") }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>

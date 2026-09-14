@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ t('Templates') }} — {{ brand_name }}{% endblock %}
+
+{% block content %}
+<div class="gallery-hero">
+  <h1>{% if active_cat == 'modern' %}{{ t('Modern templates') }}{% elif active_cat == 'ats' %}{{ t('ATS-friendly templates') }}{% else %}{{ t('All templates') }}{% endif %}</h1>
+  <p>
+    {% if active_cat == 'modern' %}{{ t('Colour, sidebars and skill graphics. Best sent as a PDF.') }}
+    {% elif active_cat == 'ats' %}{{ t('Single column, parse-safe headings, selectable skill levels. Best for job portals.') }}
+    {% else %}{{ t('Two families, one content model. Pick a layout to open it in the builder.') }}{% endif %}
+  </p>
+  <div class="tabs">
+    <a class="tab {% if not active_cat %}is-active{% endif %}" href="{{ url_for('main.templates_gallery') }}">{{ t('All') }}</a>
+    {% for c in categories %}
+    <a class="tab {% if active_cat == c.id %}is-active{% endif %}" href="{{ url_for('main.templates_gallery', cat=c.id) }}">{{ c.label }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card-grid">
+  {% for tpl in templates %}
+  <figure class="tpl-card {% if tpl.key == meta.template_key %}is-selected{% endif %}">
+    {% if not tpl.ported %}<span class="ribbon">{{ t('Soon') }}</span>{% endif %}
+    <div class="tpl-thumb">
+      {% if tpl.ported %}
+      <iframe src="{{ url_for('main.preview', template_key=tpl.key, showcase=1) }}" title="{{ tpl.label }} preview" scrolling="no" loading="lazy" tabindex="-1"></iframe>
+      {% else %}
+      <div class="placeholder">{{ t('Preview coming soon') }}</div>
+      {% endif %}
+    </div>
+    <figcaption class="tpl-meta">
+      <div class="row">
+        <h3>{{ tpl.label }}</h3>
+        <span class="chip chip-{{ tpl.category }}"><span class="dot"></span>{{ 'Modern' if tpl.category == 'modern' else 'ATS' }}</span>
+      </div>
+      <p class="blurb">{{ tpl.blurb }}</p>
+      <div class="foot">
+        <span class="chip"><span class="dot" style="background:{{ tpl.accent }}"></span>{{ tpl.skill_pattern }}</span>
+        {% if tpl.ported %}
+        <button class="btn btn-sm btn-primary use-btn" data-key="{{ tpl.key }}">
+          {% if tpl.key == meta.template_key %}{{ t('Selected') }}{% else %}{{ t('Use this') }}{% endif %}
+        </button>
+        {% else %}
+        <button class="btn btn-sm" disabled>{{ t('Coming soon') }}</button>
+        {% endif %}
+      </div>
+    </figcaption>
+  </figure>
+  {% endfor %}
+</div>
+
+<script>
+document.querySelectorAll('.use-btn').forEach(function (b) {
+  b.addEventListener('click', async function () {
+    b.disabled = true;
+    const res = await fetch('{{ url_for("main.post_template") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ template_key: b.dataset.key }),
+    });
+    if (res.ok) { window.location.href = '{{ url_for("main.builder") }}'; }
+    else { b.disabled = false; }
+  });
+});
+</script>
+{% endblock %}

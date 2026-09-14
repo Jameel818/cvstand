@@ -1,0 +1,156 @@
+{# Modern Template 21 — Rounded Card Shell · three-card (absolute) · pill headers, dot-grid
+   Ported from block <!-- 21 --> / id="t21" of "Resume Templates Coded.dc.html".
+   Locked spec: #FDFDFD page, ink #161616, deep green #013F32 + chartreuse
+   #E1F04A. Three rounded (18px) cards: a chartreuse header card with a
+   green-ringed circle portrait, a right-aligned Montserrat 800 name and a green
+   pill holding the contact line; a green left card (About Me, Skills dot-grid
+   with chartreuse dots + level word as real text, Tools, bottom-pinned
+   Languages); a right column of Education and Work Experience entry stacks hung
+   off a 2px left rail under chartreuse pill headers, with any Certifications and
+   a bottom-pinned green stat card (chartreuse Montserrat numerals) closing it.
+   Montserrat display + Source Sans 3 body.
+
+   Divergences from the supplied reference:
+     1. Palette — green #013F32 + chartreuse #E1F04A on #FDFDFD, locked here.
+     2. Type — Montserrat + Source Sans 3, not one heavy slab display.
+     3. Bullet-dot skills become dot-grid rows with a level word as real text;
+        a stat card closes the right column where the reference has an empty band.
+     4. Experience/Education bullet lists render as a running line (the reference
+        single-line entry style); optional Tools / Certifications get their own
+        pill blocks (no home in the reference).
+     5. `.tpl` is overflow:hidden with three absolute rounded cards — verified by
+        panel measurement + screenshot, not `.tpl` scrollHeight. Card gaps
+        20->18 to seat the shared sample. #}
+{% import "_macros.j2" as m %}
+{% set PILL = "display:inline-block; background:#E1F04A; color:#013F32; border-radius:999px; padding:6px 18px; font-family:Montserrat,sans-serif; font-weight:700; font-size:14px; letter-spacing:0.5px;" %}
+{% set PILL_R = "display:inline-block; background:#E1F04A; color:#013F32; border-radius:999px; padding:7px 22px; font-family:Montserrat,sans-serif; font-weight:700; font-size:15px; letter-spacing:0.5px;" %}
+{% set RAIL = "display:flex; flex-direction:column; gap:14px; margin-top:14px; border-inline-start:2px solid #D8D8D8; padding-inline-start:18px;" %}
+{% set ENTRY_TOP = "font-size:12.5px; color:#4A4A4A;" %}
+{% set ENTRY_ORG = "font-family:Montserrat,sans-serif; font-weight:700; font-size:14px; color:#013F32;" %}
+<div class="tpl" style="box-sizing:border-box; position:relative; width:850px; height:1100px; background:#FDFDFD; overflow:hidden; font-family:'Source Sans 3',sans-serif; color:#161616;">
+
+  <div style="box-sizing:border-box; position:absolute; inset-inline-start:24px; top:24px; width:802px; height:212px; border-radius:18px; background:#E1F04A; display:flex; flex-direction:column;">
+    <div style="flex:1; min-width:0; display:flex; align-items:center; gap:26px; padding:0 34px;">
+      <div style="width:118px; height:118px; flex-shrink:0; align-self:flex-end; margin-bottom:8px; border-radius:50%; background:#D8D8D8; border:5px solid #013F32; box-sizing:border-box; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:10px; color:#6a6a6a;">
+        {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% else %}{{ t('PHOTO') }}{% endif %}
+      </div>
+      <div style="flex:1; min-width:0; text-align:end;">
+        <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:44px; line-height:1.05; color:#013F32;">{{ r.name }}</div>
+        {% if r.title %}<div style="font-size:18px; color:#013F32; margin-top:2px;">{{ r.title }}</div>{% endif %}
+      </div>
+    </div>
+    {% set c = r.contact %}
+    {% set bits = [] %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
+    {% if bits %}
+    <div style="box-sizing:border-box; flex-shrink:0; height:46px; margin:0 18px 18px; border-radius:23px; background:#013F32; color:#FDFDFD; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 32px; font-size:13px; font-weight:600; letter-spacing:0.6px; overflow:hidden;">
+      {% for b in bits[:4] %}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ b }}</span>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="box-sizing:border-box; position:absolute; inset-inline-start:24px; top:252px; width:300px; bottom:24px; border-radius:18px; background:#013F32; color:#E8EDEA; padding-block: 24px 24px; padding-inline: 26px 24px; display:flex; flex-direction:column; gap:18px;">
+    {% if r.summary %}
+    <div>
+      <div style="{{ PILL }}">{{ t('About Me') }}</div>
+      <div style="font-size:12px; line-height:1.7; margin-top:12px;">{{ r.summary }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div>
+      <div style="{{ PILL }}">{{ t('Skills') }}</div>
+      <div style="display:flex; flex-direction:column; gap:11px; margin-top:12px;">
+        {% for sk in r.skills %}
+        {{ m.skill_dotrow(sk, {'dot_size': 9, 'dot_on': '#E1F04A', 'dot_off_border': '#2A5C4E',
+           'name_css': 'font-weight:600; color:#ffffff;',
+           'level_css': 'font-size:10.5px; color:#A9C0B8;'}) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.tools %}
+    <div>
+      <div style="{{ PILL }}">{{ t('Tools') }}</div>
+      <div style="font-size:12px; line-height:1.7; margin-top:10px;">{{ r.tools | join(" · ") }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.languages %}
+    <div style="margin-top:auto;">
+      <div style="{{ PILL }}">{{ t('Languages') }}</div>
+      <div style="font-size:12px; line-height:1.7; margin-top:10px;">
+        {% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="box-sizing:border-box; position:absolute; inset-inline-start:348px; top:252px; inset-inline-end:24px; bottom:24px; display:flex; flex-direction:column; gap:18px;">
+    {% if r.education %}
+    <div>
+      <div style="{{ PILL_R }}">{{ t('Education') }}</div>
+      <div style="{{ RAIL }}">
+        {% for ed in r.education %}
+        <div>
+          <div style="{{ ENTRY_TOP }}">{{ ed.degree }}</div>
+          {% if ed.school %}<div style="{{ ENTRY_ORG }}">{{ ed.school }}</div>{% endif %}
+          {% set det = [] %}
+          {% if ed.bullets %}{% set _ = det.append(ed.bullets | join(" ")) %}{% endif %}
+          {% if ed.gpa %}{% set _ = det.append(t("GPA") ~ " " ~ ed.gpa) %}{% endif %}
+          {% if ed.start or ed.end %}{% set _ = det.append(ed.start ~ (" – " if ed.start and ed.end else "") ~ ed.end) %}{% endif %}
+          {% if det %}<div style="font-size:12px; color:#4A4A4A;">{{ det | join(" · ") }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.experience %}
+    <div>
+      <div style="{{ PILL_R }}">{{ t('Work Experience') }}</div>
+      <div style="{{ RAIL }}">
+        {% for job in r.experience %}
+        <div>
+          <div style="{{ ENTRY_TOP }}">{{ job.role }}{% if job.start or job.end %} · {{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}{% endif %}</div>
+          {% if job.company or job.location %}<div style="{{ ENTRY_ORG }}">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
+          {% if job.bullets %}<div style="font-size:12px; line-height:1.6; color:#161616; margin-top:3px;">{{ job.bullets | join(" ") }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.recognition %}
+    <div>
+      <div style="{{ PILL_R }}">{{ t('Certifications') }}</div>
+      <div style="{{ RAIL }}">
+        {% for rec in r.recognition %}
+        <div>
+          <div style="{{ ENTRY_ORG }}">{{ rec.title }}</div>
+          {% if rec.detail %}<div style="font-size:12px; color:#4A4A4A;">{{ rec.detail }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.achievements %}
+    <div style="margin-top:auto; box-sizing:border-box; border-radius:18px; background:#013F32; color:#FDFDFD; padding:16px 26px; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px;">
+      {% for a in r.achievements %}
+      {% if a.metric %}
+      <div>
+        <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:23px; color:#E1F04A;">{{ a.metric }}</div>
+        <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#A9C0B8; margin-top:3px;">{{ a.label }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>

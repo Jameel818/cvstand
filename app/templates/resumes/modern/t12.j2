@@ -1,0 +1,124 @@
+{# Modern Template 12 — Typographic Mono · full-bleed · Anton headings, ring skill diagrams
+   Ported from block <!-- 12 --> / id="t12" of "Resume Templates Coded.dc.html".
+   Locked spec: #f7f7f5 page, ink #111, Anton for every heading (name, ABOUT ME,
+   the paired section labels), Inter for body. Name left / role right across the
+   top; ABOUT ME under a 2px rule with a justified summary; a four-chip stat
+   band (1px #d5d5d2 rules). Then two paired-heading rows — "WORK EXPERIENCE |
+   CONTACT" over an experience timeline (2px ink left rail, ring-cut node dots)
+   beside a right-aligned contact block, and "EDUCATIONAL HISTORY | SKILLS" over
+   an education timeline beside a 2-up conic ring grid (ink dial on #b8b8b8
+   track, percent in a #f7f7f5 hole as real text, name + level word beneath).
+
+   Divergences from the supplied reference:
+     1. Palette — ink #111 on #f7f7f5, single-tone, locked here.
+     2. Type — Anton display + Inter body.
+     3. Rings gain a level word as real text beneath the name; the reference's
+        "ADDRESS" column (which also held phone/email) becomes a generic
+        "CONTACT" block.
+     4. Experience / Education bullet lists render as a running line (the
+        reference single-paragraph entry style).
+     5. `.tpl` overflow:hidden; spacing opened up (column gap 20, ring 70) to
+        seat the shared sample. The reference is built for dense content (3
+        education entries with paragraphs); with the lighter shared sample the
+        short education column leaves whitespace beside the 5-ring skills grid —
+        real multi-entry content fills it. Ties into the open per-template
+        sample question. #}
+{% import "_macros.j2" as m %}
+{% set AH = "font-family:Anton,sans-serif; font-weight:400; font-size:33px; color:#111111; line-height:1;" %}
+{% set PAIR = "display:flex; gap:28px; align-items:center;" %}
+{% set RAILCOL = "flex:1; min-width:0; padding-inline-start:22px; border-inline-start:2px solid #111111; display:flex; flex-direction:column; gap:20px;" %}
+{% set NODE = "position:absolute; inset-inline-start:-32px; top:-2px; width:15px; height:15px; border-radius:50%; background:#f7f7f5; border:2px solid #111111; box-sizing:border-box;" %}
+{% set SIDECOL = "width:210px; flex-shrink:0;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#f7f7f5; overflow:hidden; padding:44px 46px; display:flex; flex-direction:column; gap:20px; font-family:Inter,sans-serif; color:#111111;">
+
+  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:20px;">
+    <div style="font-family:Anton,sans-serif; font-weight:400; font-size:66px; color:#111111; letter-spacing:0.5px; line-height:0.9; text-transform:uppercase;">{{ r.name }}</div>
+    {# `white-space:nowrap` here meant the headline could NEVER wrap: an ordinary 50-character title ran 39px past the 850px canvas (65px in Arabic) and the canvas is overflow:hidden, so it was simply gone from the PDF with nothing raised. Measured 2026-09-09, tools/verify_overflow.py. The name beside it is the masthead and keeps the row; the title wraps instead of escaping. #}
+    {% if r.title %}<div style="font-family:Anton,sans-serif; font-weight:400; font-size:24px; color:#111111; letter-spacing:1px; text-transform:uppercase; text-align:end;">{{ r.title }}</div>{% endif %}
+  </div>
+
+  {% if r.summary %}
+  <div style="display:flex; align-items:center; gap:18px;">
+    <span style="{{ AH }} font-size:32px;">{{ t('ABOUT ME') }}</span>
+    <div style="flex:1; height:2px; background:#111111;"></div>
+  </div>
+  <p style="font-size:12.5px; color:#222222; line-height:1.75; margin:0; text-align:justify;">{{ r.summary }}</p>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px; border-top:1px solid #d5d5d2; border-bottom:1px solid #d5d5d2; padding:16px 0;">
+    {% for a in r.achievements %}
+    {% if a.metric %}
+    <div style="text-align:center;">
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:24px; line-height:1; color:#111111;">{{ a.metric }}</div>
+      <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#555555; margin-top:5px;">{{ a.label }}</div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div style="{{ PAIR }}">
+    <div style="flex:1; display:flex; align-items:center; gap:16px;">
+      <span style="{{ AH }}">{{ t('WORK EXPERIENCE') }}</span>
+      <div style="flex:1; height:2px; background:#111111;"></div>
+    </div>
+    <div style="{{ SIDECOL }} text-align:end;"><span style="{{ AH }}">{{ t('CONTACT') }}</span></div>
+  </div>
+
+  <div style="display:flex; gap:28px; align-items:flex-start;">
+    <div style="{{ RAILCOL }}">
+      {% for job in r.experience %}
+      <div style="position:relative;">
+        <span style="{{ NODE }}"></span>
+        <div style="font-weight:800; font-size:15px; color:#111111;">{{ job.role }}{% if job.start or job.end %} ({{ job.start }}{% if job.start and job.end %}–{% endif %}{{ job.end }}){% endif %}</div>
+        {% if job.company or job.location %}<div style="font-size:11.5px; color:#555555; margin-top:1px;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
+        {% if job.bullets %}<p style="font-size:11.5px; color:#333333; line-height:1.5; margin:4px 0 0;">{{ job.bullets | join(" ") }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <div style="{{ SIDECOL }} text-align:end; display:flex; flex-direction:column; gap:8px;">
+      {% set c = r.contact %}
+      {% if c.address %}<div style="font-size:12px; color:#222222; line-height:1.5;">{{ c.address }}</div>{% endif %}
+      {% if c.phone %}<div><div style="font-family:Anton,sans-serif; font-weight:400; font-size:26px; line-height:0.9; color:#111111;">{{ t('PHONE') }}</div><div style="font-size:12px; color:#222222; margin-top:3px;">{{ c.phone }}</div></div>{% endif %}
+      {% if c.email %}<div><div style="font-family:Anton,sans-serif; font-weight:400; font-size:26px; line-height:0.9; color:#111111;">{{ t('EMAIL') }}</div><div style="font-size:12px; color:#222222; margin-top:3px; overflow-wrap:anywhere;">{{ c.email }}</div></div>{% endif %}
+      {% if c.site %}<div><div style="font-family:Anton,sans-serif; font-weight:400; font-size:26px; line-height:0.9; color:#111111;">{{ t('WEB') }}</div><div style="font-size:12px; color:#222222; margin-top:3px; overflow-wrap:anywhere;">{{ c.site }}</div></div>{% endif %}
+      {% for s in c.social %}{% if s.label %}<div style="font-size:12px; color:#222222; overflow-wrap:anywhere;">{{ s.label }}</div>{% endif %}{% endfor %}
+    </div>
+  </div>
+
+  <div style="{{ PAIR }} flex:1; min-height:0; align-items:flex-start;">
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span style="{{ AH }}">{{ t('EDUCATIONAL HISTORY') }}</span>
+        <div style="flex:1; height:2px; background:#111111;"></div>
+      </div>
+      {% if r.education %}
+      <div style="{{ RAILCOL }}">
+        {% for ed in r.education %}
+        <div style="position:relative;">
+          <span style="{{ NODE }}"></span>
+          <div style="font-weight:800; font-size:14px; color:#111111;">{{ ed.degree }}{% if ed.start or ed.end %} ({{ ed.start }}{% if ed.start and ed.end %}–{% endif %}{{ ed.end }}){% endif %}</div>
+          {% if ed.school %}<div style="font-size:11.5px; color:#555555; margin-top:1px;">{{ ed.school }}</div>{% endif %}
+          {% if ed.bullets %}<p style="font-size:11px; color:#333333; line-height:1.45; margin:4px 0 0;">{{ ed.bullets | join(" ") }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="{{ SIDECOL }} display:flex; flex-direction:column; gap:12px;">
+      <div style="text-align:end;"><span style="{{ AH }}">{{ t('SKILLS') }}</span></div>
+      {% if r.skills %}
+      <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 6px; align-content:start; justify-items:center;">
+        {% for sk in r.skills %}
+        {{ m.skill_ring(sk, {'size': 70, 'hole': 50, 'ring': '#111111', 'track': '#b8b8b8',
+           'hole_bg': '#f7f7f5', 'ink': '#111111', 'pct_size': 13,
+           'name_css': 'font-family:Anton,sans-serif; font-weight:400; font-size:11px; letter-spacing:0.3px; text-transform:uppercase; color:#111111; text-align:center; line-height:1.15;',
+           'level_css': 'font-size:9px; color:#5f5f5f; text-align:center;'}) }}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

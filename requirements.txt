@@ -1,0 +1,27 @@
+# Install:  venv/Scripts/python -m pip install -r requirements.txt
+# If pip hits SSL cert errors in this environment, add:
+#   --trusted-host pypi.org --trusted-host files.pythonhosted.org
+# After install:  venv/Scripts/python -m playwright install chromium
+
+Flask>=3.0
+jsonschema>=4.20
+Pillow>=10.0
+docxtpl>=0.18
+python-docx>=1.1
+playwright>=1.47
+
+# The AI writing assistant (app/assist.py). Optional at runtime: with no
+# ANTHROPIC_API_KEY set the feature answers 503 and the rest of the app is
+# unaffected, which is how it ships until Stage 3 turns payment on.
+anthropic>=1.5
+
+# The production WSGI server. Flask's built-in one is single-threaded and
+# explicitly not for deployment. See the Dockerfile for why this runs ONE
+# worker with threads rather than several workers: the PDF admission
+# semaphore in app/limits.py is per-process, so extra workers multiply the
+# real concurrency cap instead of respecting it.
+gunicorn>=23.0
+
+# dev
+pytest>=8.0
+ruff>=0.6

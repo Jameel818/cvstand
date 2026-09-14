@@ -1,0 +1,29 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+instance/
+data/resume.json
+data/uploads/
+*.pdf
+*.docx
+!word_masters/*.docx
+.DS_Store
+tests/e2e/artifacts/
+junit.xml
+
+# Accounts database - local state, and it would be a credential leak in a
+# public repo (scrypt hashes, but still every registered address).
+data/*.db
+
+# Deployment secrets. NEVER commit a real SECRET_KEY or ANTHROPIC_API_KEY.
+.env
+.env.*
+!.env.example
+
+# Build / CI artifacts
+junit_e2e.xml
+screenshots/
+*.PNG
+!app/static/**/*.png

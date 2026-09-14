@@ -1,0 +1,112 @@
+{# ATS Template 16 — Fraunces Stack · single column · double-rule heads, terracotta accent
+   Ported from block <!-- 16 --> / id="t16" of "ATS Resume Templates Coded.dc.html".
+   ATS-safe invariants (16-25): single linear column, source order = reading
+   order; canonical single-word headings only; label tracking <= 1.2px; every
+   skill row is "name — Level" with a real em-dash as selectable text; date ranges
+   use a plain hyphen. Locked spec: ink #1A1714, terracotta #A6462B, rule #C9BFB6,
+   tint #5B534C. Fraunces 700 for the 44px name, metric numerals and section
+   labels (13px / 1.2px); Source Sans 3 body. Each head is a 2px-over-1px double
+   rule.
+
+   Divergences from ref (Fraunces masthead reference):
+     1. Palette locked to ink #1A1714 + terracotta #A6462B.
+     2. Type — Fraunces + Source Sans 3.
+     3. Contact on one line, pipe-separated.
+     4. Ref ends at Certifications; Tools and Languages, when present, get their
+        own canonical single-word sections (no combined labels, per invariants).
+     5. Section gap 14->10, head padding 6->4 / margin 9->6 to seat the shared
+        sample once Tools + Languages are added as their own sections. #}
+{% macro dh(label) %}
+<div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:4px 0; margin-bottom:6px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">{{ label }}</span></div>
+{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:42px 64px; display:flex; flex-direction:column; gap:10px; font-family:'Source Sans 3',sans-serif; color:#1A1714;">
+
+  <div>
+    <div style="font-family:Fraunces,serif; font-weight:700; font-size:44px; line-height:1.04;">{{ r.name }}</div>
+    {% if r.title %}<div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#A6462B; margin-top:8px;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
+    {% if bits %}<div style="font-size:12px; color:#5B534C; margin-top:8px; line-height:1.6;">{{ bits | join(" | ") }}</div>{% endif %}
+  </div>
+
+  {% if r.summary %}
+  <div>{{ dh(t("Summary")) }}
+    <p style="margin:0; font-size:12px; line-height:1.5;">{{ r.summary }}</p>
+  </div>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div>{{ dh(t("Key Achievements")) }}
+    <div style="font-size:12px; line-height:1.55;">
+      {% for a in r.achievements %}
+      <div><span style="font-family:Fraunces,serif; font-weight:700; color:#A6462B;">{{ a.metric }}</span> — {{ a.label }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div>{{ dh(t("Experience")) }}
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      {% for job in r.experience %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">{{ job.role }}</span>
+          {% if job.start or job.end %}<span style="font-size:11.5px; color:#5B534C; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} - {% endif %}{{ job.end }}</span>{% endif %}
+        </div>
+        {% if job.company or job.location %}<div style="font-size:12px; color:#A6462B; margin:2px 0 4px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
+        {% if job.bullets %}
+        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.55;">
+          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div>{{ dh(t("Skills")) }}
+    <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+      {% for sk in r.skills %}
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700; color:#A6462B;">— {{ sk.level }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.education %}
+  <div>{{ dh(t("Education")) }}
+    <div style="font-size:12px; line-height:1.55;">
+      {% for ed in r.education %}
+      <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} - {% endif %}{{ ed.end }}{% endif %}{% if ed.gpa %} · {{ t('GPA') }} {{ ed.gpa }}{% endif %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.recognition %}
+  <div>{{ dh(t("Certifications")) }}
+    <div style="font-size:12px; line-height:1.55;">
+      {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.tools %}
+  <div>{{ dh(t("Tools")) }}
+    <div style="font-size:12px; line-height:1.55;">{{ r.tools | join(" · ") }}</div>
+  </div>
+  {% endif %}
+
+  {% if r.languages %}
+  <div>{{ dh(t("Languages")) }}
+    <div style="font-size:12px; line-height:1.55;">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
+  </div>
+  {% endif %}
+</div>

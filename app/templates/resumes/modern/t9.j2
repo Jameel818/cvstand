@@ -1,0 +1,157 @@
+{# Modern Template 9 — Boxed Sections · two-column · yellow boxed-section rail, boxed entries
+   Ported from block <!-- 9 --> / id="t9" of "Resume Templates Coded.dc.html".
+   Locked spec: yellow rail #FFDE00 with all-black type #000000 on white; one
+   Archivo family; 252px centred rail where every section is a 2px-outlined box
+   with its label straddling the box top (900/15px, 2px bottom rule); right column
+   of 900/34px display heads where every entry group sits in a 1px hairline box,
+   dates right-aligned in the entry row; a quantified stat band (2px top / 1px
+   bottom) opens the body; the closing Technical box holds a 2-col bar grid.
+   Bars: track #E4E4E4, fill #000000, level word as real selectable text.
+
+   Divergences from ref L (boxed-section sidebar + boxed body entries):
+     1. Palette — yellow #FFDE00 rail, all-black type, not navy/white + blue bars.
+     2. Type — one Archivo family, not a display/body pairing.
+     3. Rail content centred, not left-set; a quantified stat band opens the body;
+        bars carry a banded level word as real selectable text.
+     4. The reference's separate "Awards" and "Certifications" rail boxes collapse
+        to one "Awards" box fed by r.recognition (the data model carries a single
+        recognition list); the Technical box renders one flat r.skills loop across
+        a 2-col grid rather than two hand-labelled sub-columns.
+     5. Right-column section gap 44->16 to seat the shared dense sample (3 roles,
+        5 skills) on one fixed 1100px page. #}
+{% set SIDE_HEAD = "font-weight:900; font-size:15px; letter-spacing:1.4px; text-transform:uppercase; border-bottom:2px solid #000000; padding:4px 10px;" %}
+{% set SIDE_BODY = "font-weight:700; font-size:13.9px; line-height:1.5; overflow-wrap:anywhere; padding:6px 10px 8px;" %}
+{% set RH = "font-weight:900; font-size:34px; line-height:1; letter-spacing:-0.8px; text-transform:uppercase; margin-bottom:9px;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:26px; font-family:Archivo,sans-serif; color:#000000; display:flex;">
+
+  <div style="box-sizing:border-box; width:252px; flex-shrink:0; background:#FFDE00; padding:30px 20px 26px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:10px;">
+
+    <div>
+      {% set nm = r.name.split(" ", 1) %}
+      <div style="font-weight:900; font-size:40px; line-height:0.96; letter-spacing:-1px; text-transform:uppercase;">{{ nm[0] }}{% if nm|length > 1 %}<br>{{ nm[1] }}{% endif %}</div>
+      {% if r.title %}<div style="font-weight:700; font-size:14px; letter-spacing:1.6px; text-transform:uppercase; margin-top:8px;">{{ r.title }}</div>{% endif %}
+    </div>
+
+    {% set c = r.contact %}
+    {% if c.phone or c.email or c.site or c.address or c.social %}
+    <div style="width:100%; border:2px solid #000000;">
+      <div style="{{ SIDE_HEAD }}">{{ t('Contact') }}</div>
+      <div style="{{ SIDE_BODY }} line-height:1.45;">
+        {% if c.phone %}<div style="font-weight:700;">{{ t('Phone') }}</div><div>{{ c.phone }}</div>{% endif %}
+        {% if c.email %}<div style="font-weight:700; margin-top:6px;">{{ t('Email') }}</div><div>{{ c.email }}</div>{% endif %}
+        {% if c.site %}<div style="font-weight:700; margin-top:6px;">{{ t('Portfolio') }}</div><div>{{ c.site }}</div>{% endif %}
+        {% if c.address %}<div style="font-weight:700; margin-top:6px;">{{ t('Location') }}</div><div>{{ c.address }}</div>{% endif %}
+        {% for s in c.social %}{% if s.label %}<div style="font-weight:700; margin-top:6px;">{{ s.label }}</div>{% endif %}{% if s.url %}<div>{{ s.url }}</div>{% endif %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div style="width:100%; border:2px solid #000000;">
+      <div style="{{ SIDE_HEAD }}">{{ t('Skills') }}</div>
+      <div style="{{ SIDE_BODY }}">{{ r.skills | map(attribute='name') | br_join }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.recognition %}
+    <div style="width:100%; border:2px solid #000000;">
+      <div style="{{ SIDE_HEAD }}">{{ t('Awards') }}</div>
+      <div style="{{ SIDE_BODY }} line-height:1.4;">
+        {% for rec in r.recognition %}
+        <div style="font-weight:700;{% if not loop.first %} margin-top:7px;{% endif %}">{{ rec.title }}</div>
+        {% if rec.detail %}<div>{{ rec.detail }}</div>{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.tools %}
+    <div style="width:100%; border:2px solid #000000;">
+      <div style="{{ SIDE_HEAD }}">{{ t('Tools') }}</div>
+      <div style="{{ SIDE_BODY }}">{{ r.tools | join(" · ") }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.languages %}
+    <div style="width:100%; border:2px solid #000000;">
+      <div style="{{ SIDE_HEAD }}">{{ t('Languages') }}</div>
+      <div style="{{ SIDE_BODY }}">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div style="box-sizing:border-box; flex:1; min-width:0; padding-block: 30px 26px; padding-inline: 30px 12px; display:flex; flex-direction:column; gap:16px;">
+
+    {% if r.summary %}
+    <div>
+      <div style="{{ RH }}">{{ t('Summary') }}</div>
+      <div style="border:1px solid #000000; padding:11px 14px; font-size:12.5px; line-height:1.55;">{{ r.summary }}</div>
+    </div>
+    {% endif %}
+
+    {% if r.achievements %}
+    <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px; border-top:2px solid #000000; border-bottom:1px solid #000000; padding:10px 0;">
+      {% for a in r.achievements %}
+      <div>
+        <div style="font-weight:900; font-size:23px; line-height:1;">{{ a.metric }}</div>
+        <div style="font-size:8.5px; font-weight:700; letter-spacing:0.9px; text-transform:uppercase; margin-top:4px;">{{ a.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.experience %}
+    <div>
+      <div style="{{ RH }}">{{ t('Experience') }}</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for job in r.experience %}
+        <div style="border:1px solid #000000; padding:11px 14px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+            <span style="font-weight:900; font-size:14.5px; letter-spacing:0.3px; text-transform:uppercase;">{{ job.company or job.role }}</span>
+            {% if job.start or job.end %}<span style="font-size:11px; font-weight:600; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+          </div>
+          {% if job.company %}<div style="font-weight:700; font-size:13px; margin:1px 0 5px;">{{ job.role }}{% if job.location %} · {{ job.location }}{% endif %}</div>{% elif job.location %}<div style="font-weight:700; font-size:13px; margin:1px 0 5px;">{{ job.location }}</div>{% endif %}
+          {% if job.bullets %}
+          <ul style="margin:0; padding-inline-start:16px; font-size:12px; line-height:1.5;">
+            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.education %}
+    <div>
+      <div style="{{ RH }}">{{ t('Education') }}</div>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        {% for ed in r.education %}
+        <div style="border:1px solid #000000; padding:9px 14px; display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span><span style="font-weight:900; font-size:13.5px;">{{ ed.degree }}</span>{% if ed.school %}<br><span style="font-size:12px;">{{ ed.school }}</span>{% endif %}{% if ed.gpa %}<br><span style="font-size:12px;">{{ t('GPA') }} {{ ed.gpa }}</span>{% endif %}</span>
+          {% if ed.start or ed.end %}<span style="font-size:11px; font-weight:600; white-space:nowrap;">{{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}</span>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div>
+      <div style="{{ RH }}">{{ t('Technical') }}</div>
+      <div style="border:1px solid #000000; padding:12px 14px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 22px;">
+        {% for sk in r.skills %}
+        {% set _pc = sk.get('percent') %}
+        {% set pct = _pc if _pc is not none else (sk.dots / sk.dot_total * 100) | round | int %}
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:11.5px;"><span>{{ sk.name }}</span><span style="font-weight:700; font-size:10px;">{{ (_pc ~ '%') if _pc is not none else sk.level }}</span></div>
+          {% if sk.level or _pc is not none %}<div style="height:7px; background:#E4E4E4; border-radius:999px; overflow:hidden; margin-top:4px;"><div style="height:100%; border-radius:999px; width:{{ pct }}%; background:#000000;"></div></div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>

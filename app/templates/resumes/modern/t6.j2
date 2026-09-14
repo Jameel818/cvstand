@@ -1,0 +1,133 @@
+{# Modern Template 6 — Centred Symmetric · centred header, 50/50 body, bar levels
+   Ported from block <!-- 6 --> / id="t6" of "Resume Templates Coded.dc.html".
+   Locked spec: ink #1A1A1A + copper #9C5A2A on white; Poppins 700 for the name,
+   stat numerals and section labels, Source Sans 3 body. Centred name (46px,
+   5px tracking) over a rule-bounded copper role line; a 3-chip quantified band;
+   a centred full-width summary under a #D5D2CE hairline; then a symmetric two-
+   column body split by a centre hairline, section heads centred-weight over
+   1px #1A1A1A rules. Skill bars: track #E6E3DF, fill #9C5A2A, level word as
+   real selectable text.
+
+   Divergences from ref H (centred serif-register header, symmetric columns):
+     1. Palette — ink #1A1A1A + copper #9C5A2A on white, not black on cream.
+     2. Type — Poppins 700 + Source Sans 3, not a display serif.
+     3. Skills gain banded level words as real text; a 3-chip quantified band
+        precedes the summary.
+     4. The data model carries one metrics list and one recognition list, so the
+        left column runs Experience / Recognition / Systems(=tools) and the right
+        runs Skills / Education / Languages — a 3-and-3 split, not the reference's
+        bespoke section set. Certifications as a distinct block is dropped
+        (folded into Recognition).
+     5. Left column gap 48->22 and right gap 38->18 to seat the shared dense
+        sample on one fixed 1100px page. #}
+{% set SH = "font-family:Poppins,sans-serif; font-weight:700; font-size:14px; letter-spacing:2.6px; text-transform:uppercase; border-bottom:1px solid #1A1A1A; padding-bottom:8px; margin-bottom:13px;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 56px 48px; font-family:'Source Sans 3',sans-serif; color:#1A1A1A; display:flex; flex-direction:column; gap:18px;">
+
+  <div style="text-align:center;">
+    <div style="font-family:Poppins,sans-serif; font-weight:700; font-size:46px; line-height:1.05; letter-spacing:5px; text-transform:uppercase;">{{ r.name }}</div>
+    {% if r.title %}<div style="border-top:1px solid #1A1A1A; border-bottom:1px solid #1A1A1A; margin-top:14px; padding:9px 0; font-size:14px; letter-spacing:5.4px; text-transform:uppercase; color:#9C5A2A;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
+    {% if bits %}<div style="font-size:12px; letter-spacing:0.4px; color:#4A4A4A; margin-top:12px;">{{ bits | join(" · ") }}</div>{% endif %}
+  </div>
+
+  {% if r.achievements %}
+  <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; text-align:center;">
+    {% for a in r.achievements %}
+    <div>
+      <div style="font-family:Poppins,sans-serif; font-weight:700; font-size:28px; line-height:1; color:#9C5A2A;">{{ a.metric }}</div>
+      <div style="font-size:9px; letter-spacing:1.3px; font-weight:700; text-transform:uppercase; color:#5A5A5A; margin-top:6px;">{{ a.label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if r.summary %}
+  <div style="border-top:1px solid #D5D2CE; padding-top:18px; font-size:12.5px; line-height:1.7; color:#2E2E2E; text-align:center;">{{ r.summary }}</div>
+  {% endif %}
+
+  <div style="flex:1; min-width:0; display:flex; gap:34px;">
+
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:22px;">
+      {% if r.experience %}
+      <div>
+        <div style="{{ SH }}">{{ t('Experience') }}</div>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          {% for job in r.experience %}
+          <div>
+            <div style="font-family:Poppins,sans-serif; font-weight:700; font-size:14.5px;">{{ job.role }}</div>
+            {% if job.company or job.location or job.start or job.end %}
+            <div style="font-size:12px; color:#9C5A2A; margin:2px 0;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}{% if (job.company or job.location) and (job.start or job.end) %} · {% endif %}{{ job.start }}{% if job.start and job.end %} — {% endif %}{{ job.end }}</div>
+            {% endif %}
+            {% if job.bullets %}
+            <ul style="margin:6px 0 0; padding-inline-start:16px; font-size:12.5px; line-height:1.6; color:#333333;">
+              {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if r.recognition %}
+      <div>
+        <div style="{{ SH }}">{{ t('Recognition') }}</div>
+        <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.6; color:#333333;">
+          {% for rec in r.recognition %}<li>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if r.tools %}
+      <div>
+        <div style="{{ SH }}">{{ t('Systems') }}</div>
+        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px 18px; font-size:12.5px; color:#333333;">
+          {% for tool in r.tools %}<div>{{ tool }}</div>{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div style="flex:1; min-width:0; border-inline-start:1px solid #D5D2CE; padding-inline-start:34px; display:flex; flex-direction:column; gap:18px;">
+      {% if r.skills %}
+      <div>
+        <div style="{{ SH }}">{{ t('Skills') }}</div>
+        <div style="display:flex; flex-direction:column; gap:11px;">
+          {% for sk in r.skills %}
+          {% set _pc = sk.get('percent') %}
+          {% set pct = _pc if _pc is not none else (sk.dots / sk.dot_total * 100) | round | int %}
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12.5px;"><span style="font-weight:600;">{{ sk.name }}</span><span style="font-size:10.5px; color:#5A5A5A;">{{ (_pc ~ '%') if _pc is not none else sk.level }}</span></div>
+            {% if sk.level or _pc is not none %}<div style="height:8px; border-radius:999px; background:#E6E3DF; margin-top:5px; overflow:hidden;"><div style="height:100%; width:{{ pct }}%; border-radius:999px; background:#9C5A2A;"></div></div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if r.education %}
+      <div>
+        <div style="{{ SH }}">{{ t('Education') }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.5;">
+          {% for ed in r.education %}
+          <div><b>{{ ed.degree }}</b>{% if ed.school or ed.start or ed.end %}<br><span style="color:#5A5A5A;">{{ ed.school }}{% if ed.school and (ed.start or ed.end) %} · {% endif %}{{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}</span>{% endif %}{% if ed.gpa %}<br><span style="color:#5A5A5A;">{{ t('GPA') }} {{ ed.gpa }}</span>{% endif %}</div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if r.languages %}
+      <div>
+        <div style="{{ SH }}">{{ t('Languages') }}</div>
+        <div style="font-size:12.5px; line-height:1.7; color:#333333;">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,43 @@
+# Keep the build context small and keep local state out of the image.
+#
+# CAREFUL: `data/` is NOT excluded wholesale. It holds the two showcase
+# samples the landing hero and gallery render (sample_resume.json,
+# sample_resume_ar.json), which are shipped content, not local state. Only the
+# working document and the local accounts database are excluded below.
+
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Local state, not shipped content.
+data/resume.json
+data/uploads/
+data/*.db
+
+# Tests and their artifacts. The image runs the app, not the suite.
+tests/
+junit.xml
+junit_e2e.xml
+screenshots/
+tools/
+
+# Design sources and working documents -- large, and not served.
+*.dc.html
+*.md
+uploads/
+design_handoff_resume_templates/
+outreach/
+references/
+word_masters/~$*
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+.git/
+.gitignore
+*.PNG
+*.png
+!app/static/**/*.png

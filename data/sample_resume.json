@@ -1,0 +1,76 @@
+{
+  "name": "Wren Ashworth",
+  "title": "Creative Lead",
+  "photo_url": "",
+  "summary": "Creative lead building brand systems that survive handover — fourteen designers, four launches, one set of rules everyone can follow.",
+  "summary_highlight": "survive handover",
+  "contact": {
+    "email": "wren.ashworth@examplemail.com",
+    "phone": "555-0138-64",
+    "address": "Portside",
+    "site": "wrenashworth.example.com",
+    "social": []
+  },
+  "achievements": [
+    { "metric": "14", "label": "Designers led" },
+    { "metric": "4", "label": "Brand systems shipped" },
+    { "metric": "$3.2M", "label": "Production budget" },
+    { "metric": "2×", "label": "Industry awards" }
+  ],
+  "experience": [
+    {
+      "company": "Halden & Row",
+      "role": "Creative Lead",
+      "location": "Portside",
+      "start": "2021",
+      "end": "Present",
+      "bullets": [
+        "Runs a fourteen-person studio across brand, editorial and motion; owns the annual $3.2M production budget.",
+        "Replaced four divergent sub-brands with one documented system, cutting new-campaign setup from three weeks to four days.",
+        "Presents creative strategy to the executive group each quarter and defends the roadmap against it."
+      ]
+    },
+    {
+      "company": "Bellrock Studio",
+      "role": "Design Director",
+      "location": "Northfield",
+      "start": "2017",
+      "end": "2021",
+      "bullets": [
+        "Built the studio's first design-system practice and hired the six people who ran it.",
+        "Led two national campaign launches end to end, both delivered inside budget."
+      ]
+    },
+    {
+      "company": "Kiln Press",
+      "role": "Senior Designer",
+      "location": "Northfield",
+      "start": "2014",
+      "end": "2017",
+      "bullets": [
+        "Art-directed long-form editorial to a weekly press deadline."
+      ]
+    }
+  ],
+  "recognition": [
+    { "title": "Brand System of the Year", "detail": "Portside Design Awards, 2024" },
+    { "title": "Editorial Redesign, Gold", "detail": "Northfield Print Guild, 2019" }
+  ],
+  "education": [
+    { "school": "Harbour School of Art", "degree": "MA Visual Communication", "start": "", "end": "2014", "gpa": "", "bullets": [] },
+    { "school": "Northfield University", "degree": "BA Graphic Design", "start": "", "end": "2012", "gpa": "", "bullets": [] }
+  ],
+  "skills": [
+    { "name": "Brand Systems", "level": "Expert" },
+    { "name": "Team Leadership", "level": "Expert" },
+    { "name": "Art Direction", "level": "Advanced" },
+    { "name": "Budget Ownership", "level": "Advanced" },
+    { "name": "Motion Direction", "level": "Proficient" }
+  ],
+  "tools": ["Figma", "InDesign", "Illustrator", "After Effects", "Notion", "Keynote"],
+  "languages": [
+    { "name": "English", "level": "Native" },
+    { "name": "German", "level": "Fluent" }
+  ],
+  "references": []
+}

@@ -1,0 +1,96 @@
+{# ATS Template 1 — Tech Lead · single column · dot-grid levels
+   Ported from block <!-- 1 --> / id="t1" of "ATS Resume Templates Coded.dc.html".
+   Locked spec: ink #0F172A, signal blue #2563EB, rule #64748B, Archivo + IBM Plex
+   Mono (mono for contact / metric numerals / stack / dates only). ATS-safe:
+   single column, rule-to-margin heads, dot-grid skill levels as real text. #}
+{% import "_macros.j2" as m %}
+{% set MONO = "font-family:'IBM Plex Mono',monospace;" %}
+{% macro head(label) %}{{ m.rule_head(label, {'label_css': 'font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;', 'rule': '#64748B'}) }}{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 56px; display:flex; flex-direction:column; gap:25px; font-family:Archivo,sans-serif; color:#0F172A;">
+
+  <div style="border-bottom:2px solid #0F172A; padding-bottom:14px;">
+    <div style="font-weight:900; font-size:44px; line-height:1; letter-spacing:-0.5px;">{{ r.name }}</div>
+    {% if r.title %}<div style="font-weight:700; font-size:14px; letter-spacing:2px; color:#2563EB; margin-top:9px; text-transform:uppercase;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% if bits %}<div style="{{ MONO }} font-size:11.5px; color:#64748B; line-height:1.7; margin-top:10px;">{{ bits | join(" | ") }}</div>{% endif %}
+  </div>
+
+  {% if r.summary %}
+  <div>{{ head(t("SUMMARY")) }}
+    <p style="font-size:12.5px; line-height:1.6; margin:0;">{{ r.summary }}</p>
+  </div>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div>{{ head(t("KEY ACHIEVEMENTS")) }}
+    <div style="font-size:12px; line-height:1.8;">
+      {% for a in r.achievements %}<div><span style="{{ MONO }} font-weight:600; color:#2563EB;">{{ a.metric }}</span> — {{ a.label }}</div>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div>{{ head(t("EXPERIENCE")) }}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      {% for job in r.experience %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:14px;">{{ job.role }}</span>
+          {% if job.start or job.end %}<span style="{{ MONO }} font-size:11px; color:#64748B; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+        </div>
+        {% if job.company or job.location %}<div style="font-size:12px; color:#475569; margin:2px 0 4px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
+        {% if job.bullets %}
+        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.55;">
+          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div>{{ head(t("SKILLS")) }}
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+      {% for sk in r.skills %}
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span style="width:210px; flex-shrink:0;">{{ sk.name }}</span>
+        <span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">{{ sk.level }}</span>
+        {% if sk.level %}
+        <span style="display:flex; gap:4px;">
+          {% for i in range(sk.dot_total) %}
+          {% if i < sk.dots %}<span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span>
+          {% else %}<span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span>{% endif %}
+          {% endfor %}
+        </span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.tools %}
+  <div>{{ head(t("TECHNICAL STACK")) }}
+    <p style="margin:0; {{ MONO }} font-size:11.5px; line-height:1.85; color:#0F172A;">
+      {%- for t in r.tools -%}<span style="white-space:nowrap;">{{ t }}</span>{% if not loop.last %} · {% endif %}{%- endfor -%}
+    </p>
+  </div>
+  {% endif %}
+
+  {% if r.education or r.recognition %}
+  <div>{{ head(t("EDUCATION AND CERTIFICATIONS")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for ed in r.education %}
+      <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}</div>
+      {% endfor %}
+      {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>

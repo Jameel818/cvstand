@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F2F2F0; }
+  a { color:#16161A; }
+  a:hover { color:#6E6E78; }
+</style>
+</helmet>
+
+<div style="box-sizing:border-box; width:900px; margin:0 auto; background:#ffffff; padding:64px 72px 72px; font-family:Archivo,sans-serif; color:#16161A;">
+
+  <div style="border-bottom:2px solid #16161A; padding-bottom:22px; margin-bottom:40px;">
+    <div style="font-size:10px; font-weight:700; letter-spacing:2.4px; text-transform:uppercase; color:#6E6E78;">Resume build · data contract</div>
+    <div style="font-weight:900; font-size:44px; line-height:1.02; letter-spacing:-1.4px; margin-top:12px;">The Scope section</div>
+    <div style="font-size:15px; line-height:1.55; color:#3A3A42; margin-top:14px; max-width:62ch; text-wrap:pretty;">User-curated, machine-assisted. The builder proposes chips parsed from experience bullets; the user promotes, edits or rejects them. All 23 Scope rows across the template set are now count-agnostic — this page is the render contract for the Jinja port.</div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:44px;">
+
+    <div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#B0562F;">01</span>
+        <span style="font-weight:900; font-size:21px; letter-spacing:-0.3px;">Schema</span>
+      </div>
+      <div style="font-size:14px; line-height:1.6; color:#3A3A42; margin-bottom:16px; max-width:62ch; text-wrap:pretty;">Keep <span style="font-family:'JetBrains Mono',monospace; font-size:13px; background:#F2F2F0; padding:1px 5px;">metric</span> a string. <span style="font-family:'JetBrains Mono',monospace; font-size:13px;">"$4.1M"</span>, <span style="font-family:'JetBrains Mono',monospace; font-size:13px;">"95%"</span> and <span style="font-family:'JetBrains Mono',monospace; font-size:13px;">"2×"</span> carry formatting the user chose. Storing <span style="font-family:'JetBrains Mono',monospace; font-size:13px;">4100000</span> and formatting at render means owning currency, locale and rounding decisions you do not need to own.</div>
+      <div style="background:#16161A; color:#E8E8E6; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.75; padding:20px 24px; white-space:pre; overflow-x:auto;">achievements: [
+  &#123; metric: "$4.1M", label: "Budget owned" &#125;,
+  &#123; metric: "12",    label: "Team led"     &#125;,
+  &#123; metric: "9",     label: "Markets"      &#125;,
+  &#123; metric: "95%",   label: "Retention"    &#125;
+]</div>
+    </div>
+
+    <div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:6px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#B0562F;">02</span>
+        <span style="font-weight:900; font-size:21px; letter-spacing:-0.3px;">Degrade ladder</span>
+      </div>
+      <div style="font-size:14px; line-height:1.6; color:#3A3A42; margin-bottom:24px; max-width:62ch; text-wrap:pretty;">Columns are derived from the surviving chip count, not fixed at four. Live renders below — same markup, different array length.</div>
+
+      <div style="display:flex; flex-direction:column; gap:26px;">
+
+        <div>
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#6E6E78; margin-bottom:9px;">Four chips</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;">
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">$4.1M</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">12</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Team led</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">9</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Markets</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">95%</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Retention</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#6E6E78; margin-bottom:9px;">Three — spreads, no hole at the right edge</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;">
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">$4.1M</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">12</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Team led</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">95%</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Retention</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#6E6E78; margin-bottom:9px;">Two</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;">
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">$4.1M</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">95%</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Retention</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#6E6E78; margin-bottom:9px;">One — still legitimate, reads as a headline figure</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;">
+            <div><div style="font-weight:900; font-size:30px; line-height:1;">$4.1M</div><div style="font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#6E6E78; margin-bottom:9px;">Zero — section removed entirely, rules included</div>
+          <div style="border:1px dashed #C8C8CC; padding:15px 18px; font-size:12.5px; color:#8A8A92; font-style:italic;">Nothing renders. No hairline, no padding, no residual gap — the summary closes straight into Experience.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#B0562F;">03</span>
+        <span style="font-weight:900; font-size:21px; letter-spacing:-0.3px;">Jinja</span>
+      </div>
+      <div style="background:#16161A; color:#E8E8E6; font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.75; padding:20px 24px; white-space:pre; overflow-x:auto;">&#123;%- set chips = achievements | selectattr("metric") | list | batch(4) | first -%&#125;
+&#123;%- if chips -%&#125;
+&lt;div class="cv-scope" style="display:grid; grid-auto-flow:column;
+     grid-auto-columns:minmax(0,1fr); gap:18px;
+     border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA;
+     padding:16px 0;"&gt;
+  &#123;%- for c in chips %&#125;
+  &lt;div class="cv-scope-chip"&gt;
+    &lt;div class="cv-scope-metric"&gt;{<span></span>{ c.metric }<span></span>}&lt;/div&gt;
+    &lt;div class="cv-scope-label"&gt;{<span></span>{ c.label }<span></span>}&lt;/div&gt;
+  &lt;/div&gt;
+  &#123;%- endfor %&#125;
+&lt;/div&gt;
+&#123;%- endif -%&#125;</div>
+      <div style="font-size:13.5px; line-height:1.6; color:#3A3A42; margin-top:14px; max-width:62ch; text-wrap:pretty;"><span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; background:#F2F2F0; padding:1px 5px;">selectattr("metric")</span> drops empty chips before the count is taken, so the column count is always the surviving count. <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; background:#F2F2F0; padding:1px 5px;">batch(4) | first</span> caps the render at four — five breaks the row on every template in the set.</div>
+    </div>
+
+    <div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#B0562F;">04</span>
+        <span style="font-weight:900; font-size:21px; letter-spacing:-0.3px;">The defect this prevents</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px;">
+        <div style="border:1px solid #D6D6DA; padding:18px 20px 20px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#B0562F; margin-bottom:14px;">Major finding</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:14px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:14px 0;">
+            <div><div style="font-weight:900; font-size:26px; line-height:1;">$4.1M</div><div style="font-size:8.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+            <div><div style="font-weight:900; font-size:26px; line-height:1; color:#D6D6DA;">—</div><div style="font-size:8.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Team led</div></div>
+            <div><div style="font-weight:900; font-size:26px; line-height:1;">95%</div><div style="font-size:8.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Retention</div></div>
+          </div>
+          <div style="font-size:12.5px; line-height:1.55; color:#3A3A42; margin-top:14px; text-wrap:pretty;">A caption with no number. The single most common defect in this pattern — it reads as missing data rather than as design.</div>
+        </div>
+        <div style="border:1px solid #16161A; padding:18px 20px 20px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#16161A; margin-bottom:14px;">Correct</div>
+          <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:14px; border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:14px 0;">
+            <div><div style="font-weight:900; font-size:26px; line-height:1;">$4.1M</div><div style="font-size:8.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Budget owned</div></div>
+            <div><div style="font-weight:900; font-size:26px; line-height:1;">95%</div><div style="font-size:8.5px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; color:#6E6E78; margin-top:5px;">Retention</div></div>
+          </div>
+          <div style="font-size:12.5px; line-height:1.55; color:#3A3A42; margin-top:14px; text-wrap:pretty;">The chip is gone, the remaining two spread to fill. Nothing signals that anything was ever missing.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:16px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:#B0562F;">05</span>
+        <span style="font-weight:900; font-size:21px; letter-spacing:-0.3px;">Content rules for the builder</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0;">
+        <div style="display:grid; grid-template-columns:150px 1fr; gap:20px; border-top:1px solid #D6D6DA; padding:14px 0;">
+          <div style="font-weight:700; font-size:13px;">Mix the kinds</div>
+          <div style="font-size:13.5px; line-height:1.55; color:#3A3A42; text-wrap:pretty;">Budget, team and markets are <em>scope</em>; retention is <em>outcome</em>. Scope says how big the seat was, outcome says whether the person was good in it. An all-scope row reads as a job description.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:150px 1fr; gap:20px; border-top:1px solid #D6D6DA; padding:14px 0;">
+          <div style="font-weight:700; font-size:13px;">Corroborate</div>
+          <div style="font-size:13.5px; line-height:1.55; color:#3A3A42; text-wrap:pretty;">Every chip must reappear in an experience bullet. Recruiters look for the figure a second time, and this is the most commonly inflated element on any CV. Sourcing chips from bullets satisfies this by construction.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:150px 1fr; gap:20px; border-top:1px solid #D6D6DA; padding:14px 0;">
+          <div style="font-weight:700; font-size:13px;">Real text</div>
+          <div style="font-size:13.5px; line-height:1.55; color:#3A3A42; text-wrap:pretty;">Number and caption are selectable text, never baked into a graphic and never <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; white-space:nowrap;">::before &#123; content &#125;</span>. Pseudo-element content does not exist for a converter or an ATS parser.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:150px 1fr; gap:20px; border-top:1px solid #D6D6DA; border-bottom:1px solid #D6D6DA; padding:14px 0;">
+          <div style="font-weight:700; font-size:13px;">Seniority tell</div>
+          <div style="font-size:13.5px; line-height:1.55; color:#3A3A42; text-wrap:pretty;">Craft-output metrics — "847 mockups", "300 tickets closed" — signal the wrong level on a leadership CV. Reject them at input, not at review.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#16161A"/><text x="60" y="58" font-family="Archivo,sans-serif" font-weight="900" font-size="26" fill="#ffffff" text-anchor="middle">$4.1M</text><text x="60" y="76" font-family="Archivo,sans-serif" font-weight="700" font-size="8" letter-spacing="1.6" fill="#8A8A92" text-anchor="middle">SCOPE</text></svg>
+</template>
+</x-dc>
+</body>
+</html>

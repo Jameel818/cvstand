@@ -1,0 +1,114 @@
+{# ATS Template 14 — Numbered · single column · numbered sections, rust accent, flush-left
+   Ported from block <!-- 14 --> / id="t14" of "ATS Resume Templates Coded.dc.html".
+   Locked spec: ink #181614, rust #B93E12, tint #57524E. Archivo Narrow 700 for
+   the name, section numbers ("01"..) and labels (14px / 2.4px) and the metric
+   numerals; Source Sans 3 body. A 3x74px rust bar under the header. Every
+   section opens "NN  LABEL"; skills are "name  Level" rows, level bold rust —
+   real text, no graphic. ATS-safe: one column, no fills.
+
+   Divergences from ref (numbered-sections reference):
+     1. Palette locked to ink #181614 + rust #B93E12.
+     2. Type — Archivo Narrow + Source Sans 3.
+     3. Contact on one line, pipe-separated.
+     4. Section numbers are computed from the sections actually present, so they
+        stay contiguous when optional blocks are absent.
+     5. Ref ends at Education; Certifications (r.recognition), Tools and Languages,
+        when present, share one final numbered block (dynamic label, one line
+        each). #}
+{% set ns = namespace(n=0) %}
+{% macro sec(label) %}
+{% set ns.n = ns.n + 1 %}
+<div style="display:flex; align-items:baseline; gap:11px; margin-bottom:8px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">{{ '%02d' % ns.n }}</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">{{ label }}</span></div>
+{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 64px; display:flex; flex-direction:column; gap:16px; font-family:'Source Sans 3',sans-serif; color:#181614;">
+
+  <div>
+    <div style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:46px; line-height:1.02; letter-spacing:-0.4px; text-transform:uppercase;">{{ r.name }}</div>
+    {% if r.title %}<div style="font-size:13.5px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#B93E12; margin-top:8px;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
+    {% if bits %}<div style="font-size:12px; color:#57524E; margin-top:9px; line-height:1.6;">{{ bits | join(" | ") }}</div>{% endif %}
+  </div>
+  <div style="height:3px; background:#B93E12; width:74px;"></div>
+
+  {% if r.summary %}
+  <div>
+    {{ sec(t("Summary")) }}
+    <p style="margin:0; font-size:12px; line-height:1.6;">{{ r.summary }}</p>
+  </div>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div>
+    {{ sec(t("Key Achievements")) }}
+    <div style="font-size:12px; line-height:1.75;">
+      {% for a in r.achievements %}
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#B93E12;">{{ a.metric }}</span> — {{ a.label }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div>
+    {{ sec(t("Experience")) }}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      {% for job in r.experience %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px;">{{ job.role }}</span>
+          {% if job.start or job.end %}<span style="font-size:11.5px; color:#57524E; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+        </div>
+        {% if job.company or job.location %}<div style="font-size:12px; color:#B93E12; margin:2px 0 4px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
+        {% if job.bullets %}
+        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.55;">
+          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div>
+    {{ sec(t("Skills")) }}
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      {% for sk in r.skills %}
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700; color:#B93E12;">{{ sk.level }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.education %}
+  <div>
+    {{ sec(t("Education")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for ed in r.education %}
+      <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}{% if ed.gpa %} · {{ t('GPA') }} {{ ed.gpa }}{% endif %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.recognition or r.tools or r.languages %}
+  <div>
+    {%- set labs = [] -%}
+    {% if r.recognition %}{% set _ = labs.append(t('Certifications')) %}{% endif %}
+    {% if r.tools %}{% set _ = labs.append(t('Tools')) %}{% endif %}
+    {% if r.languages %}{% set _ = labs.append(t('Languages')) %}{% endif %}
+    {{ sec(join_labels(labs)) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% if r.recognition %}<div>{% for rec in r.recognition %}{{ rec.title }}{% if rec.detail %} ({{ rec.detail }}){% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+      {% if r.tools %}<div>{{ r.tools | join(" · ") }}</div>{% endif %}
+      {% if r.languages %}<div>{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>

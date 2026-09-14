@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ brand_name }} — {{ t('designer résumés, done in minutes') }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">{{ t('Modern & ATS-friendly') }}</div>
+      <h1>{{ t('Your résumé,') }} <span class="accent">{{ t('designed') }}</span> {{ t('and done in minutes.') }}</h1>
+      <p class="hero-sub">{{ t('Fill in your details once. Switch between') }} {{ counts.modern + counts.ats }} {{ t('designer layouts, preview live, and export a pixel-perfect PDF or an editable Word file.') }}</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.builder') }}">{{ t("Start building — it's free") }}</a>
+        <a class="btn btn-lg" href="{{ url_for('main.templates_gallery') }}">{{ t('Browse templates') }}</a>
+      </div>
+      <div class="hero-trust">
+        <span>{{ counts.modern }} {{ t('Modern designs') }}</span>
+        <span>{{ counts.ats }} {{ t('ATS-safe designs') }}</span>
+        <span>{{ t('PDF + Word export') }}</span>
+        <span>{{ t('No sign-up') }}</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      {% for tpl in featured[:3] %}
+      <div class="hero-card"><iframe src="{{ url_for('main.preview', template_key=tpl.key, showcase=1) }}" title="" scrolling="no" loading="lazy"></iframe></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="stat-strip">
+  <ul>
+    <li><b>{{ counts.modern }}</b><span>{{ t('Modern layouts') }}</span></li>
+    <li><b>{{ counts.ats }}</b><span>{{ t('ATS-friendly layouts') }}</span></li>
+    <li><b>2</b><span>{{ t('Export formats') }}</span></li>
+    <li><b>1</b><span>{{ t('Content model, every design') }}</span></li>
+  </ul>
+</div>
+
+<section class="section" id="families">
+  <div class="section-head">
+    <div class="eyebrow">{{ t('Two families') }}</div>
+    <h2>{{ t('Pick the right tool for where the résumé is going.') }}</h2>
+    <p>{{ t('Every layout is fed by the same content, so you can move between them without redoing your work.') }}</p>
+  </div>
+  <div class="family-grid">
+    <a class="family-card" href="{{ url_for('main.templates_gallery', cat='modern') }}">
+      <span class="chip chip-modern"><span class="dot"></span>{{ t('Modern') }}</span>
+      <h3>{{ t('Colour, structure, personality') }}</h3>
+      <p>{{ t('Two-column designs with sidebars, photos, skill graphics and accent palettes. Built to be sent as a PDF and to stand out in a pile.') }}</p>
+      <div class="swatch"><i style="background:#4f46e5"></i><i style="background:#0f766e"></i><i style="background:#c8a24a"></i><i style="background:#c53030"></i><i style="background:#111"></i></div>
+      <span class="count">{{ counts.modern }} {{ t('layouts') }}</span> · <span class="arrow">{{ t('Explore Modern →') }}</span>
+    </a>
+    <a class="family-card" href="{{ url_for('main.templates_gallery', cat='ats') }}">
+      <span class="chip chip-ats"><span class="dot"></span>{{ t('ATS-Friendly') }}</span>
+      <h3>{{ t('Single column, parse-safe') }}</h3>
+      <p>{{ t('One clean column, canonical section headings, real text for every skill and level. Made to survive applicant-tracking systems and job-portal uploads.') }}</p>
+      <div class="swatch"><i style="background:#2563eb"></i><i style="background:#0d9488"></i><i style="background:#7c3aed"></i><i style="background:#b45309"></i><i style="background:#334155"></i></div>
+      <span class="count">{{ counts.ats }} {{ t('layouts') }}</span> · <span class="arrow">{{ t('Explore ATS →') }}</span>
+    </a>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="section-head">
+    <div class="eyebrow">{{ t('Why it works') }}</div>
+    <h2>{{ t("Everything you need to ship a résumé you're proud of.") }}</h2>
+  </div>
+  <div class="feature-grid">
+    <div class="feature"><div class="ic">◐</div><h3>{{ t('Live preview') }}</h3><p>{{ t('Every keystroke re-renders the page. What you see is exactly what exports.') }}</p></div>
+    <div class="feature"><div class="ic">⇄</div><h3>{{ t('One content model') }}</h3><p>{{ t('Type your experience once. Try it in any of the') }} {{ counts.modern + counts.ats }} {{ t('designs instantly.') }}</p></div>
+    <div class="feature"><div class="ic">✓</div><h3>{{ t('ATS-safe option') }}</h3><p>{{ t('The ATS family is single-column with parse-safe headings and selectable skill levels.') }}</p></div>
+    <div class="feature"><div class="ic">⤓</div><h3>{{ t('PDF & Word') }}</h3><p>{{ t('Pixel-accurate PDF from a real browser engine, plus an editable .docx.') }}</p></div>
+    <div class="feature"><div class="ic">◎</div><h3>{{ t('Photo support') }}</h3><p>{{ t("Drop in a headshot — it's cropped square and placed cleanly where the design expects it.") }}</p></div>
+    <div class="feature"><div class="ic">↺</div><h3>{{ t('Nothing to lose') }}</h3><p>{{ t('Your résumé is saved locally and reloads where you left off. No account, no upload.') }}</p></div>
+  </div>
+</section>
+
+<section class="section" id="how" style="padding-top:0">
+  <div class="section-head">
+    <div class="eyebrow">{{ t('Three steps') }}</div>
+    <h2>{{ t('From blank to finished in one sitting.') }}</h2>
+  </div>
+  <div class="steps">
+    <div class="step"><h3>{{ t('Add your details') }}</h3><p>{{ t('Work through the guided sections — contact, experience, skills, education. Add and reorder entries as you go.') }}</p></div>
+    <div class="step"><h3>{{ t('Choose a design') }}</h3><p>{{ t('Open the template drawer and switch families or layouts. Your content flows into each one automatically.') }}</p></div>
+    <div class="step"><h3>{{ t('Download') }}</h3><p>{{ t('Export a PDF for sending, or a Word file for portals that ask for one. Come back and tweak anytime.') }}</p></div>
+  </div>
+</section>
+
+<section class="section" id="faq" style="padding-top:0">
+  <div class="section-head"><div class="eyebrow">{{ t('Questions') }}</div><h2>{{ t('Good to know.') }}</h2></div>
+  <div class="faq">
+    <details><summary>{{ t('Which family should I use?') }}</summary><p>{{ t('Send a') }} <b>{{ t('Modern') }}</b> {{ t('layout as a PDF when a human will read it first — recruiters, referrals, portfolios. Use an') }} <b>{{ t('ATS-Friendly') }}</b> {{ t("layout when you're pasting into a job portal or know the résumé is machine-screened before anyone sees it.") }}</p></details>
+    <details><summary>{{ t('Is the Word export the same as the PDF?') }}</summary><p>{{ t("It preserves the palette, type pairing, section order and skill levels, but Word can't reproduce every visual detail (gradient rings become dot grids, some spacing shifts). The PDF is the pixel-accurate version.") }}</p></details>
+    <details><summary>{{ t('Do you store my résumé?') }}</summary><p>{{ t("No. It's a single-user tool — your data is a JSON file on this machine and never leaves it.") }}</p></details>
+    <details><summary>{{ t('Can I use my own photo?') }}</summary><p>{{ t("Yes, on the Modern layouts that include a photo. It's cropped to a square and resized on upload.") }}</p></details>
+  </div>
+</section>
+
+<div class="cta-band">
+  <div class="inner">
+    <h2>{{ t('Build your résumé now.') }}</h2>
+    <p>{{ t('No sign-up, no paywall. Open the builder, add your details, and download in minutes.') }}</p>
+    <a class="btn btn-lg" href="{{ url_for('main.builder') }}">{{ t('Open the builder') }}</a>
+  </div>
+</div>
+{% endblock %}

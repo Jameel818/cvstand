@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Montserrat:wght@400;500;600;700;800;900&family=Anton&family=Archivo+Narrow:wght@400;500;600;700&family=Archivo:wght@400;600;700;800;900&family=Source+Sans+3:wght@400;600;700;900&family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #eef0f2; font-family: 'Inter', sans-serif; }
+    .tpl { background: white; box-shadow: 0 8px 30px rgba(0,0,0,0.12); position: relative; overflow: hidden; }
+    a { color: inherit; }
+  </style>
+</helmet>
+
+<div style="padding:40px; display:flex; flex-direction:column; gap:56px; align-items:flex-start;">
+
+<div style="position:sticky; top:0; z-index:50; background:#eef0f2; padding-bottom:12px;">
+  <h1 style="font-family:Poppins,sans-serif; font-size:22px; margin:0 0 4px;">Resume Layout Directions — Coded Reference</h1>
+  <p style="color:#666; font-size:13px; margin:0; max-width:700px;">25 layouts at 850×1100px (US Letter @100dpi). Real HTML/CSS structure for porting to Flask/Jinja2 — colors/type shifted from any source material. Placeholder copy throughout. Templates 1–15 are the original set (previously 11, 12, 13, 21, 25, 26–35 — see references/claude-design-brief-portfolio-v1.md to reconcile older references). Templates 16–25 are new and additionally fix the three residual parse risks found in the 1–15 audit: canonical single-word section headings only, section-label tracking capped at 1.2px so PDF extraction cannot fragment a heading, real em-dash separators inside every skill row, and plain-hyphen date ranges.</p>
+</div>
+
+<!-- 1 -->
+<!-- CONVERTED to ATS-safe: was a two-column impact-card grid with a right-aligned contact block,
+     badge row and two-column skill grid. Now strictly single-column. Palette, type pairing,
+     section-head rule language and all content preserved. Card grid becomes stat lines; badges
+     become one breakable text run with nowrap pairs; skills become one column with level words. -->
+<div id="t1">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t1">1</a> — Modern Tech Lead · ATS-safe · signal blue, rule-to-margin heads, dot-grid levels</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 56px; display:flex; flex-direction:column; gap:25px; font-family:Archivo,sans-serif; color:#0F172A;">
+
+  <div style="border-bottom:2px solid #0F172A; padding-bottom:14px;">
+    <div style="font-weight:900; font-size:44px; line-height:1; letter-spacing:-0.5px;">Jordan Avery</div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:2px; color:#2563EB; margin-top:9px;">ENGINEERING LEAD, PLATFORM</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#64748B; line-height:1.7; margin-top:10px;">j.avery@example.com | +1 (555) 010-8842 | Seattle, WA | example.com/javery</div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">SUMMARY</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <p style="font-size:12.5px; line-height:1.6; margin:0;">Platform engineering lead with eleven years building and running high-traffic distributed systems. Owns the deployment platform, on-call practice and service architecture for payments and identity, and has taken three teams from weekly release trains to continuous delivery with no regression in availability.</p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">KEY ACHIEVEMENTS</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="font-size:12px; line-height:1.8;">
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#2563EB;">150+</span> — Deploys per month, CI/CD pipeline owned end to end</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#2563EB;">99.98%</span> — Uptime across all tiers, rolling twelve months</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#2563EB;">22</span> — Services owned across payments, identity and billing</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#2563EB;">14</span> — Engineers led across three squads and two time zones</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">EXPERIENCE</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:14px;">Engineering Lead, Platform</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#64748B; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#475569; margin:2px 0 4px;">Northwind Systems, Seattle, WA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Rebuilt the deployment platform on Kubernetes and Terraform, taking release cadence from weekly to 150+ deploys a month.</li>
+          <li>Established the on-call rotation and incident review practice now used by every engineering team.</li>
+          <li>Owns twenty-two services across payments, identity and billing at 99.98% uptime.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:14px;">Senior Software Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#64748B; white-space:nowrap;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#475569; margin:2px 0 4px;">Meridian Data, Remote</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Led the extraction of billing from the monolith into six owned services behind a gRPC gateway.</li>
+          <li>Cut infrastructure spend 34% by right-sizing workloads and introducing tiered storage.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:14px;">Software Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#64748B; white-space:nowrap;">2015 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#475569; margin:2px 0 4px;">Cedarline Labs, Portland, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Built the event pipeline that became the reporting backbone, handling 40M events a day.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">SKILLS</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Distributed Systems</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Expert</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Platform Engineering</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Expert</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Incident Command</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Advanced</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Observability</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Advanced</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Security Review</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Proficient</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:210px; flex-shrink:0;">Cost Optimisation</span><span style="width:78px; flex-shrink:0; font-weight:700; color:#64748B;">Proficient</span><span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; background:#2563EB;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #94A3B8; box-sizing:border-box;"></span></span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">TECHNICAL STACK</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <p style="margin:0; font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.85; color:#0F172A;"><span style="white-space:nowrap;">Go</span> · <span style="white-space:nowrap;">TypeScript</span> · <span style="white-space:nowrap;">Python</span> · <span style="white-space:nowrap;">Kubernetes</span> · <span style="white-space:nowrap;">Terraform</span> · <span style="white-space:nowrap;">PostgreSQL</span> · <span style="white-space:nowrap;">Kafka</span> · <span style="white-space:nowrap;">gRPC</span> · <span style="white-space:nowrap;">AWS</span> · <span style="white-space:nowrap;">Datadog</span></p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;">EDUCATION AND CERTIFICATIONS</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Computer Science</b> — Northfield University, 2011 – 2015</div>
+      <div>Certified Kubernetes Administrator, CNCF — 2020</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2 -->
+<!-- CONVERTED to ATS-safe: was four-column KPI cards, three sparkline panels built from bare div
+     heights, and nine conic-gradient rings. Sparklines carried the trend in geometry alone and had
+     no text equivalent, so each is now a metric line stating value, prior baseline and direction.
+     Rings become grouped level rows — the grouping (Languages / Machine Learning / Infrastructure)
+     was this template's distinguishing move and is preserved. Palette and type unchanged.
+     docx: no conic-gradient anywhere, so HTML and Word now render the same skill pattern. -->
+<div id="t2">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t2">2</a> — Data Scientist · ATS-safe · teal accent, grouped skill levels, metric lines</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:44px 56px; display:flex; flex-direction:column; gap:13px; font-family:Archivo,sans-serif; color:#14213D; font-variant-numeric:tabular-nums;">
+
+  <div style="border-bottom:2px solid #14213D; padding-bottom:14px;">
+    <div style="font-weight:900; font-size:42px; line-height:1; letter-spacing:-0.5px;">Priya Narayan</div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:2px; color:#0F766E; margin-top:9px;">SENIOR DATA SCIENTIST, FORECASTING</div>
+    <div style="font-size:11.5px; color:#5B6472; line-height:1.7; margin-top:10px;">p.narayan@example.com | +1 (555) 010-3391 | Boston, MA | example.com/pnarayan</div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">SUMMARY</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <p style="font-size:12.5px; line-height:1.6; margin:0;">Senior data scientist with nine years shipping forecasting and pricing models into production. Owns the demand-forecast stack end to end, from feature pipelines through monitoring, and works directly with pricing and supply-chain teams to turn model output into decisions they act on weekly.</p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">KEY ACHIEVEMENTS</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><span style="font-weight:900; color:#0F766E;">18</span> — Models in production across forecasting, pricing and routing</div>
+      <div><span style="font-weight:900; color:#0F766E;">4.2B</span> — Rows processed daily in the feature store, nine markets</div>
+      <div><span style="font-weight:900; color:#0F766E;">31%</span> — Forecast error cut, WAPE against prior baseline</div>
+      <div><span style="font-weight:900; color:#0F766E;">7</span> — Peer-reviewed papers at applied ML venues</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">MODEL PERFORMANCE</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>Forecast WAPE</b> — 8.4%, down from 12.2% over eight quarters</div>
+      <div><b>Pricing lift</b> — plus 12.6% contribution margin, sustained two years</div>
+      <div><b>Inference p95</b> — 84 ms, down from 220 ms after the serving rewrite</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">EXPERIENCE</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:13.5px;">Senior Data Scientist</span>
+          <span style="font-size:11px; color:#5B6472; white-space:nowrap;">2020 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#4B5563; margin:2px 0 4px;">Harborline Retail, Boston, MA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owns the demand-forecast stack serving nine markets; cut weighted forecast error 31% against the prior baseline.</li>
+          <li>Built the feature store and drift monitoring now used by every modelling team in the company.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:13.5px;">Data Scientist</span>
+          <span style="font-size:11px; color:#5B6472; white-space:nowrap;">2017 – 2020</span>
+        </div>
+        <div style="font-size:12px; color:#4B5563; margin:2px 0 4px;">Meridian Analytics, Remote</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Shipped the dynamic pricing model that lifted contribution margin 12.6% across two product lines.</li>
+          </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:13.5px;">Analyst, Decision Science</span>
+          <span style="font-size:11px; color:#5B6472; white-space:nowrap;">2015 – 2017</span>
+        </div>
+        <div style="font-size:12px; color:#4B5563; margin:2px 0 4px;">Cedarline Group, Providence, RI</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Automated the weekly reporting pipeline, replacing sixteen hours of manual work with a scheduled job.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">SKILLS</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:7px; font-size:12px;">
+      <div>
+        <div style="font-size:10px; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:#5B6472; margin-bottom:4px;">Languages</div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Python</span><span style="font-weight:700; color:#0F766E;">Expert</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">SQL</span><span style="font-weight:700; color:#0F766E;">Expert</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">R</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:#5B6472; margin-bottom:4px;">Machine Learning</div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Forecasting</span><span style="font-weight:700; color:#0F766E;">Expert</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Causal Inference</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Deep Learning</span><span style="font-weight:700; color:#0F766E;">Proficient</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:#5B6472; margin-bottom:4px;">Infrastructure</div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Spark</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">Airflow</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+          <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">dbt</span><span style="font-weight:700; color:#0F766E;">Proficient</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;">PUBLICATIONS AND EDUCATION</span>
+      <div style="flex:1; height:1px; background:#64748B;"></div>
+    </div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>Hierarchical Demand Forecasting at Retail Scale</b> — Applied ML Workshop, 2023</div>
+      <div><b>MSc Statistics</b> — Northfield University, 2013 – 2015</div>
+      <div><b>BSc Mathematics</b> — Ashcombe College, 2009 – 2013</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 3 -->
+<div id="t3">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t3">3</a> — ATS-safe single column · portal submissions · dot-grid levels</div>
+<!-- ATS-safe: no sidebar, no colour blocks, no reversed-out type, no icons, no
+     multi-column bands. Single linear flow so a parser reads it in source order.
+     Field names and content model match the rest of the set — one JSON payload feeds all five. -->
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 72px; display:flex; flex-direction:column; gap:17px; font-family:Archivo,sans-serif; color:#111111;">
+
+  <div>
+    <div style="font-weight:900; font-size:30px; line-height:1.1; color:#111111;">JOHN DOE</div>
+    <div style="font-size:14px; color:#111111; margin-top:4px;">Marketing Manager</div>
+    <div style="font-size:12px; color:#555555; margin-top:6px; line-height:1.6;">
+      j.doe@example.com | +1 (555) 010-4477 | Lake Charles, LA | example.com/jdoe
+    </div>
+  </div>
+
+  <div style="height:1px; background:#cccccc;"></div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">SUMMARY</div>
+    <p style="font-size:12px; color:#111111; line-height:1.55; margin:0;">Marketing manager with eleven years owning brand voice, lifecycle programmes, and campaign delivery across consumer and B2B accounts. Owns a $3.2M budget, leads a team of fourteen across six markets, and has grown qualified pipeline 32% year over year.</p>
+  </div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">KEY ACHIEVEMENTS</div>
+    <div style="font-size:12px; color:#111111; line-height:1.7;">
+      <div>$3.2M — Annual marketing budget owned</div>
+      <div>14 — Marketers led across three squads</div>
+      <div>32% — Year-over-year qualified pipeline growth</div>
+      <div>6 — Markets with full campaign ownership</div>
+    </div>
+  </div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">PROFESSIONAL EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:11px;">
+    <div>
+      <div style="font-size:12.5px; color:#111111;"><b>Marketing Manager</b></div>
+      <div style="font-size:12px; color:#111111;">Meridian Group, Lake Charles, LA</div>
+      <div style="font-size:12px; color:#555555;">2020 – Present</div>
+      <ul style="margin:4px 0 0; padding-left:18px; font-size:12px; color:#111111; line-height:1.5;">
+        <li>Own brand voice across web, email, and paid social for three product lines.</li>
+        <li>Grew lifecycle email revenue 32% year over year and cut campaign turnaround from six weeks to three.</li>
+        <li>Manage a $3.2M annual budget and a team of fourteen across six markets.</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:12.5px; color:#111111;"><b>Marketing Specialist</b></div>
+      <div style="font-size:12px; color:#111111;">Halcyon Partners, New Orleans, LA</div>
+      <div style="font-size:12px; color:#555555;">2017 – 2020</div>
+      <ul style="margin:4px 0 0; padding-left:18px; font-size:12px; color:#111111; line-height:1.5;">
+        <li>Ran channel reporting and competitive research for eight retainer accounts.</li>
+        <li>Authored the agency’s first shared style guide, adopted across every account team.</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:12.5px; color:#111111;"><b>Marketing Associate</b></div>
+      <div style="font-size:12px; color:#111111;">Cedarline Studio, Remote</div>
+      <div style="font-size:12px; color:#555555;">2015 – 2017</div>
+      <ul style="margin:4px 0 0; padding-left:18px; font-size:12px; color:#111111; line-height:1.5;">
+        <li>Coordinated event and trade calendars across four regional markets.</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:12.5px; color:#111111;"><b>Marketing Coordinator</b></div>
+      <div style="font-size:12px; color:#111111;">Brightwell Media, New Orleans, LA</div>
+      <div style="font-size:12px; color:#555555;">2013 – 2015</div>
+      <ul style="margin:4px 0 0; padding-left:18px; font-size:12px; color:#111111; line-height:1.5;">
+        <li>Maintained the shared asset library used by every account team.</li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">SKILLS</div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">Brand Strategy</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Expert</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">Lifecycle Marketing</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Expert</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">Campaign Management</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Advanced</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">Content Marketing</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Advanced</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">SEO</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Proficient</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span></span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:12px; color:#111111; width:210px; flex-shrink:0;">ROI Analysis</span>
+      <span style="font-size:12px; color:#111111; font-weight:700; width:96px; flex-shrink:0;">Proficient</span>
+      <span style="display:flex; gap:4px;"><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; background:#111111;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #555555; box-sizing:border-box;"></span></span>
+    </div>
+    </div>
+  </div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">EDUCATION</div>
+    <div style="font-size:12px; color:#111111; line-height:1.6;">
+      <div><b>BSc New Media and Internet Marketing</b> — Northfield University, 2011 – 2015</div>
+      <div style="color:#555555;">Graduated with honours, GPA 3.8 / 4.0</div>
+    </div>
+  </div>
+
+  <div>
+  <div style="font-weight:700; font-size:14px; letter-spacing:1px; color:#111111; margin:0 0 8px;">CERTIFICATIONS</div>
+    <div style="font-size:12px; color:#111111; line-height:1.6;">
+      <div>Digital Analytics Certified — 2022</div>
+      <div>Brand Strategy Programme — 2021</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 4 -->
+<!-- INGEST ref F (pure-white editorial, wide margin, redline marker). Parameter table only; image closed before design.
+     Taken: no-fill structure (hairlines and whitespace only), oversized name over a positioning line,
+     quantified metric band under a rule, contact + capabilities + tools + languages as discrete blocks.
+     Not reproduced: photo, all icons, sample copy, employer and school names, vendor marks.
+     Divergence: (1) palette ink #16161A + chartreuse marker #D8F035, not black/orange;
+     (2) type Archivo 900 + Source Sans 3, not one neo-grotesque; (3) flat skill list becomes
+     dot-grid rows carrying name and level as real text, plus a four-line quantified band.
+     CONVERTED to ATS-safe: the 70/30 body split and its right rail are gone — the rail's contact,
+     capabilities, tools and languages blocks now sit in the single column in reading order, which
+     also moves contact details out of a side rail where parsers routinely miss them. The metric
+     band drops from a four-column grid to four text lines. Marker swipe retained: it is a
+     background behind real text, invisible to a parser and the one expressive move in the design.
+     docx: no w:shd anywhere except the marker swipe and the skill dots. -->
+<div id="t4">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t4">4</a> — Pure white, rules only · ATS-safe · creative lead, dot-grid levels, redline marker</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:50px 60px 44px; font-family:'Source Sans 3',sans-serif; color:#16161A; display:flex; flex-direction:column; gap:15px;">
+
+  <div style="border-bottom:1px solid #16161A; padding-bottom:14px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.96; letter-spacing:-1.8px; text-transform:uppercase;">Wren Ashworth</div>
+    <div style="font-size:14px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5C5C66; margin-top:10px;">Creative Lead</div>
+    <div style="font-size:12px; color:#5C5C66; margin-top:9px; line-height:1.6;">wren.ashworth@example.com | +1 (555) 013-8642 | Portside | wrenashworth.example.com</div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Summary</div>
+    <p style="margin:0; font-size:12.5px; line-height:1.65;">Creative lead building brand systems that <span style="background:#D8F035; padding:1px 5px;">survive handover</span> — fourteen designers, four launches, one set of rules everyone can follow. Runs the studio across brand, editorial and motion, owns the production budget, and defends the creative roadmap to the executive group each quarter.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.8;">
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">14</span> — Designers led across brand, editorial and motion</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">4</span> — Brand systems shipped and documented</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">$3.2M</span> — Annual production budget owned</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">2</span> — Industry awards for identity work</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Creative Lead</span>
+          <span style="font-size:11.5px; color:#6A6A74; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#3A3A42; margin:2px 0 4px;">Halden and Row, Portside</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Runs a fourteen-person studio across brand, editorial and motion; owns the annual $3.2M production budget.</li>
+          <li>Replaced four divergent sub-brands with one documented system, cutting new-campaign setup from three weeks to four days.</li>
+          <li>Presents creative strategy to the executive group each quarter and defends the roadmap against it.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Design Director</span>
+          <span style="font-size:11.5px; color:#6A6A74; white-space:nowrap;">2017 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#3A3A42; margin:2px 0 4px;">Bellrock Studio, Northfield</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Built the studio's first design-system practice and hired the six people who ran it.</li>
+          <li>Led two national campaign launches end to end, both delivered inside budget.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Senior Designer</span>
+          <span style="font-size:11.5px; color:#6A6A74; white-space:nowrap;">2014 – 2017</span>
+        </div>
+        <div style="font-size:12px; color:#3A3A42; margin:2px 0 4px;">Kiln Press, Northfield</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Art-directed long-form editorial to a weekly press deadline.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Capabilities</div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:215px; flex-shrink:0;">Brand Systems</span><span style="width:80px; flex-shrink:0; font-weight:600; color:#5C5C66;">Expert</span><span style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:215px; flex-shrink:0;">Team Leadership</span><span style="width:80px; flex-shrink:0; font-weight:600; color:#5C5C66;">Expert</span><span style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:215px; flex-shrink:0;">Art Direction</span><span style="width:80px; flex-shrink:0; font-weight:600; color:#5C5C66;">Advanced</span><span style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:215px; flex-shrink:0;">Budget Ownership</span><span style="width:80px; flex-shrink:0; font-weight:600; color:#5C5C66;">Advanced</span><span style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:14px;"><span style="width:215px; flex-shrink:0;">Motion Direction</span><span style="width:80px; flex-shrink:0; font-weight:600; color:#5C5C66;">Proficient</span><span style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; background:#16161A;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span><span style="width:9px; height:9px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Tools</div>
+    <p style="margin:0; font-size:12px; line-height:1.7; color:#3A3A42;"><span style="white-space:nowrap;">Figma</span> · <span style="white-space:nowrap;">InDesign</span> · <span style="white-space:nowrap;">Illustrator</span> · <span style="white-space:nowrap;">After Effects</span> · <span style="white-space:nowrap;">Notion</span> · <span style="white-space:nowrap;">Keynote</span></p>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">Recognition, Education and Languages</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>Brand System of the Year</b> — Portside Design Awards, 2024</div>
+      <div><b>MA Visual Communication</b> — Harbour School of Art, 2014</div>
+      <div><b>BA Graphic Design</b> — Northfield University, 2012</div>
+      <div style="color:#5C5C66;">English — Native · German — Fluent</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 5 -->
+<!-- INGEST ref J (label-margin editorial, narrow left gutter of section labels). Parameter table only; image closed first.
+     Taken: sectioned editorial rhythm, one hairline per section, name set across the full measure,
+     bar-family skills, wide text measure.
+     Not reproduced: photo, rule ornaments, all sample copy, employer and school names.
+     Divergence: (1) palette ink #1B1B22 + plum #6B2A5A on white, not grey on grey; (2) type
+     Archivo 900 + Inter, not one geometric sans; (3) bars carry banded level words as real text and
+     a four-line stat band sits directly under the header.
+     CONVERTED to ATS-safe: the 112px left label gutter is gone. Labels that sat beside their content
+     now sit above it as ordinary headings, because a gutter label and its body are separate columns
+     to a parser and routinely arrive orphaned from each other. The per-section hairline — the
+     reference's real structural idea — is kept, so the rhythm survives the change. Skill bars drop
+     from a two-column grid to one column; every bar still states name and level as text. -->
+<div id="t5">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t5">5</a> — Sectioned editorial · ATS-safe · product management, plum accent, bar levels</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 58px 44px; font-family:Inter,sans-serif; color:#1B1B22; display:flex; flex-direction:column; gap:28px;">
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.98; letter-spacing:-1.8px; text-transform:uppercase;">Soren Adeyinka</div>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:24px; border-top:2px solid #1B1B22; margin-top:14px; padding-top:11px;">
+      <span style="font-size:13.5px; font-weight:600; letter-spacing:3.2px; text-transform:uppercase; color:#6B2A5A;">Product Manager</span>
+      <span style="font-size:11.5px; color:#54545E; text-align:right;">soren.adeyinka@example.com · +1 (555) 014-6730 · Portside</span>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #D9D7DD; padding-top:13px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A; margin-bottom:9px;">Profile</div>
+    <p style="margin:0; font-size:12.5px; line-height:1.65;">Product manager for consumer platform work — strongest at the unglamorous middle of the funnel, where a small change to onboarding is worth more than a new feature. Nine years shipping with designers and engineers rather than at them.</p>
+  </div>
+
+  <div style="border-top:1px solid #D9D7DD; padding-top:13px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A; margin-bottom:9px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.8;">
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900; color:#6B2A5A;">1.4M</span> — Monthly active users owned</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900; color:#6B2A5A;">31%</span> — Activation lift from the onboarding rebuild</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900; color:#6B2A5A;">3</span> — Squads partnered across discovery and delivery</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900; color:#6B2A5A;">9 yrs</span> — Shipping consumer platform products</div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #D9D7DD; padding-top:13px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14.5px;">Senior Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:2px 0 4px;">Arowwai Platform, Portside</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owns onboarding and retention for a 1.4M-user product across three squads.</li>
+          <li>Lifted activation 31% by cutting the signup flow from nine steps to four and instrumenting what was left.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14.5px;">Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:2px 0 4px;">Ginyard Digital, Northfield</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Ran discovery and delivery for the self-serve billing rebuild.</li>
+          <li>Introduced the weekly usage review that retired two features nobody used.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14.5px;">Associate Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2016 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:2px 0 4px;">Bellrock Systems, Northfield</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owned the internal admin tooling backlog and its release notes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #D9D7DD; padding-top:13px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A; margin-bottom:9px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:7px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px;"><span>Discovery and Research</span><span style="font-size:11px; font-weight:600; color:#5A5A64;">Expert</span></div>
+        <div style="height:7px; border-radius:999px; background:#E4E2E7; margin-top:4px; overflow:hidden;"><div style="height:100%; width:93%; border-radius:999px; background:#6B2A5A;"></div></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px;"><span>Roadmap Ownership</span><span style="font-size:11px; font-weight:600; color:#5A5A64;">Expert</span></div>
+        <div style="height:7px; border-radius:999px; background:#E4E2E7; margin-top:4px; overflow:hidden;"><div style="height:100%; width:90%; border-radius:999px; background:#6B2A5A;"></div></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px;"><span>Experimentation</span><span style="font-size:11px; font-weight:600; color:#5A5A64;">Advanced</span></div>
+        <div style="height:7px; border-radius:999px; background:#E4E2E7; margin-top:4px; overflow:hidden;"><div style="height:100%; width:84%; border-radius:999px; background:#6B2A5A;"></div></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px;"><span>Analytics and SQL</span><span style="font-size:11px; font-weight:600; color:#5A5A64;">Advanced</span></div>
+        <div style="height:7px; border-radius:999px; background:#E4E2E7; margin-top:4px; overflow:hidden;"><div style="height:100%; width:79%; border-radius:999px; background:#6B2A5A;"></div></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12px;"><span>Pricing Strategy</span><span style="font-size:11px; font-weight:600; color:#5A5A64;">Proficient</span></div>
+        <div style="height:7px; border-radius:999px; background:#E4E2E7; margin-top:4px; overflow:hidden;"><div style="height:100%; width:63%; border-radius:999px; background:#6B2A5A;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #D9D7DD; padding-top:13px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A; margin-bottom:9px;">Tooling and Education</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div style="color:#2E2E38;"><span style="white-space:nowrap;">Amplitude</span> · <span style="white-space:nowrap;">Looker</span> · <span style="white-space:nowrap;">Figma</span> · <span style="white-space:nowrap;">Linear</span> · <span style="white-space:nowrap;">dbt</span> · <span style="white-space:nowrap;">Optimizely</span></div>
+      <div><b>MSc Human-Computer Interaction</b> — Northfield University, 2016</div>
+      <div><b>BSc Information Systems</b> — Harbour University, 2014</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 6 -->
+<!-- ATS-SAFE INVARIANTS (all of 26–35): single linear column, source order = reading order.
+     No tables, no side rails, no absolutely-positioned content, no icons, no photos, no logos.
+     No content in CSS (no ::before content, no text baked into a background). Real <ul>/<li>
+     bullets. Standard section headings (SUMMARY / KEY ACHIEVEMENTS / EXPERIENCE / SKILLS /
+     EDUCATION / CERTIFICATIONS). Every skill carries its name AND its level as real selectable
+     text. Every stat is one text line — number and caption in the same node pair, so an empty
+     metric leaves no orphaned caption. Repeating entries are identical siblings.
+     Variation is carried by type, rule language and one accent — never by layout columns. -->
+<div id="t6">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t6">6</a> — Rule Stack · ATS-safe · steel accent, hairline sections</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 68px; display:flex; flex-direction:column; gap:17px; font-family:'Source Sans 3',sans-serif; color:#111318;">
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase;">Adaeze Okafor</div>
+    <div style="font-size:14px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#1F4E79; margin-top:7px;">Marketing Manager</div>
+    <div style="font-size:12px; color:#54585F; margin-top:8px; line-height:1.6;">a.okafor@example.com | +1 (555) 010-4477 | Lake Charles, LA | example.com/aokafor</div>
+  </div>
+  <div style="height:2px; background:#111318;"></div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:9px;">SUMMARY</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Marketing manager with eleven years owning brand voice, lifecycle programmes and campaign delivery across consumer and B2B accounts. Owns a $3.2M budget, leads fourteen marketers across six markets, and has grown qualified pipeline 32% year over year.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:9px;">KEY ACHIEVEMENTS</div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-weight:700; color:#1F4E79;">$3.2M</span> — Annual marketing budget owned</div>
+      <div><span style="font-weight:700; color:#1F4E79;">14</span> — Marketers led across three squads</div>
+      <div><span style="font-weight:700; color:#1F4E79;">32%</span> — Year-over-year qualified pipeline growth</div>
+      <div><span style="font-weight:700; color:#1F4E79;">6</span> — Markets with full campaign ownership</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:10px;">EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px;">Marketing Manager</span>
+          <span style="font-size:11.5px; color:#54585F; white-space:nowrap;">2020 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#33373E; margin:2px 0 4px;">Meridian Group, Lake Charles, LA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Own brand voice across web, email and paid social for three product lines.</li>
+          <li>Grew lifecycle email revenue 32% year over year and cut campaign turnaround from six weeks to three.</li>
+          <li>Manage a $3.2M annual budget and fourteen marketers across six markets.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px;">Marketing Specialist</span>
+          <span style="font-size:11.5px; color:#54585F; white-space:nowrap;">2017 – 2020</span>
+        </div>
+        <div style="font-size:12px; color:#33373E; margin:2px 0 4px;">Halcyon Partners, New Orleans, LA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Ran channel reporting and competitive research for eight retainer accounts.</li>
+          <li>Authored the agency's first shared style guide, adopted across every account team.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:700; font-size:13px;">Marketing Associate</span>
+          <span style="font-size:11.5px; color:#54585F; white-space:nowrap;">2015 – 2017</span>
+        </div>
+        <div style="font-size:12px; color:#33373E; margin:2px 0 4px;">Cedarline Studio, Remote</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Coordinated event and trade calendars across four regional markets.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:9px;">SKILLS</div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Brand Strategy</span><span style="font-weight:700;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Lifecycle Marketing</span><span style="font-weight:700;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Campaign Management</span><span style="font-weight:700;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Content Marketing</span><span style="font-weight:700;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Marketing Analytics</span><span style="font-weight:700;">Proficient</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">SEO</span><span style="font-weight:700;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:9px;">EDUCATION</div>
+    <div style="font-size:12px; line-height:1.65;">
+      <div><b>BSc New Media and Internet Marketing</b> — Northfield University, 2011 – 2015</div>
+      <div style="color:#54585F;">Graduated with honours, GPA 3.8 / 4.0</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:13px; letter-spacing:2px; color:#1F4E79; padding-bottom:6px; border-bottom:1px solid #C9CDD4; margin-bottom:9px;">CERTIFICATIONS</div>
+    <div style="font-size:12px; line-height:1.65;">
+      <div>Digital Analytics Certified — 2022</div>
+      <div>Brand Strategy Programme — 2021</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 7 -->
+<div id="t7">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t7">7</a> — Accent Band · ATS-safe · full-width navy masthead, linear body</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; display:flex; flex-direction:column; font-family:'Open Sans',sans-serif; color:#151A22;">
+
+  <div style="box-sizing:border-box; flex-shrink:0; background:#0E2D55; color:#ffffff; padding:34px 60px 30px;">
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:42px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase;">Tobias Renner</div>
+    <div style="font-size:14px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#9FB8D4; margin-top:8px;">Operations Manager</div>
+    <div style="font-size:12px; color:#D3DEEB; margin-top:12px; line-height:1.6;">t.renner@example.com | +1 (555) 018-2244 | Portland, OR | example.com/trenner</div>
+  </div>
+
+  <div style="box-sizing:border-box; flex:1; min-width:0; padding:26px 60px 34px; display:flex; flex-direction:column; gap:16px;">
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:7px;">SUMMARY</div>
+      <p style="margin:0; font-size:12px; line-height:1.6;">Operations manager for multi-site fulfilment, brought in to make a network legible and then to make it cheaper without breaking the service promise. Twelve years across warehousing, planning and vendor management.</p>
+    </div>
+
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:7px;">KEY ACHIEVEMENTS</div>
+      <div style="font-size:12px; line-height:1.75;">
+        <div><span style="font-weight:700; color:#0E2D55;">22%</span> — Reduction in cost per order across the network</div>
+        <div><span style="font-weight:700; color:#0E2D55;">140</span> — Staff managed across three fulfilment sites</div>
+        <div><span style="font-weight:700; color:#0E2D55;">99.2%</span> — On-time dispatch sustained for eight quarters</div>
+        <div><span style="font-weight:700; color:#0E2D55;">$410K</span> — Annual saving from carrier consolidation</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:9px;">EXPERIENCE</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+            <span style="font-weight:700; font-size:13px;">Operations Manager</span>
+            <span style="font-size:11.5px; color:#5A606B; white-space:nowrap;">2020 – Present</span>
+          </div>
+          <div style="font-size:12px; color:#0E2D55; margin:2px 0 4px;">Halden Logistics, Portland, OR</div>
+          <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+            <li>Runs fulfilment across three sites and 140 staff at 99.2% on-time dispatch.</li>
+            <li>Took 22% out of cost per order by re-slotting pick faces and renegotiating two carrier contracts.</li>
+            <li>Opened a third site from lease signature to first dispatch in eleven weeks.</li>
+          </ul>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+            <span style="font-weight:700; font-size:13px;">Site Supervisor</span>
+            <span style="font-size:11.5px; color:#5A606B; white-space:nowrap;">2016 – 2020</span>
+          </div>
+          <div style="font-size:12px; color:#0E2D55; margin:2px 0 4px;">Bellrock Supply, Salem, OR</div>
+          <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+            <li>Owned the shift plan and safety record for a 60-person warehouse.</li>
+            <li>Introduced a daily stand-up that cut unplanned overtime by a third.</li>
+          </ul>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+            <span style="font-weight:700; font-size:13px;">Planner</span>
+            <span style="font-size:11.5px; color:#5A606B; white-space:nowrap;">2014 – 2016</span>
+          </div>
+          <div style="font-size:12px; color:#0E2D55; margin:2px 0 4px;">Kiln Distribution, Salem, OR</div>
+          <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+            <li>Built the weekly replenishment plan for 1,200 active lines.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:7px;">SKILLS</div>
+      <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid #E4E7EC; padding-bottom:4px;"><span>Process Design</span><span style="font-weight:700; color:#0E2D55;">Expert</span></div>
+        <div style="display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid #E4E7EC; padding-bottom:4px;"><span>Vendor Management</span><span style="font-weight:700; color:#0E2D55;">Expert</span></div>
+        <div style="display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid #E4E7EC; padding-bottom:4px;"><span>Demand Planning</span><span style="font-weight:700; color:#0E2D55;">Advanced</span></div>
+        <div style="display:flex; justify-content:space-between; gap:14px; border-bottom:1px solid #E4E7EC; padding-bottom:4px;"><span>Lean and Six Sigma</span><span style="font-weight:700; color:#0E2D55;">Advanced</span></div>
+        <div style="display:flex; justify-content:space-between; gap:14px;"><span>SQL Reporting</span><span style="font-weight:700; color:#0E2D55;">Proficient</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:7px;">EDUCATION</div>
+      <div style="font-size:12px; line-height:1.65;">
+        <div><b>BSc Supply Chain Management</b> — Northfield University, 2010 – 2014</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:14px; letter-spacing:1.6px; color:#0E2D55; margin-bottom:7px;">CERTIFICATIONS</div>
+      <div style="font-size:12px; line-height:1.65;">
+        <div>Lean Six Sigma, Green Belt — 2021</div>
+        <div>APICS CPIM, Part 1 — 2018</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 8 -->
+<div id="t8">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t8">8</a> — Big Type · ATS-safe · no rules, space-only structure, inline skill run</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:60px 64px 52px; display:flex; flex-direction:column; gap:24px; font-family:'Source Sans 3',sans-serif; color:#17181A;">
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:66px; line-height:0.94; letter-spacing:0.5px; text-transform:uppercase;">Wren<br>Ashworth</div>
+    <div style="font-size:16px; color:#C0392B; margin-top:12px; font-weight:600;">Creative Lead</div>
+    <div style="font-size:12.5px; color:#55565A; margin-top:6px; line-height:1.6;">wren.ashworth@example.com | +1 (555) 013-8642 | Portland, OR | example.com/washworth</div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:8px;">SUMMARY</div>
+    <p style="margin:0; font-size:12.5px; line-height:1.65; max-width:620px;">Creative lead building brand systems that survive handover. Runs a fourteen-person studio across brand, editorial and motion, owns the annual production budget, and defends the creative roadmap to the executive group each quarter.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:8px;">KEY ACHIEVEMENTS</div>
+    <div style="font-size:12.5px; line-height:1.8;">
+      <div><span style="font-family:Anton,sans-serif; font-size:15px;">14</span> — Designers led across three disciplines</div>
+      <div><span style="font-family:Anton,sans-serif; font-size:15px;">4</span> — Brand systems shipped and documented</div>
+      <div><span style="font-family:Anton,sans-serif; font-size:15px;">$3.2M</span> — Annual production budget owned</div>
+      <div><span style="font-family:Anton,sans-serif; font-size:15px;">2</span> — Industry awards for identity work</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:10px;">EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <div style="font-family:Anton,sans-serif; font-size:17px; letter-spacing:0.3px;">Creative Lead</div>
+        <div style="font-size:12.5px; color:#55565A; margin:2px 0 5px;">Halden and Row, Portland, OR &nbsp;·&nbsp; 2021 – Present</div>
+        <ul style="margin:0; padding-left:17px; font-size:12.5px; line-height:1.6;">
+          <li>Runs a fourteen-person studio across brand, editorial and motion; owns the annual $3.2M production budget.</li>
+          <li>Replaced four divergent sub-brands with one documented system, cutting campaign setup from three weeks to four days.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:Anton,sans-serif; font-size:17px; letter-spacing:0.3px;">Design Director</div>
+        <div style="font-size:12.5px; color:#55565A; margin:2px 0 5px;">Bellrock Studio, Seattle, WA &nbsp;·&nbsp; 2017 – 2021</div>
+        <ul style="margin:0; padding-left:17px; font-size:12.5px; line-height:1.6;">
+          <li>Built the studio's first design-system practice and hired the six people who ran it.</li>
+          <li>Led two national campaign launches end to end, both delivered inside budget.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:Anton,sans-serif; font-size:17px; letter-spacing:0.3px;">Senior Designer</div>
+        <div style="font-size:12.5px; color:#55565A; margin:2px 0 5px;">Kiln Press, Seattle, WA &nbsp;·&nbsp; 2014 – 2017</div>
+        <ul style="margin:0; padding-left:17px; font-size:12.5px; line-height:1.6;">
+          <li>Art-directed long-form editorial to a weekly press deadline.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:8px;">SKILLS</div>
+    <p style="margin:0; font-size:12.5px; line-height:1.85;"><span style="white-space:nowrap;">Brand Systems — Expert</span> &nbsp;·&nbsp; <span style="white-space:nowrap;">Team Leadership — Expert</span> &nbsp;·&nbsp; <span style="white-space:nowrap;">Art Direction — Advanced</span> &nbsp;·&nbsp; <span style="white-space:nowrap;">Budget Ownership — Advanced</span> &nbsp;·&nbsp; <span style="white-space:nowrap;">Editorial Design — Advanced</span> &nbsp;·&nbsp; <span style="white-space:nowrap;">Motion Direction — Proficient</span></p>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:8px;">EDUCATION</div>
+    <div style="font-size:12.5px; line-height:1.7;">
+      <div><b>MA Visual Communication</b> — Harbour School of Art, 2014</div>
+      <div><b>BA Graphic Design</b> — Northfield University, 2012</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 9 -->
+<div id="t9">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t9">9</a> — Ledger · ATS-safe · double rules, tabular dates, serif masthead</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:54px 70px; display:flex; flex-direction:column; gap:15px; font-family:'Source Sans 3',sans-serif; color:#1A1A1A;">
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:34px; line-height:1.15; letter-spacing:-0.4px;">Ilias Fontaine</div>
+    <div style="font-size:13px; font-weight:600; letter-spacing:2.6px; text-transform:uppercase; color:#7A5C1E; margin-top:8px;">Financial Analyst</div>
+    <div style="font-size:12px; color:#525252; margin-top:8px; line-height:1.6;">i.fontaine@example.com | +1 (555) 018-2450 | Boston, MA | example.com/ifontaine</div>
+  </div>
+  <div style="border-top:3px solid #1A1A1A; border-bottom:1px solid #1A1A1A; height:4px;"></div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:7px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Corporate finance analyst working between planning and the business units — the person who makes the model match how the operation actually behaves before a number reaches the board pack. Nine years across FP&amp;A, close reporting and investment cases.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:7px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-weight:700; color:#7A5C1E; font-variant-numeric:tabular-nums;">$240M</span> — Portfolio modelled and reported quarterly</div>
+      <div><span style="font-weight:700; color:#7A5C1E; font-variant-numeric:tabular-nums;">18%</span> — Reduction in rolling forecast error</div>
+      <div><span style="font-weight:700; color:#7A5C1E; font-variant-numeric:tabular-nums;">2 days</span> — Removed from every monthly close</div>
+      <div><span style="font-weight:700; color:#7A5C1E; font-variant-numeric:tabular-nums;">7</span> — Analysts mentored across two teams</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px; letter-spacing:1.4px; text-transform:uppercase; border-bottom:1px solid #1A1A1A; padding-bottom:5px; margin-bottom:10px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #E0DDD5; padding-bottom:3px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13px;">Senior Financial Analyst</span>
+          <span style="font-size:11.5px; color:#525252; white-space:nowrap; font-variant-numeric:tabular-nums;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#7A5C1E; margin:4px 0 4px;">Arowwai Group, Boston, MA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owns the driver-based model behind a $240M portfolio and the quarterly board pack built on it.</li>
+          <li>Cut rolling forecast error 18% by rebuilding demand inputs with the commercial team.</li>
+          <li>Mentors seven analysts and owns the modelling standard they work to.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #E0DDD5; padding-bottom:3px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13px;">Financial Analyst</span>
+          <span style="font-size:11.5px; color:#525252; white-space:nowrap; font-variant-numeric:tabular-nums;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#7A5C1E; margin:4px 0 4px;">Ginyard International, Hartford, CT</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Ran monthly close reporting and variance analysis for three business units.</li>
+          <li>Automated the reporting pack, taking two days out of every close.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #E0DDD5; padding-bottom:3px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13px;">Finance Graduate</span>
+          <span style="font-size:11.5px; color:#525252; white-space:nowrap; font-variant-numeric:tabular-nums;">2016 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#7A5C1E; margin:4px 0 4px;">Bellrock Holdings, Hartford, CT</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Rotated through treasury, tax and management reporting.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px; letter-spacing:1.4px; text-transform:uppercase; border-bottom:1px solid #1A1A1A; padding-bottom:5px; margin-bottom:9px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Financial Modelling</span><span style="font-weight:700; color:#7A5C1E;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Excel and Power Query</span><span style="font-weight:700; color:#7A5C1E;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Board Reporting</span><span style="font-weight:700; color:#7A5C1E;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">SQL</span><span style="font-weight:700; color:#7A5C1E;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Power BI</span><span style="font-weight:700; color:#7A5C1E;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Python for Finance</span><span style="font-weight:700; color:#7A5C1E;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px; letter-spacing:1.4px; text-transform:uppercase; border-bottom:1px solid #1A1A1A; padding-bottom:5px; margin-bottom:8px;">Education and Certifications</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>MSc Finance</b> — Northfield University, 2016</div>
+      <div><b>BSc Economics</b> — Harbour University, 2014</div>
+      <div style="color:#525252;">CFA Level II Candidate, 2025 &nbsp;·&nbsp; ACCA Applied Skills, 2020</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 10 -->
+<div id="t10">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t10">10</a> — Marker · ATS-safe · pure white, hairlines only, one highlight swipe</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:58px 66px 44px; display:flex; flex-direction:column; gap:18px; font-family:'Source Sans 3',sans-serif; color:#16161A;">
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.98; letter-spacing:-1.8px; text-transform:uppercase;">Soren Adeyinka</div>
+    <div style="font-size:14px; font-weight:600; letter-spacing:3.2px; text-transform:uppercase; color:#5C5C66; margin-top:11px;">Senior Product Manager</div>
+    <div style="font-size:12px; color:#5C5C66; margin-top:9px; line-height:1.6;">soren.adeyinka@example.com | +1 (555) 014-6730 | Austin, TX | example.com/sadeyinka</div>
+  </div>
+  <div style="height:1px; background:#16161A;"></div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">SUMMARY</div>
+    <p style="margin:0; font-size:14px; line-height:1.6; color:#33333B; max-width:600px;">Product manager building platform work that <span style="background:#D8F035; padding:1px 5px;">survives its own roadmap</span> — nine years shipping with designers and engineers rather than at them.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; margin-bottom:8px;">KEY ACHIEVEMENTS</div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">1.4M</span> — Monthly active users owned</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">31%</span> — Activation lift from onboarding rebuild</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">3</span> — Squads partnered across discovery and delivery</div>
+      <div><span style="font-family:Archivo,sans-serif; font-weight:900;">9 yrs</span> — Shipping consumer platform products</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:10px;">EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:13px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Senior Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:3px 0 5px;">Arowwai Platform, Austin, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Owns onboarding and retention for a 1.4M-user product across three squads.</li>
+          <li>Lifted activation 31% by cutting signup from nine steps to four and instrumenting what was left.</li>
+          <li>Runs the weekly usage review that retired two features nobody used.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:3px 0 5px;">Ginyard Digital, Dallas, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Ran discovery and delivery for the self-serve billing rebuild.</li>
+          <li>Introduced the pricing experiment framework still used by the growth team.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:14px;">Associate Product Manager</span>
+          <span style="font-size:11.5px; color:#63636D; white-space:nowrap;">2016 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#3E3E48; margin:3px 0 5px;">Bellrock Systems, Dallas, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Owned the internal admin tooling backlog and its release notes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:9px;">SKILLS</div>
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+      <div style="display:flex; align-items:center; gap:12px;"><span style="width:200px; flex-shrink:0;">Discovery and Research</span><span style="width:82px; flex-shrink:0; font-weight:700;">Expert</span><span style="display:flex; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:12px;"><span style="width:200px; flex-shrink:0;">Roadmap Ownership</span><span style="width:82px; flex-shrink:0; font-weight:700;">Expert</span><span style="display:flex; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:12px;"><span style="width:200px; flex-shrink:0;">Experimentation</span><span style="width:82px; flex-shrink:0; font-weight:700;">Advanced</span><span style="display:flex; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:12px;"><span style="width:200px; flex-shrink:0;">Analytics and SQL</span><span style="width:82px; flex-shrink:0; font-weight:700;">Advanced</span><span style="display:flex; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+      <div style="display:flex; align-items:center; gap:12px;"><span style="width:200px; flex-shrink:0;">Pricing Strategy</span><span style="width:82px; flex-shrink:0; font-weight:700;">Proficient</span><span style="display:flex; gap:4px;"><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; background:#16161A;"></span><span style="width:8px; height:8px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span><span style="width:8px; height:8px; border-radius:50%; border:1px solid #B8B8BE; box-sizing:border-box;"></span></span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:8px;">EDUCATION</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>MSc Human-Computer Interaction</b> — Northfield University, 2016</div>
+      <div><b>BSc Information Systems</b> — Harbour University, 2014</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:12.5px; letter-spacing:2.4px; padding-bottom:6px; border-bottom:1px solid #D6D6DA; margin-bottom:8px;">CERTIFICATIONS</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Certified Scrum Product Owner — 2022</div>
+      <div>Reforge Advanced Growth Series — 2020</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 11 -->
+<div id="t11">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t11">11</a> — Caps Tick · ATS-safe · teal accent, tick-marked section labels</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:18px; font-family:'Open Sans',sans-serif; color:#14201E;">
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:38px; line-height:1.08; letter-spacing:-0.6px;">Marisol Adeyemi</div>
+    <div style="font-size:13.5px; font-weight:600; letter-spacing:3.2px; text-transform:uppercase; color:#0F766E; margin-top:8px;">People Operations Lead</div>
+    <div style="font-size:12px; color:#4E5A57; margin-top:9px; line-height:1.6;">m.adeyemi@example.com | +1 (555) 015-9120 | Denver, CO | example.com/madeyemi</div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Summary</span></div>
+    <p style="margin:0; font-size:12px; line-height:1.65;">People operations lead for fast-scaling teams — hiring systems, performance frameworks and the unglamorous policy work that keeps a company defensible as it doubles. Ten years across talent, HR operations and internal comms.</p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Key Achievements</span></div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-weight:700; color:#0F766E;">240</span> — Headcount supported across four countries</div>
+      <div><span style="font-weight:700; color:#0F766E;">38%</span> — Reduction in time to hire</div>
+      <div><span style="font-weight:700; color:#0F766E;">92%</span> — Offer acceptance rate sustained two years</div>
+      <div><span style="font-weight:700; color:#0F766E;">11 pts</span> — Improvement in engagement score</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Experience</span></div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Montserrat,sans-serif; font-weight:700; font-size:13px;">People Operations Lead</span>
+          <span style="font-size:11.5px; color:#5A6663; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#0F766E; margin:2px 0 4px;">Arowwai Group, Denver, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owns hiring, onboarding and performance cycles for 240 people across four countries.</li>
+          <li>Cut time to hire 38% by rebuilding the interview loop and killing three redundant stages.</li>
+          <li>Wrote the levelling framework now used for every promotion decision.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Montserrat,sans-serif; font-weight:700; font-size:13px;">HR Business Partner</span>
+          <span style="font-size:11.5px; color:#5A6663; white-space:nowrap;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#0F766E; margin:2px 0 4px;">Ginyard International, Boulder, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Partnered three engineering directors on org design and succession planning.</li>
+          <li>Ran the annual engagement survey and the action plan that lifted it eleven points.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Montserrat,sans-serif; font-weight:700; font-size:13px;">Talent Coordinator</span>
+          <span style="font-size:11.5px; color:#5A6663; white-space:nowrap;">2016 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#0F766E; margin:2px 0 4px;">Bellrock Supply, Boulder, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Scheduled and tracked 400 interviews a quarter across six hiring teams.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:9px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Skills</span></div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">Talent Acquisition</span><span style="font-weight:700; color:#0F766E;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">Performance Frameworks</span><span style="font-weight:700; color:#0F766E;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">Employment Policy</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">Compensation Benchmarking</span><span style="font-weight:700; color:#0F766E;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">HRIS Administration</span><span style="font-weight:700; color:#0F766E;">Proficient</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">People Analytics</span><span style="font-weight:700; color:#0F766E;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Education and Certifications</span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BA Organisational Psychology</b> — Northfield University, 2012 – 2016</div>
+      <div style="color:#4E5A57;">SHRM-CP, 2020 &nbsp;·&nbsp; Certified Compensation Professional, 2022</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">Languages</span></div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">English</span><span style="font-weight:700; color:#0F766E;">Native</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:225px; flex-shrink:0;">Spanish</span><span style="font-weight:700; color:#0F766E;">Fluent</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 12 -->
+<div id="t12">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t12">12</a> — Serif Editorial · ATS-safe · ink only, executive register, generous leading</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:62px 76px; display:flex; flex-direction:column; gap:20px; font-family:'Open Sans',sans-serif; color:#1C1F26;">
+
+  <div style="text-align:center;">
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:36px; line-height:1.15; letter-spacing:0.4px;">Beatriz Salcedo</div>
+    <div style="font-size:12.5px; letter-spacing:4.6px; text-transform:uppercase; color:#4A5568; margin-top:11px;">Chief Operating Officer</div>
+    <div style="height:1px; background:#1C1F26; margin:14px 0 12px;"></div>
+    <div style="font-size:12px; color:#4A5568; line-height:1.6;">b.salcedo@example.com | +1 (555) 011-7788 | Chicago, IL | example.com/bsalcedo</div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:8px;">Summary</div>
+    <p style="margin:0; font-size:12.5px; line-height:1.75;">Operating executive for scaling services businesses. Sixteen years turning fragmented delivery organisations into ones that forecast accurately, hire deliberately and hold margin under growth. Reports to the board on operations, and has integrated two acquisitions without losing a quarter.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:8px;">Key Achievements</div>
+    <div style="font-size:12.5px; line-height:1.85;">
+      <div><span style="font-family:Merriweather,serif; font-weight:700;">$84M</span> — Revenue under operational ownership</div>
+      <div><span style="font-family:Merriweather,serif; font-weight:700;">9 pts</span> — Gross margin improvement over three years</div>
+      <div><span style="font-family:Merriweather,serif; font-weight:700;">320</span> — Employees across five business units</div>
+      <div><span style="font-family:Merriweather,serif; font-weight:700;">2</span> — Acquisitions integrated end to end</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:10px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px;">Chief Operating Officer</span>
+          <span style="font-size:11.5px; color:#5B6472; white-space:nowrap;">2020 – Present</span>
+        </div>
+        <div style="font-size:12.5px; color:#4A5568; margin:3px 0 5px;">Arowwai Services, Chicago, IL</div>
+        <ul style="margin:0; padding-left:18px; font-size:12.5px; line-height:1.65;">
+          <li>Owns delivery, planning and support for an $84M services business of 320 people.</li>
+          <li>Lifted gross margin nine points by consolidating five delivery models into two.</li>
+          <li>Integrated two acquisitions without a missed quarter or a leadership departure.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px;">VP Operations</span>
+          <span style="font-size:11.5px; color:#5B6472; white-space:nowrap;">2016 – 2020</span>
+        </div>
+        <div style="font-size:12.5px; color:#4A5568; margin:3px 0 5px;">Ginyard International, Milwaukee, WI</div>
+        <ul style="margin:0; padding-left:18px; font-size:12.5px; line-height:1.65;">
+          <li>Built the capacity model that ended three years of chronic over-hiring.</li>
+          <li>Established the quarterly business review discipline still used company-wide.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Merriweather,serif; font-weight:700; font-size:13.5px;">Director of Delivery</span>
+          <span style="font-size:11.5px; color:#5B6472; white-space:nowrap;">2012 – 2016</span>
+        </div>
+        <div style="font-size:12.5px; color:#4A5568; margin:3px 0 5px;">Bellrock Partners, Milwaukee, WI</div>
+        <ul style="margin:0; padding-left:18px; font-size:12.5px; line-height:1.65;">
+          <li>Ran a 70-person delivery group across eleven concurrent client programmes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:9px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12.5px;">
+      <div style="display:flex; gap:12px;"><span style="width:235px; flex-shrink:0;">Operational Strategy</span><span style="font-weight:700;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:235px; flex-shrink:0;">P&amp;L Ownership</span><span style="font-weight:700;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:235px; flex-shrink:0;">Post-Merger Integration</span><span style="font-weight:700;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:235px; flex-shrink:0;">Board Reporting</span><span style="font-weight:700;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:235px; flex-shrink:0;">Workforce Planning</span><span style="font-weight:700;">Advanced</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Merriweather,serif; font-weight:700; font-size:13px; letter-spacing:2.4px; text-transform:uppercase; margin-bottom:8px;">Education</div>
+    <div style="font-size:12.5px; line-height:1.75;">
+      <div><b>MBA</b> — Harbour Business School, 2010</div>
+      <div><b>BSc Industrial Engineering</b> — Northfield University, 2006</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 13 -->
+<div id="t13">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t13">13</a> — Mono Tech · ATS-safe · monospace labels, signal blue, engineering register</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:54px 62px; display:flex; flex-direction:column; gap:17px; font-family:'Source Sans 3',sans-serif; color:#12141A;">
+
+  <div>
+    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.04; letter-spacing:-1.2px;">Marek Halvorsen</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; letter-spacing:1.4px; color:#2563EB; margin-top:8px;">Senior Software Engineer</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#525866; margin-top:9px; line-height:1.7;">m.halvorsen@example.com | +1 (555) 017-7040 | Seattle, WA | example.com/mhalvorsen</div>
+  </div>
+  <div style="height:1px; background:#12141A;"></div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:7px;">SUMMARY</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Backend-leaning engineer, eight years across platform and product. Happiest reducing a slow, tangled service to something a new hire can read in an afternoon. Owns the on-call rotation and the postmortem practice behind it.</p>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:7px;">KEY ACHIEVEMENTS</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.9;">
+      <div><span style="font-weight:600; color:#2563EB;">40%</span> — p95 latency cut at unchanged infrastructure cost</div>
+      <div><span style="font-weight:600; color:#2563EB;">8 yrs</span> — Production systems owned end to end</div>
+      <div><span style="font-weight:600; color:#2563EB;">6</span> — Engineers mentored through first full cycle</div>
+      <div><span style="font-weight:600; color:#2563EB;">900</span> — Stars on a maintained open-source library</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:9px;">EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:13.5px;">Senior Software Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#525866; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#333844; margin:2px 0 4px;">TechInnovate Ltd, Seattle, WA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Led the rewrite of the request pipeline, cutting p95 latency 40% at unchanged infrastructure cost.</li>
+          <li>Designed the public REST surface now used by every third-party integration.</li>
+          <li>Runs the on-call rotation and the postmortem practice behind it.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:13.5px;">Software Developer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#525866; white-space:nowrap;">2018 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#333844; margin:2px 0 4px;">InnoTech Solutions, Portland, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Built front-end and service components across the customer portal.</li>
+          <li>Introduced the automated test harness that took regression escapes to near zero.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Archivo,sans-serif; font-weight:800; font-size:13.5px;">Junior Developer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#525866; white-space:nowrap;">2016 – 2018</span>
+        </div>
+        <div style="font-size:12px; color:#333844; margin:2px 0 4px;">Bellrock Systems, Portland, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Maintained internal tooling and the nightly batch that fed it.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:8px;">SKILLS</div>
+    <div style="display:flex; flex-direction:column; gap:4px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;">
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Python</span><span style="font-weight:600; color:#2563EB;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Distributed Systems</span><span style="font-weight:600; color:#2563EB;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">TypeScript</span><span style="font-weight:600; color:#2563EB;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Cloud and Infrastructure as Code</span><span style="font-weight:600; color:#2563EB;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">PostgreSQL</span><span style="font-weight:600; color:#2563EB;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">Data Modelling</span><span style="font-weight:600; color:#2563EB;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:7px;">EDUCATION AND CERTIFICATIONS</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>MSc Software Engineering</b> — University of Northfield, 2016</div>
+      <div><b>BSc Computer Science</b> — Harbour University, 2014</div>
+      <div style="color:#525866;">Certified Kubernetes Administrator, 2023 &nbsp;·&nbsp; AWS Solutions Architect Associate, 2021</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.6px; color:#2563EB; margin-bottom:7px;">SELECTED OPEN SOURCE</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>queue-relay</b> — Maintainer, 900 stars. Backpressure-aware task relay for Python services.</div>
+      <div><b>pytest-snapshot-lite</b> — Contributor. Minimal snapshot assertions without a plugin chain.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 14 -->
+<div id="t14">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t14">14</a> — Numbered · ATS-safe · numbered sections, rust accent, flush-left</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 64px; display:flex; flex-direction:column; gap:16px; font-family:'Source Sans 3',sans-serif; color:#181614;">
+
+  <div>
+    <div style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:46px; line-height:1.02; letter-spacing:-0.4px; text-transform:uppercase;">Priya Narayan</div>
+    <div style="font-size:13.5px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#B93E12; margin-top:8px;">Data Analyst</div>
+    <div style="font-size:12px; color:#57524E; margin-top:9px; line-height:1.6;">p.narayan@example.com | +1 (555) 012-3390 | Atlanta, GA | example.com/pnarayan</div>
+  </div>
+  <div style="height:3px; background:#B93E12; width:74px;"></div>
+
+  <div>
+    <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:7px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">01</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">Summary</span></div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Analyst working between the warehouse and the people who ask for numbers — turning ambiguous questions into models the business actually acts on. Seven years across forecasting, experimentation and reporting automation.</p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:7px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">02</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">Key Achievements</span></div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#B93E12;">8.4%</span> — Forecast WAPE on the demand model</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#B93E12;">12.6%</span> — Revenue lift from a pricing experiment</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#B93E12;">14 hrs</span> — Weekly reporting time automated away</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#B93E12;">40+</span> — Dashboards owned across four teams</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:9px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">03</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">Experience</span></div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px;">Senior Data Analyst</span>
+          <span style="font-size:11.5px; color:#57524E; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#B93E12; margin:2px 0 4px;">Arowwai Retail, Atlanta, GA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owns the demand forecast for 1,200 SKUs, holding WAPE at 8.4% through two seasonal shifts.</li>
+          <li>Designed and read the pricing experiment that added 12.6% to category revenue.</li>
+          <li>Replaced fourteen hours of weekly manual reporting with a scheduled pipeline.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px;">Data Analyst</span>
+          <span style="font-size:11.5px; color:#57524E; white-space:nowrap;">2019 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#B93E12; margin:2px 0 4px;">Ginyard Commerce, Nashville, TN</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Built the marketing attribution model used for quarterly budget allocation.</li>
+          <li>Standardised metric definitions across four teams that had been reporting differently.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px;">Reporting Analyst</span>
+          <span style="font-size:11.5px; color:#57524E; white-space:nowrap;">2017 – 2019</span>
+        </div>
+        <div style="font-size:12px; color:#B93E12; margin:2px 0 4px;">Bellrock Supply, Nashville, TN</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Maintained the weekly commercial reporting pack for the leadership team.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:8px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">04</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">Skills</span></div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">SQL</span><span style="font-weight:700; color:#B93E12;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Python and pandas</span><span style="font-weight:700; color:#B93E12;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Forecasting</span><span style="font-weight:700; color:#B93E12;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Experiment Design</span><span style="font-weight:700; color:#B93E12;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">dbt and Warehouse Modelling</span><span style="font-weight:700; color:#B93E12;">Proficient</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Looker and Power BI</span><span style="font-weight:700; color:#B93E12;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:8px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">05</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">Education</span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>MSc Statistics</b> — Northfield University, 2017</div>
+      <div><b>BSc Mathematics</b> — Harbour University, 2015</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 15 -->
+<div id="t15">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t15">15</a> — Split Rule · ATS-safe · plum accent, label-then-rule section heads</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:17px; font-family:'Open Sans',sans-serif; color:#191520;">
+
+  <div>
+    <div style="font-family:Poppins,sans-serif; font-weight:700; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">Rowan Pike</div>
+    <div style="font-size:13.5px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#6B2A5A; margin-top:8px;">Senior Account Executive</div>
+    <div style="font-size:12px; color:#544E5C; margin-top:9px; line-height:1.6;">r.pike@example.com | +1 (555) 014-2880 | Charlotte, NC | example.com/rpike</div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Summary</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Enterprise seller who grows territories by fixing qualification rather than adding activity. Eight years carrying quota across three verticals, with a record of turning renewals into expansion conversations.</p>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Key Achievements</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><span style="font-family:Poppins,sans-serif; font-weight:700; color:#6B2A5A;">$6.4M</span> — Book of business owned</div>
+      <div><span style="font-family:Poppins,sans-serif; font-weight:700; color:#6B2A5A;">128%</span> — Average quota attainment over eight quarters</div>
+      <div><span style="font-family:Poppins,sans-serif; font-weight:700; color:#6B2A5A;">94%</span> — Client retention across 22 enterprise renewals</div>
+      <div><span style="font-family:Poppins,sans-serif; font-weight:700; color:#6B2A5A;">31%</span> — Territory growth in three years</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Experience</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px;">Senior Account Executive</span>
+          <span style="font-size:11.5px; color:#5C5666; white-space:nowrap;">2021 – Present</span>
+        </div>
+        <div style="font-size:12px; color:#6B2A5A; margin:2px 0 4px;">Halden Commercial, Charlotte, NC</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Grew a $6.4M territory 31% in three years by rebuilding the qualification model.</li>
+          <li>Closed 22 enterprise renewals at 94% retention while mentoring four junior reps.</li>
+          <li>Averaged 128% of quota over eight consecutive quarters.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px;">Account Executive</span>
+          <span style="font-size:11.5px; color:#5C5666; white-space:nowrap;">2019 – 2021</span>
+        </div>
+        <div style="font-size:12px; color:#6B2A5A; margin:2px 0 4px;">Halden Commercial, Charlotte, NC</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Sourced and qualified outbound pipeline across three verticals.</li>
+          <li>Lifted average deal size 20% by pairing usage data with tailored upsell proposals.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px;">Sales Associate</span>
+          <span style="font-size:11.5px; color:#5C5666; white-space:nowrap;">2017 – 2019</span>
+        </div>
+        <div style="font-size:12px; color:#6B2A5A; margin:2px 0 4px;">Bellrock Supply, Raleigh, NC</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Handled inbound qualification for a 900-account book at 98% CRM hygiene.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:9px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Skills</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Pipeline Strategy</span><span style="font-weight:700; color:#6B2A5A;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Negotiation</span><span style="font-weight:700; color:#6B2A5A;">Expert</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Account Growth</span><span style="font-weight:700; color:#6B2A5A;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Forecasting</span><span style="font-weight:700; color:#6B2A5A;">Advanced</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">CRM Operations</span><span style="font-weight:700; color:#6B2A5A;">Proficient</span></div>
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">Market Research</span><span style="font-weight:700; color:#6B2A5A;">Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Education</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Business Management</b> — Northfield University, 2013 – 2017</div>
+      <div style="color:#544E5C;">Diploma in Commercial Strategy — Harbour Business School, 2019</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">Certifications</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Challenger Selling Certification — 2022</div>
+      <div>Salesforce Certified Administrator — 2020</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 16 -->
+<!-- ATS-SAFE INVARIANTS (all of 16–25): single linear column, source order = reading order. No tables,
+     no side rails, no absolutely-positioned content, no icons, photos or logos. No content in CSS.
+     Real <ul>/<li> bullets. Canonical single-word section headings only (SUMMARY / KEY ACHIEVEMENTS /
+     EXPERIENCE / SKILLS / EDUCATION / CERTIFICATIONS) — no combined or invented labels. Section-label
+     tracking capped at 1.2px so PDF text extraction cannot fragment the heading. Every skill row
+     carries name, a real em-dash separator character, and level as selectable text. Date ranges use a
+     plain hyphen. Distinction comes from palette, type pairing and rule language only. -->
+<div id="t16">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t16">16</a> — Rule Stack · ATS-safe · Fraunces masthead, terracotta accent, double-rule heads</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:50px 64px; display:flex; flex-direction:column; gap:14px; font-family:'Source Sans 3',sans-serif; color:#1A1714;">
+
+  <div>
+    <div style="font-family:Fraunces,serif; font-weight:700; font-size:44px; line-height:1.04;">Imani Castellanos</div>
+    <div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#A6462B; margin-top:8px;">Operations Director</div>
+    <div style="font-size:12px; color:#5B534C; margin-top:8px; line-height:1.6;">i.castellanos@example.com | +1 (555) 016-3204 | Denver, CO | example.com/icastellanos</div>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:9px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Summary</span></div>
+    <p style="margin:0; font-size:12px; line-height:1.62;">Operations director who treats process as a product — twelve years turning manual coordination into systems that hold up when volume triples. Runs distribution, vendor strategy and a 40-person floor across three sites.</p>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:9px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Key Achievements</span></div>
+    <div style="font-size:12px; line-height:1.78;">
+      <div><span style="font-family:Fraunces,serif; font-weight:700; color:#A6462B;">$18M</span> — Annual operating budget owned</div>
+      <div><span style="font-family:Fraunces,serif; font-weight:700; color:#A6462B;">34%</span> — Reduction in order cycle time over two years</div>
+      <div><span style="font-family:Fraunces,serif; font-weight:700; color:#A6462B;">99.2%</span> — On-time fulfilment at peak season</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:10px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Experience</span></div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Operations Director</span>
+          <span style="font-size:11.5px; color:#5B534C; white-space:nowrap;">2020 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#A6462B; margin:2px 0 4px;">Cardell Distribution, Denver, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Cut order cycle time 34% by rebuilding the pick-and-pack sequence around demand bands.</li>
+          <li>Held 99.2% on-time fulfilment through a peak season with 2.4x normal volume.</li>
+          <li>Renegotiated seven carrier contracts, saving $1.1M against the prior year baseline.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Operations Manager</span>
+          <span style="font-size:11.5px; color:#5B534C; white-space:nowrap;">2017 - 2020</span>
+        </div>
+        <div style="font-size:12px; color:#A6462B; margin:2px 0 4px;">Cardell Distribution, Denver, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Opened a second site in eleven weeks and staffed it to full capacity in one quarter.</li>
+          <li>Introduced weekly variance reviews that took inventory shrink from 2.8% to 0.9%.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Logistics Coordinator</span>
+          <span style="font-size:11.5px; color:#5B534C; white-space:nowrap;">2014 - 2017</span>
+        </div>
+        <div style="font-size:12px; color:#A6462B; margin:2px 0 4px;">Brightmoor Freight, Pueblo, CO</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Scheduled 300 weekly shipments and owned exception handling for the western lane.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:9px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Skills</span></div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Supply Chain Planning</span><span style="font-weight:700; color:#A6462B;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Vendor Negotiation</span><span style="font-weight:700; color:#A6462B;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Process Design</span><span style="font-weight:700; color:#A6462B;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Inventory Control</span><span style="font-weight:700; color:#A6462B;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Team Leadership</span><span style="font-weight:700; color:#A6462B;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Demand Forecasting</span><span style="font-weight:700; color:#A6462B;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:8px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Education</span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Industrial Engineering</b> — Northfield University, 2010 - 2014</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:6px 0; margin-bottom:8px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Certifications</span></div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Certified Supply Chain Professional — 2021</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 17 -->
+<div id="t17">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t17">17</a> — Wide Caps · ATS-safe · Anton masthead, forest accent, hairline-only structure</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 62px; display:flex; flex-direction:column; gap:17px; font-family:Inter,sans-serif; color:#141A17;">
+
+  <div style="border-bottom:3px solid #1F4436; padding-bottom:12px;">
+    <div style="font-family:Anton,sans-serif; font-size:52px; line-height:0.98; letter-spacing:0.5px; text-transform:uppercase;">Dashiell Moreau</div>
+    <div style="font-size:13px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-top:10px;">Construction Project Manager</div>
+    <div style="font-size:12px; color:#4E574F; margin-top:8px; line-height:1.6;">d.moreau@example.com | +1 (555) 017-9911 | Austin, TX | example.com/dmoreau</div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.62;">Project manager for commercial builds between $5M and $60M. Fourteen years bringing schedules back from the brink by fixing sequencing and subcontractor communication rather than adding crews.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.78;">
+      <div><span style="font-family:Anton,sans-serif; color:#1F4436;">$60M</span> — Largest single project delivered</div>
+      <div><span style="font-family:Anton,sans-serif; color:#1F4436;">21</span> — Commercial builds completed on or under budget</div>
+      <div><span style="font-family:Anton,sans-serif; color:#1F4436;">0</span> — Lost-time incidents across four years</div>
+      <div><span style="font-family:Anton,sans-serif; color:#1F4436;">11%</span> — Average schedule compression against baseline</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #D2D8D3; padding-bottom:3px;">
+          <span style="font-weight:700; font-size:13px;">Senior Project Manager</span>
+          <span style="font-size:11.5px; color:#4E574F; white-space:nowrap;">2019 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#1F4436; margin:3px 0 4px;">Halloran Build Group, Austin, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Delivered a $60M mixed-use build four weeks early by resequencing the envelope trades.</li>
+          <li>Held zero lost-time incidents across four years and 900,000 site hours.</li>
+          <li>Ran weekly cost-to-complete reviews that kept eleven projects inside contingency.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #D2D8D3; padding-bottom:3px;">
+          <span style="font-weight:700; font-size:13px;">Project Manager</span>
+          <span style="font-size:11.5px; color:#4E574F; white-space:nowrap;">2015 - 2019</span>
+        </div>
+        <div style="font-size:12px; color:#1F4436; margin:3px 0 4px;">Halloran Build Group, Austin, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Managed six retail fit-outs concurrently at an average value of $8M.</li>
+          <li>Rebuilt the submittal process, cutting approval turnaround from 12 days to 4.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; border-bottom:1px solid #D2D8D3; padding-bottom:3px;">
+          <span style="font-weight:700; font-size:13px;">Assistant Project Manager</span>
+          <span style="font-size:11.5px; color:#4E574F; white-space:nowrap;">2012 - 2015</span>
+        </div>
+        <div style="font-size:12px; color:#1F4436; margin:3px 0 4px;">Verrick Contractors, San Antonio, TX</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Owned RFIs, change orders and closeout documentation for three concurrent builds.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Schedule Management</span><span style="font-weight:700; color:#1F4436;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Cost Control</span><span style="font-weight:700; color:#1F4436;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Subcontractor Management</span><span style="font-weight:700; color:#1F4436;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Site Safety</span><span style="font-weight:700; color:#1F4436;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Contract Administration</span><span style="font-weight:700; color:#1F4436;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">BIM Coordination</span><span style="font-weight:700; color:#1F4436;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">Education</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Construction Management</b> — Northfield University, 2008 - 2012</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">Certifications</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Project Management Professional — 2017</div>
+      <div>OSHA 30-Hour Construction Safety — 2016</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 18 -->
+<div id="t18">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t18">18</a> — Indent Rule · ATS-safe · indigo accent, left border marking each section</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 60px; display:flex; flex-direction:column; gap:28px; font-family:Montserrat,sans-serif; color:#16182B;">
+
+  <div style="border-left:4px solid #35408E; padding-left:16px;">
+    <div style="font-weight:800; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">Nadia Okonjo-Reyes</div>
+    <div style="font-size:12.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-top:8px;">Human Resources Business Partner</div>
+    <div style="font-size:12px; color:#525573; margin-top:8px; line-height:1.6;">n.okonjo@example.com | +1 (555) 018-4507 | Minneapolis, MN | example.com/nokonjo</div>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:6px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">HR business partner to engineering and commercial leadership. Ten years turning attrition and hiring problems into structural fixes — levelling, compensation bands, and manager capability rather than programmes.</p>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:6px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:2.0;">
+      <div><span style="font-weight:800; color:#35408E;">1,200</span> — Employees supported across two business units</div>
+      <div><span style="font-weight:800; color:#35408E;">9pt</span> — Drop in voluntary attrition over three years</div>
+      <div><span style="font-weight:800; color:#35408E;">38%</span> — Faster time-to-offer after redesigning the loop</div>
+      <div><span style="font-weight:800; color:#35408E;">6</span> — Compensation bands rebuilt and published</div>
+    </div>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:11px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Senior HR Business Partner</span>
+          <span style="font-size:11.5px; color:#525573; white-space:nowrap;">2021 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#35408E; margin:2px 0 4px;">Lindquist Systems, Minneapolis, MN</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Took voluntary attrition down 9 points by rebuilding levelling and pay transparency.</li>
+          <li>Partnered with 14 managers through a reorganisation affecting 340 roles.</li>
+          <li>Published six compensation bands and closed 22 out-of-band cases in one cycle.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">HR Business Partner</span>
+          <span style="font-size:11.5px; color:#525573; white-space:nowrap;">2018 - 2021</span>
+        </div>
+        <div style="font-size:12px; color:#35408E; margin:2px 0 4px;">Lindquist Systems, Minneapolis, MN</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Cut time-to-offer 38% by removing two redundant interview stages.</li>
+          <li>Ran manager capability training for 60 first-time people leaders.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Talent Acquisition Specialist</span>
+          <span style="font-size:11.5px; color:#525573; white-space:nowrap;">2015 - 2018</span>
+        </div>
+        <div style="font-size:12px; color:#35408E; margin:2px 0 4px;">Averton Group, Saint Paul, MN</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Filled 90 technical roles a year while lifting offer-accept rate to 87%.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:9px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Organisational Design</span><span style="font-weight:700; color:#35408E;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Compensation Strategy</span><span style="font-weight:700; color:#35408E;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Employee Relations</span><span style="font-weight:700; color:#35408E;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Workforce Planning</span><span style="font-weight:700; color:#35408E;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Talent Acquisition</span><span style="font-weight:700; color:#35408E;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">People Analytics</span><span style="font-weight:700; color:#35408E;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:7px;">Education</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>MA Industrial and Organisational Psychology</b> — Harbour State University, 2013 - 2015</div>
+      <div style="color:#525573;">BA Sociology — Northfield University, 2009 - 2013</div>
+    </div>
+  </div>
+
+  <div style="border-left:4px solid #DADCEC; padding-left:16px;">
+    <div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:7px;">Certifications</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>SHRM Senior Certified Professional — 2020</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 19 -->
+<div id="t19">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t19">19</a> — Ochre Ledger · ATS-safe · mono dates, right-hand rule column, warm neutral</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:54px 62px; display:flex; flex-direction:column; gap:28px; font-family:'Source Sans 3',sans-serif; color:#1C1A15;">
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px; border-bottom:1px solid #1C1A15; padding-bottom:11px;">
+    <div>
+      <div style="font-weight:900; font-size:42px; line-height:1.02; letter-spacing:-0.8px;">Teodoro Vasquez</div>
+      <div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-top:8px;">Financial Controller</div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5D584D; line-height:1.65; text-align:right; white-space:nowrap;">t.vasquez@example.com<br>+1 (555) 019-7726<br>Chicago, IL</div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.62;">Controller for a $240M manufacturer. Thirteen years closing books faster each year while making the numbers legible to people who do not read financial statements for a living.</p>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.78;">
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#B0761A;">$240M</span> — Annual revenue under financial control</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#B0761A;">3 days</span> — Month-end close, down from eleven</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#B0761A;">$4.6M</span> — Working capital released from receivables</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#B0761A;">0</span> — Material audit findings across six years</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Financial Controller</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5D584D; white-space:nowrap;">2019 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#B0761A; margin:2px 0 4px;">Whitlock Industrial, Chicago, IL</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Took month-end close from eleven days to three by automating intercompany reconciliation.</li>
+          <li>Released $4.6M of working capital by rebuilding collections terms and dunning cadence.</li>
+          <li>Closed six consecutive audits with no material findings across four legal entities.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Assistant Controller</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5D584D; white-space:nowrap;">2016 - 2019</span>
+        </div>
+        <div style="font-size:12px; color:#B0761A; margin:2px 0 4px;">Whitlock Industrial, Chicago, IL</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Built the monthly reporting pack still used by the executive team and board.</li>
+          <li>Led the ERP migration for the finance module across three sites with no close delay.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Senior Accountant</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5D584D; white-space:nowrap;">2013 - 2016</span>
+        </div>
+        <div style="font-size:12px; color:#B0761A; margin:2px 0 4px;">Renfrew Audit Partners, Chicago, IL</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Ran statutory audits for nine mid-market manufacturing and distribution clients.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Financial Reporting</span><span style="font-weight:700; color:#B0761A;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Internal Controls</span><span style="font-weight:700; color:#B0761A;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Cash Flow Management</span><span style="font-weight:700; color:#B0761A;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Cost Accounting</span><span style="font-weight:700; color:#B0761A;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">ERP Implementation</span><span style="font-weight:700; color:#B0761A;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Tax Compliance</span><span style="font-weight:700; color:#B0761A;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">Education</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Accounting</b> — Northfield University, 2009 - 2013</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">Certifications</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Certified Public Accountant — 2015</div>
+      <div>Certified Management Accountant — 2018</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 20 -->
+<div id="t20">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t20">20</a> — Centred Serif · ATS-safe · burgundy accent, centred masthead, quiet register</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 78px; display:flex; flex-direction:column; gap:28px; font-family:Merriweather,serif; color:#1B1517;">
+
+  <div style="text-align:center; border-bottom:1px solid #6E1F2B; padding-bottom:13px;">
+    <div style="font-weight:700; font-size:34px; line-height:1.15;">Cordelia Ashgrove</div>
+    <div style="font-family:Inter,sans-serif; font-size:12px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-top:9px;">General Counsel</div>
+    <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#5A5054; margin-top:8px; line-height:1.6;">c.ashgrove@example.com | +1 (555) 020-6188 | Boston, MA</div>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:6px;">Summary</div>
+    <p style="margin:0; font-size:11.5px; line-height:1.68;">General counsel for a 600-person technology business. Sixteen years making legal a faster route rather than a slower one — commercial contracting, privacy, and a board that gets bad news early.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:6px;">Key Achievements</div>
+    <div style="font-family:Inter,sans-serif; font-size:11.5px; line-height:1.8;">
+      <div><span style="font-weight:700; color:#6E1F2B;">$210M</span> — Transaction value negotiated and closed</div>
+      <div><span style="font-weight:700; color:#6E1F2B;">62%</span> — Faster contract turnaround after playbook rollout</div>
+      <div><span style="font-weight:700; color:#6E1F2B;">4</span> — Jurisdictions brought into privacy compliance</div>
+      <div><span style="font-weight:700; color:#6E1F2B;">$1.8M</span> — Outside counsel spend reduced annually</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:8px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:11px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">General Counsel</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#5A5054; white-space:nowrap;">2020 - Present</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#6E1F2B; margin:2px 0 4px;">Pellingham Technologies, Boston, MA</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:11.5px; line-height:1.58;">
+          <li>Negotiated and closed $210M of transaction value across acquisitions and licensing.</li>
+          <li>Cut contract turnaround 62% with a self-serve playbook for the commercial team.</li>
+          <li>Reduced outside counsel spend $1.8M a year by bringing privacy work in house.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Deputy General Counsel</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#5A5054; white-space:nowrap;">2016 - 2020</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#6E1F2B; margin:2px 0 4px;">Pellingham Technologies, Boston, MA</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:11.5px; line-height:1.58;">
+          <li>Built the commercial contracting function from one lawyer to a team of five.</li>
+          <li>Brought four jurisdictions into privacy compliance ahead of statutory deadlines.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Associate, Corporate</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#5A5054; white-space:nowrap;">2010 - 2016</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#6E1F2B; margin:2px 0 4px;">Marchetti and Vale, Boston, MA</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:11.5px; line-height:1.58;">
+          <li>Advised technology clients on financings, licensing and commercial arrangements.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:7px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:9px; font-family:Inter,sans-serif; font-size:11.5px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Commercial Contracting</span><span style="font-weight:700; color:#6E1F2B;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Mergers and Acquisitions</span><span style="font-weight:700; color:#6E1F2B;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Data Privacy</span><span style="font-weight:700; color:#6E1F2B;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Corporate Governance</span><span style="font-weight:700; color:#6E1F2B;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Employment Law</span><span style="font-weight:700; color:#6E1F2B;">— Proficient</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Intellectual Property</span><span style="font-weight:700; color:#6E1F2B;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:6px;">Education</div>
+    <div style="font-family:Inter,sans-serif; font-size:11.5px; line-height:1.7;">
+      <div><b>Juris Doctor</b> — Harbour School of Law, 2007 - 2010</div>
+      <div style="color:#5A5054;">BA Political Science — Northfield University, 2003 - 2007</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Inter,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#6E1F2B; margin-bottom:6px;">Certifications</div>
+    <div style="font-family:Inter,sans-serif; font-size:11.5px; line-height:1.7;">
+      <div>Certified Information Privacy Professional — 2019</div>
+      <div>Admitted to the Massachusetts Bar — 2010</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 21 -->
+<div id="t21">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t21">21</a> — Mono Label · ATS-safe · cyan on slate, monospace headings, engineering register</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 60px; display:flex; flex-direction:column; gap:28px; font-family:Inter,sans-serif; color:#0F1A20;">
+
+  <div style="border-bottom:2px solid #0E7490; padding-bottom:12px;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:38px; line-height:1.06; letter-spacing:-1px;">Kwabena Lindholm</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500; letter-spacing:1.2px; text-transform:uppercase; color:#0E7490; margin-top:9px;">Site Reliability Engineer</div>
+    <div style="font-size:12px; color:#4A5A63; margin-top:8px; line-height:1.6;">k.lindholm@example.com | +1 (555) 021-3355 | Portland, OR | example.com/klindholm</div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:6px;">SUMMARY</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Reliability engineer for high-traffic payment infrastructure. Nine years reducing pages rather than adding dashboards — error budgets, honest postmortems, and automation that removes the class of failure.</p>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:6px;">KEY ACHIEVEMENTS</div>
+    <div style="font-size:12px; line-height:1.78;">
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#0E7490;">99.99%</span> — Availability sustained across eight quarters</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#0E7490;">71%</span> — Reduction in paging volume per on-call week</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#0E7490;">4.2min</span> — Median time to detect, down from 26 minutes</div>
+      <div><span style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:#0E7490;">1.1B</span> — Daily requests under reliability ownership</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:9px;">EXPERIENCE</div>
+    <div style="display:flex; flex-direction:column; gap:11px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Staff Site Reliability Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#4A5A63; white-space:nowrap;">2021 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#0E7490; margin:2px 0 4px;">Northgate Payments, Portland, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Held 99.99% availability on a 1.1B request per day payment path for eight quarters.</li>
+          <li>Cut paging volume 71% by eliminating the three highest-frequency failure classes.</li>
+          <li>Brought median detection time from 26 minutes to 4.2 by rewriting alerting on SLOs.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Site Reliability Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#4A5A63; white-space:nowrap;">2018 - 2021</span>
+        </div>
+        <div style="font-size:12px; color:#0E7490; margin:2px 0 4px;">Northgate Payments, Portland, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Migrated 140 services to a shared deployment pipeline with automated rollback.</li>
+          <li>Introduced blameless postmortems and drove action-item closure to 94%.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:13px;">Systems Engineer</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#4A5A63; white-space:nowrap;">2016 - 2018</span>
+        </div>
+        <div style="font-size:12px; color:#0E7490; margin:2px 0 4px;">Calderwood Hosting, Eugene, OR</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Automated fleet provisioning for 2,000 hosts, removing all manual build steps.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:8px;">SKILLS</div>
+    <div style="display:flex; flex-direction:column; gap:9px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Kubernetes</span><span style="font-weight:700; color:#0E7490;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Observability and SLOs</span><span style="font-weight:700; color:#0E7490;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Incident Command</span><span style="font-weight:700; color:#0E7490;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Terraform</span><span style="font-weight:700; color:#0E7490;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Go</span><span style="font-weight:700; color:#0E7490;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Capacity Planning</span><span style="font-weight:700; color:#0E7490;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:7px;">EDUCATION</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSc Computer Engineering</b> — Northfield University, 2012 - 2016</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; color:#0E7490; margin-bottom:7px;">CERTIFICATIONS</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Certified Kubernetes Administrator — 2021</div>
+      <div>AWS Solutions Architect Professional — 2019</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 22 -->
+<div id="t22">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t22">22</a> — Accent Bar · ATS-safe · one full-bleed crimson band, Archivo black masthead</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:0 0 52px; display:flex; flex-direction:column; gap:30px; font-family:Archivo,sans-serif; color:#171215;">
+
+  <div style="padding:46px 60px 0;">
+    <div style="font-weight:900; font-size:48px; line-height:1; letter-spacing:-1.6px; text-transform:uppercase;">Saoirse Delacroix</div>
+  </div>
+  <div style="background:#9B1B30; color:#ffffff; padding:11px 60px; margin-top:-4px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:20px;">
+      <span style="font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">Registered Nurse, Critical Care</span>
+      <span style="font-size:11.5px; white-space:nowrap;">s.delacroix@example.com | +1 (555) 022-8140 | Phoenix, AZ</span>
+    </div>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:6px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.6;">Critical care nurse with eleven years in a level-one trauma unit. Charge experience across nights, precepting new graduates, and the quiet work of keeping a floor calm when it should not be.</p>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:6px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:2.05;">
+      <div><span style="font-weight:900; color:#9B1B30;">28</span> — Bed intensive care unit covered as charge nurse</div>
+      <div><span style="font-weight:900; color:#9B1B30;">41</span> — New graduate nurses precepted to independent practice</div>
+      <div><span style="font-weight:900; color:#9B1B30;">26%</span> — Fall in central line infections after protocol revision</div>
+      <div><span style="font-weight:900; color:#9B1B30;">98%</span> — Patient satisfaction on unit surveys, two years running</div>
+    </div>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:15px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Charge Nurse, Intensive Care</span>
+          <span style="font-size:11.5px; color:#5A5054; white-space:nowrap;">2020 - Present</span>
+        </div>
+        <div style="font-size:12px; color:#9B1B30; margin:2px 0 4px;">Vermilion Regional Medical Center, Phoenix, AZ</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Run night charge for a 28-bed unit, coordinating admissions with the trauma service.</li>
+          <li>Revised the central line protocol and cut associated infections 26% in one year.</li>
+          <li>Precepted 41 new graduate nurses, with 38 still in practice on the unit.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Registered Nurse, Intensive Care</span>
+          <span style="font-size:11.5px; color:#5A5054; white-space:nowrap;">2016 - 2020</span>
+        </div>
+        <div style="font-size:12px; color:#9B1B30; margin:2px 0 4px;">Vermilion Regional Medical Center, Phoenix, AZ</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Carried a two-patient critical assignment including ventilated and post-arrest cases.</li>
+          <li>Served on the unit practice council and rewrote the handover checklist.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:800; font-size:13px;">Registered Nurse, Medical Surgical</span>
+          <span style="font-size:11.5px; color:#5A5054; white-space:nowrap;">2014 - 2016</span>
+        </div>
+        <div style="font-size:12px; color:#9B1B30; margin:2px 0 4px;">Ashfield Community Hospital, Tucson, AZ</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.55;">
+          <li>Managed a six-patient assignment on a 40-bed post-surgical floor.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Critical Care Nursing</span><span style="font-weight:800; color:#9B1B30;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Ventilator Management</span><span style="font-weight:800; color:#9B1B30;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Charge Nurse Leadership</span><span style="font-weight:800; color:#9B1B30;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Preceptorship</span><span style="font-weight:800; color:#9B1B30;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Infection Prevention</span><span style="font-weight:800; color:#9B1B30;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Electronic Health Records</span><span style="font-weight:800; color:#9B1B30;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:7px;">Education</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div><b>BSN Nursing</b> — Northfield University, 2010 - 2014</div>
+    </div>
+  </div>
+
+  <div style="padding:0 60px;">
+    <div style="font-weight:900; font-size:13px; letter-spacing:1.2px; text-transform:uppercase; color:#9B1B30; margin-bottom:7px;">Certifications</div>
+    <div style="font-size:12px; line-height:1.7;">
+      <div>Critical Care Registered Nurse — 2018</div>
+      <div>Advanced Cardiac Life Support — renewed 2024</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 23 -->
+<div id="t23">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t23">23</a> — Open Air · ATS-safe · teal accent, no rules at all, space-only structure</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:62px 72px; display:flex; flex-direction:column; gap:22px; font-family:Poppins,sans-serif; color:#13201E;">
+
+  <div>
+    <div style="font-weight:600; font-size:38px; line-height:1.1; letter-spacing:-0.8px;">Elias Brandvold</div>
+    <div style="font-size:12.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-top:9px;">UX Research Lead</div>
+    <div style="font-size:11.5px; color:#57635F; margin-top:9px; line-height:1.65;">e.brandvold@example.com | +1 (555) 023-5072 | Seattle, WA | example.com/ebrandvold</div>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:8px;">Summary</div>
+    <p style="margin:0; font-size:12px; line-height:1.7; max-width:640px;">Research lead who works to change decisions, not to produce reports. Ten years embedding mixed-methods practice in product teams that previously guessed, and teaching them to run their own studies.</p>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:8px;">Key Achievements</div>
+    <div style="font-size:12px; line-height:1.85;">
+      <div><span style="font-weight:600; color:#0F6E63;">7</span> — Product teams supported by an embedded research practice</div>
+      <div><span style="font-weight:600; color:#0F6E63;">240</span> — Participant sessions run in the last two years</div>
+      <div><span style="font-weight:600; color:#0F6E63;">3x</span> — Growth in team-led studies after enabling self-serve research</div>
+      <div><span style="font-weight:600; color:#0F6E63;">18%</span> — Lift in task success on the redesigned onboarding flow</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:10px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:600; font-size:13px;">UX Research Lead</span>
+          <span style="font-size:11px; color:#57635F; white-space:nowrap;">2021 - Present</span>
+        </div>
+        <div style="font-size:11.5px; color:#0F6E63; margin:3px 0 5px;">Fernhollow Software, Seattle, WA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Built the research practice from one person to four, supporting seven product teams.</li>
+          <li>Tripled team-led studies by shipping a self-serve toolkit and a reviewer rota.</li>
+          <li>Lifted onboarding task success 18% with findings that reframed the core flow.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:600; font-size:13px;">Senior UX Researcher</span>
+          <span style="font-size:11px; color:#57635F; white-space:nowrap;">2018 - 2021</span>
+        </div>
+        <div style="font-size:11.5px; color:#0F6E63; margin:3px 0 5px;">Fernhollow Software, Seattle, WA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Ran the longitudinal study that killed a planned feature before build started.</li>
+          <li>Established a participant panel of 900 and cut recruitment time by half.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:600; font-size:13px;">UX Researcher</span>
+          <span style="font-size:11px; color:#57635F; white-space:nowrap;">2015 - 2018</span>
+        </div>
+        <div style="font-size:11.5px; color:#0F6E63; margin:3px 0 5px;">Larkspur Digital, Tacoma, WA</div>
+        <ul style="margin:0; padding-left:17px; font-size:12px; line-height:1.6;">
+          <li>Delivered usability and concept testing for eleven client engagements.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Qualitative Research</span><span style="font-weight:600; color:#0F6E63;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Study Design</span><span style="font-weight:600; color:#0F6E63;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Survey Methods</span><span style="font-weight:600; color:#0F6E63;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Research Operations</span><span style="font-weight:600; color:#0F6E63;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Stakeholder Facilitation</span><span style="font-weight:600; color:#0F6E63;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:240px; flex-shrink:0;">Statistical Analysis</span><span style="font-weight:600; color:#0F6E63;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:8px;">Education</div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div><b>MSc Human Computer Interaction</b> — Harbour State University, 2013 - 2015</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#0F6E63; margin-bottom:8px;">Certifications</div>
+    <div style="font-size:12px; line-height:1.75;">
+      <div>Certified Professional in Accessibility Core Competencies — 2022</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 24 -->
+<div id="t24">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t24">24</a> — Narrow Two-Tone · ATS-safe · olive accent, condensed type, tight rules</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 58px; display:flex; flex-direction:column; gap:25px; font-family:'Archivo Narrow',sans-serif; color:#191A12;">
+
+  <div style="border-bottom:1px solid #191A12; padding-bottom:11px;">
+    <div style="font-size:46px; line-height:1.02; letter-spacing:-0.4px;"><span style="font-weight:400;">Beatriz </span><span style="font-weight:700;">Nakamura</span></div>
+    <div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-top:8px;">Supply Chain Analyst</div>
+    <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#575A4C; margin-top:8px; line-height:1.6;">b.nakamura@example.com | +1 (555) 024-9613 | Kansas City, MO | example.com/bnakamura</div>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:6px;">Summary</div>
+    <p style="margin:0; font-family:Inter,sans-serif; font-size:12px; line-height:1.6;">Analyst who makes forecasting arguments that operations people actually act on. Seven years cutting stockouts and carrying cost at the same time, mostly by challenging the assumptions inside the plan.</p>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:6px;">Key Achievements</div>
+    <div style="font-family:Inter,sans-serif; font-size:12px; line-height:1.78;">
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#5A6B23;">$7.2M</span> — Inventory value under active planning</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#5A6B23;">43%</span> — Reduction in stockout events year over year</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#5A6B23;">12pt</span> — Improvement in forecast accuracy at SKU level</div>
+      <div><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; color:#5A6B23;">2,400</span> — Active SKUs across four regional warehouses</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:9px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:11px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:14px;">Senior Supply Chain Analyst</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#575A4C; white-space:nowrap;">2022 - Present</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#5A6B23; margin:2px 0 4px;">Ostrander Foods, Kansas City, MO</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:12px; line-height:1.55;">
+          <li>Improved SKU-level forecast accuracy 12 points by segmenting demand by volatility.</li>
+          <li>Cut stockout events 43% while holding inventory value flat at $7.2M.</li>
+          <li>Built the weekly planning review now run by four regional warehouse managers.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:14px;">Supply Chain Analyst</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#575A4C; white-space:nowrap;">2019 - 2022</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#5A6B23; margin:2px 0 4px;">Ostrander Foods, Kansas City, MO</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:12px; line-height:1.55;">
+          <li>Replaced a manual reorder spreadsheet with a rules-based model across 2,400 SKUs.</li>
+          <li>Reduced expedited freight spend 28% by moving safety stock closer to demand.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:14px;">Inventory Coordinator</span>
+          <span style="font-family:Inter,sans-serif; font-size:11px; color:#575A4C; white-space:nowrap;">2017 - 2019</span>
+        </div>
+        <div style="font-family:Inter,sans-serif; font-size:11.5px; color:#5A6B23; margin:2px 0 4px;">Halbert Wholesale, Topeka, KS</div>
+        <ul style="margin:0; padding-left:17px; font-family:Inter,sans-serif; font-size:12px; line-height:1.55;">
+          <li>Ran cycle counts and variance investigation for a 900-SKU distribution centre.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:8px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:8px; font-family:Inter,sans-serif; font-size:12px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Demand Forecasting</span><span style="font-weight:700; color:#5A6B23;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Inventory Optimisation</span><span style="font-weight:700; color:#5A6B23;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">SQL</span><span style="font-weight:700; color:#5A6B23;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Power BI</span><span style="font-weight:700; color:#5A6B23;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Supplier Coordination</span><span style="font-weight:700; color:#5A6B23;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Python</span><span style="font-weight:700; color:#5A6B23;">— Proficient</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:7px;">Education</div>
+    <div style="font-family:Inter,sans-serif; font-size:12px; line-height:1.7;">
+      <div><b>BSc Supply Chain Management</b> — Northfield University, 2013 - 2017</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-weight:700; font-size:14px; letter-spacing:1.2px; text-transform:uppercase; color:#5A6B23; margin-bottom:7px;">Certifications</div>
+    <div style="font-family:Inter,sans-serif; font-size:12px; line-height:1.7;">
+      <div>Certified in Planning and Inventory Management — 2021</div>
+      <div>Lean Six Sigma Green Belt — 2019</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 25 -->
+<div id="t25">
+<div style="font-weight:700; margin-bottom:8px;"><a href="#t25">25</a> — Dense Career · ATS-safe · steel blue, four roles, built for long histories</div>
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:46px 56px; display:flex; flex-direction:column; gap:24px; font-family:'Open Sans',sans-serif; color:#15191C;">
+
+  <div style="border-bottom:2px solid #2A5A78; padding-bottom:10px;">
+    <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:36px; line-height:1.04; letter-spacing:-0.6px;">Ambrose Ferreira</div>
+    <div style="font-size:12.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-top:7px;">Director of Information Technology</div>
+    <div style="font-size:11.5px; color:#4F585E; margin-top:7px; line-height:1.6;">a.ferreira@example.com | +1 (555) 025-1408 | Atlanta, GA | example.com/aferreira</div>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:5px;">Summary</div>
+    <p style="margin:0; font-size:11.5px; line-height:1.58;">IT director with nineteen years across infrastructure, security and vendor management. Runs a 26-person function for a 3,000-employee organisation and has done every job in it.</p>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:5px;">Key Achievements</div>
+    <div style="font-size:11.5px; line-height:1.95;">
+      <div><span style="font-family:Montserrat,sans-serif; font-weight:800; color:#2A5A78;">$14M</span> — Annual technology budget owned</div>
+      <div><span style="font-family:Montserrat,sans-serif; font-weight:800; color:#2A5A78;">26</span> — Staff across infrastructure, security and service desk</div>
+      <div><span style="font-family:Montserrat,sans-serif; font-weight:800; color:#2A5A78;">3,000</span> — Employees supported across nine sites</div>
+      <div><span style="font-family:Montserrat,sans-serif; font-weight:800; color:#2A5A78;">52%</span> — Reduction in critical incidents over four years</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:7px;">Experience</div>
+    <div style="display:flex; flex-direction:column; gap:13px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Director of Information Technology</span>
+          <span style="font-size:11px; color:#4F585E; white-space:nowrap;">2018 - Present</span>
+        </div>
+        <div style="font-size:11.5px; color:#2A5A78; margin:1px 0 3px;">Kessington Health Group, Atlanta, GA</div>
+        <ul style="margin:0; padding-left:16px; font-size:11.5px; line-height:1.52;">
+          <li>Cut critical incidents 52% in four years by consolidating nine site networks.</li>
+          <li>Delivered a $14M portfolio including an identity platform and endpoint rebuild.</li>
+          <li>Renegotiated the top eight vendor agreements for $2.3M in annual savings.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Infrastructure Manager</span>
+          <span style="font-size:11px; color:#4F585E; white-space:nowrap;">2013 - 2018</span>
+        </div>
+        <div style="font-size:11.5px; color:#2A5A78; margin:1px 0 3px;">Kessington Health Group, Atlanta, GA</div>
+        <ul style="margin:0; padding-left:16px; font-size:11.5px; line-height:1.52;">
+          <li>Migrated 400 servers to virtualised infrastructure with no unplanned downtime.</li>
+          <li>Stood up the disaster recovery site and proved a four-hour recovery objective.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Systems Administrator</span>
+          <span style="font-size:11px; color:#4F585E; white-space:nowrap;">2009 - 2013</span>
+        </div>
+        <div style="font-size:11.5px; color:#2A5A78; margin:1px 0 3px;">Braddock Manufacturing, Macon, GA</div>
+        <ul style="margin:0; padding-left:16px; font-size:11.5px; line-height:1.52;">
+          <li>Owned directory services, backup and patching for 600 users across two plants.</li>
+        </ul>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-weight:700; font-size:12.5px;">Service Desk Analyst</span>
+          <span style="font-size:11px; color:#4F585E; white-space:nowrap;">2006 - 2009</span>
+        </div>
+        <div style="font-size:11.5px; color:#2A5A78; margin:1px 0 3px;">Braddock Manufacturing, Macon, GA</div>
+        <ul style="margin:0; padding-left:16px; font-size:11.5px; line-height:1.52;">
+          <li>Resolved 1,800 tickets a year at a 96% first-contact satisfaction rating.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:6px;">Skills</div>
+    <div style="display:flex; flex-direction:column; gap:8px; font-size:11.5px;">
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">IT Strategy</span><span style="font-weight:700; color:#2A5A78;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Infrastructure Architecture</span><span style="font-weight:700; color:#2A5A78;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Vendor Management</span><span style="font-weight:700; color:#2A5A78;">— Expert</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Information Security</span><span style="font-weight:700; color:#2A5A78;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Budget Planning</span><span style="font-weight:700; color:#2A5A78;">— Advanced</span></div>
+      <div style="display:flex;"><span style="width:230px; flex-shrink:0;">Cloud Migration</span><span style="font-weight:700; color:#2A5A78;">— Advanced</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:5px;">Education</div>
+    <div style="font-size:11.5px; line-height:1.65;">
+      <div><b>BSc Information Systems</b> — Northfield University, 2002 - 2006</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:Montserrat,sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#2A5A78; margin-bottom:5px;">Certifications</div>
+    <div style="font-size:11.5px; line-height:1.65;">
+      <div>ITIL Expert — 2016</div>
+      <div>Certified Information Systems Security Professional — 2014</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<template id="__bundler_thumbnail"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#2f3237"/><text x="50" y="58" font-size="34" fill="white" text-anchor="middle" font-family="sans-serif">18</text></svg></template>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,166 @@
+{# Modern Template 4 — Ribbon Sidebar · two-column · clay ribbon heads, dot-grid levels, references
+   Ported from block <!-- 4 --> / id="t4" of "Resume Templates Coded.dc.html".
+   Locked spec: deep navy #000034 sidebar (text #E3E5EF), clay #C4562F ribbon
+   headers that overhang the rail by 14px with an #8E3A1E fold triangle; teal-ink
+   #14343B display heads + #37474C body; Archivo 900 for the name/stat numerals,
+   Source Sans 3 body. Sidebar dot-grid: filled #C4562F / empty 1px #565C8A,
+   name AND level word as real text. A stat-chip band sits under the name; a
+   2-up References grid closes the body.
+
+   Divergences from the supplied reference:
+     1. Palette — teal-ink #14343B + clay #C4562F on deep navy #000034, not
+        achromatic grey.
+     2. Type — Archivo 900 display + Source Sans 3 body, not one rounded grotesque.
+     3. Flat skill bullets become dot-grid markers with the level word as real
+        selectable text; a quantified stat band sits under the name.
+     4. Recognition + Tools have no place in the reference; when present they
+        render as compact right-column blocks after Experience. References only
+        render when r.references is non-empty (the shared sample has none, so the
+        block is absent rather than faked).
+     5. Right-column gap 20 kept; no compression needed for the shared sample. #}
+{% macro ribbon(label) %}
+<div style="box-sizing:border-box; position:relative; background:#C4562F; color:#ffffff; font-family:Archivo,sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px; padding-block: 10px 10px; padding-inline: 34px 0; width:314px;">{{ label }}<span style="position:absolute; inset-inline-end:0; bottom:-8px; width:14px; height:8px; background:#8E3A1E; clip-path:polygon(0 0, 100% 0, 0 100%);"></span></div>
+{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; display:flex; font-family:'Source Sans 3',sans-serif; color:#37474C;">
+
+  <div style="width:300px; flex-shrink:0; background:#000034; color:#E3E5EF; display:flex; flex-direction:column; gap:13px; padding:0 0 22px;">
+
+    <div style="padding:26px 34px 16px; display:flex; justify-content:center;">
+      <div style="width:158px; height:158px; flex-shrink:0; aspect-ratio:1; border-radius:50%; background:#DCD6CB; border:5px solid #ffffff; box-shadow:0 0 0 1px #1A1F4A; overflow:hidden;">
+        {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% endif %}
+      </div>
+    </div>
+
+    {% set c = r.contact %}
+    {% if c.phone or c.email or c.address or c.site or c.social %}
+    {{ ribbon(t('Contact')) }}
+    <div style="padding:0 34px; display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.45; overflow-wrap:anywhere;">
+      {% if c.phone %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Phone') }}</div><div>{{ c.phone }}</div></div>{% endif %}
+      {% if c.email %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Email') }}</div><div>{{ c.email }}</div></div>{% endif %}
+      {% if c.address %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Address') }}</div><div>{{ c.address }}</div></div>{% endif %}
+      {% if c.site %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Portfolio') }}</div><div>{{ c.site }}</div></div>{% endif %}
+      {% for s in c.social %}{% if s.label or s.url %}<div>{% if s.label %}<div style="font-weight:700; color:#ffffff; font-size:13px;">{{ s.label }}</div>{% endif %}{% if s.url %}<div>{{ s.url }}</div>{% endif %}</div>{% endif %}{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.education %}
+    {{ ribbon(t('Education')) }}
+    <div style="padding:0 34px; display:flex; flex-direction:column; gap:14px; font-size:12.5px; line-height:1.45;">
+      {% for ed in r.education %}
+      <div>
+        <div style="font-weight:700; color:#ffffff; font-size:13.5px;">{{ ed.degree }}</div>
+        {% if ed.school %}<div>{{ ed.school }}</div>{% endif %}
+        {% if ed.start or ed.end %}<div style="color:#AEB4D2;">{{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}</div>{% endif %}
+        {% if ed.gpa %}<div style="color:#AEB4D2;">{{ t('GPA') }} {{ ed.gpa }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    {{ ribbon(t('Skills')) }}
+    <div style="padding:0 34px; display:flex; flex-direction:column; gap:9px;">
+      {% for sk in r.skills %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:12.5px;"><span style="font-weight:600; color:#ffffff;">{{ sk.name }}</span><span style="color:#AEB4D2; font-size:11px;">{{ sk.level }}</span></div>
+        {% if sk.level %}
+        <div style="display:flex; gap:5px; margin-top:5px;">
+          {% for i in range(sk.dot_total) %}
+          {% if i < sk.dots %}
+          <span style="width:9px; height:9px; border-radius:50%; background:#C4562F;"></span>
+          {% else %}
+          <span style="width:9px; height:9px; border-radius:50%; border:1px solid #565C8A; box-sizing:border-box;"></span>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.languages %}
+    {{ ribbon(t('Language')) }}
+    <div style="padding:0 34px; display:flex; flex-direction:column; gap:8px; font-size:12.5px;">
+      {% for l in r.languages %}
+      <div style="display:flex; justify-content:space-between; gap:8px;"><span style="font-weight:600; color:#ffffff;">{{ l.name }}</span><span style="color:#AEB4D2;">{{ l.level }}</span></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div style="flex:1; min-width:0; padding-block: 52px 34px; padding-inline: 40px 44px; display:flex; flex-direction:column; gap:20px;">
+
+    <div>
+      {% set nm = r.name.split(" ", 1) %}
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:54px; line-height:0.98; letter-spacing:-1.5px; color:#14343B; text-transform:uppercase;">{{ nm[0] }}{% if nm|length > 1 %}<br>{{ nm[1] }}{% endif %}</div>
+      {% if r.title %}<div style="font-size:19px; color:#37474C; margin-top:10px;">{{ r.title }}</div>{% endif %}
+    </div>
+
+    {% if r.achievements %}
+    <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:14px; border-top:1px solid #D8D2C7; border-bottom:1px solid #D8D2C7; padding:12px 0;">
+      {% for a in r.achievements %}
+      <div>
+        <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:24px; line-height:1; color:#C4562F;">{{ a.metric }}</div>
+        <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#6E7C80; margin-top:5px;">{{ a.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.experience %}
+    <div>
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; color:#14343B; letter-spacing:-0.2px; margin-bottom:16px;">{{ t('Professional Experience') }}</div>
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        {% for job in r.experience %}
+        <div style="display:flex; gap:18px;">
+          <div style="width:54px; flex-shrink:0; text-align:end; font-family:Archivo,sans-serif; font-weight:700; font-size:12px; letter-spacing:0.5px; color:#14343B; line-height:1.5;">{{ job.start }}{% if job.start and job.end %}<br>–<br>{% endif %}{{ job.end }}</div>
+          <div style="flex:1; min-width:0; border-inline-start:1px solid #C9C1B3; padding-inline-start:18px;">
+            <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:16px; color:#14343B;">{{ job.role }}</div>
+            {% if job.company or job.location %}<div style="font-size:13px; color:#37474C; margin:3px 0 7px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>{% endif %}
+            {% if job.bullets %}
+            <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.5; color:#37474C;">
+              {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.recognition or r.tools %}
+    <div>
+      {% if r.recognition %}
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; color:#14343B; letter-spacing:-0.2px; margin-bottom:10px;">{{ t('Recognition') }}</div>
+      <div style="display:flex; flex-direction:column; gap:5px; font-size:12.5px; color:#37474C;">
+        {% for rec in r.recognition %}<div><b style="color:#14343B;">{{ rec.title }}</b>{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
+      </div>
+      {% endif %}
+      {% if r.tools %}<div style="font-size:12.5px; color:#37474C; margin-top:{{ '10px' if r.recognition else '0' }};"><b style="color:#14343B; font-family:Archivo,sans-serif;">{{ t('Tools') }}</b> &nbsp;{{ r.tools | join(" · ") }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if r.references %}
+    <div style="margin-top:auto;">
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; color:#14343B; letter-spacing:-0.2px; margin-bottom:14px;">{{ t('References') }}</div>
+      <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px;">
+        {% for ref in r.references %}
+        <div>
+          <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:15px; color:#14343B;">{{ ref.name }}</div>
+          {% if ref.title %}<div style="font-size:13px; color:#37474C; margin-bottom:6px;">{{ ref.title }}</div>{% endif %}
+          {% if ref.phone or ref.email %}
+          <div style="font-size:11.5px; color:#6E7C80; line-height:1.6;">
+            {% if ref.phone %}<b style="color:#14343B;">{{ t('Phone:') }}</b> {{ ref.phone }}{% endif %}{% if ref.phone and ref.email %}<br>{% endif %}{% if ref.email %}<b style="color:#14343B;">{{ t('Email:') }}</b> {{ ref.email }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>

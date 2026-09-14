@@ -1,0 +1,105 @@
+{# Modern Template 13 — Band Timeline · colour band + single-column timeline · finance
+   Ported from block <!-- 13 --> / id="t13" of "Resume Templates Coded.dc.html".
+   Locked spec: ink #22293A, navy band #0E2D55, gold rail #D8C79A, Inter body +
+   Archivo heads, dot-grid skill levels, three-chip metric band inside the band.
+
+   Divergences from ref:
+     1. Body padding-bottom 34->33. The body overran the page box by 0.25px —
+        sub-pixel, invisible on screen, and a 2-PAGE PDF. Integer
+        `.tpl.scrollHeight` rounded it to a clean 1100 and hid it for months;
+        found by tools/verify_autofit.py. #}
+{% import "_macros.j2" as m %}
+{% set H = "font-family:Archivo,sans-serif; font-weight:900; font-size:19px; letter-spacing:1.6px; text-transform:uppercase; color:#0E2D55;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; font-family:Inter,sans-serif; color:#22293A; display:flex; flex-direction:column;">
+
+  <div style="box-sizing:border-box; flex-shrink:0; background:#0E2D55; color:#E9EEF5; padding:38px 48px 32px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:30px;">
+      <div>
+        <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:46px; line-height:1.0; letter-spacing:-1.2px; text-transform:uppercase; color:#ffffff;">{{ r.name }}</div>
+        {% if r.title %}<div style="font-size:14px; letter-spacing:3.6px; text-transform:uppercase; color:#D8C79A; margin-top:9px;">{{ r.title }}</div>{% endif %}
+      </div>
+      {% set c = r.contact %}{% set bits = [] %}
+      {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+      {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+      {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+      {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+      {% if bits %}<div style="text-align:end; font-size:11.5px; line-height:1.8; color:#C7D4E4; white-space:nowrap;">{{ bits | br_join }}</div>{% endif %}
+    </div>
+    {% if r.achievements %}
+    <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:16px; border-top:1px solid rgba(255,255,255,0.28); margin-top:22px; padding-top:16px;">
+      {% for a in r.achievements %}
+      <div>
+        <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; line-height:1; color:#D8C79A;">{{ a.metric }}</div>
+        <div style="font-size:9px; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:#AFC0D4; margin-top:5px;">{{ a.label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="box-sizing:border-box; flex:1; min-width:0; padding:30px 48px 33px; display:flex; flex-direction:column; gap:46px;">
+
+    {% if r.summary %}<div style="font-size:12.5px; line-height:1.7; color:#2E3646;">{{ r.summary }}</div>{% endif %}
+
+    {% if r.experience %}
+    <div>
+      <div style="{{ H }} margin-bottom:16px;">{{ t('Experience') }}</div>
+      <div style="position:relative; padding-inline-start:24px;">
+        <span style="position:absolute; inset-inline-start:0; top:11px; bottom:11px; width:2px; background:#D8C79A;"></span>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          {% for job in r.experience %}
+          <div style="position:relative;">
+            <span style="position:absolute; inset-inline-start:-30px; top:4px; width:14px; height:14px; border-radius:50%; background:#0E2D55;"></span>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+              <span style="font-weight:700; font-size:14.5px; color:#0E2D55;">{{ job.role }}</span>
+              {% if job.start or job.end %}<span style="font-size:11.5px; color:#6C7484; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} — {% endif %}{{ job.end }}</span>{% endif %}
+            </div>
+            {% if job.company or job.location %}<div style="font-size:12.5px; color:#4A5364; margin:2px 0 7px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>{% endif %}
+            {% if job.bullets %}
+            <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.6; color:#2E3646;">
+              {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div>
+      <div style="{{ H }} margin-bottom:14px;">{{ t('Skills') }}</div>
+      <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px 40px;">
+        {% for sk in r.skills %}
+        {{ m.skill_dotrow(sk, {'dot_on': '#0E2D55', 'dot_off_border': '#C2C6CE'}) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if r.education or r.recognition %}
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:40px; border-top:1px solid #D8DAE0; padding-top:20px;">
+      {% if r.education %}
+      <div>
+        <div style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Education') }}</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.5;">
+          {% for ed in r.education %}
+          <div><b style="color:#0E2D55;">{{ ed.degree }}</b><br><span style="color:#5C6474;">{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}</span></div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% if r.recognition %}
+      <div>
+        <div style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Certifications') }}</div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px; color:#2E3646;">
+          {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} · {{ rec.detail }}{% endif %}</div>{% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>

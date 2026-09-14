@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{#
+  One template for sign-in and sign-up. They differ by a heading, a button and
+  one link, and two files would drift apart the first time the field styling
+  changed.
+
+  Everything directional here is inherited from `base.html`'s `dir`, and
+  `app.css` is fully logical (session 21), so this mirrors for Arabic without
+  a single rule of its own. Do not add `margin-left`, `text-align: left` or a
+  `transform` — the last one has no logical form and blanked the entire Arabic
+  gallery once.
+#}
+{% set heading = t('Create your account') if mode == 'signup' else t('Sign in') %}
+{% set submit  = t('Create account') if mode == 'signup' else t('Sign in') %}
+{% block title %}{{ heading }} · {{ brand_name }}{% endblock %}
+
+{% block content %}
+<div class="container account-page">
+  <h1>{{ heading }}</h1>
+
+  <p class="account-intro">
+    {{ t('You only need an account for the paid features. Building a résumé and downloading a PDF stays free, with no sign-up.') }}
+  </p>
+
+  {% if error %}
+    {# Server-rendered, not a JS toast: this page must work with scripting
+       off, and the error is the whole reason the page re-rendered. #}
+    <div class="form-errors show" role="alert">{{ t(error) }}</div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {# `next` survives the round trip so a person sent here by `login_required`
+       lands back where they were trying to go, not on the home page. It is
+       re-validated server-side as a path on this app — see routes._safe_next;
+       an absolute URL from a form field is an open redirect. #}
+    <input type="hidden" name="next" value="{{ next_url or '' }}">
+
+    <div class="field">
+      <label for="email">{{ t('Email') }}</label>
+      <input id="email" name="email" type="email" autocomplete="email"
+             required value="{{ email or '' }}" dir="ltr">
+    </div>
+
+    <div class="field">
+      <label for="password">{{ t('Password') }}</label>
+      {# autocomplete tells a password manager which of the two this is. Get
+         it wrong and the manager offers to overwrite a saved password on a
+         sign-in form. #}
+      <input id="password" name="password" type="password" dir="ltr"
+             autocomplete="{{ 'new-password' if mode == 'signup' else 'current-password' }}"
+             required minlength="{{ min_password }}">
+      {% if mode == 'signup' %}
+        {# The number is a literal inside the msgid, not interpolated. The
+           catalogue has no %(n)s precedent, and adding one means a
+           translation that drops the placeholder raises KeyError at render
+           time. `test_password_hint_matches_the_constant` pins the copy to
+           MIN_PASSWORD_LENGTH so the two cannot drift instead. #}
+        <small class="field-hint">
+          {{ t('At least 10 characters. A short phrase you will remember beats a short password.') }}
+        </small>
+      {% endif %}
+    </div>
+
+    <button class="btn btn-primary btn-lg account-submit" type="submit">{{ submit }}</button>
+  </form>
+
+  <p class="account-alt">
+    {% if mode == 'signup' %}
+      {{ t('Already have an account?') }}
+      <a href="{{ url_for('main.sign_in_page', next=next_url) }}">{{ t('Sign in') }}</a>
+    {% else %}
+      {{ t('No account yet?') }}
+      <a href="{{ url_for('main.sign_up_page', next=next_url) }}">{{ t('Create one') }}</a>
+    {% endif %}
+  </p>
+
+  {% if mode != 'signup' %}
+    {# Honest rather than a dead "Forgot password?" link. Password reset needs
+       email, which does not exist yet (app/auth.py MISSING). A link that goes
+       nowhere is worse than a sentence that tells the truth. #}
+    <p class="account-fineprint">
+      {{ t('Forgotten your password? Password reset is not available yet — get in touch and we will sort it out.') }}
+      <a href="mailto:{{ brand_email }}" dir="ltr">{{ brand_email }}</a>
+    </p>
+  {% endif %}
+</div>
+{% endblock %}

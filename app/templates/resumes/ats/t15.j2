@@ -1,0 +1,110 @@
+{# ATS Template 15 — Split Rule · single column · plum accent, label-then-rule heads
+   Ported from block <!-- 15 --> / id="t15" of "ATS Resume Templates Coded.dc.html".
+   Locked spec: ink #191520, plum #6B2A5A, tint #544E5C / #5C5666. Poppins 700 for
+   the 40px name, the metric numerals and section labels (13px / 2.2px plum);
+   Open Sans body. Each section head is "LABEL ————" — the label then a 1px plum
+   rule filling the line. Skills are "name  Level" rows, level bold plum — real
+   text, no graphic. ATS-safe: one column, no fills.
+
+   Divergences from ref (label-then-rule reference):
+     1. Palette locked to ink #191520 + plum #6B2A5A.
+     2. Type — Poppins + Open Sans.
+     3. Contact on one line, pipe-separated.
+     4. Ref ends Summary / KeyAch / Experience / Skills / Education / Certifications;
+        Tools and Languages, when present, share one final split-rule block.
+     5. Section gap 17->16 to seat the shared sample. It overran the page box by
+        0.453px — sub-pixel, invisible on screen, and a 2-PAGE PDF, because
+        Chromium paginates on any overflow at all. Trimming the bottom padding
+        does NOT fix this class: in a fixed-height flex column the children do
+        not move, so only the gap (or the leading) can. #}
+{% macro head(label) %}
+<div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">{{ label }}</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
+{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:16px; font-family:'Open Sans',sans-serif; color:#191520;">
+
+  <div>
+    <div style="font-family:Poppins,sans-serif; font-weight:700; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">{{ r.name }}</div>
+    {% if r.title %}<div style="font-size:13.5px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#6B2A5A; margin-top:8px;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
+    {% if bits %}<div style="font-size:12px; color:#544E5C; margin-top:9px; line-height:1.6;">{{ bits | join(" | ") }}</div>{% endif %}
+  </div>
+
+  {% if r.summary %}
+  <div>{{ head(t("Summary")) }}
+    <p style="margin:0; font-size:12px; line-height:1.6;">{{ r.summary }}</p>
+  </div>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div>{{ head(t("Key Achievements")) }}
+    <div style="font-size:12px; line-height:1.75;">
+      {% for a in r.achievements %}
+      <div><span style="font-family:Poppins,sans-serif; font-weight:700; color:#6B2A5A;">{{ a.metric }}</span> — {{ a.label }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div>{{ head(t("Experience")) }}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      {% for job in r.experience %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px;">
+          <span style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px;">{{ job.role }}</span>
+          {% if job.start or job.end %}<span style="font-size:11.5px; color:#5C5666; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+        </div>
+        {% if job.company or job.location %}<div style="font-size:12px; color:#6B2A5A; margin:2px 0 4px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
+        {% if job.bullets %}
+        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.55;">
+          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div>{{ head(t("Skills")) }}
+    <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
+      {% for sk in r.skills %}
+      <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700; color:#6B2A5A;">{{ sk.level }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.education %}
+  <div>{{ head(t("Education")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for ed in r.education %}
+      <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}{% if ed.gpa %} · {{ t('GPA') }} {{ ed.gpa }}{% endif %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.recognition %}
+  <div>{{ head(t("Certifications")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.tools or r.languages %}
+  <div>{{ head((t('Tools & Languages') if r.tools and r.languages else (t('Tools') if r.tools else t('Languages')))) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% if r.tools %}<div>{{ r.tools | join(" · ") }}</div>{% endif %}
+      {% if r.languages %}<div>{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>

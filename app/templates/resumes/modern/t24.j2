@@ -1,0 +1,141 @@
+{# Modern Template 24 — Hard-Edged Sidebar · two-column · block headers, gold skill rings
+   Squared replica of block <!-- 05 -->; ported from block <!-- 24 --> / id="t24"
+   of "Resume Templates Coded.dc.html".
+   Locked spec: #f2f2f2 page with a 24px frame, hard-edged #4A4C4A sidebar
+   (280px), amber #FFD633 block headers in the sidebar and #1a1a1a block headers
+   in the body — all full-bleed rectangles, no rounding. Sidebar: circular
+   portrait, Contact, Summary, Education (grey #DFDEDD date-block cards),
+   Languages, Tools. Body: Archivo 900 name, a four-chip stat band (1px #d9d9d9
+   rules), Professional Experience (52px right-aligned date column + a 2px
+   #1a1a1a rail with node dots), then a 3-col ring grid for Creative & Technical
+   Skills (grey #4A4C4A dial on an amber #FFD633 track, percent in a white hole
+   as real text, name beneath) inside a #d9d9d9 cell-rule grid, and
+   Certifications. Archivo display + Open Sans body.
+
+   Divergences from the reference block 05:
+     1. Palette — slate #4A4C4A + amber #FFD633 on #f2f2f2, locked here.
+     2. Contact icon glyphs (☎ ✉ ◉ in) dropped; lines only.
+     3. Rings gain the skill level word as real text beneath the name.
+     4. Bespoke "Selected Projects" block dropped (no data field).
+     5. `.tpl` is a plain flex two-column; sidebar gap 22->16 and body gap
+        10 kept tight to seat the shared sample. #}
+{% import "_macros.j2" as m %}
+{% set SB = "background:#FFD633; color:#1a1a1a; font-weight:800; font-size:15px; padding:9px 22px; letter-spacing:0.4px;" %}
+{% set BB = "background:#1a1a1a; color:#ffffff; font-weight:800; font-size:15px; padding:9px 22px; letter-spacing:1px;" %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; padding:24px; background:#f2f2f2; display:flex; gap:24px; font-family:'Open Sans',sans-serif; color:#1a1a1a;">
+
+  <div style="box-sizing:border-box; width:280px; flex-shrink:0; background:#4A4C4A; padding:30px 26px; display:flex; flex-direction:column; gap:16px; color:#ffffff;">
+    <div style="width:150px; height:150px; flex-shrink:0; border-radius:50%; background:#9F9F9E; align-self:center; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:11px; color:#5a5a5a;">
+      {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% else %}{{ t('PHOTO') }}{% endif %}
+    </div>
+
+    {% set c = r.contact %}
+    {% if c.email or c.phone or c.address or c.site or c.social %}
+    <div style="{{ SB }}">{{ t('Contact') }}</div>
+    <div style="font-size:12.5px; line-height:1.75; padding-inline-start:4px; overflow-wrap:anywhere;">
+      {% set parts = [] %}
+      {% if c.phone %}{% set _ = parts.append(c.phone) %}{% endif %}
+      {% if c.email %}{% set _ = parts.append(c.email) %}{% endif %}
+      {% if c.address %}{% set _ = parts.append(c.address) %}{% endif %}
+      {% if c.site %}{% set _ = parts.append(c.site) %}{% endif %}
+      {% for s in c.social %}{% if s.label %}{% set _ = parts.append(s.label) %}{% endif %}{% endfor %}
+      {{ parts | br_join }}
+    </div>
+    {% endif %}
+
+    {% if r.summary %}
+    <div style="{{ SB }}">{{ t('Summary') }}</div>
+    <p style="font-size:12px; line-height:1.6; margin:0 4px;">{{ r.summary }}</p>
+    {% endif %}
+
+    {% if r.education %}
+    <div style="{{ SB }}">{{ t('Education') }}</div>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      {% for ed in r.education %}
+      <div style="background:#DFDEDD; color:#1a1a1a; padding:12px 14px; display:flex; gap:12px; font-size:11.5px;">
+        {% if ed.start or ed.end %}<div style="font-weight:600; line-height:1.4; flex-shrink:0;">{{ ed.start }}{% if ed.start and ed.end %}<br>—<br>{% endif %}{{ ed.end }}</div>{% endif %}
+        <div><b>{{ ed.degree }}</b>{% if ed.school %}<br><span style="color:#666;">{{ ed.school }}</span>{% endif %}{% if ed.gpa %}<br><span style="color:#666;">{{ t('GPA') }} {{ ed.gpa }}</span>{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.languages %}
+    <div style="{{ SB }}">{{ t('Languages') }}</div>
+    <div style="display:flex; flex-direction:column; gap:7px; padding-inline-start:4px;">
+      {% for l in r.languages %}
+      <div style="display:flex; justify-content:space-between; gap:8px; font-size:12px;"><span>{{ l.name }}</span><span style="color:#EEC300; font-weight:700;">{{ l.level }}</span></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.tools %}
+    <div style="{{ SB }}">{{ t('Tools') }}</div>
+    <div style="font-size:12px; line-height:1.55; padding-inline-start:4px;">{{ r.tools | join(" · ") }}</div>
+    {% endif %}
+  </div>
+
+  <div style="box-sizing:border-box; flex:1; min-width:0; display:flex; flex-direction:column; gap:10px;">
+    <div style="padding:6px 6px 0;">
+      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:50px; color:#1a1a1a; letter-spacing:-1px; line-height:0.98; text-transform:uppercase;">{{ r.name }}</div>
+      {% if r.title %}<div style="font-size:17px; color:#333333; margin-top:8px; letter-spacing:1px; text-transform:uppercase;">{{ r.title }}</div>{% endif %}
+    </div>
+
+    {% if r.achievements %}
+    <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px; border-top:1px solid #d9d9d9; border-bottom:1px solid #d9d9d9; padding:13px 0;">
+      {% for a in r.achievements %}
+      {% if a.metric %}
+      <div style="text-align:center;">
+        <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; line-height:1; color:#1a1a1a;">{{ a.metric }}</div>
+        <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#555555; margin-top:5px;">{{ a.label }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.experience %}
+    <div style="{{ BB }}">{{ t('Professional Experience') }}</div>
+    <div style="padding:4px 6px 0; display:flex; flex-direction:column; gap:14px;">
+      {% for job in r.experience %}
+      <div style="display:flex; gap:16px;">
+        <div style="font-size:11.5px; color:#333333; flex-shrink:0; width:52px; text-align:end; line-height:1.4;">{% if job.start or job.end %}{{ job.start }}{% if job.start and job.end %}<br>—<br>{% endif %}{{ job.end }}{% endif %}</div>
+        <div style="position:relative; padding-inline-start:16px; border-inline-start:2px solid #1a1a1a; flex:1; min-width:0;">
+          <span style="position:absolute; inset-inline-start:-6px; top:0; width:10px; height:10px; background:#1a1a1a; border-radius:50%;"></span>
+          <div style="font-weight:700; font-size:14px;">{{ job.role }}</div>
+          {% if job.company or job.location %}<div style="font-size:12px; color:#555555; margin-bottom:4px;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
+          {% if job.bullets %}
+          <ul style="margin:0; padding-inline-start:16px; font-size:11.5px; color:#333333; line-height:1.5;">
+            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.skills %}
+    <div style="{{ BB }}">{{ t('Creative & Technical Skills') }}</div>
+    <div style="margin:6px 4px 0; border-top:1px solid #d9d9d9; border-inline-start:1px solid #d9d9d9; display:grid; grid-template-columns:repeat(3,1fr);">
+      {% for sk in r.skills %}
+      <div style="border-inline-end:1px solid #d9d9d9; border-bottom:1px solid #d9d9d9; padding:9px 14px; display:flex; justify-content:center;">
+        {{ m.skill_ring(sk, {'size': 66, 'hole': 46, 'ring': '#4A4C4A', 'track': '#FFD633',
+           'ink': '#1a1a1a', 'pct_size': 14,
+           'name_css': 'font-size:12.5px; color:#1a1a1a; font-weight:600; text-align:center; line-height:1.3;',
+           'level_css': 'font-size:10px; color:#666666; text-align:center;'}) }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if r.recognition %}
+    <div style="{{ BB }}">{{ t('Certifications') }}</div>
+    <div style="padding:4px 6px 0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 26px;">
+      {% for rec in r.recognition %}
+      <div><div style="font-weight:700; font-size:13px;">{{ rec.title }}</div>{% if rec.detail %}<div style="font-size:11.5px; color:#555555;">{{ rec.detail }}</div>{% endif %}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>

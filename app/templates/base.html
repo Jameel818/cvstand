@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+{# `dir` is what mirrors the whole shell: every directional rule in app.css
+   is logical, so it resolves against this one attribute. The INTERFACE
+   language is the ui_lang cookie and is independent of the resume's own
+   `lang` - see app/i18n.py. -#}
+<html lang="{{ ui_lang }}" dir="{{ ui_dir }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ brand_name }}{% endblock %}</title>
+<meta name="description" content="{{ t('Build a polished résumé in minutes. 49 designer layouts across Modern and ATS-friendly families. Export to PDF and Word.') }}">
+{# The app shell uses the SAME self-hosted faces as the resume documents
+   (Inter + Fraunces are 2 of the 11 families in static/fonts/). It used to
+   <link> fonts.googleapis.com, which is a render-blocking stylesheet: with no
+   network the whole UI stalled ~21s per cold page load before the request
+   timed out. tests/e2e/test_offline.py keeps it local. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/fonts.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M9 8h11l4 4v12H9z' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M12 14h8M12 18h8M12 22h5' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="manifest" href="{{ url_for('main.manifest') }}">
+<meta name="theme-color" content="#4f46e5">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block chrome %}
+<header class="site-header">
+  <a class="logo" href="{{ url_for('main.landing') }}">
+    <span class="logo-mark" aria-hidden="true"></span>
+    <span>{{ brand_head }}<b>{{ brand_tail }}</b></span>
+  </a>
+  <nav class="site-nav">
+    <a href="{{ url_for('main.templates_gallery') }}">{{ t('Templates') }}</a>
+    <a href="{{ url_for('main.landing') }}#how">{{ t('How it works') }}</a>
+    <a href="{{ url_for('main.landing') }}#families">{{ t('Families') }}</a>
+  </nav>
+  {# Interface language. A link per language rather than a <select>: it works
+     with JavaScript off, it is a real navigation the back button understands,
+     and `next` returns the reader to the page they were already on. #}
+  <div class="lang-switch">
+    <span class="sr-only">{{ t('Language') }}</span>
+    <a href="{{ url_for('main.set_ui_language', code='en', next=request.path) }}"
+       aria-current="{{ 'true' if ui_lang == 'en' else 'false' }}" lang="en">EN</a>
+    <a href="{{ url_for('main.set_ui_language', code='ar', next=request.path) }}"
+       aria-current="{{ 'true' if ui_lang == 'ar' else 'false' }}" lang="ar">العربية</a>
+  </div>
+  {# The account slot. Shows NOTHING to an anonymous visitor except after they
+     have made an account — the free tier needs no sign-in and a prominent
+     "Sign in" invites people to think it does. `current_user` is injected by
+     the app factory's context processor. #}
+  <div class="site-account">
+    {% if current_user %}
+      <span class="who" dir="ltr">{{ current_user['email'] }}</span>
+      {# POST, because a GET sign-out is CSRF-able and gets link-prefetched. #}
+      <form method="post" action="{{ url_for('main.sign_out_page') }}">
+        <button class="btn btn-sm btn-ghost" type="submit">{{ t('Sign out') }}</button>
+      </form>
+    {% endif %}
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('main.builder') }}">{{ t('Build my résumé') }}</a>
+</header>
+{% endblock %}
+
+<main>{% block content %}{% endblock %}</main>
+
+{% block footer %}
+<footer class="site-footer">
+  <div>
+    <a class="logo" href="{{ url_for('main.landing') }}">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span>{{ brand_head }}<b>{{ brand_tail }}</b></span>
+    </a>
+    <p class="footer-tagline">{{ t(brand_tagline) }}</p>
+    <p>{{ t('Designer résumé layouts, your content, exported to PDF and Word.') }}</p>
+  </div>
+  <div class="footer-cols">
+    <div>
+      <h4>{{ t('Product') }}</h4>
+      <a href="{{ url_for('main.templates_gallery') }}">{{ t('All templates') }}</a>
+      <a href="{{ url_for('main.templates_gallery', cat='modern') }}">{{ t('Modern family') }}</a>
+      <a href="{{ url_for('main.templates_gallery', cat='ats') }}">{{ t('ATS-friendly family') }}</a>
+      <a href="{{ url_for('main.builder') }}">{{ t('Open the builder') }}</a>
+    </div>
+    <div>
+      <h4>{{ t('About') }}</h4>
+      <a href="{{ url_for('main.landing') }}#how">{{ t('How it works') }}</a>
+      <a href="{{ url_for('main.landing') }}#faq">{{ t('FAQ') }}</a>
+      <a href="mailto:{{ brand_email }}" dir="ltr">{{ brand_email }}</a>
+    </div>
+  </div>
+  <p class="footer-fine">{% if server_store %}{{ t('Built as a single-user tool. Your résumé stays on this machine.') }}{% else %}{{ t('Your résumé stays in your browser. It is never stored on our server.') }}{% endif %}</p>
+</footer>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+<script>
+  /* Register the offline shell. Guarded three ways, because a service worker
+     that fails to register must never be visible to the user:
+       - `serviceWorker` is absent in some browsers and in private windows;
+       - registration REJECTS outside a secure context (https, or localhost),
+         which is exactly how this app runs during development;
+       - a rejected promise with no catch is an unhandled rejection in the
+         console, which is the same swallow-shape this project has fixed twice.
+     Nothing in the app depends on it succeeding — it is a faster second visit
+     and an editable form offline, not a feature. */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

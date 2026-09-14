@@ -1,0 +1,80 @@
+{# ATS Template 2 — Data Scientist · single column · teal accent, metric lines
+   Ported from block <!-- 2 --> / id="t2" of "ATS Resume Templates Coded.dc.html".
+   Locked spec: ink #14213D, teal #0F766E, rule #64748B, Archivo, tabular numerals.
+   ATS-safe: single column, skills as "name  Level" text.
+   NOTE: reference groups skills (Languages / ML / Infrastructure) and carries a
+   bespoke "Model Performance" block; the shared data model has neither, so skills
+   render as one flat list and that block is omitted. #}
+{% import "_macros.j2" as m %}
+{% macro head(label) %}{{ m.rule_head(label, {'label_css': 'font-weight:900; font-size:14px; letter-spacing:2.5px; color:#14213D;', 'rule': '#64748B'}) }}{% endmacro %}
+<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:44px 56px; display:flex; flex-direction:column; gap:13px; font-family:Archivo,sans-serif; color:#14213D; font-variant-numeric:tabular-nums;">
+
+  <div style="border-bottom:2px solid #14213D; padding-bottom:14px;">
+    <div style="font-weight:900; font-size:42px; line-height:1; letter-spacing:-0.5px;">{{ r.name }}</div>
+    {% if r.title %}<div style="font-weight:700; font-size:14px; letter-spacing:2px; color:#0F766E; margin-top:9px; text-transform:uppercase;">{{ r.title }}</div>{% endif %}
+    {% set c = r.contact %}{% set bits = [] %}
+    {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
+    {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
+    {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
+    {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
+    {% if bits %}<div style="font-size:11.5px; color:#5B6472; line-height:1.7; margin-top:10px;">{{ bits | join(" | ") }}</div>{% endif %}
+  </div>
+
+  {% if r.summary %}
+  <div>{{ head(t("SUMMARY")) }}<p style="font-size:12.5px; line-height:1.6; margin:0;">{{ r.summary }}</p></div>
+  {% endif %}
+
+  {% if r.achievements %}
+  <div>{{ head(t("KEY ACHIEVEMENTS")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for a in r.achievements %}<div><span style="font-weight:900; color:#0F766E;">{{ a.metric }}</span> — {{ a.label }}</div>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div>{{ head(t("EXPERIENCE")) }}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      {% for job in r.experience %}
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+          <span style="font-weight:900; font-size:13.5px;">{{ job.role }}</span>
+          {% if job.start or job.end %}<span style="font-size:11px; color:#5B6472; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
+        </div>
+        {% if job.company or job.location %}<div style="font-size:12px; color:#4B5563; margin:2px 0 4px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
+        {% if job.bullets %}
+        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.55;">
+          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div>{{ head(t("SKILLS")) }}
+    <div style="display:flex; flex-direction:column; gap:3px; font-size:12px;">
+      {% for sk in r.skills %}
+      <div style="display:flex; gap:14px;"><span style="width:230px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700; color:#0F766E;">{{ sk.level }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if r.tools %}
+  <div>{{ head(t("TOOLS")) }}<div style="font-size:12px; line-height:1.7;">{{ r.tools | join(" · ") }}</div></div>
+  {% endif %}
+
+  {% if r.education or r.recognition %}
+  <div>{{ head(t("PUBLICATIONS AND EDUCATION")) }}
+    <div style="font-size:12px; line-height:1.7;">
+      {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
+      {% for ed in r.education %}
+      <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
