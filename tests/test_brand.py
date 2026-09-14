@@ -221,3 +221,43 @@ def test_the_service_worker_still_sweeps_the_old_cache_prefix():
     assert 'startsWith("resumecraft-")' in sw, (
         "dropping the old prefix strands previously-cached shells forever"
     )
+
+
+# --- deployment flags -------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [("0", False), ("false", False), ("no", False), ("OFF", False), (" 0 ", False),
+     ("1", True), ("true", True), ("yes", True), ("ON", True), ("", True)],
+)
+def test_server_store_flag_reads_the_word_the_operator_typed(raw, expected):
+    """`CVSTAND_SERVER_STORE` decides whether the server keeps ONE résumé for
+    everyone. The original test was `!= "0"`, under which `false`, `no` and
+    `off` all evaluate TRUE -- an operator typing the word they mean got the
+    exact opposite, silently, on the one setting where being wrong means two
+    visitors read and overwrite each other's document.
+    """
+    from app.config import _flag
+
+    import os
+    os.environ["CVSTAND_TEST_FLAG"] = raw
+    try:
+        assert _flag("CVSTAND_TEST_FLAG", "1") is expected
+    finally:
+        del os.environ["CVSTAND_TEST_FLAG"]
+
+
+@pytest.mark.parametrize("raw", ["maybe", "2", "yes please", "-1"])
+def test_an_ambiguous_flag_is_refused_rather_than_guessed(raw):
+    """Nothing downstream can detect the mistake -- a wrong value is a valid
+    configuration -- so import time is the only moment anyone is looking."""
+    import os
+
+    from app.config import AmbiguousFlag, _flag
+
+    os.environ["CVSTAND_TEST_FLAG"] = raw
+    try:
+        with pytest.raises(AmbiguousFlag):
+            _flag("CVSTAND_TEST_FLAG", "1")
+    finally:
+        del os.environ["CVSTAND_TEST_FLAG"]

@@ -52,7 +52,41 @@ MAX_UPLOAD_BYTES = 4 * 1024 * 1024  # 4 MB photo cap
 #   0            those refuse; the browser is the only store
 #
 # Set it to 0 for any deployment more than one person can reach.
-SERVER_STORE = (os.environ.get("CVSTAND_SERVER_STORE", "1") != "0")
+class AmbiguousFlag(RuntimeError):
+    """A deployment flag whose value does not clearly mean anything."""
+
+
+def _flag(name: str, default: str) -> bool:
+    """Read a 0/1 deployment flag, refusing anything ambiguous.
+
+    `!= "0"` is the historical test, and it has a trap that is invisible until
+    it has already cost you: `CVSTAND_SERVER_STORE=false` is TRUE. So is `no`,
+    and so is `off`. An operator who types the word they mean gets the exact
+    opposite of it, silently, on the one setting where being wrong means two
+    visitors read and overwrite each other's résumé.
+
+    Nothing in the app can detect that mistake later -- the wrong value is a
+    perfectly valid configuration -- so it is refused at import, which is the
+    only moment anyone is looking.
+    """
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        raw = default
+    value = raw.strip().lower()
+    if value in ("0", "false", "no", "off"):
+        return False
+    if value in ("1", "true", "yes", "on"):
+        return True
+    raise AmbiguousFlag(
+        f"{name}={raw!r} is not a yes/no value. Use 1 or 0 "
+        f"(true/false/yes/no/on/off are also accepted). Refusing to guess: "
+        f"for {name} the two answers are not equally safe."
+    )
+
+
+# Does the SERVER keep the résumé? See the long comment above. Set it to 0 for
+# any deployment more than one person can reach.
+SERVER_STORE = _flag("CVSTAND_SERVER_STORE", "1")
 
 
 # The shipped placeholder. `app/__init__.py` refuses to start a DEPLOYMENT
