@@ -6,7 +6,34 @@ pushing to GitHub needs the user's account (there is no `gh` CLI here).
 | | start of day | now |
 |---|---|---|
 | fast suite | 1692 passed, 0 errors | **1745 passed, 0 errors** |
-| full `--e2e` | 2136 | **2202 passed, 0 errors** (11m22s, junit: 2226 cases) |
+| full `--e2e` | 2136 | **2237 passed, 0 errors** (11m48s, junit: 2261 cases) |
+
+## 🔴 A LAUNCH-BLOCKING BUG WAS FOUND AND FIXED — the app did not work on phones
+
+**28 of 32** page x width x language combinations overflowed horizontally below
+900px. On a 390px screen the builder's **download button was off the edge of
+the screen**. Nothing could have caught it: every browser context in the suite
+was 1440x950 or 900x1200, so the narrowest thing ever rendered was a tablet.
+
+Cause: two flex rows that could not shrink, plus `grid-template-columns: 1fr`
+being `minmax(auto, 1fr)` — whose `auto` minimum is MIN-CONTENT, so the column
+refused to shrink below its widest child. `minmax(0, 1fr)` is the fix.
+
+Gated by `tests/e2e/test_mobile_layout.py` (35 tests, 4 widths x 4 pages x 2
+languages). **That gate measures element rects, NOT `scrollWidth`**, and the
+reason is written at the top of the file: the fix needs
+`html { overflow-x: hidden }`, which collapses `scrollWidth` to the viewport
+and would make the obvious test pass vacuously forever. It did exactly that
+mid-fix — a scrollWidth probe reported 32/32 clean while the builder was still
+140px too wide.
+
+## Known gaps, NOT fixed
+
+| Gap | Note |
+|---|---|
+| **Chromium only** | No WebKit/Firefox. iOS Safari is a large share of Gulf traffic and is entirely untested |
+| **No CI** | `.github/` does not exist; tests run only when someone remembers |
+| **Docker image never built** | Still the top deployment unknown |
 
 **Three commits on `main`.** The third added `tests/e2e/test_brand_and_cache.py`
 (13 browser tests): the brand VISIBLE rather than merely emitted, the footer
