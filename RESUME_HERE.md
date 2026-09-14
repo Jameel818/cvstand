@@ -6,7 +6,23 @@ pushing to GitHub needs the user's account (there is no `gh` CLI here).
 | | start of day | now |
 |---|---|---|
 | fast suite | 1692 passed, 0 errors | **1745 passed, 0 errors** |
-| full `--e2e` | 2136 | **2175 passed, 0 errors** (11m21s, junit: 2199 cases) |
+| full `--e2e` | 2136 | **2202 passed, 0 errors** (11m22s, junit: 2226 cases) |
+
+**Three commits on `main`.** The third added `tests/e2e/test_brand_and_cache.py`
+(13 browser tests): the brand VISIBLE rather than merely emitted, the footer
+mailto as a real link, and the service-worker cache sweep across the rename —
+the last being browser-only logic that nothing could previously reach.
+
+⚠ **Two traps fired for real while writing those tests, both worth knowing:**
+
+1. **pytest exited 0 with a failure present.** The summary line said
+   `1 failed, 2201 passed`. This is the project's oldest trap and it has now
+   burned four sessions. Read the summary line or the junit; never the exit code.
+2. **A new test can be order-dependent and look fine.** The sweep test passed
+   alone and failed in the full suite: a service worker's `activate` only fires
+   for a worker not already running, and `test_offline.py` registers one
+   earlier. `_cold_origin()` unregisters and clears caches first. **Run a new
+   e2e test both alone AND in the full suite before believing it.**
 
 ## Read these first, in this order
 
