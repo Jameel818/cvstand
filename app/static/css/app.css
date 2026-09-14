@@ -510,12 +510,74 @@ body.builder-body { overflow: hidden; }
 }
 @media (max-width: 900px) {
   .builder {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 56px minmax(0, 46vh) 1fr;
     grid-template-areas: "bar" "form" "preview";
   }
+  .builder-bar, .builder-form, .builder-preview { min-width: 0; }
   .site-nav { display: none; }
 }
+
+/* ---------- phones ----------------------------------------------------------
+   Added 2026-09-14, because nothing had ever rendered this app below 900px:
+   every e2e context was 1440x950 or 900x1200, so 28 of 32 page/width/language
+   combinations overflowed horizontally and no test could see it. On a CV
+   builder sold into a mobile-first market that is not a rough edge.
+
+   TWO CAUSES, both "a row that cannot shrink":
+
+     .site-header  — a nowrap flex whose logo + language switcher + account +
+                     call-to-action summed to a 454px floor. Hiding .site-nav
+                     at 900px was not enough; the remainder still did not fit
+                     a 390px phone.
+     .builder-bar  — the same shape at 475px: back link, template chip, save
+                     state and the download button.
+
+   The fix is to let them shrink rather than to wrap: a header that wraps onto
+   two lines changes `--header-h`, and the builder is a 100vh grid whose rows
+   are declared in pixels, so a taller bar silently crops the preview.
+
+   Logical properties only (padding-inline, inset-inline), and NO
+   letter-spacing anywhere here: it does nothing to joined Arabic script and
+   would only damage the Latin half. */
+@media (max-width: 640px) {
+  .site-header { gap: 10px; padding-inline: 14px; }
+  .site-header .logo { font-size: 15px; gap: 8px; min-width: 0; }
+  .site-header .logo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .site-header .logo-mark { width: 22px; height: 22px; flex: none; }
+  .site-header .btn { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+  .lang-switch { gap: 2px; font-size: 12px; }
+
+  /* The signed-in address is the longest thing in the header and the least
+     needed on a phone — the account page says who you are. */
+  .site-account .who { display: none; }
+
+  .builder-bar { gap: 8px; padding-inline: 10px; }
+  /* min-width:0 is the part that matters: a flex item defaults to min-content
+     width, so the template name refuses to shrink below its full text and
+     pushes the whole bar wide. */
+  .builder-bar .tpl-name { min-width: 0; padding: 5px 9px; font-size: 13px; }
+  .builder-bar .tpl-name #tpl-label {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .builder-bar .back { flex: none; font-size: 12px; }
+  .builder-bar .dl-wrap { flex: none; }
+  /* The family chip repeats what the template name already says, and at this
+     width the name itself is the thing worth the pixels. */
+  .builder-bar .tpl-name .chip { display: none; }
+  /* "Saved" is reassurance, not navigation, and the dot alone still carries
+     the state (.save-state::before is coloured by the same class). */
+  .save-state { font-size: 0; gap: 0; }
+  .save-state::before { width: 8px; height: 8px; }
+}
+
+/* A fixed, translated-off-canvas panel still counts toward the document's
+   scroll width, so the closed template drawer widened every builder page on a
+   phone. Containing it on the root is the one place that cannot re-introduce
+   the scrollbar somewhere else. `transform` has no logical form, which is why
+   the drawer moves the same way in both directions and why this guard is
+   needed at all rather than falling out of the RTL conversion. */
+html { overflow-x: hidden; }
 
 /* ---------------------------------------------------------------------------
    RTL. Every directional rule above is logical, so the interface mirrors on
