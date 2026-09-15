@@ -24,24 +24,31 @@ normal and is what the DNS step below sets up.
 
 ## Phase C — Railway
 
-### C1. Push to GitHub
+### C1. Push to GitHub — DONE 2026-09-14
 
-The repo exists locally with one commit. It has no remote yet, and there is no
-`gh` CLI on this machine, so this part is yours:
+`origin` is **https://github.com/Jameel818/cvstand** and `main` is on it.
+Nothing secret is committed — verified before the first commit: no `.env`, no
+`data/*.db`, no `venv/`.
+
+What remains is keeping it current: **Railway builds what is on GitHub, not
+what is on disk.** Before every deploy, check you are not ahead:
 
 ```
-# Create an EMPTY repo at github.com/new  (no README, no .gitignore)
-git remote add origin https://github.com/<you>/cvstand.git
-git push -u origin main
+git status -sb        # "[ahead N]" means Railway would build a stale tree
+git push origin main
 ```
 
-**Make it private** unless you have a reason not to. Nothing secret is
-committed — verified before the first commit: no `.env`, no `data/*.db`, no
-`venv/` — but the repo is the whole product.
-
-> The commit is authored as `Jamal Jameel <jamaljameel81@gmail.com>`, set
-> repo-locally. If the name is wrong:
-> `git config user.name "..."` then `git commit --amend --reset-author`.
+> **A push cannot be run from inside Claude Code.** It needs an interactive
+> credential prompt; every attempt hangs. Run it in your own terminal.
+> `git -c credential.interactive=never push` fails fast and is the safe way to
+> test whether a credential is stored.
+>
+> Git Credential Manager's device-code flow is broken on this machine — the
+> OAuth callback shows "This site can't be reached" and Git never receives the
+> token. The fallback is a Personal Access Token (scope `repo`) from
+> https://github.com/settings/tokens/new, used once as
+> `git push https://TOKEN@github.com/Jameel818/cvstand.git main`.
+> **Never let a token into the repo, a file, or a transcript.**
 
 ### C2. Create the service
 
@@ -86,11 +93,17 @@ and overwrite each other's document. There is no bug anywhere in the code —
 it is one file where there needs to be one per person. `app/config.py` says so
 at length.
 
-Two ways this bites silently:
+One way this still bites silently:
 - Spelling it `RESUMECRAFT_SERVER_STORE` (the old name, renamed 2026-09-14).
-  It is then ignored and the default applies.
-- Setting it to `false` or `no`. The check is `!= "0"`, so **only the string
-  `0` turns it off.**
+  It is then ignored and the default applies. **A misspelled name is the only
+  remaining silent failure** — nothing can distinguish it from "unset".
+
+The value itself is now safe to get wrong loudly rather than quietly:
+`app/config.py:_flag` accepts `0/false/no/off` and `1/true/yes/on`, and raises
+`AmbiguousFlag` at import on anything else. So `false` means false, and a typo
+stops the container instead of silently flipping the setting. (This paragraph
+described the old `!= "0"` check; that was replaced the same day the rename
+landed.)
 
 If `SECRET_KEY` is missing or still the shipped default while
 `CVSTAND_SERVER_STORE=0`, the app **refuses to boot** with

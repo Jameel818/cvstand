@@ -2,26 +2,51 @@
 # If pip hits SSL cert errors in this environment, add:
 #   --trusted-host pypi.org --trusted-host files.pythonhosted.org
 # After install:  venv/Scripts/python -m playwright install chromium
-
-Flask>=3.0
-jsonschema>=4.20
-Pillow>=10.0
-docxtpl>=0.18
-python-docx>=1.1
-playwright>=1.47
+#
+# PINNED, deliberately, 2026-09-15. These are the exact versions the 1745-test
+# fast suite and the 2237-test --e2e suite pass against locally. They were
+# `>=` until the first container build, which meant the image would resolve
+# whatever PyPI served that morning -- so the one build nobody had ever run
+# would also be the first to use versions nobody had ever tested. Two unknowns
+# at once is how a build failure becomes unattributable.
+#
+# `playwright` matters most: the Dockerfile runs `playwright install` from the
+# version pip resolved here, so this pin is what keeps the driver and the
+# downloaded Chromium in step.
+#
+# To move a pin: bump it here, run the full suite with --e2e, then commit both.
+Flask==3.1.3
+jsonschema==4.26.0
+Pillow==12.3.0
+docxtpl==0.20.2
+python-docx==1.2.0
+playwright==1.62.0
 
 # The AI writing assistant (app/assist.py). Optional at runtime: with no
 # ANTHROPIC_API_KEY set the feature answers 503 and the rest of the app is
 # unaffected, which is how it ships until Stage 3 turns payment on.
-anthropic>=1.5
+anthropic==1.5.0
 
 # The production WSGI server. Flask's built-in one is single-threaded and
 # explicitly not for deployment. See the Dockerfile for why this runs ONE
 # worker with threads rather than several workers: the PDF admission
 # semaphore in app/limits.py is per-process, so extra workers multiply the
 # real concurrency cap instead of respecting it.
-gunicorn>=23.0
+#
+# Pinned like the rest, and this is the one where floating was least safe:
+# `>=23.0` resolves to 26.2.0 today -- a major jump past the version the
+# Dockerfile's comments were written against, arriving on the same build
+# nobody has ever run. It is pinned at what resolves now so the build is
+# reproducible, NOT because it is tested: gunicorn is absent from this
+# machine's venv (nothing on Windows needs it) and the container is the first
+# place it will ever run. If the first deploy fails at process start rather
+# than during the image build, this line is the first thing to suspect.
+gunicorn==26.2.0
 
-# dev
-pytest>=8.0
+# dev -- installed in the image too, because the Dockerfile installs this file
+# wholesale. Costs a few MB and nothing at runtime; splitting the file is not
+# worth a second failure mode on deploy day.
+# ruff is NOT pinned: it is not installed in this venv at all, so there is
+# no tested version to pin to. It lints; it never runs in the container.
+pytest==9.1.1
 ruff>=0.6
