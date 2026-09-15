@@ -124,20 +124,45 @@ means moving that state out of memory, not adding workers.
 
 ### C6. Smoke-test on the Railway URL, before DNS
 
-Against the `*.up.railway.app` URL:
+Run this against the `*.up.railway.app` URL. It is 23 checks and takes about
+fifteen seconds:
 
-- [ ] `/` loads, wordmark reads **CVStand**, footer shows `info@cvstand.com`
-- [ ] `/templates` shows all 49; switch the language — the UI flips to Arabic RTL
-- [ ] `/builder` — type a name, it appears in the preview
-- [ ] **Download PDF** — this is the Chromium path and the one most likely to
-      fail first in a container
-- [ ] **Download Word**
-- [ ] `PUT /api/resume` returns **403** (proves `CVSTAND_SERVER_STORE=0` took)
-- [ ] Sign up, redeploy, sign in again — proves the volume is mounted
-- [ ] `/manifest.webmanifest` returns `"name": "CVStand"`
+```
+venv/Scripts/python tools/smoke_deploy.py https://xxxx.up.railway.app
+```
 
-That PDF check is worth doing twice. If it fails, it is almost always Chromium
-not being found — check `PLAYWRIGHT_BROWSERS_PATH=/opt/playwright` survived.
+Read the **VERDICT** block, not the exit code (this project has a four-session
+history of a green exit code over a red run).
+
+**Do not hand-check the export by opening `/export/pdf` in a browser.** That is
+the obvious move and it is actively misleading, in both directions:
+
+- Configured correctly (`CVSTAND_SERVER_STORE=0`), a GET never launches
+  Chromium at all — `_export_subject()` raises `_ExportNeedsPost` and the route
+  answers 405. You get a tidy JSON refusal, no traceback, and no information.
+- Configured **wrongly** (`=1`), the same GET returns **200 and a real PDF**.
+  It looks like a clean pass at the exact moment the deployment is serving one
+  shared résumé to every visitor.
+
+Only a POST carrying the document in the body reaches `render_pdf`, which is
+what the script sends. It also asserts the PDF's magic bytes *and* a size floor,
+because a Chromium that fails to start can still render an error page into a
+structurally valid, nearly empty PDF.
+
+Verified 2026-09-15: 23/23 against a local instance configured like production,
+and mutation-tested by running it against `CVSTAND_SERVER_STORE=1`, where the
+three store checks correctly fail.
+
+If the PDF check fails, it is almost always Chromium not being found — check
+`PLAYWRIGHT_BROWSERS_PATH=/opt/playwright` survived into the runtime image.
+
+**Then the three the script cannot judge**, plus the one that needs a redeploy:
+
+- [ ] `/builder` — type a name, it appears in the preview as you type
+- [ ] The Arabic pages read correctly, not merely right-to-left
+- [ ] Open it on a **phone** — the 2026-09-14 overflow bug was invisible above 900px
+- [ ] **Sign up, redeploy, sign in again** — proves the `/data` volume is really
+      mounted. If the account is gone, every deploy is deleting every user.
 
 ---
 
