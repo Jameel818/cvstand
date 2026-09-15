@@ -1,3 +1,152 @@
+# RESUME HERE — paused 2026-09-15 (RAILWAY IS PAID · THE IMAGE BUILT · config half-done)
+
+## ⏸ EXACTLY WHERE THIS STOPPED
+
+**The Docker image built successfully on Railway. That was the single biggest
+unknown in the project and it is now resolved.** The user paid for Hobby, the
+service deployed, and `Deployments` shows "deployment successful".
+
+**But the service is running on DEFAULTS, which is the dangerous configuration.**
+
+### 🔴 THE FIRST THING TO DO — the app is live and misconfigured
+
+As of the pause the five environment variables had **not** been saved. With
+`CVSTAND_SERVER_STORE` unset it defaults to `1`, which means the server keeps
+ONE résumé at `data/resume.json` and **every visitor reads and overwrites the
+same document**. Nothing is broken and nothing logs an error; it is simply one
+file where there needs to be one per person.
+
+**Nobody has the URL yet, so no harm has been done. Do not share the link or
+sign up until the variables are in.**
+
+Variables tab → **Raw Editor** → paste all five in ONE save:
+
+```
+SECRET_KEY=<generate a fresh one, see below>
+CVSTAND_SERVER_STORE=0
+CVSTAND_DATA_DIR=/data
+CVSTAND_TRUSTED_PROXIES=1
+CVSTAND_RENDER_CONCURRENCY=1
+```
+
+**All five together, not one at a time.** `app/__init__.py` raises
+`InsecureDeployment` when `CVSTAND_SERVER_STORE=0` and `SECRET_KEY` is still
+the shipped default, so saving the store flag without the key gives a
+crash-looping container that reads like a broken deploy but is the guard
+working correctly.
+
+A key was generated in the previous session and exists **only in that chat
+transcript** — deliberately never written to disk or to git. If it was already
+pasted into Railway, Railway holds it and nothing more is needed. Otherwise
+generate a fresh one; nothing has been signed with the old one, so there is no
+cost to replacing it:
+
+```
+venv/Scripts/python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+### State of the three deploy steps
+
+| Step | State |
+|---|---|
+| **Build** | ✅ **SUCCEEDED** — first time ever, on the unpinned tree at `d1a9337` |
+| **Volume at `/data`** | 🟡 **Probably attached** — the service shows a `Backups` tab, which Railway only renders for a service with a volume. **The mount path was never confirmed.** Check Settings; it must read exactly `/data`, not `/app/data` |
+| **Variables** | ❌ **NOT SET** — see above |
+| **Public domain** | ❓ Never confirmed. Railway does not expose a service by default: Settings → Networking → Public Networking → **Generate Domain**, port **8080** |
+
+### Then, in order
+
+1. Push. **4 commits are sitting unpushed** (see below). Railway builds what is
+   on GitHub, so until this happens the running image is the unpinned one.
+   `git push origin main` — **from the user's own terminal**, never from inside
+   Claude Code, where it hangs on the credential prompt.
+2. Smoke-test: `venv/Scripts/python tools/smoke_deploy.py https://<url>`
+3. The four things the script cannot judge — live preview, Arabic reading
+   correctly, a real phone, and the volume proof (sign up → redeploy → sign in).
+
+---
+
+## What this session added — 4 unpushed commits
+
+All of it is pre-flight work done while waiting on the dashboard. The fast
+suite is **1745 passed, 0 failed, 516 skipped**, unchanged throughout.
+
+### `33875a2` — pinned dependencies, corrected two stale runbook claims
+
+`requirements.txt` was all `>=`. The first-ever container build would therefore
+also have been the first to use whatever PyPI served that morning — two
+unknowns at once, and a failure nobody could attribute. Pinned to exactly what
+the suite passes against.
+
+**`gunicorn` most of all: `>=23.0` resolves to `26.2.0` today**, a major jump
+past the version the Dockerfile's comments were written against. It is pinned
+for reproducibility, **not** confidence — gunicorn is not installed on this
+machine (nothing on Windows needs it) and the container is the first place it
+has ever run. **If a deploy fails at process start rather than during the image
+build, suspect that line first.**
+
+Two things `DEPLOY.md` claimed that were no longer true:
+
+- C4 said the store flag is checked with `!= "0"` so only `0` disables it. That
+  was replaced the same day the rename landed — `app/config.py::_flag` accepts
+  `0/false/no/off` and raises `AmbiguousFlag` on anything else. The runbook was
+  warning the operator about the one input that is now safe. **A misspelled
+  variable NAME is the only silent failure left**, because nothing can
+  distinguish it from "unset".
+- C1 still described a repo with one commit and no remote.
+
+### `ed04fb7` — `tools/smoke_deploy.py`, and C6 stopped recommending a bad check
+
+23 checks against a live URL, stdlib only, ~15s. In `tools/`, which
+`.dockerignore` excludes, so it adds nothing to the image.
+
+**The finding worth keeping: never smoke-test the PDF by opening `/export/pdf`
+in a browser.** It misleads in both directions:
+
+- Configured **correctly** (`SERVER_STORE=0`) a GET never launches Chromium —
+  `_export_subject()` raises `_ExportNeedsPost` and the route answers 405. A
+  tidy JSON refusal, no traceback, no information.
+- Configured **wrongly** (`=1`) the same GET returns **200 and a real PDF** —
+  it looks like a clean pass at the exact moment the deployment is serving one
+  shared résumé to everyone.
+
+Only a POST carrying the document in the body reaches `render_pdf`. The script
+also asserts the `%PDF` magic **and** a size floor, because a Chromium that
+fails to start can still render an error page into a structurally valid,
+nearly empty PDF.
+
+**The script was tested before being trusted, and both halves caught something:**
+
+1. Run against a local instance configured like production, it reported 2
+   failures that were bugs in **the script** — `urllib` follows redirects, so
+   the `/lang/ar` check was reading the final `200` and the landing page's
+   headers instead of the `302` and its `Set-Cookie`. Fixed with a
+   non-following opener. Now 23/23, including a real 241 KB PDF in 2.9s.
+2. Mutation-tested against a second instance with `CVSTAND_SERVER_STORE=1`,
+   where the three store checks correctly fail. **A check that cannot fail is
+   worthless** — this repo has already shipped a pixel gate that silently never
+   ran.
+
+### Verified this session, do not re-derive
+
+- **The volume split is correct by construction.** `SAMPLE_RESUME_PATH` is
+  anchored to `ROOT/data`, so the showcase samples ship *inside the image* and
+  survive an empty volume, while `RESUME_PATH`, `UPLOADS_DIR` and `DB_PATH` all
+  resolve under `CVSTAND_DATA_DIR` → `/data`. `create_app()` mkdirs both at
+  boot. **Mounting `/data` will not hide the landing hero.**
+- 49/49 templates are ported and render.
+- The UI language cookie is `ui_lang`.
+
+## Still open, unchanged
+
+- **DNS at Hostinger — not started.** A/CNAME only. **Never MX or the SPF/DKIM
+  TXT records**, or the mailbox breaks silently.
+- **The mailbox `info@cvstand.com` does not exist.** The plan is bought; the
+  address was never created. Every page footer already links to it.
+- No CI (`.github/` does not exist). Chromium-only tests — iOS Safari untested.
+
+---
+
 # RESUME HERE — paused 2026-09-14c (CODE IS ON GITHUB · Railway blocked on a payment decision)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
