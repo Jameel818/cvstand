@@ -151,7 +151,7 @@ def templates_gallery():
 
 @bp.get("/builder")
 def builder():
-    resume = load_resume()
+    resume = load_resume(i18n_mod.current_lang())
     doc_lang = lang_of(resume)
     # The builder generates its form in the browser, so its labels cannot go
     # through a Jinja call - the page ships the table instead. Two DIFFERENT
@@ -183,7 +183,8 @@ def builder():
 
 @bp.get("/api/resume")
 def get_resume():
-    return jsonify({"resume": load_resume(), "meta": load_meta()})
+    return jsonify({"resume": load_resume(i18n_mod.current_lang()),
+                    "meta": load_meta()})
 
 
 @bp.put("/api/resume")
@@ -259,7 +260,7 @@ def preview():
     if request.args.get("showcase"):
         data = load_showcase(i18n_mod.current_lang())
     else:
-        data = load_resume()
+        data = load_resume(i18n_mod.current_lang())
     return Response(document_html(data, key), mimetype="text/html")
 
 
@@ -307,7 +308,8 @@ def _export_subject():
 
     if not SERVER_STORE:
         raise _ExportNeedsPost()
-    return load_resume(), _resolve_key(request.args.get("template_key"))
+    return (load_resume(i18n_mod.current_lang()),
+            _resolve_key(request.args.get("template_key")))
 
 
 @bp.route("/export/pdf", methods=["GET", "POST"])

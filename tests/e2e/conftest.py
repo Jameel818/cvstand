@@ -161,6 +161,21 @@ def clean_state(live_server):
 
 
 @pytest.fixture()
+def no_document(live_server):
+    """A visitor who has never made a résumé — nothing in the data dir yet.
+
+    The autouse `clean_state` writes the shared sample before every test, which
+    is right for the 490-odd tests that need a document to edit and wrong for
+    the few that exercise the SEED. Removing the file afterwards is what makes
+    `load_resume`'s first-read branch reachable from a browser at all; the
+    browser context is new per test, so localStorage is empty too and the page
+    genuinely boots from the server's seed."""
+    path = live_server.data_dir / "resume.json"
+    _despite_the_server(lambda: path.unlink(missing_ok=True))
+    return path
+
+
+@pytest.fixture()
 def seed_resume(live_server):
     """Write a résumé straight into the live server's data dir, retry-guarded.
 

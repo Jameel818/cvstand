@@ -1,3 +1,173 @@
+# RESUME HERE — paused 2026-09-16 (SEED FIX SHIPPED · two plans written, NEITHER confirmed)
+
+## ⏸ EXACTLY WHERE THIS STOPPED
+
+One feature shipped and verified. Two plans are written and **waiting on the
+user's answer** — no code was written for either. The deploy state is
+**unchanged** from 2026-09-15 and is still the most dangerous thing here.
+
+### 🔴 UNCHANGED AND STILL FIRST — the live service is misconfigured
+
+Nothing in this session touched the deployment. Everything in the 2026-09-15
+entry below still applies verbatim: the five environment variables, the volume
+mount path, the public domain. **`CVSTAND_SERVER_STORE` unset still means every
+visitor reads and overwrites one `data/resume.json`.**
+
+**There are now 5 unpushed commits, not 4.** Railway builds what is on GitHub,
+so the seed fix below is NOT live until `git push origin main` runs **from the
+user's own terminal** (never from inside Claude Code — it hangs on the
+credential prompt).
+
+---
+
+## ✅ SHIPPED — the builder's default document language follows the interface
+
+**The problem.** An Arabic visitor switched the interface to Arabic, opened the
+builder, and found an ENGLISH résumé. The fix was reachable only through
+`Résumé language` in Basics — a control they may never notice, and whose
+purpose is not obvious if they do.
+
+**What was rejected, and why it matters.** The user first asked for the résumé
+to follow the interface language everywhere. That was declined and the reason
+given, because six passing tests assert the opposite
+(`test_ui_language.py:123,135`, `test_journey_ar.py:211,254,350`, and all of
+`test_showcase_language.py`). The sharp case: an Arabic CV opened by an English
+reader must stay Arabic — the user changed the menu, not their CV. The user
+agreed and chose the seed fix instead.
+
+**THE RULE, and it is a narrow one:** the reader's language decides what a
+**new** résumé starts as, and nothing more. A document that exists owns its own
+language. Do not widen this.
+
+- `app/store.py::load_resume(seed_lang="en")` — seeds from
+  `SAMPLE_RESUME_PATHS[seed_lang]` on the FIRST read only. Unknown language
+  falls back to English (the same degrade rule `load_showcase` uses; the value
+  comes from a user-editable cookie).
+- `app/routes.py` — **all four** call sites pass `i18n_mod.current_lang()`:
+  `/builder`, `/api/resume`, `/preview`, and the export subject. All four, not
+  just the builder, because whichever endpoint is hit first creates the file —
+  seeding only in the builder leaves the language decided by the entry point.
+- Covers the deployed config too: with `SERVER_STORE=0` the browser owns the
+  document, but `builder.js` falls back to the server-injected `#resume-data`
+  when localStorage is empty.
+
+**Measured on a fresh data dir:** English UI → English sample, no `lang` key
+(absent = English, unchanged). Arabic UI → Arabic sample with `lang: "ar"`.
+
+**Session 24 declined this and was right at the time.** Its objection was that
+stamping `lang:"ar"` on the ENGLISH sample's text renders worse than absent.
+That was about the SAMPLE, not the principle — seeding from the Arabic sample
+carries Arabic text and `lang:"ar"` together, so the pair stays consistent.
+
+### Tests
+
+`tests/e2e/test_language_consistency.py` — **9 tests**, plus a `no_document`
+fixture in `tests/e2e/conftest.py` (the autouse `clean_state` writes a résumé
+before every test, so the seed branch is otherwise unreachable from a browser).
+
+- The interface language survives `/` → `/templates` → `/builder`, by `goto`
+  AND by clicking, plus a back-navigation. Existing tests check each page in
+  isolation, one request each; none walked a visitor THROUGH the journey, which
+  is where a language actually gets lost.
+- Showcase cards follow the reader **with the document seeded in the opposite
+  language** — that is what makes the test able to fail.
+- A new résumé opens in the chosen language, asserted on the PREVIEW iframe's
+  `dir`, not the shell's: the shell has followed the cookie all along, so a
+  shell assertion passes with the bug still present.
+- The seed never overrides an existing document.
+
+**Verification:** fast suite `1745 passed` (baseline unchanged; skips 516 → 525
+= exactly the 9 new tests). Full browser suite `501 passed, 1769 deselected`
+— read from the summary line, not the exit code. Run alone AND in the full
+suite, per this file's order-dependence trap.
+
+**Mutation-tested, 3 mutants, all caught, all reverted:** showcase coupled to
+the document (`routes.py`), `dir="ltr"` hardcoded in `base.html`, seed forced
+back to English-only (`store.py`).
+
+---
+
+## ⏳ TWO PLANS WRITTEN — BOTH WAITING ON THE USER, NO CODE WRITTEN
+
+### Plan A — Arabic sample content (the user's live question)
+
+**The user asked: "when the user changes the language to Arabic, will all the
+English names change to Arabic names — is that applicable without problems?"**
+
+**The answer is yes, and MOST OF IT ALREADY WORKS. Do not rebuild it.**
+Switching the interface already swaps the whole showcase document, name
+included — measured: `Wren Ashworth` → `ورين آشورث`.
+
+**The real defect is content, in ONE file.** `data/sample_resume_ar.json` is
+transliterated English, not Arabic: `ورين آشورث` IS "Wren Ashworth" in Arabic
+letters. Likewise `هالدن آند رو` = "Halden & Row", `بورتسايد` = "Portside",
+`كلية نورثفيلد` = "Northfield College". 61 of 67 string fields are already
+Arabic script; only 6 carry Latin (3 emails, 1 site, `$3.2M`, the `lang` code).
+
+Phases: (1) rewrite the proper nouns — **keep some Latin**, a real Gulf CV
+mixes scripts and the bidi suite measured mixing needs no isolation (0/49);
+scrubbing all Latin deletes that test's subject. (2) `tests/samples.py`
+hardcodes `_ARABIC_COMPANY` / `_ARABIC_CITY` to mirror the sample and
+`test_bidi_mixed.py:152-155` pairs `samples.MIXED` against `samples.ARABIC`
+field by field — these break in lockstep. (3) add Arabic to
+`test_autofit_gate.py`. (4) `test_rtl_typography.py` and
+`test_rtl_mirroring.py` both load this sample and run geometry over 49
+templates — most likely casualties of a text-length change.
+
+**Estimated ~3-4h**, revised DOWN from 9-13h after measuring.
+
+**The boundary to keep:** this is our DEMO content. The user's own typed name
+must never change when they flip the interface. The seed fix already draws
+that line.
+
+### Plan B — template names and blurbs are untranslated (separate, not started)
+
+`app/registry.py` holds 49 labels + 49 blurbs as hardcoded English tuples,
+never routed through `t()`. Plus `tpl.skill_pattern` rendered raw
+(`gallery.html:38`), the category tabs (`:15`), and a bare `'Modern' if ...
+else 'ATS'` literal (`gallery.html:34`, `builder.html:12`). **≈106 msgids.**
+
+**OPEN DECISION the user has not answered.** ~6 names are typeface proper nouns
+("Fraunces Stack", "Mono Tech", Archivo/Anton). Translating a font name is
+wrong, and transliterating it reproduces exactly the Plan A defect. But
+`test_arabic_differs_from_english_for_every_msgid` **fails any msgid whose
+Arabic equals its English**, so leaving one in Latin collides with a live gate.
+Options given: (a) translate all 49; (b) translate descriptive + role names,
+keep typeface names Latin with a narrow documented exemption — **recommended**;
+(c) rename the ~6 in English first so every name becomes translatable.
+
+---
+
+## Measured this session — DO NOT RE-DERIVE
+
+- **Arabic seats 49/49 with ZERO compression**, identical to English
+  (`not fitted = []`, `compressed = 0`, via the real `ResumeAutofit` engine).
+  There is genuine headroom for a content rewrite.
+- **`test_overflow_gate.py:87` IS parametrized `["en","ar"]`** across all 49.
+  The horizontal axis is already gated for Arabic. Only the **vertical**
+  auto-fit gate (`test_autofit_gate.py:39`) and the **pixel** baselines
+  (`test_golden_pixels.py:46`) are English-only. An earlier claim in this
+  session that all four gates were English-only was wrong.
+- **A naive height check is not the fit gate.** Setting `.tpl` height to `auto`
+  and reading `scrollHeight` reported **16/49 English failures on the shipped
+  sample** — content the real gate calls clean. The instrument was wrong, not
+  the templates. Run a new geometric check against the SHIPPED sample first;
+  this is the second time that rule has paid (see the `Range`-rects note).
+- **No entry reordering exists anywhere in the builder** — `entryHTML()`
+  (`builder.js:230`) emits only `Remove`; `add` always appends. **And
+  `landing.html:85` advertises "Add and reorder entries as you go"**, shipped
+  translated into Arabic via `labels.py:356`. We promise it in two languages
+  and ship none. Section order is a different, far larger problem: it is
+  hardcoded per template AND split across columns (`modern/t1.j2:65`).
+- **Five hardcoded English strings in `builder.js`** — `Remove` (`:167`,
+  `:231`), `Bullet points` (`:222`), `+ Add bullet` (`:227`), and
+  `+ Add ${label.toLowerCase()}` (`:244`). `test_no_label_is_still_hardcoded`
+  (`test_labels.py:325`) walks `_template_files()` — **Jinja only, it has never
+  scanned JS** — and flags only literals already in the catalogue, which is why
+  the bare `'Modern'` literal has always passed too.
+
+---
+
 # RESUME HERE — paused 2026-09-15 (RAILWAY IS PAID · THE IMAGE BUILT · config half-done)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED

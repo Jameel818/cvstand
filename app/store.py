@@ -1,6 +1,7 @@
 """The single working resume, persisted as one JSON file (v1, no DB).
 
-On first read, seeds data/resume.json from data/sample_resume.json.
+On first read, seeds data/resume.json from the sample matching the reader's
+interface language (data/sample_resume.json for English) — see load_resume.
 Selection state (chosen template) lives in a separate data/meta.json so the
 resume file stays a clean instance of the locked schema.
 """
@@ -30,9 +31,36 @@ def _write_json(path, data: dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def load_resume() -> dict[str, Any]:
+def load_resume(seed_lang: str = "en") -> dict[str, Any]:
+    """The user's OWN résumé, seeded in the reader's language on first run.
+
+    `seed_lang` applies at exactly one moment — the first read, when no
+    document exists yet — and never again. An existing document's language is
+    a property of the document (app/i18n.py) and no cookie may overwrite it;
+    that is what `tests/test_showcase_language.py` and the phase-6 tests
+    protect, and nothing here weakens it.
+
+    WHY THE SEED IS THE EXCEPTION
+
+        A new résumé has no language of its own to respect yet. Seeding it
+        from the English sample regardless of the interface meant an Arabic
+        visitor opened the builder onto an English document and had to find
+        `Résumé language` in Basics to fix it — a control they may never
+        notice, and whose purpose is not obvious if they do. The default now
+        follows the choice they already made in the header.
+
+        Session 24 declined to default `lang` from the interface, and was
+        right to: stamping `lang: "ar"` onto the ENGLISH sample's text renders
+        worse than leaving it absent. That objection was about the sample, not
+        the principle. Seeding from the Arabic sample carries Arabic text AND
+        `lang: "ar"` together, so the pair stays consistent.
+
+    An unknown language falls back to English rather than raising — the same
+    degrade rule `load_showcase` follows, and for the same reason: the value
+    comes from a user-editable cookie.
+    """
     if not RESUME_PATH.exists():
-        data = _read_json(SAMPLE_RESUME_PATH)
+        data = _read_json(SAMPLE_RESUME_PATHS.get(seed_lang, SAMPLE_RESUME_PATH))
         _write_json(RESUME_PATH, data)
         return data
     return _read_json(RESUME_PATH)
