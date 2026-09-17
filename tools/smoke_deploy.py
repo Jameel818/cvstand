@@ -33,6 +33,7 @@ EXIT CODE
 from __future__ import annotations
 
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -131,6 +132,37 @@ def main(base: str) -> int:
     check('landing flips to dir="rtl"', 'dir="rtl"' in ar)
     check("landing renders Arabic script",
           any("؀" <= ch <= "ۿ" for ch in ar))
+
+    # ---- is the DEPLOYED build actually the current one? ------------------
+    #
+    # Everything above passes against a container built from any commit, so
+    # the whole script stayed green while the running image was eight commits
+    # behind and served 49 English template names to Arabic readers. A local
+    # check cannot see that: localhost is always current, which is exactly why
+    # it was mistaken for proof about the live site.
+    #
+    # These two are staleness detectors, not feature tests. They read the same
+    # two surfaces from the DEPLOYED origin and fail when the image predates
+    # the work, which is a deploy problem wearing a translation costume.
+    print("\nDeployed build is current (staleness, not features)")
+    _, _, raw = fetch(base + "/templates", headers={"Cookie": "ui_lang=ar"})
+    gallery = raw.decode("utf-8", "replace")
+    names = re.findall(r"<h3>([^<]*)</h3>", gallery)
+    latin = [n for n in names if re.search(r"[A-Za-z]{2,}", n)]
+    check("template names are translated",
+          bool(names) and not latin,
+          f"{len(latin)} of {len(names)} still Latin, e.g. {latin[:3]}"
+          if latin else f"all {len(names)} in Arabic")
+
+    # The form is generated in the browser, so its labels ship inside the JS
+    # rather than in any rendered page. A stale asset here means an Arabic
+    # user gets an Arabic page with English buttons on it.
+    _, _, raw = fetch(base + "/static/js/builder.js")
+    js = raw.decode("utf-8", "replace")
+    check("builder.js carries its labels through T()",
+          'T("Bullet points")' in js,
+          "" if 'T("Bullet points")' in js
+          else "stale asset -- form buttons stay English in Arabic")
 
     # ---- the multi-visitor switch, on BOTH routes that honour it ----------
     print("\nCVSTAND_SERVER_STORE=0  (two visitors must not share one document)")
