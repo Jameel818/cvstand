@@ -9,8 +9,8 @@
   <div class="builder-bar">
     <a class="back" href="{{ url_for('main.templates_gallery') }}"><span class="dir-flip" aria-hidden="true">←</span> {{ t('Templates') }}</a>
     <button type="button" class="tpl-name" id="open-drawer">
-      <span class="chip chip-{{ template.category if template else 'modern' }}"><span class="dot"></span>{{ 'Modern' if template and template.category == 'modern' else 'ATS' }}</span>
-      <span id="tpl-label">{{ template.label if template else 'Choose a template' }}</span>
+      <span class="chip chip-{{ template.category if template else 'modern' }}"><span class="dot"></span>{{ t('Modern') if template and template.category == 'modern' else t('ATS') }}</span>
+      <span id="tpl-label">{{ t(template.label) if template else t('Choose a template') }}</span>
       <span aria-hidden="true">▾</span>
     </button>
     <span class="spacer"></span>

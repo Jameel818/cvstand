@@ -12,7 +12,7 @@
   <div class="tabs">
     <a class="tab {% if not active_cat %}is-active{% endif %}" href="{{ url_for('main.templates_gallery') }}">{{ t('All') }}</a>
     {% for c in categories %}
-    <a class="tab {% if active_cat == c.id %}is-active{% endif %}" href="{{ url_for('main.templates_gallery', cat=c.id) }}">{{ c.label }}</a>
+    <a class="tab {% if active_cat == c.id %}is-active{% endif %}" href="{{ url_for('main.templates_gallery', cat=c.id) }}">{{ t(c.label) }}</a>
     {% endfor %}
   </div>
 </div>
@@ -23,19 +23,19 @@
     {% if not tpl.ported %}<span class="ribbon">{{ t('Soon') }}</span>{% endif %}
     <div class="tpl-thumb">
       {% if tpl.ported %}
-      <iframe src="{{ url_for('main.preview', template_key=tpl.key, showcase=1) }}" title="{{ tpl.label }} preview" scrolling="no" loading="lazy" tabindex="-1"></iframe>
+      <iframe src="{{ url_for('main.preview', template_key=tpl.key, showcase=1) }}" title="{{ t(tpl.label) }}" scrolling="no" loading="lazy" tabindex="-1"></iframe>
       {% else %}
       <div class="placeholder">{{ t('Preview coming soon') }}</div>
       {% endif %}
     </div>
     <figcaption class="tpl-meta">
       <div class="row">
-        <h3>{{ tpl.label }}</h3>
-        <span class="chip chip-{{ tpl.category }}"><span class="dot"></span>{{ 'Modern' if tpl.category == 'modern' else 'ATS' }}</span>
+        <h3>{{ t(tpl.label) }}</h3>
+        <span class="chip chip-{{ tpl.category }}"><span class="dot"></span>{{ t('Modern') if tpl.category == 'modern' else t('ATS') }}</span>
       </div>
-      <p class="blurb">{{ tpl.blurb }}</p>
+      <p class="blurb">{{ t(tpl.blurb) }}</p>
       <div class="foot">
-        <span class="chip"><span class="dot" style="background:{{ tpl.accent }}"></span>{{ tpl.skill_pattern }}</span>
+        <span class="chip"><span class="dot" style="background:{{ tpl.accent }}"></span>{{ t(tpl.skill_pattern) }}</span>
         {% if tpl.ported %}
         <button class="btn btn-sm btn-primary use-btn" data-key="{{ tpl.key }}">
           {% if tpl.key == meta.template_key %}{{ t('Selected') }}{% else %}{{ t('Use this') }}{% endif %}

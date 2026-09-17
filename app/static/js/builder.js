@@ -164,7 +164,7 @@
         <div style="display:flex;gap:10px;align-items:center">
           <input type="file" id="${id}" accept="image/png,image/jpeg,image/webp" data-photo="${path}">
           ${val ? `<img src="${esc(val)}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid var(--line)">` : ""}
-          ${val ? `<button type="button" class="rm" data-clear-photo="${path}">Remove</button>` : ""}
+          ${val ? `<button type="button" class="rm" data-clear-photo="${path}">${T("Remove")}</button>` : ""}
         </div>
       </div>`;
     }
@@ -219,16 +219,16 @@
     let bullets = "";
     if (listCfg.bullets) {
       const arr = Array.isArray(entry.bullets) ? entry.bullets : [];
-      bullets = `<div class="bullets"><label style="font-size:12px;font-weight:600;color:var(--muted)">Bullet points</label>
+      bullets = `<div class="bullets"><label style="font-size:12px;font-weight:600;color:var(--muted)">${T("Bullet points")}</label>
         ${arr.map((b, bi) => `<div class="bullet-row">
           <input type="text" name="${base}.bullets.${bi}" value="${esc(b)}">
           <button type="button" data-act="rmbullet" data-path="${base}.bullets" data-idx="${bi}">×</button>
         </div>`).join("")}
-        <button type="button" class="add" data-act="addbullet" data-path="${base}.bullets" style="margin-top:8px">+ Add bullet</button></div>`;
+        <button type="button" class="add" data-act="addbullet" data-path="${base}.bullets" style="margin-top:8px">${T("+ Add bullet")}</button></div>`;
     }
     return `<div class="entry">
       <div class="entry-head"><b>${esc(title)}</b>
-        <button type="button" class="rm" data-act="rm" data-path="${listCfg.path}" data-idx="${idx}">Remove</button></div>
+        <button type="button" class="rm" data-act="rm" data-path="${listCfg.path}" data-idx="${idx}">${T("Remove")}</button></div>
       ${inner}${bullets}
     </div>`;
   }
@@ -241,7 +241,11 @@
       const arr = Array.isArray(getPath(data, sec.list.path)) ? getPath(data, sec.list.path) : [];
       body += `<div data-list="${sec.list.path}">`;
       arr.forEach((_, i) => { body += entryHTML(sec.list, i); });
-      body += `</div><button type="button" class="add" data-act="add" data-path="${sec.list.path}">+ Add ${sec.list.label.toLowerCase()}</button>`;
+      /* Composed, not one msgid per list: `sec.list.label` is ALREADY through
+         T() where the section was declared, so translating only the verb keeps
+         the two halves in one language. English is byte-identical — T("+ Add")
+         returns "+ Add" — so the golden HTML gate does not move. */
+      body += `</div><button type="button" class="add" data-act="add" data-path="${sec.list.path}">${T("+ Add")} ${sec.list.label.toLowerCase()}</button>`;
     }
     const open = n <= 2 ? " open" : "";
     return `<details class="sec"${open}><summary><span class="num">${n}</span>${sec.title}<span class="caret">›</span></summary>
@@ -652,7 +656,7 @@
       groups[cat].forEach((t) => {
         html += `<div class="drawer-item${t.key === templateKey ? " is-current" : ""}" data-key="${t.key}" ${t.ported ? "" : 'aria-disabled="true"'}>
           <div class="mini">${t.ported ? `<iframe data-mini="${t.key}" title="" scrolling="no"></iframe>` : ""}</div>
-          <div class="info"><b>${esc(t.label)}</b><p>${esc(t.blurb)}</p>${t.ported ? "" : '<p style="color:var(--warn)">Coming soon</p>'}</div>
+          <div class="info"><b>${esc(T(t.label))}</b><p>${esc(T(t.blurb))}</p>${t.ported ? "" : `<p style="color:var(--warn)">${T("Coming soon")}</p>`}</div>
         </div>`;
       });
     });
@@ -687,8 +691,14 @@
       }
       templateKey = key;
       const t = catalogue.find((x) => x.key === key);
-      $("#tpl-label").textContent = t.label;
-      $(".builder-bar .tpl-name .chip").className = "chip chip-" + t.category;
+      $("#tpl-label").textContent = T(t.label);
+      /* The chip's COLOUR was being swapped without its TEXT, so switching a
+         Modern template for an ATS one left the bar reading "Modern" in an ATS
+         colour until the page was reloaded. `lastChild` is the bare text node -
+         textContent on the chip itself would delete the `.dot` span. */
+      const chip = $(".builder-bar .tpl-name .chip");
+      chip.className = "chip chip-" + t.category;
+      chip.lastChild.textContent = t.category === "modern" ? T("Modern") : T("ATS");
       markCurrent();
       closeDrawer();
       doRender();

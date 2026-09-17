@@ -419,7 +419,9 @@ _UI_AR: dict[str, str] = {
     "Zoom out": "تصغير",
     "Résumé preview": "معاينة السيرة الذاتية",
     "Close": "إغلاق",
-    "Language": "اللغة",
+    # The builder's field/list label, indefinite for the same reason as "Role".
+    # The résumé section heading is `_AR["language"]` = "اللغة" and is separate.
+    "Language": "لغة",
 
     # --- builder form: sections and fields --------------------------------
     # Anything not here falls through to the DOCUMENT catalogue, which is the
@@ -443,12 +445,16 @@ _UI_AR: dict[str, str] = {
     "Stat": "رقم",
     "Metric": "القيمة",
     "Caption": "الوصف",
-    "Role": "الوظيفة",
+    # Indefinite, because these three are COMPOSED into the add button
+    # ("+ إضافة وظيفة"). With the article the button read "add THE job". They
+    # are also the entry-title fallback ("وظيفة 1"), which wants the indefinite
+    # too. The résumé HEADINGS keep their article and live in `_AR`, untouched.
+    "Role": "وظيفة",
     "Job title": "المسمى الوظيفي",
     "Company": "الشركة",
     "Start": "من",
     "End": "إلى",
-    "Qualification": "المؤهل",
+    "Qualification": "مؤهل",
     "Degree": "الدرجة",
     "School": "المؤسسة التعليمية",
     "Award": "جائزة",
@@ -498,6 +504,15 @@ _UI_AR: dict[str, str] = {
     " export failed.": " فشل التصدير.",
     "Add": "إضافة",
     "Remove": "حذف",
+    # The builder's form is generated in the browser, so these four lived as
+    # English literals in builder.js and were invisible to the miss detector -
+    # `test_no_label_is_still_hardcoded` walks `_template_files()`, which is
+    # Jinja only and has never scanned JS. An Arabic user saw them in English.
+    "Bullet points": "النقاط",
+    "+ Add bullet": "+ إضافة نقطة",
+    # Composed with an already-translated list label ("+ Add" + " " + "Role"),
+    # so only the verb is a msgid. See the note at its call site.
+    "+ Add": "+ إضافة",
 
     # --- builder: the DOCUMENT's language (not the interface's) -------------
     # The option labels are autonyms ("English", "العربية"), like the header
@@ -508,6 +523,188 @@ _UI_AR: dict[str, str] = {
         "اللغة التي كُتبت بها السيرة الذاتية — تحدد اتجاهها وعناوين أقسامها وكلمات المستوى فيها. وهي ليست لغة الواجهة.",
     "Translate the level words already chosen? ":
         "هل تريد ترجمة كلمات المستوى المختارة مسبقاً؟ ",
+
+    # --- the template catalogue (gallery cards + the builder's drawer) ------
+    # 49 layout names and 49 one-line blurbs live as English tuples in
+    # `registry.py`, and the gallery printed them raw - so an Arabic reader met
+    # 49 English cards under an Arabic heading. The msgid is still the English
+    # string, so `registry.py` stays the single source of the catalogue and the
+    # two cannot drift apart silently: `test_catalogue_has_no_dead_rows` scans
+    # `app/**.py` and fails any row whose English no longer appears there.
+    #
+    # SIX NAMES ARE TYPEFACE PROPER NOUNS - "Fraunces Stack", "Mono Tech",
+    # "Wide Caps" (Anton), "Accent Bar" (Archivo), "Serif Executive" and
+    # "Centred Serif". A font's name is not a word, so it is NOT transliterated:
+    # that is exactly the defect that makes `sample_resume_ar.json` read as
+    # English spelled in Arabic letters. Each is translated by what the face
+    # DOES on the page ("Fraunces Stack" -> a classical stacked masthead), which
+    # also keeps it clear of the equal-strings gate in
+    # `test_arabic_differs_from_english_for_every_shell_msgid`.
+
+    # category tabs, and the chip on every card
+    "Modern": "مودرن",
+    "ATS-Friendly": "متوافق مع أنظمة التتبع",
+    "ATS": "أنظمة التتبع",
+
+    # skill-graphic patterns, printed on the card's foot chip
+    "dot-grid": "شبكة نقاط",
+    "bars": "أشرطة",
+    "rings": "حلقات",
+    "inline": "في السطر",
+
+    # --- MODERN: names -----------------------------------------------------
+    "Editorial Redline": "خط التحرير الأحمر",
+    "Navy & Gold": "كحلي وذهبي",
+    "Yellow Photo Rail": "شريط الصورة الأصفر",
+    "Ribbon Sidebar": "شريط جانبي بأوشحة",
+    "Rounded Dark": "داكن بحواف دائرية",
+    "Centred Symmetric": "متوسط متماثل",
+    "Poster Band": "شريط الملصق",
+    "Interlocking Blocks": "كتل متشابكة",
+    "Boxed Sections": "أقسام مؤطرة",
+    "FinTech Elite": "نخبة التقنية المالية",
+    "Colour Header Rail": "شريط ترويسة ملوّن",
+    "Typographic Mono": "طباعة أحادية",
+    "Band Timeline": "شريط بمسار زمني",
+    "Offset Plaque": "لوحة مزاحة",
+    "Forest & Amber": "أخضر غابي وكهرماني",
+    "Charcoal Rings": "حلقات فحمية",
+    "Two-Tone Ribbon": "وشاح بلونين",
+    "Interlocking Block": "كتلة متشابكة",
+    "Label Gutter": "هامش التسميات",
+    "Cotton & Cherry": "قطني وكرزي",
+    "Rounded Card Shell": "إطار بطاقة دائري",
+    "Vertical Rail Rings": "حلقات بشريط رأسي",
+    "Spine Timeline": "مسار زمني بعمود",
+    "Hard-Edged Sidebar": "شريط جانبي حاد الحواف",
+
+    # --- MODERN: blurbs ----------------------------------------------------
+    "Pure white, hairlines only, chartreuse redline marker":
+        "أبيض خالص، وخطوط رفيعة فقط، وعلامة تحرير بلون ليموني",
+    "Navy sidebar with a gold band, numeric skill bars":
+        "شريط جانبي كحلي مع شريط ذهبي، وأشرطة مهارات رقمية",
+    "Heavy display heads over a yellow photo rail":
+        "عناوين عريضة فوق شريط صورة أصفر",
+    "Ribbon-header sidebar, references block, dot levels":
+        "شريط جانبي بعناوين وشاحية، وقسم للمعرّفين، ومستويات بالنقاط",
+    "Rounded dark sidebar, black pill headers, coral sliders":
+        "شريط جانبي داكن دائري، وعناوين سوداء بيضاوية، ومؤشرات مرجانية",
+    "Centred header, symmetric two-column body, bar levels":
+        "ترويسة متوسطة، ومتن من عمودين متماثلين، ومستويات بالأشرطة",
+    "Poster masthead over a two-tone body, early-career":
+        "ترويسة كالملصق فوق متن بلونين، لبداية المسيرة المهنية",
+    "Navy and pale-blue interlocking blocks, dot-grid levels":
+        "كتل متشابكة بالكحلي والأزرق الفاتح، ومستويات بشبكة نقاط",
+    "Yellow boxed-section rail with boxed entries":
+        "شريط أقسام مؤطرة بالأصفر مع مدخلات مؤطرة",
+    "Editorial sidebar tuned for finance leadership":
+        "شريط جانبي تحريري مهيأ لقيادات القطاع المالي",
+    "Photo rail plus a colour header block, dot levels":
+        "شريط صورة مع كتلة ترويسة ملوّنة، ومستويات بالنقاط",
+    "Full-bleed typographic mono with ring skill diagrams":
+        "طباعة أحادية ممتدة بالكامل مع حلقات لمستويات المهارات",
+    "Colour band over a single-column timeline, finance":
+        "شريط ملوّن فوق مسار زمني بعمود واحد، للقطاع المالي",
+    "Offset plaque with flag headers, graphic-design":
+        "لوحة مزاحة بعناوين كالأعلام، للتصميم الجرافيكي",
+    "Forest sidebar, amber band, seam photo, skill bars":
+        "شريط جانبي أخضر غابي، وشريط كهرماني، وصورة على الحد، وأشرطة مهارات",
+    "Charcoal rail with a ring cluster, circular levels":
+        "شريط فحمي مع تجمّع حلقات، ومستويات دائرية",
+    "Two-tone ribbon banners, photo top-right":
+        "لافتات وشاحية بلونين، والصورة في الأعلى",
+    "Interlocking two-tone block with a straddling photo":
+        "كتلة متشابكة بلونين مع صورة متداخلة بينهما",
+    "Label-gutter editorial, product management":
+        "تحرير بهامش تسميات، لإدارة المنتجات",
+    "Cotton sidebar, cherry rail, dot-grid expertise":
+        "شريط جانبي قطني، وشريط كرزي، وخبرات بشبكة نقاط",
+    "Rounded card shell with pill headers, dot levels":
+        "إطار بطاقة دائري بعناوين بيضاوية، ومستويات بالنقاط",
+    "Vertical RESUME rail, bold type, circular rings":
+        "شريط رأسي بكلمة السيرة، وخط عريض، وحلقات دائرية",
+    "Spine timeline with pill tags, software engineering":
+        "مسار زمني بعمود مع وسوم بيضاوية، لهندسة البرمجيات",
+    "Hard-edged sidebar, block headers, gold skill rings":
+        "شريط جانبي حاد الحواف، وعناوين كتلية، وحلقات مهارات ذهبية",
+
+    # --- ATS: names --------------------------------------------------------
+    "Tech Lead": "قائد تقني",
+    "Data Scientist": "عالم بيانات",
+    "Portal Standard": "معيار بوابات التوظيف",
+    "Sectioned Plum": "أقسام برقوقية",
+    "Rule Stack": "خطوط متراصة",
+    "Accent Band": "شريط لوني",
+    "Big Type": "خط كبير",
+    "Ledger": "دفتر الأستاذ",
+    "Marker": "قلم التظليل",
+    "Caps Tick": "عناوين بعلامات صح",
+    "Serif Executive": "تنفيذي بخط مذيّل",
+    "Mono Tech": "تقني بخط أحادي",
+    "Numbered": "مرقّم",
+    "Split Rule": "خط مجزّأ",
+    "Fraunces Stack": "ترويسة كلاسيكية متراصة",
+    "Wide Caps": "أحرف كبيرة عريضة",
+    "Indent Rule": "خط بإزاحة",
+    "Ochre Ledger": "دفتر بلون المغرة",
+    "Centred Serif": "مذيّل متوسط",
+    "Mono Label": "تسميات أحادية",
+    "Accent Bar": "شريط لوني ممتد",
+    "Open Air": "فضاء مفتوح",
+    "Narrow Two-Tone": "ضيّق بلونين",
+    "Dense Career": "مسيرة مكثّفة",
+
+    # --- ATS: blurbs -------------------------------------------------------
+    "Signal blue, rule-to-margin heads, dot-grid levels":
+        "أزرق إشاري، وعناوين بخطوط ممتدة إلى الهامش، ومستويات بشبكة نقاط",
+    "Teal accent, grouped skill levels, metric lines":
+        "لمسة فيروزية، ومستويات مهارات مجمّعة، وأسطر بالأرقام",
+    "The safest single column — dot-grid levels, plain rules":
+        "أكثر التصاميم أمانًا بعمود واحد — مستويات بشبكة نقاط وخطوط بسيطة",
+    "Pure white, redline marker, ATS-safe port of Modern 1":
+        "أبيض خالص، وعلامة تحرير حمراء، نسخة متوافقة مع أنظمة التتبع من مودرن ١",
+    "Sectioned editorial, plum accent, bar levels":
+        "تحرير مقسّم، ولمسة برقوقية، ومستويات بالأشرطة",
+    "Steel accent, hairline sections, quiet structure":
+        "لمسة فولاذية، وأقسام بخطوط رفيعة، وبنية هادئة",
+    "Full-width navy masthead over a linear body":
+        "ترويسة كحلية بعرض الصفحة فوق متن خطّي",
+    "No rules — space-only structure, inline skill run":
+        "بلا خطوط — بنية بالمسافات وحدها، ومهارات في سطر متصل",
+    "Double rules, tabular dates, serif masthead":
+        "خطوط مزدوجة، وتواريخ بمحاذاة جدولية، وترويسة بخط مذيّل",
+    "Pure white, hairlines only, one highlight swipe":
+        "أبيض خالص، وخطوط رفيعة فقط، ومسحة تظليل واحدة",
+    "Teal accent, tick-marked section labels":
+        "لمسة فيروزية، وتسميات أقسام بعلامات صح",
+    "Ink only, executive register, generous leading":
+        "حبر فقط، وطابع تنفيذي، وتباعد أسطر سخي",
+    "Monospace labels, signal blue, engineering register":
+        "تسميات بخط أحادي، وأزرق إشاري، وطابع هندسي",
+    "Numbered sections, rust accent, flush-left":
+        "أقسام مرقّمة، ولمسة صدئة، ومحاذاة إلى بداية السطر",
+    "Plum accent, label-then-rule section heads":
+        "لمسة برقوقية، وعناوين أقسام بتسمية يتبعها خط",
+    "Fraunces masthead, terracotta accent, double-rule heads":
+        "ترويسة بخط كلاسيكي، ولمسة طينية، وعناوين بخطين",
+    "Anton masthead, forest accent, hairline-only":
+        "ترويسة بخط عريض، ولمسة خضراء غابية، وخطوط رفيعة فقط",
+    "Indigo accent, left border marking each section":
+        "لمسة نيلية، وحد جانبي يميّز كل قسم",
+    "Mono dates, right-hand rule column, warm neutral":
+        "تواريخ بخط أحادي، وعمود خطوط جانبي، وحياد دافئ",
+    "Burgundy accent, centred masthead, quiet register":
+        "لمسة عنابية، وترويسة متوسطة، وطابع هادئ",
+    "Cyan on slate, monospace headings, engineering":
+        "سماوي على رمادي أردوازي، وعناوين بخط أحادي، للهندسة",
+    "One full-bleed crimson band, Archivo black masthead":
+        "شريط قرمزي واحد ممتد، وترويسة بخط أسود عريض",
+    "Teal accent, no rules at all, space-only structure":
+        "لمسة فيروزية، بلا خطوط إطلاقًا، وبنية بالمسافات وحدها",
+    "Olive accent, condensed type, tight rules":
+        "لمسة زيتونية، وخط مضغوط، وخطوط متقاربة",
+    "Steel blue, built for long multi-role histories":
+        "أزرق فولاذي، مصمّم للمسيرات الطويلة متعددة الأدوار",
 }
 
 

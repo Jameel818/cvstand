@@ -142,6 +142,24 @@ def _template_files():
     )
 
 
+# The builder's form does not exist in any .j2 or .html file -- `builder.js`
+# generates it in the browser. So `_template_files()` has never been able to
+# see it, and five reader-visible English strings ("Remove" twice, "Bullet
+# points", "+ Add bullet" and the "+ Add <thing>" verb) sat there in English
+# through every run of this file, shown to Arabic readers for eight sessions.
+def _script_files():
+    return sorted(ROOT.joinpath("app", "static", "js").glob("*.js"))
+
+
+#: A JS template literal, which is where this file builds its HTML.
+TEMPLATE_LITERAL = re.compile(r"`([^`]*)`", re.S)
+#: `${...}` inside one. Replaced with SENTINEL for the same reason Jinja
+#: expressions are: blanking would fuse the text on either side into a run
+#: that is not in the file.
+INTERP = re.compile(r"\$\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", re.S)
+JS_COMMENT = re.compile(r"/\*.*?\*/|//[^\n]*", re.S)
+
+
 def _rel(f: Path) -> str:
     if f.parent == SHELL_DIR:
         return f.name
@@ -358,6 +376,46 @@ def test_no_label_is_still_hardcoded():
     assert not findings, (
         "labels not routed through t() - these render English inside an "
         "Arabic resume:\n  " + "\n  ".join(findings)
+    )
+
+
+def test_no_label_is_hardcoded_in_the_generated_form():
+    """The third shape: an English text node inside a JS template literal.
+
+    `test_no_label_is_still_hardcoded` walks `_template_files()`, which is
+    Jinja and HTML only. The builder's entire form is assembled in
+    `builder.js`, so that gate could never reach it -- and did not, while five
+    English strings shipped to Arabic readers.
+
+    Deliberately narrower than the Jinja scan: it flags only a text node whose
+    folded key IS in a catalogue. A JS file is full of prose that is not a
+    label (comments are stripped, but selectors, class names and console text
+    are not), and a gate that cries wolf gets its findings pasted into an
+    exclusion list until it means nothing.
+    """
+    findings = []
+    for f in _script_files():
+        rel = f.name
+        src = f.read_text(encoding="utf-8")
+        blanked = JS_COMMENT.sub(lambda m: " " * len(m.group(0)), src)
+        for lit in TEMPLATE_LITERAL.finditer(blanked):
+            body = INTERP.sub(SENTINEL, lit.group(1))
+            for m in NODE.finditer(body):
+                for frag in m.group(1).split(SENTINEL):
+                    frag = frag.replace("&nbsp;", " ").strip()
+                    # `WORDY` requires a leading LETTER, so the add buttons
+                    # ("+ Add bullet") slipped past it while the two beside
+                    # them were caught. Found by mutation, not by reading.
+                    probe = frag[1:].strip() if frag.startswith("+") else frag
+                    if not probe or not WORDY.match(probe):
+                        continue
+                    if _key(frag) in _AR or frag in _UI_AR:
+                        line = src.count(chr(10), 0, lit.start()) + 1
+                        findings.append(f"{rel}:{line}: text node {frag!r}")
+    assert not findings, (
+        "labels hardcoded in generated markup - these stay English in an "
+        "Arabic interface, and no .j2 scan can see them:" + chr(10) + "  "
+        + (chr(10) + "  ").join(findings)
     )
 
 
