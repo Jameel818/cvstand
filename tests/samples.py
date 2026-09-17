@@ -81,9 +81,15 @@ MIXED_LATIN = (_LATIN_COMPANY, _LATIN_SCHOOL, _LATIN_SKILL)
 #: a preference rather than a defect.
 MIXED_NEUTRAL = (_LATIN_PHONE,)
 
-_ARABIC_COMPANY = "هالدن آند رو"
-_ARABIC_CITY = "بورتسايد"
-_ARABIC_IN_PROSE = "Runs the هالدن آند رو studio across brand and motion."
+# These are planted into the ENGLISH résumé, so they are independent of the
+# Arabic sample file - but they carried the same defect it did: "هالدن آند رو"
+# IS "Halden & Row" spelled in Arabic letters, which is not what a bilingual
+# user types. They are kept equal to the sample's values so the two résumés
+# name the same employer, which is what makes REVERSED the mirror of MIXED
+# rather than a second unrelated fixture.
+_ARABIC_COMPANY = "ديوان للتصميم"
+_ARABIC_CITY = "دبي"
+_ARABIC_IN_PROSE = "Runs the ديوان للتصميم studio across brand and motion."
 
 #: The Arabic runs planted into the English résumé, likewise.
 REVERSED_ARABIC = (_ARABIC_COMPANY, _ARABIC_CITY)

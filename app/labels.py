@@ -472,8 +472,10 @@ _UI_AR: dict[str, str] = {
     "Budget owned": "الميزانية المُدارة",
 
     # --- builder: status, errors and alerts ---------------------------
-    "Modern": "مودرن",
-    "ATS-Friendly": "متوافقة مع أنظمة التوظيف",
+    # "Modern" / "ATS-Friendly" were repeated here, identically, and are
+    # defined once with the family blurbs above. A dict literal accepts a
+    # repeated key and silently keeps the LAST, so the copy that renders is
+    # whichever sits lower in the file.
     "Invalid résumé data.": "بيانات السيرة الذاتية غير صالحة.",
     "Could not reach the preview service.": "تعذّر الوصول إلى خدمة المعاينة.",
     "The preview could not be built (server error ": "تعذّر إنشاء المعاينة (خطأ في الخادم ",
@@ -541,10 +543,12 @@ _UI_AR: dict[str, str] = {
     # also keeps it clear of the equal-strings gate in
     # `test_arabic_differs_from_english_for_every_shell_msgid`.
 
-    # category tabs, and the chip on every card
-    "Modern": "مودرن",
-    "ATS-Friendly": "متوافق مع أنظمة التتبع",
-    "ATS": "أنظمة التتبع",
+    # The card chip only. "Modern" and "ATS-Friendly" are the SAME msgids the
+    # landing page's family blurbs already define, so they are not repeated
+    # here - the copy added with this block said "أنظمة التتبع" where the
+    # established vocabulary says "أنظمة التوظيف", and being lower in the file
+    # it would have won and split the app's term for ATS in two.
+    "ATS": "أنظمة التوظيف",
 
     # skill-graphic patterns, printed on the card's foot chip
     "dot-grid": "شبكة نقاط",

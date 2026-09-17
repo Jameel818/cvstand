@@ -20,6 +20,7 @@ WHAT THIS PROTECTS
 """
 from __future__ import annotations
 
+import ast
 import collections
 import json
 import re
@@ -27,6 +28,7 @@ from pathlib import Path
 
 import pytest
 
+from app import labels as labels_mod
 from app import registry
 from app.labels import (
     _AR, _UI_AR, _as_html, _key, _MARKUP_MSGIDS, join_labels, reset_lang, set_lang,
@@ -310,6 +312,44 @@ def test_the_catalogue_has_no_dead_rows():
     assert not dead, (
         "catalogue rows nothing can reach - delete them, or the next reader "
         f"maintains a translation for a page that no longer exists: {dead}"
+    )
+
+
+def test_no_catalogue_key_is_defined_twice():
+    """A dict literal accepts a repeated key and keeps the LAST silently.
+
+    Both catalogues are long, hand-maintained and grouped by page, so the same
+    string is easy to add twice under two headings. Python reports nothing; the
+    row that renders is simply whichever sits lower in the file.
+
+    That is not theoretical. `Modern` was defined twice and `ATS-Friendly`
+    three times, and the third said "أنظمة التتبع" where the other two said
+    "أنظمة التوظيف" -- one term for ATS on the landing page and a different one
+    on the gallery cards, decided by line number.
+
+    Has to be read from the SOURCE: by the time the module is imported the
+    duplicate has already collapsed and is unrecoverable.
+    """
+    tree = ast.parse(Path(labels_mod.__file__).read_text(encoding="utf-8"))
+    dupes = []
+    for node in ast.walk(tree):
+        value = getattr(node, "value", None)
+        if not isinstance(value, ast.Dict):
+            continue
+        target = node.targets[0] if isinstance(node, ast.Assign) else getattr(node, "target", None)
+        name = getattr(target, "id", None)
+        if name not in ("_AR", "_UI_AR"):
+            continue
+        seen: dict[str, int] = {}
+        for k in value.keys:
+            if not isinstance(k, ast.Constant) or not isinstance(k.value, str):
+                continue
+            if k.value in seen:
+                dupes.append(f"{name}[{k.value!r}] at lines {seen[k.value]} and {k.lineno}")
+            seen[k.value] = k.lineno
+    assert not dupes, (
+        "a catalogue key is defined twice - the lower one wins silently:\n  "
+        + "\n  ".join(dupes)
     )
 
 

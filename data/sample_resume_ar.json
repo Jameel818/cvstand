@@ -1,15 +1,15 @@
 {
   "lang": "ar",
-  "name": "ورين آشورث",
+  "name": "ليلى خليل",
   "title": "مديرة إبداعية",
   "photo_url": "",
   "summary": "مديرة إبداعية تبني أنظمة هوية بصرية قادرة على الصمود بعد التسليم — أربعة عشر مصمماً، وأربع حملات إطلاق، ومجموعة واحدة من القواعد يستطيع الجميع اتباعها.",
   "summary_highlight": "الصمود بعد التسليم",
   "contact": {
-    "email": "wren.ashworth@examplemail.com",
+    "email": "laila.khalil@examplemail.com",
     "phone": "555-0138-64",
-    "address": "بورتسايد",
-    "site": "wrenashworth.example.com",
+    "address": "دبي",
+    "site": "lailakhalil.example.com",
     "social": []
   },
   "achievements": [
@@ -20,9 +20,9 @@
   ],
   "experience": [
     {
-      "company": "هالدن آند رو",
+      "company": "ديوان للتصميم",
       "role": "مديرة إبداعية",
-      "location": "بورتسايد",
+      "location": "دبي",
       "start": "2021",
       "end": "حتى الآن",
       "bullets": [
@@ -32,9 +32,9 @@
       ]
     },
     {
-      "company": "استوديو بلروك",
+      "company": "استوديو المدى",
       "role": "مديرة تصميم",
-      "location": "نورثفيلد",
+      "location": "أبوظبي",
       "start": "2017",
       "end": "2021",
       "bullets": [
@@ -45,7 +45,7 @@
   ],
   "education": [
     {
-      "school": "كلية نورثفيلد للفنون",
+      "school": "كلية الفنون الجميلة",
       "degree": "بكالوريوس التصميم الجرافيكي",
       "start": "2013",
       "end": "2017",
@@ -70,7 +70,7 @@
     { "name": "الإنجليزية", "level": "بطلاقة" }
   ],
   "references": [
-    { "name": "مروان الحسيني", "title": "الرئيس التنفيذي، هالدن آند رو", "phone": "555-0100-22", "email": "m.h@examplemail.com" },
-    { "name": "سارة نوفاك", "title": "مديرة المحتوى، بلروك", "phone": "555-0177-31", "email": "s.n@examplemail.com" }
+    { "name": "مروان الحسيني", "title": "الرئيس التنفيذي، ديوان للتصميم", "phone": "555-0100-22", "email": "m.h@examplemail.com" },
+    { "name": "سارة محمود", "title": "مديرة المحتوى، المدى", "phone": "555-0177-31", "email": "s.m@examplemail.com" }
   ]
 }

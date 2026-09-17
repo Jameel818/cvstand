@@ -202,11 +202,17 @@ def test_the_word_export_carries_both_scripts(key):
     paras = [p.text for p in
              Document(io.BytesIO(render_docx(samples.MIXED, key))).paragraphs]
     body = "\n".join(paras)
+    # Read from the fixture, never spelled again here. The city was hardcoded
+    # as "بورتسايد" — itself a transliteration of "Portside" — so rewriting the
+    # sample's proper nouns broke this file while the export was working fine.
+    # A literal copied out of a fixture is a second source of truth that only
+    # announces itself when someone edits the first.
+    city = samples.MIXED["contact"]["address"]
     assert "Halden & Row" in body, "the Latin employer did not survive the export"
-    assert "بورتسايد" in body, "the Arabic city did not survive the export"
+    assert city in body, "the Arabic city did not survive the export"
     assert samples.MIXED["contact"]["phone"] in body
     # the employer and the Arabic city share one line — that is the mixed run
-    assert any("Halden & Row" in p and "بورتسايد" in p for p in paras)
+    assert any("Halden & Row" in p and city in p for p in paras)
 
 
 # ------------------------------------------------------- the browser measurement
