@@ -121,8 +121,25 @@ def test_english_ships_no_translation_table():
 # --- the two languages must be able to disagree ---------------------------
 
 def test_interface_language_does_not_touch_the_document(client):
-    """An Arabic interface must not relabel an English resume."""
+    """An Arabic interface must not relabel an English resume.
+
+    The English résumé is written HERE rather than assumed. Without this the
+    test passed in a full run and failed when run alone — it needed an earlier
+    test to have left a document behind, and when none had, the seed rule
+    (session 2026-09-16) created an ARABIC one from the `ar` cookie, so the
+    level words came back Arabic and the assertion below fired.
+
+    Both outcomes were correct behaviour. The test simply never stated the
+    premise its own name depends on: there has to BE an English resume for an
+    Arabic interface to leave alone. `tests/conftest.py` already wipes the rate
+    limits and the user table per test for exactly this reason - the résumé
+    file is the one piece of shared state that was left implicit.
+    """
+    from app import store
+    from tests import samples
+
     client.set_cookie(COOKIE, "ar")
+    store.save_resume(samples.ENGLISH)
     page = client.get("/builder").get_data(as_text=True)
     assert 'lang="ar" dir="rtl"' in page          # the shell mirrored
     payload = json.loads(re.search(
