@@ -199,18 +199,50 @@ the first measurement (the first attempt reported all six faces at exactly
 
 ## Next actions (in order)
 
-1. **Install the Railway GitHub App** (above). The only user-blocked item.
-2. **Send `outreach/thmanyah-webfont-licence.md`.** Unblocks the one real
-   remaining font improvement.
-3. **The volume proof — still not done.** Sign up, redeploy, sign in. If the
-   account is gone, `/data` is not really persisting and every deploy deletes
-   every user, silently. The variables being right does NOT prove this.
-4. **Open it on a phone.** The 2026-09-14 layout bug was invisible above 900px
-   and nothing since has been checked on a real device.
-5. **Resolve the order-dependent `test_ui_language` failure** — a test and the
-   shipped seed rule currently disagree.
-6. **`data/meta.json` shows as modified after most runs** — it is runtime
-   state in a tracked file. Worth gitignoring or moving under the data dir.
+1. **Install the Railway GitHub App** (above). **The only item still blocked on
+   the user.** Everything else below is now done.
+2. **Send `outreach/thmanyah-webfont-licence.md`** to `ask@thmanyah.com`.
+   Unblocks the one real remaining font improvement. A Gmail draft could not be
+   created from here — the connector lacks the compose scope.
+
+### Closed this session — do not redo
+
+3. ~~The volume proof~~ — **DONE, and it passes.** Created an account on the
+   live service, ran `railway redeploy`, watched the container cycle
+   (`http=000` mid-flight), signed in again: **HTTP 302, the account survived.**
+   `/data` is genuinely persistent. The account
+   `volume-proof-53150f4a@example.com` is still there; delete it whenever.
+4. ~~Open it on a phone~~ — **18/18 clean** on the LIVE site: `/`, `/templates`
+   and `/builder` at 375, 393 and 412px, in both languages, `documentElement
+   .scrollWidth` never exceeding the viewport. Not a real device, so iOS Safari
+   is still untested, but the 2026-09-14 failure mode is gone.
+   **The first run of that check reported 6 failures and every one was false.**
+   It excluded `position:fixed` elements but not their CHILDREN, so the closed
+   drawer — `fixed`, `aria-hidden="true"`, `translateX(379px)` — reported all of
+   its contents as overflow while `scrollWidth == viewport` the whole time.
+   Fixed by walking ancestors for `fixed` / `aria-hidden` / `transform` /
+   `overflow-x`.
+5. ~~The order-dependent `test_ui_language` failure~~ — **FIXED (`c0d326c`).**
+   The test was under-specified, not in conflict with the seed rule: its name
+   says "an Arabic interface must not relabel an ENGLISH resume" and it never
+   wrote one, so it depended on an earlier test leaving a document behind. It
+   now writes `samples.ENGLISH` itself. Passes alone, as a single test, and in
+   the suite; mutation-tested with `samples.ARABIC`.
+6. ~~`data/meta.json` tracked~~ — **untracked (`9e45cb5`).** `load_meta()`
+   already guards on its absence. `data/resume.json` was never tracked. The two
+   sample résumés stay tracked: they ship INSIDE the image and must survive an
+   empty volume.
+
+### On using Thmanyah for the SITE but not the résumés
+
+Asked 2026-09-18 and the answer is no, for a reason worth writing down: the
+licence prohibition is about the FONT FILE being fetchable, not about what text
+it renders. A `@font-face` in the app shell publishes the `.woff2` at a public
+URL exactly as one in a résumé template does — same file, same download, same
+clause. The only compliant route is outlining fixed text to SVG paths, which
+ships no font file; but the wordmark is "CVStand" (Latin, so Thmanyah would not
+touch it) and baking Arabic UI text into paths would break this project's own
+rule that text stays real and selectable. The licence request is the unlock.
 
 ## Verification at the pause
 
