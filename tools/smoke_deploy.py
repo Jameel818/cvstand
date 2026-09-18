@@ -172,8 +172,15 @@ def main(base: str) -> int:
           if status != 403 else "")
     status, hdrs, _ = fetch(base + "/export/pdf")
     check("GET /export/pdf is 405", status == 405, f"got {status}")
-    check("  ...and says Allow: POST", "POST" in (hdrs.get("Allow") or ""),
-          hdrs.get("Allow") or "no Allow header")
+    # Case-INSENSITIVE, because HTTP header names are. Railway's edge
+    # (`Server: railway-hikari`) hands them back lowercased, HTTP/2 style, so
+    # `hdrs.get("Allow")` found nothing and this reported "no Allow header"
+    # against a deployment that was sending `allow: POST` correctly. A check
+    # that fails on a healthy service is worse than no check: it trains the
+    # reader to discount the whole report.
+    allow = next((v for k, v in hdrs.items() if k.lower() == "allow"), "")
+    check("  ...and says Allow: POST", "POST" in allow,
+          allow or "no Allow header")
 
     # ---- Chromium. the one most likely to fail in a container ------------
     print("\nPDF export  (launches a real Chromium -- the top deploy risk)")
