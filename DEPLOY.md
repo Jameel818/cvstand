@@ -122,6 +122,34 @@ The Dockerfile runs **one gunicorn worker with 8 threads**, deliberately —
 multiply the real concurrency cap instead of respecting it. Raising throughput
 means moving that state out of memory, not adding workers.
 
+### C5b. Deploying from the CLI — check WHERE before you push
+
+The GitHub App is not installed on the repo (see C1), so pushes do not
+auto-deploy and the CLI is the deploy path:
+
+```
+venv/Scripts/python tools/verify_deploy_target.py && railway up --detach
+```
+
+**Never run `railway up` without the guard.** It deploys to whatever the
+working directory is linked to, and when the link is missing or stale it
+**creates a new project and service rather than refusing** — reporting success
+either way.
+
+That is not hypothetical. On 2026-09-18 it produced a second project,
+`perfect-illumination`, with its own `cvstand` service: Online, no public
+domain, no volume, no variables. Nothing broke and nothing said anything. The
+live URL kept answering because the real service was untouched, and
+`smoke_deploy.py` kept returning 25/25 because it tests a URL, not a target.
+An orphaned container just ran, and billed, until someone noticed an extra row
+in the dashboard.
+
+A green deploy tells you the upload worked. It does not tell you where it went.
+
+The guard checks the project by **ID**, because Railway's generated names all
+look alike — `cooperative-healing` and `perfect-illumination` are not
+distinguishable at a glance in a list.
+
 ### C6. Smoke-test on the Railway URL, before DNS
 
 Run this against the `*.up.railway.app` URL. It is 23 checks and takes about
