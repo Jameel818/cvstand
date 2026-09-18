@@ -35,3 +35,10 @@ screenshots/
 # currently renders, and the gate passes by having nothing to compare against.
 # That is this repo's signature failure: a check that looks green and is inert.
 !tests/golden/pixels/*.png
+
+# Runtime state that lives in a TRACKED path. `data/meta.json` records which
+# template was last selected, so it is rewritten by ordinary use and shows up
+# as a modification after almost every run — noise in every `git status`, and
+# a file whose committed contents mean nothing.
+data/meta.json
+data/resume.json

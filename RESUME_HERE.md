@@ -1,3 +1,229 @@
+# RESUME HERE — paused 2026-09-18 (LIVE AND CONFIGURED · 8 commits deployed · Arabic gallery shipped)
+
+## ⏸ EXACTLY WHERE THIS STOPPED
+
+**The deploy is no longer the dangerous thing here.** The five variables are
+set, the volume is confirmed, the service passes 25/25, and every visitor now
+owns their own résumé. Eight commits shipped and are live.
+
+**Two capabilities were unblocked permanently and are worth knowing about
+before anything else:**
+
+- **`gh` is authenticated as `Jameel818`.** `git push` runs from inside Claude
+  Code now. The claim in every previous entry that a push "can never run from
+  here" is obsolete — it was the git credential manager hanging, and
+  `gh auth login` displaces it. If a push ever hangs again, check
+  `git config --get-all credential.helper` first.
+- **The Railway CLI is installed and logged in** (`railway 5.57.9`, linked to
+  `cooperative-healing` / `production` / `cvstand`). `railway up` deploys the
+  working tree in ~135s.
+
+### 🔴 THE ONLY THING STILL NEEDING THE USER
+
+**The Railway GitHub App is not installed on the repo**, so pushes do NOT
+auto-deploy. Confirmed from GitHub's own page: *"There aren't any GitHub Apps
+installed on this repository."* Railway therefore shows `Auto deploy
+unavailable` and `Could not load branches` while still displaying the repo
+name, because it stores that in its own database.
+
+    https://github.com/apps/railway-app/installations/new
+    -> Only select repositories -> tick cvstand -> Install
+    -> then Railway > Settings > Source > Retry
+
+**The slug is `railway-app`, not `railway`.** Two earlier attempts sent the
+user to `github.com/apps/railway` (404) and to the personal-account
+installations page, neither of which exists for this purpose. Resolved via
+`gh api apps/railway-app`; verify before quoting a URL.
+
+Installing it is a consent action GitHub only accepts through its own UI —
+there is no API, by design. A token with `repo` scope cannot do it. Until then,
+`railway up` is the deploy path and nothing is blocked.
+
+---
+
+## ✅ SHIPPED — the user's four stated priorities
+
+### 1. The gallery and builder are Arabic (`8c48bf3`)
+
+`registry.py` held 49 names and 49 blurbs as English tuples that never passed
+through `t()`, so an Arabic reader met 49 English cards under an Arabic
+heading. 104 new `_UI_AR` rows: 48 names (Editorial Redline is shared by
+`modern-t1` and `ats-t4`), 49 blurbs, 4 skill patterns, the category tabs and
+the card chip. Measured on the live site: **49 cards, 0 Latin.**
+
+**Six names are TYPEFACE proper nouns** (Fraunces Stack, Mono Tech, Wide Caps,
+Accent Bar, Serif Executive, Centred Serif). None is transliterated — that is
+the defect item 2 exists to fix. Each is translated by what the face DOES on
+the page, which also clears the equal-strings gate.
+
+Three existing rows lost their definite article (`Role`, `Qualification`,
+`Language`) because they are composed into the add button, which read "add THE
+job". The résumé HEADINGS keep theirs; they live in `_AR` and are untouched.
+
+### 2. The Arabic sample has real Arabic names (`7491ec6`)
+
+`ورين آشورث` IS "Wren Ashworth" in Arabic letters, and so were the employer,
+the city and the school. Now `ليلى خليل` at `ديوان للتصميم · دبي`, from the
+user's supplied name list where it had one.
+
+**Lengths were held close on purpose** (10→9, 20→19). The RTL geometry suites
+run over this sample across all 49 templates and were named as the likeliest
+casualties; holding lengths is why all 322 passed untouched.
+
+Emails, the site and `$3.2M` stay LATIN. A real Gulf CV mixes scripts and
+`test_bidi_mixed` measured that the mixing needs no isolation (0/49) —
+scrubbing every Latin character would delete that test's subject.
+
+### 3. Template distortion: one defect, not a systemic one (`20ba360`, `bdc3c27`)
+
+`modern-t2`'s main column was `justify-content:space-between` on a FIXED
+1100px frame, which hands all leftover height to the gaps. Measured: a declared
+**22px row-gap rendering as 157px, twice — 270px of void.** It matched the
+reference image only because the reference's content filled the page.
+
+**Only 1 of 49 templates did this** — checked before changing anything.
+
+Now gated by `tools/verify_voids.py` + `tests/e2e/test_void_gate.py`. The
+vertical axis had two gates and neither could see it: auto-fit fails when
+content is too TALL, overflow when it is too WIDE, and **nothing watched for
+content too SHORT.**
+
+It measures a DISCREPANCY, not a property — `gap - (row-gap + larger adjoining
+margin)`. Grepping for `space-between` finds this one instance and misses
+`margin-top:auto`, stray margins, grid `align-content`. It also stays quiet
+correctly: t2's SIDEBAR is still `space-between` and is not flagged, because
+its content fills the height.
+
+### 3b. Skill bars: the words-vs-numbers divergence was DATA (`a7834c2`)
+
+The reference shows `90%`; the app showed `Expert`. It looked like a template
+defect and was not: `sample_resume_ar.json` carried `percent` on every skill
+and `sample_resume.json` never did. `_macros.j2:112` already does the right
+thing — `label_txt = (_pc ~ '%') if _pc is not none else skill.level` — so the
+English showcase fell back to the level word for want of a number.
+
+Blast radius was exactly right: **17 of 49 templates moved, precisely the
+`bars` and `rings` patterns.** dot-grid and inline never read `percent`.
+
+The two showcase samples are now structural twins, so LANGUAGE is the only
+variable between them. Comparing an English preview against an Arabic one was
+previously comparing two different documents.
+
+### 4. Fonts: the five Arabic faces now agree on size (`195c6a2`, `505c855`)
+
+**Thmanyah cannot ship as a webfont, and the licence is explicit.** Read from
+their live page, not only the bundled PDF. Commercial use in websites IS
+permitted — the user was right about that — but embedding is permitted *"only
+as part of a compiled, packaged, or obfuscated product"*, and it is prohibited
+to *"make the Font Software available in any manner that allows end users to
+extract, download, access... independently as font files, **including through
+web embedding**."* A `@font-face` serving a `.woff2` is the named case.
+
+`outreach/thmanyah-webfont-licence.md` is a ready-to-send request to
+`ask@thmanyah.com`, which their licence invites in writing. **If the grant
+arrives, keep it in `outreach/` and wire the face in — Cairo and thmanyah Sans
+measured nearly metric-compatible (232.5 vs 230.4 wide, 94 vs 99 ink), so the
+swap will barely move the layout.**
+
+**"Nice fonts" has no licence files at all** — `sakkal-majalla`, `bahij-muna`,
+`lyon-arabic-display` are commercial retail faces. Not shipped.
+
+**What DID ship** is the real measured defect. Over five strings at
+font-size:100px:
+
+    Cairo                  103.6   100.1% of mean
+    IBM Plex Sans Arabic   103.8   100.3%
+    Tajawal                 90.6    87.6%   <- 12% smaller
+    Amiri                  112.8   109.0%   <-  9% larger
+    Noto Kufi Arabic       106.6   103.0%
+
+Archivo layouts printed Arabic visibly small and Fraunces/Merriweather layouts
+visibly large, beside the other 45. `size-adjust` corrects it with no template
+change and no risk to English (`unicode-range` confines every alias to U+0600
+and above; `--check` re-asserts it).
+
+---
+
+## Measured this session — DO NOT RE-DERIVE
+
+- **The live service is correctly configured.** `SERVER_STORE=0`,
+  `DATA_DIR=/data`, `TRUSTED_PROXIES=1`, `RENDER_CONCURRENCY=1`, a real
+  `SECRET_KEY`. `RAILWAY_VOLUME_MOUNT_PATH` is **`/data`** and matches
+  `CVSTAND_DATA_DIR` — the open question from 2026-09-15 is answered.
+- **Chromium works in the container**: 147 KB PDF in 1.6s.
+- **`tools/verify_voids.py` sweep: 0 of 49.** Reverting t2 makes it 1 of 49 at
+  135px excess, so the sweep discriminates.
+- **`.gitignore`'s `*.PNG` was swallowing all 49 pixel baselines** — 49 on
+  disk, 0 tracked. Git's ignore matching is case-insensitive on Windows. A
+  baseline that is not versioned cannot gate anything: a fresh clone has none,
+  `golden.py --pixels` writes whatever the code currently renders, and the gate
+  passes by having nothing to compare against. **That is the second silent
+  pixel gate this repo has shipped.** Fixed with `!tests/golden/pixels/*.png`.
+- **`test_no_label_is_still_hardcoded` had never scanned JS.** It walks
+  `_template_files()`, which is Jinja only, while the builder's entire form is
+  generated by `builder.js` — five English strings sat there for eight
+  sessions. New gate: `test_no_label_is_hardcoded_in_the_generated_form`.
+- **`_UI_AR` had duplicate keys.** `Modern` twice, `ATS-Friendly` three times,
+  the last disagreeing with the other two. A dict literal keeps the LAST
+  silently. New gate parses `labels.py` with `ast` — it must read the SOURCE,
+  because by import time the duplicate has collapsed.
+- **`test_ui_language.py::test_interface_language_does_not_touch_the_document`
+  fails when run ALONE and passes in the full suite.** Pre-dates this session
+  (confirmed by stashing). The seed fix means an Arabic cookie with no document
+  seeds an Arabic résumé, so the level words come back Arabic where the test
+  asserts English; in the full suite an earlier test writes a résumé first.
+  **This is a genuine disagreement between that test and the seed rule**, still
+  unresolved.
+- **The builder's template chip never updated its text** — switching Modern for
+  ATS swapped the colour and left the word. Fixed.
+
+## Instrument errors this session — the recurring lesson, three more times
+
+1. **Four servers on port 5000, two started with system Python.** `curl` and
+   the user's browser could be served by different processes. Everything I
+   verified locally was true and told the user nothing about what they saw.
+2. **A screenshot "proving" the Arabic sample** rendered a fully ENGLISH page.
+   `?lang=ar` is ignored — the interface language is the `ui_lang` COOKIE.
+   Caught only because the text probes disagreed with the image.
+3. **The void detector's self-test failed against a working instrument.** The
+   planted `height:600px` child was squashed to 44px because `.tpl` is itself a
+   flex container, so the fixture planted no void at all. Without the
+   self-test, "0 of 49" would have been reported on the strength of a check
+   that could see nothing.
+
+Also: **a claim made by eye was wrong twice in the same direction.** Amiri
+"renders noticeably smaller" — it renders 9% LARGER. It is narrower with a
+lighter stroke. Measure before proposing a change, and again before believing
+the first measurement (the first attempt reported all six faces at exactly
+100px, having measured `getBoundingClientRect` on a span with `line-height:1`).
+
+## Next actions (in order)
+
+1. **Install the Railway GitHub App** (above). The only user-blocked item.
+2. **Send `outreach/thmanyah-webfont-licence.md`.** Unblocks the one real
+   remaining font improvement.
+3. **The volume proof — still not done.** Sign up, redeploy, sign in. If the
+   account is gone, `/data` is not really persisting and every deploy deletes
+   every user, silently. The variables being right does NOT prove this.
+4. **Open it on a phone.** The 2026-09-14 layout bug was invisible above 900px
+   and nothing since has been checked on a real device.
+5. **Resolve the order-dependent `test_ui_language` failure** — a test and the
+   shipped seed rule currently disagree.
+6. **`data/meta.json` shows as modified after most runs** — it is runtime
+   state in a tracked file. Worth gitignoring or moving under the data dir.
+
+## Verification at the pause
+
+    fast suite                    1747 passed, 575 skipped
+    RTL typography/mirroring/bidi/journey_ar   238 passed
+    pixel + void gates            100 passed
+    golden html                   196 regenerated, only intended files differ
+    verify_overflow en / ar       49/49 clean both
+    verify_autofit                ALL PASS
+    smoke_deploy (LIVE)           all 25 checks passed
+
+---
+
 # RESUME HERE — paused 2026-09-16 (SEED FIX SHIPPED · two plans written, NEITHER confirmed)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
