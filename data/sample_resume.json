@@ -12,10 +12,22 @@
     "social": []
   },
   "achievements": [
-    { "metric": "14", "label": "Designers led" },
-    { "metric": "4", "label": "Brand systems shipped" },
-    { "metric": "$3.2M", "label": "Production budget" },
-    { "metric": "2×", "label": "Industry awards" }
+    {
+      "metric": "14",
+      "label": "Designers led"
+    },
+    {
+      "metric": "4",
+      "label": "Brand systems shipped"
+    },
+    {
+      "metric": "$3.2M",
+      "label": "Production budget"
+    },
+    {
+      "metric": "2×",
+      "label": "Industry awards"
+    }
   ],
   "experience": [
     {
@@ -53,24 +65,77 @@
     }
   ],
   "recognition": [
-    { "title": "Brand System of the Year", "detail": "Portside Design Awards, 2024" },
-    { "title": "Editorial Redesign, Gold", "detail": "Northfield Print Guild, 2019" }
+    {
+      "title": "Brand System of the Year",
+      "detail": "Portside Design Awards, 2024"
+    },
+    {
+      "title": "Editorial Redesign, Gold",
+      "detail": "Northfield Print Guild, 2019"
+    }
   ],
   "education": [
-    { "school": "Harbour School of Art", "degree": "MA Visual Communication", "start": "", "end": "2014", "gpa": "", "bullets": [] },
-    { "school": "Northfield University", "degree": "BA Graphic Design", "start": "", "end": "2012", "gpa": "", "bullets": [] }
+    {
+      "school": "Harbour School of Art",
+      "degree": "MA Visual Communication",
+      "start": "",
+      "end": "2014",
+      "gpa": "",
+      "bullets": []
+    },
+    {
+      "school": "Northfield University",
+      "degree": "BA Graphic Design",
+      "start": "",
+      "end": "2012",
+      "gpa": "",
+      "bullets": []
+    }
   ],
   "skills": [
-    { "name": "Brand Systems", "level": "Expert" },
-    { "name": "Team Leadership", "level": "Expert" },
-    { "name": "Art Direction", "level": "Advanced" },
-    { "name": "Budget Ownership", "level": "Advanced" },
-    { "name": "Motion Direction", "level": "Proficient" }
+    {
+      "name": "Brand Systems",
+      "level": "Expert",
+      "percent": 95
+    },
+    {
+      "name": "Team Leadership",
+      "level": "Expert",
+      "percent": 90
+    },
+    {
+      "name": "Art Direction",
+      "level": "Advanced",
+      "percent": 80
+    },
+    {
+      "name": "Budget Ownership",
+      "level": "Advanced",
+      "percent": 75
+    },
+    {
+      "name": "Motion Direction",
+      "level": "Proficient",
+      "percent": 65
+    }
   ],
-  "tools": ["Figma", "InDesign", "Illustrator", "After Effects", "Notion", "Keynote"],
+  "tools": [
+    "Figma",
+    "InDesign",
+    "Illustrator",
+    "After Effects",
+    "Notion",
+    "Keynote"
+  ],
   "languages": [
-    { "name": "English", "level": "Native" },
-    { "name": "German", "level": "Fluent" }
+    {
+      "name": "English",
+      "level": "Native"
+    },
+    {
+      "name": "German",
+      "level": "Fluent"
+    }
   ],
   "references": []
 }
