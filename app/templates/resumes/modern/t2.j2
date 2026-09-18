@@ -93,7 +93,15 @@
       {% if r.title %}<div style="font-family:Archivo,sans-serif; font-weight:400; font-size:17px; color:#002366; letter-spacing:4px; margin-top:8px;">{{ r.title }}</div>{% endif %}
     </div>
 
-    <div style="padding:26px 40px 34px; display:flex; flex-direction:column; justify-content:space-between; gap:22px; flex:1; min-height:0;">
+    {# `justify-content:space-between` on a FIXED 1100px column distributes all
+       leftover height between the children, so it only looks like the reference
+       when the content happens to fill the page — which it did in the reference
+       image and does not for a real résumé. Measured on the shipped sample: a
+       declared 22px gap rendering as 157px twice, 270px of void between the
+       contact block, the stat band and EXPERIENCE. Stacking from the top keeps
+       the reference's rhythm at every content volume and puts the slack at the
+       bottom, where a short CV belongs. #}
+    <div style="padding:26px 40px 34px; display:flex; flex-direction:column; gap:22px; flex:1; min-height:0;">
       {% set c = r.contact %}
       {% if c.phone or c.site or c.email or c.address %}
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 20px;">

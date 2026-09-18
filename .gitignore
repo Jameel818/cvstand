@@ -27,3 +27,11 @@ junit_e2e.xml
 screenshots/
 *.PNG
 !app/static/**/*.png
+# The pixel gate's baselines. `*.PNG` is meant for the screenshots that pile up
+# in the project root, but git's ignore matching is case-insensitive on Windows,
+# so it was also swallowing all 49 of these: they existed on one machine and
+# were tracked NOWHERE. A baseline that is not versioned cannot gate anything —
+# a fresh clone has none, `golden.py --pixels` then writes whatever the code
+# currently renders, and the gate passes by having nothing to compare against.
+# That is this repo's signature failure: a check that looks green and is inert.
+!tests/golden/pixels/*.png
