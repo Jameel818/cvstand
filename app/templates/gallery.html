@@ -3,7 +3,14 @@
 
 {% block content %}
 <div class="gallery-hero">
+  {# Outlined Thmanyah in Arabic, live text in English — same reasoning as the
+     landing hero (FONTS.md). These three headings are fixed strings, which is
+     what makes them safe to outline. #}
+  {% if ui_lang == 'ar' %}
+  <h1 class="hero-ar">{% if active_cat == 'modern' %}{% include "_gallery_head_modern_ar.html" %}{% elif active_cat == 'ats' %}{% include "_gallery_head_ats_ar.html" %}{% else %}{% include "_gallery_head_ar.html" %}{% endif %}</h1>
+  {% else %}
   <h1>{% if active_cat == 'modern' %}{{ t('Modern templates') }}{% elif active_cat == 'ats' %}{{ t('ATS-friendly templates') }}{% else %}{{ t('All templates') }}{% endif %}</h1>
+  {% endif %}
   <p>
     {% if active_cat == 'modern' %}{{ t('Colour, sidebars and skill graphics. Best sent as a PDF.') }}
     {% elif active_cat == 'ats' %}{{ t('Single column, parse-safe headings, selectable skill levels. Best for job portals.') }}

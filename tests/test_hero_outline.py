@@ -31,34 +31,42 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from app.labels import ui_t
 
 ROOT = Path(__file__).resolve().parent.parent
 PARTIAL = ROOT / "app" / "templates" / "_hero_ar.html"
 
-#: The English msgids the hero is built from, in order.
-HERO_MSGIDS = ("Your résumé,", "designed", "and done in minutes.")
+#: Every outlined partial and the msgids it was built from. Imported from the
+#: generator so the two cannot describe different things — a test with its own
+#: copy of the list passes happily after someone adds a fourth partial.
+from tools.outline_text import OUTLINED  # noqa: E402
+
+HERO_MSGIDS = tuple(t for t, _ in OUTLINED["_hero_ar.html"])
 
 
-def _partial() -> str:
-    return PARTIAL.read_text(encoding="utf-8")
+def _partial(name: str = "_hero_ar.html") -> str:
+    return (ROOT / "app" / "templates" / name).read_text(encoding="utf-8")
 
 
-def _sr_only_text() -> str:
-    m = re.search(r'<span class="sr-only">(.*?)</span>', _partial(), re.S)
-    assert m, "the hero partial has no .sr-only span — the real text is gone"
+def _sr_only_text(name: str = "_hero_ar.html") -> str:
+    m = re.search(r'<span class="sr-only">(.*?)</span>', _partial(name), re.S)
+    assert m, f"{name} has no .sr-only span — the real text is gone"
     return " ".join(m.group(1).split())
 
 
-def test_the_hero_partial_exists():
-    assert PARTIAL.exists(), (
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_the_partial_exists(name):
+    assert (ROOT / "app" / "templates" / name).exists(), (
         "run: venv/Scripts/python tools/outline_text.py --build-hero")
 
 
-def test_no_font_file_is_referenced():
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_no_font_file_is_referenced(name):
     """The licence permits the DESIGN and forbids serving the FONT. An @font-face
     here would look identical on the page and breach it."""
-    src = _partial()
+    src = _partial(name)
     # The generator's own Jinja comment names the typeface; strip comments the
     # way Jinja does before rendering, then nothing should remain.
     code = re.sub(r"\{#.*?#\}", " ", src, flags=re.S).lower()
@@ -68,11 +76,12 @@ def test_no_font_file_is_referenced():
             "only, never a font reference")
 
 
-def test_the_real_text_survives_for_assistive_technology():
-    sr = _sr_only_text()
-    expected = " ".join(str(ui_t(m, "ar")) for m in HERO_MSGIDS)
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_the_real_text_survives_for_assistive_technology(name):
+    sr = _sr_only_text(name)
+    expected = " ".join(str(ui_t(t, "ar")) for t, _ in OUTLINED[name])
     assert sr == expected, (
-        "the hero's .sr-only text no longer matches the label catalogue - the "
+        f"{name}'s .sr-only text no longer matches the label catalogue - the "
         "copy changed and the outlines were not rebuilt, so the page SHOWS one "
         "headline and TELLS screen readers another.\n"
         f"  partial:   {sr}\n"
@@ -106,3 +115,20 @@ def test_english_does_not_include_the_partial():
     assert "ui_lang == 'ar'" in block, (
         "the outlined hero is not behind an Arabic check — English would get it "
         "too, which is explicitly not what was asked for")
+
+
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_every_partial_is_behind_an_arabic_check(name):
+    """An outlined partial rendered to an English reader would show Arabic
+    headings on an English page — and because they are paths, nothing in the
+    label gates would notice."""
+    pages = list((ROOT / "app" / "templates").glob("*.html"))
+    including = [p for p in pages if name in p.read_text(encoding="utf-8")
+                 and not p.name.startswith("_")]
+    assert including, f"{name} is generated but never included anywhere"
+    for page in including:
+        src = page.read_text(encoding="utf-8")
+        before = src[max(0, src.index(name) - 500):src.index(name)]
+        assert "ui_lang == 'ar'" in before, (
+            f"{page.name} includes {name} without an Arabic check — English "
+            "readers would get Arabic outlined headings")

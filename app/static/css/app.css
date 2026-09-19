@@ -69,6 +69,18 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
+/* Form controls do NOT inherit font-family — every browser gives them a UA
+   default instead, which is why the sign-up and sign-in fields rendered in
+   Arial while the page around them was Inter, and why an Arabic reader got
+   Arial in the one place they actually type. `.field input` already carried
+   `font: inherit`, so the builder was fine and the account pages were not; a
+   per-component fix would just wait to be forgotten on the next form.
+
+   This corrects ENGLISH too (a bare <button> on /builder was Arial). That is
+   not the Arabic policy leaking — it is English finally getting its own
+   declared face. */
+input, select, textarea, button { font-family: inherit; }
+
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 h1, h2, h3, h4 { line-height: 1.15; margin: 0 0 .4em; letter-spacing: -.02em; }
