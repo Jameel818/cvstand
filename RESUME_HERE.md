@@ -233,6 +233,32 @@ the first measurement (the first attempt reported all six faces at exactly
    sample résumés stay tracked: they ship INSIDE the image and must survive an
    empty volume.
 
+### The duplicate Railway project — deleted 2026-09-19
+
+`perfect-illumination` (`be278493-a619-4e32-a320-309db2605052`) is deleted.
+`railway delete --project <id> --yes` marks it `deletedAt` and a plain
+`railway list` STILL PRINTS IT afterwards — read `railway list --json` and
+check the field, or you will conclude the delete failed and run it again.
+
+**The dashboard images corrected the theory about how it got there.** It was
+not `railway up` scaffolding a project on a missing link. Its deployments were
+all **"via GitHub"** and carried this session's commit messages, while
+`cooperative-healing`'s were **"via CLI"** (`railway up`) with two GitHub ones
+mixed in. So the Railway GitHub App IS installed and working — it was wired to
+a NEW project instead of the existing service, and every push after
+"Close modern-t2's 270px of void" auto-deployed to an unexposed twin with no
+domain, no volume and no variables.
+
+That is why deleting it was right regardless: its only asset was an auto-deploy
+pointed at a dead end. But it means the GitHub integration is NOT simply
+missing, as the 2026-09-18 entry above concluded from
+`Auto deploy unavailable` / `Could not load branches`. Both readings were taken
+from real evidence; the dashboard history is the one that settles it.
+
+**Open question, testable in one push:** now that the twin is gone, does a push
+deploy to `cooperative-healing`? Its history shows it HAS accepted GitHub
+deploys. If yes, auto-deploy is solved and no GitHub App work remains.
+
 ### On using Thmanyah for the SITE but not the résumés
 
 Asked 2026-09-18 and the answer is no, for a reason worth writing down: the
