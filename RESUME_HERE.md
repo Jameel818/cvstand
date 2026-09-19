@@ -18,10 +18,37 @@ before anything else:**
   `cooperative-healing` / `production` / `cvstand`). `railway up` deploys the
   working tree in ~135s.
 
-### 🔴 THE ONLY THING STILL NEEDING THE USER
+### ✅ AUTO-DEPLOY WORKS — resolved 2026-09-19
 
-**The Railway GitHub App is not installed on the repo**, so pushes do NOT
-auto-deploy. Confirmed from GitHub's own page: *"There aren't any GitHub Apps
+A push to `main` now builds and deploys `cooperative-healing` on its own.
+Verified from the API, not the dashboard: active deployment `8c7d2b4`,
+`SUCCESS`, matching `origin/main` exactly, and 25/25 afterwards.
+
+**The fix was one click and it was not the one three earlier attempts aimed
+at.** Railway's side had been correct the whole time — Settings > Source showed
+`Jameel818/cvstand`, branch `main`, "Auto deploys when pushed to GitHub". What
+was missing was on GITHUB: the Railway app existed but its *repository access*
+did not include `cvstand`. `github.com/settings/installations` > Railway >
+Configure > **Only select repositories** > tick `cvstand` > **Save**.
+
+So the connection was one-directional: Railway believed it was wired up because
+that setting lives in Railway's own database, while GitHub had no permission to
+deliver the push event. **A settings pane showing a connection is not evidence
+that events flow.** The measurable version: the repo had zero webhooks, and a
+real push (`8c7d2b4`) sat undeployed for minutes while everything "looked fine".
+
+Diagnosing this took three wrong turns, all from reading UI state as truth:
+`Auto deploy unavailable` in a settings pane, then a repo page saying no apps
+were installed, then `perfect-illumination` deploying "via GitHub" anyway. The
+thing that settled it each time was an observable fact — deployment history,
+webhook count, a push that did or did not build.
+
+### Nothing is blocked on the user any more
+
+### Formerly blocking, now closed
+
+~~**The Railway GitHub App is not installed on the repo**, so pushes do NOT
+auto-deploy.~~ Confirmed from GitHub's own page: *"There aren't any GitHub Apps
 installed on this repository."* Railway therefore shows `Auto deploy
 unavailable` and `Could not load branches` while still displaying the repo
 name, because it stores that in its own database.
