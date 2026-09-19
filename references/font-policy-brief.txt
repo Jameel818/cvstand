@@ -1,0 +1,59 @@
+You are building a brand identity for an Arabic digital products store.
+
+The products are: Word files (.docx) and PDF files - courses, data sheets, and infographics.
+The owner sells them on a landing page (Salla / Zid / WordPress).
+
+GOAL: Use ONLY free fonts with full commercial license that allows selling as part of a digital product. No paid fonts.
+
+ALLOWED FONTS ONLY:
+1.  IBM Plex Sans Arabic (Google Fonts - OFL)
+2.  Tajawal (Google Fonts - OFL)
+3.  Cairo (Google Fonts - OFL)
+4.  Amiri (Google Fonts - OFL) - for long-form Naskh text
+5.  Noto Naskh Arabic (Google Fonts - OFL) - alternative to Amiri
+6.  Thmanyah Sans (from font.thmanyah.com - free commercial, but must be embedded as compiled/obfuscated, not as standalone font file for download)
+7.  Thmanyah Serif Display (from font.thmanyah.com)
+8.  Thmanyah Serif Text (from font.thmanyah.com)
+
+FONT USAGE RULES - STRICTLY FOLLOW:
+
+FOR WORD / PDF FILES THAT WILL BE SOLD (editable files):
+- Primary body text for courses/data/tables: IBM Plex Sans Arabic Regular, 12-14pt, line-height 1.8. This is the safest for editable embedding.
+- Headings inside Word/PDF: Tajawal Bold 700, 18-24pt
+- Large infographic titles: Cairo Bold 700, 24-32pt
+- Long-form course text (book-like): Amiri Regular or Noto Naskh Arabic
+- DO NOT embed Thmanyah fonts inside editable .docx files that you sell as a font file. If you need Thmanyah look inside PDF, export it as outlined vectors or flattened image, not as extractable font.
+
+FOR LANDING PAGE (web):
+- Hero main title: Thmanyah Serif Display Bold (fallback: Tajawal ExtraBold 800)
+- Section headings / benefits: Cairo Bold 700
+- Body description / FAQ / price: IBM Plex Sans Arabic Regular 18px, line-height 1.9
+- CTA buttons: Tajawal ExtraBold 800, 20px
+- Data tables / pricing tables: IBM Plex Sans Arabic Medium 500
+
+TECHNICAL IMPLEMENTATION:
+
+1.  For Web - Use this Google Fonts import:
+    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Tajawal:wght@700;800&display=swap');
+    
+    For Thmanyah, self-host from https://font.thmanyah.com/:
+    - Host woff2 files locally in /public/fonts/thmanyah/
+    - Files: thmanyah-sans-regular, medium, bold, black + thmanyah-serif-display-bold
+    - CSS: @font-face for each weight
+
+2.  For Word Template (.docx):
+    - Set Styles:
+      Heading 1 = Tajawal Bold 24pt
+      Heading 2 = Cairo Bold 18pt
+      Normal Body = IBM Plex Sans Arabic 12pt
+      Quote = Amiri 12pt
+    - Enable: File > Options > Save > Embed fonts in the file > Embed only characters used
+
+3.  Do NOT use any paid fonts like 29LT Bukra, 29LT Zarid, GE SS, DIN Next LT Arabic, FF Shamel.
+
+DELIVERABLES I NEED FROM YOU:
+- A clean CSS file with variables : --font-hero, --font-heading, --font-body, --font-cta
+- A Word template structure description
+- Confirmation that all fonts allow commercial use inside a sold digital product (OFL for Google Fonts, and compiled-embedding allowed for Thmanyah)
+
+Keep the brand modern, clean, readable on mobile, similar to Thmanyah.com style.

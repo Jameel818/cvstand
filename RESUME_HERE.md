@@ -1,3 +1,207 @@
+# RESUME HERE — paused 2026-09-20 (AUTO-DEPLOY WORKS · Arabic typography shipped · nothing blocked)
+
+## ⏸ EXACTLY WHERE THIS STOPPED
+
+**Nothing is blocked on the user and nothing is half-done.** Working tree clean,
+17 commits pushed, `d2f8fcf` deployed and live, smoke test 25/25.
+
+The whole pipeline now runs from here: commit → push → Railway builds on its
+own. No `railway up` needed.
+
+### The one optional item left
+
+**Send `outreach/thmanyah-webfont-licence.md`** to `ask@thmanyah.com`. It buys
+Thmanyah as LIVE text sitewide. Everything else about fonts is done; this is an
+upgrade, not a gap. A Gmail draft could not be created — the connector lacks
+the compose scope.
+
+---
+
+## ✅ AUTO-DEPLOY — fixed, and not where three attempts looked
+
+A push to `main` now builds and deploys by itself. Verified from the API twice.
+
+**The fix was one click on GITHUB, not Railway.** Railway had been correct the
+whole time — Settings ▸ Source showed the repo, the branch, and "Auto deploys
+when pushed to GitHub", no errors. What was missing was the Railway app's
+**repository access** not including `cvstand`:
+`github.com/settings/installations` ▸ Railway ▸ Configure ▸ **Only select
+repositories** ▸ tick `cvstand` ▸ **Save**.
+
+The connection was one-directional: Railway believed it was wired because that
+setting lives in Railway's own database, while GitHub had no permission to
+deliver the push event. **A settings pane showing a connection is not evidence
+that events flow.** The measurable version: the repo had zero webhooks, and a
+real push sat undeployed for minutes while everything "looked fine".
+
+**The app slug is `railway-app`, not `railway`.** Two earlier attempts sent the
+user to a 404 and to a page that does not serve this purpose.
+
+### The duplicate project is deleted
+
+`perfect-illumination` (`be278493-…`) is gone. It was NOT `railway up`
+scaffolding against a missing link, as first recorded — its deployments were
+all "via GitHub" while `cooperative-healing`'s were "via CLI". The GitHub app
+had been wired to a NEW project instead of the existing service, so every push
+auto-deployed to an unexposed twin with no domain, no volume, no variables.
+
+`railway delete` marks `deletedAt` and **a plain `railway list` still prints
+the project afterwards** — read `railway list --json`. Believing the plain
+output, the delete was run twice and the second said "Project not found", which
+reads like failure and was the opposite.
+
+`tools/verify_deploy_target.py` now refuses to deploy when the CLI points
+anywhere but `cooperative-healing`, checked by project **ID** (Railway's
+generated names are indistinguishable at a glance). Mutation-tested against the
+real duplicate before it was deleted.
+
+---
+
+## ✅ ARABIC TYPOGRAPHY — the user's font policy, applied
+
+Adopted from the user's own written brief. **`FONTS.md` is the policy;
+`tests/test_font_policy.py` (9 checks) is what makes it true.**
+
+### The shell had no Arabic webfonts at all
+
+`base.html` linked `fonts.css` (Latin) and nothing else, so the Arabic
+INTERFACE fell back to whatever the OS supplied. The five OFL Arabic faces were
+already vendored and correct; only the résumé previews ever asked for them.
+
+    ar   hero Tajawal · headings Cairo · body IBM Plex Sans Arabic · CTA Tajawal
+    en   Inter throughout, 1.6 leading — untouched
+
+Scoped to `[dir="rtl"]`, which comes from the `ui_lang` cookie, so it is
+unreachable on an English page. `fonts_ar_shell.css` is linked only when
+`ui_lang == 'ar'`.
+
+### Thmanyah IS on the site — as outlines
+
+The licence forbids serving the font FILE, not using the DESIGN, and the user's
+own brief names the route: *"export it as outlined vectors… not as extractable
+font"*. `tools/outline_text.py --build-hero` shapes the fixed headlines with
+HarfBuzz and writes SVG paths at build time.
+
+**Live: the landing hero and all three gallery headings are Thmanyah Serif
+Display, and the browser fetches no Thmanyah file** (measured: 26 font requests,
+zero Thmanyah).
+
+Build time, not request time: shaping costs ~200ms per cold page, and doing it
+live would put fontTools, uharfbuzz AND the `.otf` inside the production image —
+a font file on the server, which is the thing this avoids.
+
+**FIXED text only.** Body copy, template names, blurbs and anything a user types
+stay live text on the OFL faces. Outlines cannot be searched, selected,
+translated or restyled.
+
+### Two defects found by measuring, not looking
+
+- **Cairo is a VARIABLE font (`wght 200-1000`) and the @font-face pinned it to
+  900**, so `font-weight: 700` rendered Black and every heading looked
+  oversized. Found because Google returns the IDENTICAL URL for weights 700 and
+  800 — one file for the range. Fixed with `font-weight: 200 1000`.
+  **`VARIABLE_RANGE` in `fetch_fonts_ar.py` records which families this applies
+  to; Tajawal has no fvar table and is correctly per-weight. Check, do not
+  assume, in either direction.**
+- **`line-height: 1.9` was on `body`.** It is a body-copy value and the policy
+  says so; on `body` it reached chips, buttons and card titles. The gallery's
+  "أنظمة التوظيف" chip wrapped onto two lines. Now scoped to prose only.
+
+### Also fixed: form controls were Arial, in BOTH languages
+
+Browsers do not inherit `font-family` into `input`, `select`, `textarea` or
+`button`. `.field input` had `font: inherit` so the builder was fine and the
+account pages were not. One base rule; it corrects English too.
+
+### The five faces now agree on optical size
+
+Measured with canvas actualBoundingBox over five strings at font-size:100 —
+Tajawal was 12% small and Amiri 9% large against the mean, so the same Arabic
+résumé rendered at three different sizes depending on the template. `size-adjust`
+corrects it with no template change.
+
+**A claim made by eye was wrong twice:** Amiri "renders smaller" — it renders
+9% LARGER; it is narrower with a lighter stroke.
+
+---
+
+## ✅ Earlier the same session
+
+- **Gallery + builder in Arabic** — 104 catalogue rows, 49 names, 49 blurbs.
+  Measured live: **49 cards, 0 Latin**.
+- **Arabic sample names** — `ورين آشورث` IS "Wren Ashworth" in Arabic letters.
+  Now `ليلى خليل` at `ديوان للتصميم · دبي`. Lengths held close (10→9, 20→19)
+  so the RTL geometry suites over 49 templates passed untouched.
+- **modern-t2's 270px void** — `justify-content:space-between` on a fixed
+  column. 1 of 49. Gated by `tools/verify_voids.py` + `test_void_gate.py`.
+- **Skill bars: words vs numbers was DATA** — the Arabic sample carried
+  `percent` and the English one never did. 17 of 49 templates moved, exactly
+  the bars and rings patterns.
+- **The volume proof PASSES** — account created on live, `railway redeploy`,
+  container cycled, signed back in: HTTP 302. `/data` genuinely persists.
+- **Mobile: 18/18 clean** on live, 3 widths × 2 languages.
+
+---
+
+## Instrument errors — seven this session, and the pattern is the lesson
+
+A new geometric or textual check is wrong until it has been pointed at
+something whose answer is already known.
+
+1. **Four servers on port 5000**, two started with system Python. Everything
+   verified locally was true and said nothing about what the user saw.
+2. **A screenshot "proving" the Arabic sample** rendered a fully ENGLISH page.
+   `?lang=ar` is ignored — the interface language is the `ui_lang` COOKIE.
+3. **The void detector's self-test failed against a working instrument.** The
+   planted `height:600px` child was squashed to 44px because `.tpl` is itself a
+   flex container. Without it, "0 of 49" would have been reported on a check
+   that could see nothing.
+4. **`size-adjust` went to the wrong fonts.** Splitting CSS on `@font-face {`
+   left each rule holding the NEXT rule's comment, so Noto Kufi got Tajawal's
+   correction — a wrong number in exactly the right shape.
+5. **Two mutation tests of "English is untouched" PASSED against a broken
+   stylesheet.** Both mutations were inert: the role variables are unread in
+   English, and a `:root` declaration inserted above the original loses to it.
+6. **The Thmanyah gate fired on the COMMENT explaining why Thmanyah is banned.**
+   A check whose only failure is the note saying "we do not do this" teaches
+   people to delete the note.
+7. **The mobile check reported 6 failures, all false.** It excluded
+   `position:fixed` elements but not their CHILDREN, so the closed drawer
+   (`fixed`, `aria-hidden`, `translateX(379px)`) reported all its contents as
+   overflow while `scrollWidth == viewport` throughout.
+
+**And the flake fix that made things worse:** `test_shell_rtl_geometry` waited
+`wait_for_timeout(3000)` for lazy iframes. Replacing it with a condition was
+right, but the first version checked `contentDocument` on `#preview-stage`,
+which is a DIV wrapping an iframe — an occasional flake became three consistent
+failures. Caught only by running the combination THREE times; one green run
+would have hidden it and one red would have looked like the original flake.
+The suite is now 40% faster (~110s → ~63s).
+
+---
+
+## Untracked on purpose
+
+- **`Fonts/`** — 27 MB. Holds the Thmanyah `.otf` files needed to regenerate
+  the outlines (`--build-hero`), and `Nice fonts/`, which is fourteen
+  commercial retail faces with **zero licence files**. **Not committed, and it
+  must stay that way**: Thmanyah's licence forbids "redistribute, share,
+  upload, host", and pushing to a git remote is uploading. A fresh clone
+  therefore cannot rebuild the outlines without this folder — copy it by hand.
+- `Arabic Fictitious names.txt`, `My recommedation.txt` — the user's inputs,
+  now committed as `references/` so the policy's provenance is in the repo.
+
+## Verification at the pause
+
+    fast suite                     1775 passed, 583 skipped
+    browser gates (roles/rtl/mobile)  55 passed ×3
+    pixel + void gates                100 passed
+    verify_overflow en / ar           49/49 clean both
+    smoke_deploy (LIVE)               all 25 checks passed
+    live                              d2f8fcf, auto-deployed from a push
+
+---
+
 # RESUME HERE — paused 2026-09-18 (LIVE AND CONFIGURED · 8 commits deployed · Arabic gallery shipped)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED

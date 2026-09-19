@@ -42,3 +42,14 @@ screenshots/
 # a file whose committed contents mean nothing.
 data/meta.json
 data/resume.json
+
+# Font SOURCES, not shipped assets. 27 MB, and two reasons it stays out:
+#
+#   Fonts/Thmanyah/     the .otf files that tools/outline_text.py --build-hero
+#                       reads. Its licence forbids "redistribute, share,
+#                       upload, host" — and pushing to a git remote is
+#                       uploading. A fresh clone cannot rebuild the outlines
+#                       without copying this folder in by hand.
+#   Fonts/Nice fonts/   fourteen commercial retail faces with ZERO licence
+#                       files between them. See FONTS.md.
+Fonts/
