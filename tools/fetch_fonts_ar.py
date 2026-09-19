@@ -307,13 +307,27 @@ def check() -> int:
 SHELL_FACES = {
     ("Tajawal", "800"),                 # hero, CTA — the policy's ExtraBold
     ("Tajawal", "700"),
-    ("Cairo", "900"),                   # headings; 700 is not on disk, see FONTS.md
+    ("Cairo", "900"),                   # see VARIABLE_RANGE below
     ("IBM Plex Sans Arabic", "400"),    # body
     ("IBM Plex Sans Arabic", "500"),    # tables
     ("IBM Plex Sans Arabic", "600"),
     ("IBM Plex Sans Arabic", "700"),
 }
 AR_SHELL_CSS = "fonts_ar_shell.css"
+
+#: Families whose vendored .woff2 is a VARIABLE font, and the range to declare.
+#:
+#: Google serves one file for Cairo's whole weight range — requesting 700 and
+#: requesting 800 return the same URL, which is how this was found. Declaring
+#: it `font-weight: 900` pins the variable axis to Black, so `font-weight: 700`
+#: in the stylesheet rendered at 900 anyway and the headings came out far
+#: heavier than the policy asks for. A RANGE lets the axis respond.
+#:
+#: Checked with fontTools: cairo has `wght 200-1000`; tajawal does not have an
+#: fvar table at all and is correctly declared per static weight.
+VARIABLE_RANGE = {
+    "Cairo": "200 1000",
+}
 
 
 def shell_faces() -> int:
@@ -343,8 +357,11 @@ def shell_faces() -> int:
         # Restore the family and weight this face actually IS, rather than the
         # Latin one it was aliased to.
         body = re.sub(r"font-family: '[^']+'", f"font-family: '{key[0]}'", body, count=1)
-        body = re.sub(r"font-weight: [^;]+;", f"font-weight: {key[1]};", body, count=1)
-        rules.append(f"/* {key[0]} {key[1]} */\n@font-face {{{body}}}")
+        weight = VARIABLE_RANGE.get(key[0], key[1])
+        body = re.sub(r"font-weight: [^;]+;", f"font-weight: {weight};", body, count=1)
+        note = (f"{key[0]} {weight}  (variable)" if key[0] in VARIABLE_RANGE
+                else f"{key[0]} {key[1]}")
+        rules.append(f"/* {note} */\n@font-face {{{body}}}")
 
     missing = sorted(SHELL_FACES - seen)
     header = (

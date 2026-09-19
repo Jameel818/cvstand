@@ -646,10 +646,25 @@ html { overflow-x: hidden; }
                         so no extra leading is needed or wanted. */
                      margin-block: 0.06em; }
 
-[dir="rtl"] body { font-family: var(--font-body); line-height: var(--leading-body); }
-[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 { font-family: var(--font-heading); }
+[dir="rtl"] body { font-family: var(--font-body); }
+
+/* 1.9 is a BODY-COPY value and the policy says so — "body description / FAQ /
+   price". Putting it on `body` inherited it into chips, buttons, card titles
+   and table cells, which do not want prose leading: the gallery's "أنظمة
+   التوظيف" chip wrapped onto two lines and every card grew. Prose gets it;
+   components keep the 1.6 they were designed around. */
+[dir="rtl"] p, [dir="rtl"] li, [dir="rtl"] .blurb, [dir="rtl"] .hero-sub,
+[dir="rtl"] .account-intro { line-height: var(--leading-body); }
+
+/* Cairo is a VARIABLE font (wght 200-1000) and its @font-face now declares
+   that range, so these weights finally mean what they say. While it was pinned
+   at `font-weight: 900` every heading rendered Black no matter what was asked
+   for — which is why they looked oversized. 700 is what the policy specifies. */
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 {
+  font-family: var(--font-heading); font-weight: 700;
+}
 [dir="rtl"] .hero h1 { font-family: var(--font-hero); font-weight: 800; }
-[dir="rtl"] .btn, [dir="rtl"] button { font-family: var(--font-cta); font-weight: 800; }
+[dir="rtl"] .btn, [dir="rtl"] button { font-family: var(--font-cta); font-weight: 700; }
 [dir="rtl"] table, [dir="rtl"] .tpl-meta { font-family: var(--font-body); font-weight: 500; }
 
 /* ---------------------------------------------------------------------------

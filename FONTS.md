@@ -18,7 +18,7 @@ by a template.
 |---|---|---|
 | IBM Plex Sans Arabic | OFL 1.1 | Arabic behind Inter, Open Sans, Source Sans 3, Plex Mono |
 | Tajawal | OFL 1.1 | Arabic behind Archivo, Archivo Narrow |
-| Cairo | OFL 1.1 | Arabic behind Montserrat, Poppins |
+| Cairo | OFL 1.1 | Arabic behind Montserrat, Poppins; shell headings. **VARIABLE, wght 200-1000** |
 | Amiri | OFL 1.1 | Arabic behind Fraunces, Merriweather (Naskh, for serif pairings) |
 | Noto Kufi Arabic | OFL 1.1 | Arabic behind Anton (display weight) |
 | Anton, Archivo, Archivo Narrow, Fraunces, IBM Plex Mono, Inter, Merriweather, Montserrat, Open Sans, Poppins, Source Sans 3 | OFL 1.1 | the Latin families the 49 templates declare |
@@ -27,6 +27,22 @@ by a template.
 is not currently used. **Noto Kufi Arabic** is used instead, and is the same
 OFL grant from the same foundry — it is a display face, which is what the Anton
 pairing needs; Naskh is a text face and would be wrong there.
+
+## Variable fonts: declare the RANGE, not a weight
+
+Cairo's vendored `.woff2` is a **variable** font covering `wght 200-1000`
+(checked with fontTools). Google serves one file for the whole range —
+requesting weight 700 and weight 800 return the identical URL, which is how
+this was found.
+
+Declaring it `font-weight: 900` in `@font-face` **pins the axis to Black**, so
+`font-weight: 700` in a stylesheet renders at 900 anyway and nothing warns. The
+shell headings shipped far heavier than this policy asks for until the
+declaration was changed to `font-weight: 200 1000`.
+
+`VARIABLE_RANGE` in `tools/fetch_fonts_ar.py` holds the families this applies
+to. Tajawal has no `fvar` table and is correctly declared per static weight —
+check before assuming, in either direction.
 
 ## Never
 
