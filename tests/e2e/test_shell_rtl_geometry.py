@@ -102,8 +102,39 @@ def _measure(page, live_server, lang, path, selector, reveal):
     page.goto(live_server.url + path, wait_until="networkidle")
     if reveal:
         page.click(reveal)
-    # the iframes are lazy and each is a real /preview render
-    page.wait_for_timeout(3000)
+
+    # WAIT FOR THE CONDITION, NOT A DURATION.
+    #
+    # The iframes are lazy and each is a real /preview render, so this used to
+    # be `wait_for_timeout(3000)`. Three seconds is enough on an idle machine
+    # and sometimes is not when this file runs after other browser suites —
+    # observed 2026-09-19, one failure in six runs of the same combination,
+    # passing 5/5 before and after. A duration that is "usually enough" is a
+    # flake with a schedule, and this repo has chased one of those before
+    # (session 11b).
+    #
+    # The real condition is that the target iframe has finished rendering its
+    # résumé, which is observable: `.tpl` exists inside its document. Measuring
+    # before that gives an empty box and a geometry assertion that fails for a
+    # reason that has nothing to do with direction.
+    # Two shapes in SURFACES, and the first version of this wait handled only
+    # one: `#preview-stage` is a DIV wrapping an iframe, not an iframe, so
+    # `contentDocument` was null and the condition could never come true. It
+    # turned an occasional flake into three reliable failures — caught by
+    # running the same combination three times instead of once.
+    page.wait_for_function(
+        """(sel) => {
+            const el = document.querySelector(sel);
+            if (!el) return true;         // "missing" is the probe's own case
+            const frame = el.tagName === 'IFRAME'
+                ? el : el.querySelector('iframe');
+            if (!frame) return true;      // nothing lazy to wait for
+            const d = frame.contentDocument;
+            return !!(d && d.querySelector('.tpl'));
+        }""",
+        arg=selector,
+        timeout=20000,
+    )
     return page.evaluate(_PROBE, selector)
 
 
