@@ -32,6 +32,16 @@
   --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
 
+  /* Role variables, per the font policy in FONTS.md. In ENGLISH every one of
+     them resolves to what the shell already used, so adding them moves
+     nothing — they exist so the Arabic block below has something to override
+     without touching a single rule that English renders through. */
+  --font-hero: var(--font-display);
+  --font-heading: var(--font-ui);
+  --font-body: var(--font-ui);
+  --font-cta: var(--font-ui);
+  --leading-body: 1.6;
+
   /* shape */
   --r-xs: 6px;
   --r-sm: 10px;
@@ -578,6 +588,45 @@ body.builder-body { overflow: hidden; }
    the drawer moves the same way in both directions and why this guard is
    needed at all rather than falling out of the RTL conversion. */
 html { overflow-x: hidden; }
+
+/* ---------------------------------------------------------------------------
+   ARABIC TYPOGRAPHY — the font policy (FONTS.md), applied to the shell ONLY
+   when the reader has chosen Arabic.
+
+   `dir="rtl"` comes from `ui_dir`, which comes from the `ui_lang` cookie, so
+   this block is unreachable on an English page. Nothing here is a media query
+   or a class a stylesheet could apply by accident: English renders through the
+   `:root` values above, unchanged, and `test_font_roles.py` asserts that the
+   English computed fonts are byte-identical to what shipped before.
+
+   Until this, the shell linked `fonts.css` (Latin) and nothing else, so the
+   Arabic interface fell back to whatever the OS supplied — Segoe UI on
+   Windows, Geeza Pro on macOS, anything at all on Android. The faces were
+   already vendored; the interface simply never asked for them.
+
+   The hero should be Thmanyah Serif Display per the policy. It cannot ship
+   (licence — see FONTS.md), so this uses the policy's own stated fallback,
+   Tajawal ExtraBold 800.
+
+   Cairo 700 is what the policy asks for and only Cairo 900 is vendored; 900 at
+   heading sizes is the closer error than dropping to a different family. If
+   Cairo 700 is ever fetched, change SHELL_FACES and this line together.
+   --------------------------------------------------------------------------- */
+[dir="rtl"] {
+  --font-hero: "Tajawal", "IBM Plex Sans Arabic", var(--font-display);
+  --font-heading: "Cairo", "Tajawal", var(--font-ui);
+  --font-body: "IBM Plex Sans Arabic", "Tajawal", var(--font-ui);
+  --font-cta: "Tajawal", "IBM Plex Sans Arabic", var(--font-ui);
+  /* 1.9 per the policy: Arabic ascenders and descenders need more room than
+     the 1.6 Latin is set at, and dense Arabic body copy is the case it is for. */
+  --leading-body: 1.9;
+}
+
+[dir="rtl"] body { font-family: var(--font-body); line-height: var(--leading-body); }
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 { font-family: var(--font-heading); }
+[dir="rtl"] .hero h1 { font-family: var(--font-hero); font-weight: 800; }
+[dir="rtl"] .btn, [dir="rtl"] button { font-family: var(--font-cta); font-weight: 800; }
+[dir="rtl"] table, [dir="rtl"] .tpl-meta { font-family: var(--font-body); font-weight: 500; }
 
 /* ---------------------------------------------------------------------------
    RTL. Every directional rule above is logical, so the interface mirrors on

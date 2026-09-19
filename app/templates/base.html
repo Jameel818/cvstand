@@ -15,6 +15,15 @@
    network the whole UI stalled ~21s per cold page load before the request
    timed out. tests/e2e/test_offline.py keeps it local. #}
 <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fonts.css') }}">
+{# Arabic faces under their real names, for the font policy in FONTS.md.
+   Linked only when the READER has chosen Arabic: an English visitor must not
+   pay for a stylesheet whose every rule is unreachable. `unicode-range` would
+   already stop the .woff2 files themselves downloading, but the stylesheet is
+   render-blocking and that cost is real on a cold load — the same reason
+   fonts.googleapis.com was dropped (tests/e2e/test_offline.py). #}
+{% if ui_lang == 'ar' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts/fonts_ar_shell.css') }}">
+{% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M9 8h11l4 4v12H9z' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M12 14h8M12 18h8M12 22h5' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="manifest" href="{{ url_for('main.manifest') }}">
