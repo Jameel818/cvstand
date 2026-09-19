@@ -46,9 +46,19 @@ This applies to the **app shell exactly as much as to the résumé templates**:
 the prohibition is about the font FILE being fetchable, not about what text it
 renders. Serving it for the site chrome publishes the same file.
 
-The compliant route is outlining fixed text to SVG paths, which ships no font
-file. Not used, because the wordmark is Latin and baking Arabic UI text into
-paths would break this project's rule that text stays real and selectable.
+**The compliant route IS used, for the Arabic landing hero.**
+`tools/outline_text.py --build-hero` shapes the headline with HarfBuzz and
+converts it to SVG paths at build time, writing `app/templates/_hero_ar.html`.
+Geometry is not a font: there is no `@font-face`, no `.woff2`, nothing in the
+network tab but the page. The user's own brief names this route — *"export it
+as outlined vectors or flattened image, not as extractable font"*.
+
+It is for FIXED text only. Body copy, headings and buttons stay on the OFL
+faces, because outlining them would ship a wall of geometry no screen reader
+can read and no translator can change. The hero partial keeps the real string
+in an `.sr-only` span and marks the SVG `aria-hidden`, so nothing is lost;
+`tests/test_hero_outline.py` fails if the copy and the outlines ever drift
+apart, which is otherwise invisible.
 
 `outreach/thmanyah-webfont-licence.md` is a ready-to-send request for a
 single-domain grant, which their licence invites. **If it arrives, keep the

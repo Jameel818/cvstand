@@ -7,7 +7,16 @@
   <div class="hero-inner">
     <div>
       <div class="eyebrow">{{ t('Modern & ATS-friendly') }}</div>
+      {# The Arabic hero is Thmanyah Serif Display, converted to SVG outlines
+         at build time (tools/outline_text.py --build-hero). Its licence
+         forbids serving the font file; geometry is not a font. The partial
+         carries the real string in an .sr-only span, so nothing is lost to
+         assistive technology. English is unchanged — same markup as before. #}
+      {% if ui_lang == 'ar' %}
+      <h1 class="hero-ar">{% include "_hero_ar.html" %}</h1>
+      {% else %}
       <h1>{{ t('Your résumé,') }} <span class="accent">{{ t('designed') }}</span> {{ t('and done in minutes.') }}</h1>
+      {% endif %}
       <p class="hero-sub">{{ t('Fill in your details once. Switch between') }} {{ counts.modern + counts.ats }} {{ t('designer layouts, preview live, and export a pixel-perfect PDF or an editable Word file.') }}</p>
       <div class="hero-cta">
         <a class="btn btn-primary btn-lg" href="{{ url_for('main.builder') }}">{{ t("Start building — it's free") }}</a>

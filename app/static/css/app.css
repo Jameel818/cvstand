@@ -622,6 +622,18 @@ html { overflow-x: hidden; }
   --leading-body: 1.9;
 }
 
+/* The outlined Arabic hero. Each run is an <svg> whose viewBox was measured at
+   font-size:100, so `height: 1em` makes it scale with whatever the h1's
+   font-size already is — the headline stays responsive without a second set of
+   breakpoints. `width:auto` keeps the aspect ratio the shaper produced. */
+.hero-ar { display: block; }
+.hero-outlined { display: flex; flex-wrap: wrap; align-items: baseline;
+                 gap: 0 0.28em; justify-content: flex-start; }
+.hero-outlined svg { height: 1em; width: auto; display: block;
+                     /* The glyphs' own ascent/descent are inside the viewBox,
+                        so no extra leading is needed or wanted. */
+                     margin-block: 0.06em; }
+
 [dir="rtl"] body { font-family: var(--font-body); line-height: var(--leading-body); }
 [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 { font-family: var(--font-heading); }
 [dir="rtl"] .hero h1 { font-family: var(--font-hero); font-weight: 800; }
