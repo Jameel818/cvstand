@@ -187,3 +187,53 @@ def test_every_exemption_is_still_real():
         assert fam not in vendored, (
             f"EXEMPT lists ({stem}, {fam}) but {fam} IS vendored now - the "
             f"exemption is stale and the guard should apply.")
+
+
+# ---------------------------------------------------------------------------
+# The Arabic section-face split.
+# ---------------------------------------------------------------------------
+#
+# The written policy assigns CV section titles to Tajawal in one sentence and
+# to Cairo in another, and the decision was to carry both: 27 templates on
+# Tajawal, 22 on Cairo, split by each template's own Latin register so that
+# two templates which look alike in English do not diverge in Arabic.
+#
+# Nothing else would notice this collapsing. The rules are same-specificity
+# and source-order dependent, so deleting either one, or reordering them,
+# silently puts all 49 on a single face -- and every other gate would still
+# pass, because both faces are on the allowlist and neither changes English.
+
+SPLIT_CLASS = "cv-sections-taj"
+
+
+def test_the_arabic_section_split_is_intact():
+    marked = [p for p in _template_files()
+              if SPLIT_CLASS in p.read_text(encoding="utf-8")]
+    unmarked = [p for p in _template_files()
+                if not p.name.startswith("_")
+                and 'class="tpl' in p.read_text(encoding="utf-8")
+                and SPLIT_CLASS not in p.read_text(encoding="utf-8")]
+    assert len(marked) == 27, (
+        f"{len(marked)} templates carry {SPLIT_CLASS}, expected 27 - the "
+        f"Arabic section-face split has drifted (see FONTS.md)")
+    assert len(unmarked) == 22, (
+        f"{len(unmarked)} templates are on the Cairo default, expected 22")
+
+
+def test_both_halves_of_the_split_are_declared_and_ordered():
+    """Same specificity (0,2,0), so SOURCE ORDER decides which wins.
+
+    If the Tajawal rule is moved above the Cairo one, every template silently
+    renders Cairo and the split disappears with nothing failing."""
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from app.rendering import RTL_TYPOGRAPHY
+
+    cairo = RTL_TYPOGRAPHY.find('[dir="rtl"] .tpl .cv-section')
+    taj = RTL_TYPOGRAPHY.find(f'[dir="rtl"] .{SPLIT_CLASS} .cv-section')
+    assert cairo != -1, "the Cairo default rule is gone - the split collapsed"
+    assert taj != -1, f"the {SPLIT_CLASS} override is gone - the split collapsed"
+    assert cairo < taj, (
+        "the Tajawal override now precedes the Cairo default. They have equal "
+        "specificity, so source order decides and all 49 templates just went "
+        "to Cairo without a single test noticing.")

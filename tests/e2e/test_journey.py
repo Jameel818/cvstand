@@ -50,7 +50,9 @@ def test_every_gallery_card_renders_a_live_preview(page, live_server):
         src = frames.nth(i).get_attribute("src")
         resp = page.request.get(live_server.url + src)
         assert resp.status == 200
-        assert 'class="tpl"' in resp.text()
+        # the class TOKEN, not the attribute: 27 roots also carry
+        # `cv-sections-taj` for the Arabic section-face split
+        assert re.search(r'<div class="tpl[ "]', resp.text())
 
 
 def test_use_this_selects_the_template_and_opens_the_builder(page, live_server):

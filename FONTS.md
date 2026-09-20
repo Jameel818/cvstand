@@ -81,8 +81,36 @@ résumé documents themselves — **in Arabic only**:
 | role | face | hook |
 |---|---|---|
 | name | Tajawal ExtraBold 800 | `class="cv-name"` (49, one per template) |
-| section title | Cairo Bold | `class="cv-section"` (229) |
+| section title | Tajawal (27) / Cairo (22) — see below | `class="cv-section"` (229) |
 | body | IBM Plex Sans Arabic | everything else under `.tpl` |
+
+### Section titles are split across the catalogue, on purpose
+
+The written policy says both things, and they cannot both be true of the same
+element:
+
+> "Tajawal Bold ExtraBold for CV name headline **and section titles inside CV
+> template**"
+
+> "Word CV template styles … Section Title **Cairo Bold** 12pt all caps"
+
+Asked which wins, the answer was *"50% Cairo, 50% Tajawal"*. So the catalogue
+carries both — and the split follows each template's own Latin register rather
+than a coin toss, because two templates that look alike in English must not
+diverge in Arabic for no reason:
+
+| Latin section head | Arabic section title | n |
+|---|---|---|
+| Archivo, Archivo Narrow (grotesque) | **Tajawal** | 27 |
+| Montserrat, Poppins, Anton (geometric); Fraunces, Merriweather (serif); Inter, Open Sans, Source Sans 3, IBM Plex Mono (humanist) | **Cairo** | 22 |
+
+That lands 27/22 — as near even as a non-arbitrary rule gets. Measured, not
+guessed: Archivo leads the section heads in 25 of the 49.
+
+The Tajawal half carries `cv-sections-taj` on its `.tpl` root. The Cairo rule
+is the default and the `.cv-sections-taj` rule overrides it at the **same**
+specificity (0,2,0), so it must stay after it in source order. **To collapse
+back to a single face, delete one of the two rules.**
 
 The rules live in `app/rendering.py::RTL_TYPOGRAPHY`, which `document_html()`
 emits **only for `dir="rtl"`**. An English CV never carries a byte of it, and

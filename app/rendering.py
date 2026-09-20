@@ -290,9 +290,38 @@ RTL_TYPOGRAPHY = """<style>
   [dir="rtl"] .tpl * {
     font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
   }
+  /* SECTION TITLES ARE SPLIT ACROSS THE CATALOGUE, 27 Tajawal / 22 Cairo.
+     The written policy says both things and they cannot both be true of the
+     same element:
+
+       "Tajawal Bold ExtraBold for CV name headline AND SECTION TITLES
+        inside CV template"
+       "Word CV template styles ... Section Title CAIRO BOLD 12pt all caps"
+
+     Asked which won, the answer was "50% Cairo, 50% Tajawal" - so the
+     catalogue carries both, and the split follows each template's own Latin
+     register rather than a coin toss. Two templates that look alike in
+     English must not diverge in Arabic for no reason:
+
+       grotesque Latin section heads (Archivo, Archivo Narrow)  -> Tajawal
+       geometric / serif / humanist (Montserrat, Poppins, Anton,
+         Fraunces, Merriweather, Inter, Open Sans, Source Sans,
+         IBM Plex Mono)                                         -> Cairo
+
+     That lands 27/22, which is as near even as a non-arbitrary rule gets.
+     Measured, not guessed: Archivo leads the section heads in 25 of the 49.
+
+     To collapse it back to one face, delete one of the two rules below - the
+     Cairo rule is the default and the .cv-sections-taj rule is the override. */
   [dir="rtl"] .tpl .cv-section,
   [dir="rtl"] .tpl .cv-section * {
     font-family: "Cairo", "Tajawal", sans-serif !important;
+  }
+  /* Same specificity as the rule above (0,2,0), so SOURCE ORDER decides and
+     this must stay after it. */
+  [dir="rtl"] .cv-sections-taj .cv-section,
+  [dir="rtl"] .cv-sections-taj .cv-section * {
+    font-family: "Tajawal", "Cairo", sans-serif !important;
   }
   [dir="rtl"] .tpl .cv-name,
   [dir="rtl"] .tpl .cv-name * {

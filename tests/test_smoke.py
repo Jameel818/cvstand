@@ -1,4 +1,5 @@
 """Smoke + contract tests. Run: venv/Scripts/python -m pytest -q"""
+import re
 import dataclasses
 import io
 
@@ -84,7 +85,12 @@ def test_render_and_preview_api(client):
     r = client.post("/api/render", json={"data": SAMPLE, "template_key": "modern-t1"})
     assert r.status_code == 200
     body = r.get_json()
-    assert body["ok"] and "<div class=\"tpl\"" in body["html"] and body["doc"].startswith("<!DOCTYPE")
+    # Match the class TOKEN, not the whole attribute: 27 of the 49 roots
+    # now read `class="tpl cv-sections-taj"` (the Arabic section-face
+    # split), and an exact-string check called that a missing canvas.
+    assert body["ok"]
+    assert re.search(r'<div class="tpl[ "]', body["html"]), body["html"][:200]
+    assert body["doc"].startswith("<!DOCTYPE")
     assert client.get("/preview?template_key=ats-t3").status_code == 200
 
 

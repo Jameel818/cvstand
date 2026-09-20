@@ -175,6 +175,7 @@ def test_an_arabic_resume_uses_the_policys_cv_roles(page, live_server):
               body: f(document.querySelector('.tpl')),
               name: f(name),
               nameWeight: name ? cs(name).fontWeight : null,
+              taj: document.querySelector('.tpl').classList.contains('cv-sections-taj'),
               sec: f(document.querySelector('.tpl .cv-section'))};
     }""")
     if got["dir"] != "rtl":
@@ -184,4 +185,12 @@ def test_an_arabic_resume_uses_the_policys_cv_roles(page, live_server):
     assert got["nameWeight"] == "800", (
         f"the policy says the name is Tajawal ExtraBold, got weight "
         f"{got['nameWeight']}")
-    assert got["sec"] == "Cairo", got["sec"]
+    # Section titles are split 27 Tajawal / 22 Cairo across the catalogue,
+    # because the policy states both and the answer was "50/50" (FONTS.md).
+    # The expectation is READ FROM THE ROOT rather than hardcoded: pinning
+    # this to "Cairo" made the test assert the wrong half the moment the
+    # split landed, and modern-t2 is Archivo-led, so it is in the Tajawal half.
+    want = "Tajawal" if got["taj"] else "Cairo"
+    assert got["sec"] == want, (
+        f"modern-t2 carries cv-sections-taj={got['taj']}, so its section "
+        f"titles should be {want}, got {got['sec']}")

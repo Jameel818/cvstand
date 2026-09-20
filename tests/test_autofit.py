@@ -66,7 +66,8 @@ def test_engine_reaches_no_network():
 def test_engine_runs_after_the_canvas():
     """It queries `.tpl` at parse time, so it must come after the canvas."""
     doc = document_html(SAMPLE, KEY)
-    assert doc.index('class="tpl"') < doc.index("window.ResumeAutofit")
+    assert (re.search(r'<div class="tpl[ "]', doc).start()
+            < doc.index("window.ResumeAutofit"))
 
 
 def test_canvas_fragment_stays_script_free():
