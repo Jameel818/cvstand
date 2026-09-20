@@ -212,3 +212,32 @@ def test_the_gallery_button_reports_a_browser_that_stores_nothing(page, deployed
     assert "/templates" in page.url, (
         "the reader was sent to the builder even though nothing stored the "
         "template they picked")
+
+
+def test_the_builder_bar_names_the_template_that_is_rendering(page, deployed_server):
+    """`#tpl-label` is Jinja-rendered from the SERVER's meta.
+
+    On a deployment the server stores nothing, so that is always its default —
+    while the preview, the exports and the drawer all use `templateKey`, which
+    came from localStorage. Measured on production 2026-09-20: localStorage
+    held `ats-t8` ("Big Type"), the canvas rendered ats-t8, and the bar read
+    "Editorial Redline", the deployed default. Only the bar was lying, which
+    is the kind of defect that survives because everything else is right.
+
+    Reachable before the gallery button was fixed (switch in the drawer, then
+    reload) but rare. Now every "Use this" lands here."""
+    page.goto(deployed_server.url + "/templates", wait_until="networkidle")
+    btn = page.locator(".use-btn").nth(6)
+    key = btn.get_attribute("data-key")
+    btn.click()
+    page.wait_for_url("**/builder", timeout=10_000)
+    page.wait_for_timeout(1200)
+
+    label = page.locator("#tpl-label").inner_text().strip()
+    expected = page.evaluate(
+        "(k) => JSON.parse(document.getElementById('catalogue-data').textContent)"
+        ".find(t => t.key === k).label", key)
+    assert label.lower() == expected.lower(), (
+        f"the builder rendered {key} but its bar says {label!r} instead of "
+        f"{expected!r} — the bar is naming the server's default, not the "
+        f"template the reader picked")

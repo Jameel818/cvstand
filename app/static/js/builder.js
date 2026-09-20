@@ -53,6 +53,32 @@
      and the preview would 400. */
   if (!catalogue.some((t) => t.key === templateKey && t.ported)) templateKey = S.templateKey;
 
+  /* THE BAR MUST NAME THE TEMPLATE THAT IS ACTUALLY RENDERING.
+     `#tpl-label` is rendered by Jinja from the SERVER's meta, and on a
+     deployment the server stores nothing - so it always says the server
+     default while the preview uses `templateKey`, which came from
+     localStorage. Measured on production: localStorage held `ats-t8` ("Big
+     Type"), the preview rendered ats-t8, and the bar read "Editorial
+     Redline", the deployed default. The exports used ats-t8 too, so the bar
+     was the only thing lying.
+
+     Reachable before the gallery button was fixed (switch in the drawer, then
+     reload) but rare; now every "Use this" lands here, so it is painted on
+     boot from the same value the preview uses. */
+  function paintTemplateName(key) {
+    const t = catalogue.find((x) => x.key === key);
+    if (!t) return;
+    $("#tpl-label").textContent = T(t.label);
+    /* The chip's COLOUR was being swapped without its TEXT, so switching a
+       Modern template for an ATS one left the bar reading "Modern" in an ATS
+       colour until the page was reloaded. `lastChild` is the bare text node -
+       textContent on the chip itself would delete the `.dot` span. */
+    const chip = $(".builder-bar .tpl-name .chip");
+    if (!chip) return;
+    chip.className = "chip chip-" + t.category;
+    chip.lastChild.textContent = t.category === "modern" ? T("Modern") : T("ATS");
+  }
+
   /* Interface strings and level vocabularies, handed over by the server.
      Two different languages on purpose: T() follows the READER (the ui_lang
      cookie) while the level lists follow the RESUME, because a level word is
@@ -690,15 +716,7 @@
         } catch (_) { /* the local choice stands */ }
       }
       templateKey = key;
-      const t = catalogue.find((x) => x.key === key);
-      $("#tpl-label").textContent = T(t.label);
-      /* The chip's COLOUR was being swapped without its TEXT, so switching a
-         Modern template for an ATS one left the bar reading "Modern" in an ATS
-         colour until the page was reloaded. `lastChild` is the bare text node -
-         textContent on the chip itself would delete the `.dot` span. */
-      const chip = $(".builder-bar .tpl-name .chip");
-      chip.className = "chip chip-" + t.category;
-      chip.lastChild.textContent = t.category === "modern" ? T("Modern") : T("ATS");
+      paintTemplateName(key);
       markCurrent();
       closeDrawer();
       doRender();
@@ -746,6 +764,10 @@
   /* ---------- boot ---------- */
   renderForm();
   applyZoom();
+  /* After T() exists and before anything is drawn: the bar is server-rendered
+     from the server's meta, which on a deployment is not what `templateKey`
+     resolved to. See paintTemplateName. */
+  paintTemplateName(templateKey);
   doRender();
   setSaveState("saved");
 })();
