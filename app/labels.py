@@ -487,6 +487,11 @@ _UI_AR: dict[str, str] = {
     # (a private window, or site data blocked).
     "The template could not be switched — this browser is not storing anything.":
         "تعذّر تغيير القالب — هذا المتصفح لا يحفظ أي بيانات.",
+    # The gallery's version of the same failure. Separate msgid because the
+    # gallery SELECTS a template and the drawer SWITCHES one - the reader is
+    # at a different point in the journey and "switched" would be wrong there.
+    "The template could not be selected — this browser is not storing anything.":
+        "تعذّر اختيار القالب — هذا المتصفح لا يحفظ أي بيانات.",
     # Shown instead of the single-user line when the server keeps no résumé
     # (CVSTAND_SERVER_STORE=0). Not a slogan — it is literally what the
     # deployed app does, and in this market it is worth saying plainly.

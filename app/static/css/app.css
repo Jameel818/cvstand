@@ -298,6 +298,16 @@ p { margin: 0 0 1em; }
 .faq details[open] summary::after { content: "–"; }
 .faq p { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
 
+/* The gallery's failure line. Only reachable when NEITHER store works — the
+   browser refuses localStorage and the deployment holds nothing — in which
+   case the builder would open on a different template than the one clicked. */
+.gallery-error {
+  max-width: var(--maxw); margin: 0 auto 8px; padding: 10px 24px;
+  font-size: 13px; color: #991b1b; background: #fef2f2;
+  border-block: 1px solid #fca5a5;
+}
+.gallery-error[hidden] { display: none; }
+
 /* ==========================================================================
    GALLERY
    ========================================================================== */

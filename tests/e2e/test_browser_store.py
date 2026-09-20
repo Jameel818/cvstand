@@ -161,3 +161,54 @@ def test_a_browser_that_stores_nothing_still_works(page, live_server):
     page.fill("#f_name", MINE)
     # It cannot claim to have saved what it could not store.
     expect(page.locator("#save-state")).to_have_class("save-state is-unsaved")
+
+
+# ---------------------------------------------------------------------------
+# The gallery's "Use this" button, on a server configured the way a PUBLIC one
+# is. This is the gap that shipped a dead button to production.
+# ---------------------------------------------------------------------------
+#
+# `test_the_deployed_server_refuses_to_hold_a_resume` above asserts that the
+# server correctly says no. Nothing asserted that the USER CAN STILL PROCEED
+# after it says no, and those are different claims. /api/template answers 403
+# when CVSTAND_SERVER_STORE=0, and the gallery's script navigated only on
+# res.ok - so every "Use this" button on the deployed site re-enabled itself
+# and did nothing, with no message. It worked in every test because the
+# default fixture runs with the server store ON.
+#
+# Measured on the live deployment 2026-09-20: POST /api/template -> 403
+# {"error": "This deployment keeps your template choice in your browser."}
+
+def test_use_this_works_when_the_server_holds_nothing(page, deployed_server):
+    page.goto(deployed_server.url + "/templates", wait_until="networkidle")
+    btn = page.locator(".use-btn").first
+    key = btn.get_attribute("data-key")
+    assert key, "no .use-btn on the gallery"
+
+    btn.click()
+    page.wait_for_url("**/builder", timeout=10_000)
+
+    stored = page.evaluate("() => window.localStorage.getItem('cvstand:template')")
+    assert stored == key, (
+        f"the gallery sent the reader to the builder but stored {stored!r} "
+        f"instead of the template they clicked ({key!r}) - the builder will "
+        f"open on something else")
+
+
+def test_the_gallery_button_reports_a_browser_that_stores_nothing(page, deployed_server):
+    """If neither store works the builder would open on a DIFFERENT template.
+
+    Navigating anyway would quietly disagree with the click, so the page says
+    so instead. Storage is broken here the same way test_a_browser_that_stores
+    _nothing_still_works does it - by making setItem throw."""
+    page.goto(deployed_server.url + "/templates", wait_until="networkidle")
+    page.evaluate("""() => {
+      Storage.prototype.setItem = function () { throw new Error('denied'); };
+    }""")
+    page.locator(".use-btn").first.click()
+    err = page.locator("#gallery-error")
+    err.wait_for(state="visible", timeout=5_000)
+    assert err.inner_text().strip(), "the failure line is visible but empty"
+    assert "/templates" in page.url, (
+        "the reader was sent to the builder even though nothing stored the "
+        "template they picked")

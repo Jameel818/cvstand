@@ -56,18 +56,68 @@
   {% endfor %}
 </div>
 
+<p class="gallery-error" id="gallery-error" role="status" hidden></p>
+
 <script>
-document.querySelectorAll('.use-btn').forEach(function (b) {
-  b.addEventListener('click', async function () {
-    b.disabled = true;
-    const res = await fetch('{{ url_for("main.post_template") }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ template_key: b.dataset.key }),
+/* "Use this" used to POST to /api/template and navigate only on res.ok.
+   A PUBLIC deployment runs with CVSTAND_SERVER_STORE=0, and that route then
+   answers 403 {"error": "This deployment keeps your template choice in your
+   browser."} - so every button on this page did nothing but re-enable itself,
+   silently, with no message. It worked on localhost purely because the local
+   default is server_store=1. Measured on the deployment: 403.
+
+   The order is now the same as the builder's drawer: the choice lives in THIS
+   BROWSER first, and the server is a best-effort mirror for the local
+   workflow. builder.js reads `cvstand:template` on boot (`readStored(TPL_KEY)
+   || S.templateKey`), so writing it here is what actually carries the choice
+   across - the POST never did, on a deployment. */
+(function () {
+  var TPL_KEY = 'cvstand:template';          /* must match builder.js */
+  var SERVER_STORE = {{ server_store | tojson }};
+  var BUILDER = '{{ url_for("main.builder") }}';
+  var SET_TEMPLATE = '{{ url_for("main.post_template") }}';
+  var errBox = document.getElementById('gallery-error');
+
+  function showError(msg) {
+    if (!errBox) return;
+    errBox.textContent = msg || '';
+    errBox.hidden = !msg;
+  }
+
+  document.querySelectorAll('.use-btn').forEach(function (b) {
+    b.addEventListener('click', async function () {
+      b.disabled = true;
+      showError(null);
+      var key = b.dataset.key;
+
+      /* localStorage throws outright in some privacy modes rather than
+         returning null, which is why this is wrapped. */
+      var stored = false;
+      try { window.localStorage.setItem(TPL_KEY, key); stored = true; } catch (_) {}
+
+      if (SERVER_STORE) {
+        /* The local workflow keeps the choice server-side too. A failure here
+           is not the user's problem: the browser already has it. */
+        try {
+          await fetch(SET_TEMPLATE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ template_key: key }),
+          });
+        } catch (_) { /* the stored choice stands */ }
+      }
+
+      /* Nothing could hold the choice, so the builder would open on a
+         DIFFERENT template than the one just clicked. Say so instead of
+         navigating somewhere that quietly disagrees with the click. */
+      if (!stored && !SERVER_STORE) {
+        showError({{ t('The template could not be selected — this browser is not storing anything.') | tojson }});
+        b.disabled = false;
+        return;
+      }
+      window.location.href = BUILDER;
     });
-    if (res.ok) { window.location.href = '{{ url_for("main.builder") }}'; }
-    else { b.disabled = false; }
   });
-});
+})();
 </script>
 {% endblock %}
