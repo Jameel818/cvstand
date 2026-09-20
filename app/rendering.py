@@ -251,6 +251,57 @@ RTL_TYPOGRAPHY = """<style>
     font-size: 14px !important;
     font-weight: 700 !important;
   }
+
+  /* ---- the font policy's CV roles ---------------------------------------
+     The user's written policy names three faces for a CV by ROLE:
+
+         Name           Tajawal ExtraBold
+         Section title  Cairo Bold
+         Body           IBM Plex Sans Arabic, 10-12pt, line-height 1.6
+
+     ARABIC ONLY. This whole stylesheet is emitted by document_html() solely
+     for dir="rtl", so an English CV never carries a byte of it. The classes
+     it targets are inert in LTR: nothing selects them there. That is the
+     standing instruction - the policy is about Arabic type and must not move
+     an English template.
+
+     WHY THE ALIAS LAYER COULD NOT DO THIS. Arabic normally reaches the 49
+     templates through fonts_ar.css, which declares each Arabic face under a
+     LATIN family name and confines it by unicode-range. That layer keys on
+     (family, weight), so it can only express "Archivo becomes Tajawal" - not
+     "the name becomes Tajawal". Weight is not a usable proxy for role here,
+     measured across all 49: Archivo 900 is used at 25px (x30) AND at 12px
+     (x25), and Open Sans 700 is 12px in 42 of its uses. Mapping the heavy
+     weights to a display face would have put Cairo and Tajawal on bold words
+     inside paragraphs in every template. So the roles are marked in the
+     markup instead, and named here.
+
+     WHY !important. Every one of the 49 templates sets font-family in an
+     INLINE style attribute, which outranks any stylesheet rule. Nothing here
+     is !important for emphasis; it is the only declaration that reaches. The
+     inline styles carry no !important of their own, so ordinary specificity
+     still decides between the three rules below - .tpl .cv-name (0,2,0) beats
+     .tpl * (0,1,0), which is what makes the name win over the body default.
+
+     FAMILY ONLY. Size, colour, weight, tracking and layout stay exactly as
+     each template set them - that is the template's identity, and the policy
+     assigns faces, not a type scale. The one exception is leading, below. */
+  [dir="rtl"] .tpl,
+  [dir="rtl"] .tpl * {
+    font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
+  }
+  [dir="rtl"] .tpl .cv-section,
+  [dir="rtl"] .tpl .cv-section * {
+    font-family: "Cairo", "Tajawal", sans-serif !important;
+  }
+  [dir="rtl"] .tpl .cv-name,
+  [dir="rtl"] .tpl .cv-name * {
+    font-family: "Tajawal", "Cairo", sans-serif !important;
+    /* ExtraBold per the policy. Only raised where the template already set a
+       bold-or-heavier name, so a deliberately light masthead is not shouted
+       at; Tajawal has a real 800 and does not need synthesising. */
+    font-weight: 800 !important;
+  }
 </style>"""
 
 

@@ -27,7 +27,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:50px 58px 40px; font-family:Inter,sans-serif; color:#1B1B22; display:flex; flex-direction:column; gap:20px;">
 
   <div>
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.98; letter-spacing:-1.8px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.98; letter-spacing:-1.8px; text-transform:uppercase;">{{ r.name }}</div>
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
     {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
@@ -42,14 +42,14 @@
 
   {% if r.summary %}
   <div style="{{ SEC }}">
-    <div style="{{ HEAD }}">{{ t('Profile') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Profile') }}</div>
     <p style="margin:0; font-size:12.5px; line-height:1.65;">{{ r.summary }}</p>
   </div>
   {% endif %}
 
   {% if r.achievements %}
   <div style="{{ SEC }}">
-    <div style="{{ HEAD }}">{{ t('Key Achievements') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Key Achievements') }}</div>
     <div style="font-size:12px; line-height:1.8;">
       {% for a in r.achievements %}
       <div><span style="font-family:Archivo,sans-serif; font-weight:900; color:#6B2A5A;">{{ a.metric }}</span> — {{ a.label }}</div>
@@ -60,7 +60,7 @@
 
   {% if r.experience %}
   <div style="{{ SEC }}">
-    <div style="{{ HEAD }}">{{ t('Experience') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Experience') }}</div>
     <div style="display:flex; flex-direction:column; gap:12px;">
       {% for job in r.experience %}
       <div>
@@ -82,7 +82,7 @@
 
   {% if r.skills %}
   <div style="{{ SEC }}">
-    <div style="{{ HEAD }}">{{ t('Skills') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Skills') }}</div>
     <div style="display:flex; flex-direction:column; gap:7px;">
       {% for sk in r.skills %}
       {{ m.skill_bar(sk, {
@@ -102,7 +102,7 @@
   {% if r.education or r.tools or r.recognition or r.languages %}
   {% set SUB = "font-family:Archivo,sans-serif; font-weight:700; color:#6B2A5A; letter-spacing:0.4px;" %}
   <div style="{{ SEC }}">
-    <div style="{{ HEAD }}">{{ t('Education, Tools & Credentials') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Education, Tools & Credentials') }}</div>
     <div style="font-size:12px; line-height:1.7; display:flex; flex-direction:column; gap:7px;">
       {% if r.education %}
       <div>
@@ -113,9 +113,9 @@
         {% endfor %}
       </div>
       {% endif %}
-      {% if r.tools %}<div style="color:#2E2E38;"><span style="{{ SUB }}">{{ t('Tools') }}</span> &nbsp;{% for tool in r.tools %}<span style="white-space:nowrap;">{{ tool }}</span>{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
-      {% if r.recognition %}<div><span style="{{ SUB }}">{{ t('Certifications') }}</span> &nbsp;{% for rec in r.recognition %}{{ rec.title }}{% if rec.detail %} ({{ rec.detail }}){% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
-      {% if r.languages %}<div><span style="{{ SUB }}">{{ t('Languages') }}</span> &nbsp;{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+      {% if r.tools %}<div style="color:#2E2E38;"><span class="cv-section" style="{{ SUB }}">{{ t('Tools') }}</span> &nbsp;{% for tool in r.tools %}<span style="white-space:nowrap;">{{ tool }}</span>{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+      {% if r.recognition %}<div><span class="cv-section" style="{{ SUB }}">{{ t('Certifications') }}</span> &nbsp;{% for rec in r.recognition %}{{ rec.title }}{% if rec.detail %} ({{ rec.detail }}){% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
+      {% if r.languages %}<div><span class="cv-section" style="{{ SUB }}">{{ t('Languages') }}</span> &nbsp;{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>{% endif %}
     </div>
   </div>
   {% endif %}

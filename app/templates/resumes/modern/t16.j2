@@ -31,7 +31,7 @@
     {% set c = r.contact %}
     {% if c.email or c.phone or c.address or c.site or c.social %}
     <div>
-      <div style="{{ RH }}">{{ t('Contact') }}</div>
+      <div class="cv-section" style="{{ RH }}">{{ t('Contact') }}</div>
       <div style="font-size:12px; line-height:1.9; overflow-wrap:anywhere;">
         {% set parts = [] %}
         {% if c.email %}{% set _ = parts.append(c.email) %}{% endif %}
@@ -46,7 +46,7 @@
 
     {% if r.skills %}
     <div>
-      <div style="{{ RH }}">{{ t('Skills') }}</div>
+      <div class="cv-section" style="{{ RH }}">{{ t('Skills') }}</div>
       <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 18px;">
         {% for sk in r.skills %}
         {{ m.skill_ring(sk, {'size': 74, 'hole': 56, 'ring': '#A32638', 'track': '#3C3C44',
@@ -60,7 +60,7 @@
 
     {% if r.recognition %}
     <div>
-      <div style="{{ RH }}">{{ t('Certifications') }}</div>
+      <div class="cv-section" style="{{ RH }}">{{ t('Certifications') }}</div>
       <div style="font-size:12px; line-height:1.75;">
         {% for rec in r.recognition %}{{ rec.title }}{% if rec.detail %} · {{ rec.detail }}{% endif %}{% if not loop.last %}<br>{% endif %}{% endfor %}
       </div>
@@ -69,7 +69,7 @@
 
     {% if r.languages %}
     <div>
-      <div style="{{ RH }}">{{ t('Languages') }}</div>
+      <div class="cv-section" style="{{ RH }}">{{ t('Languages') }}</div>
       <div style="font-size:12px; line-height:1.85;">
         {% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}
       </div>
@@ -79,7 +79,7 @@
 
   <div style="box-sizing:border-box; flex:1; min-width:0; padding-block: 44px 34px; padding-inline: 40px 44px; display:flex; flex-direction:column; gap:34px;">
     <div>
-      <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:44px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase; color:#1C1C20;">{{ r.name }}</div>
+      <div class="cv-name" style="font-family:Montserrat,sans-serif; font-weight:800; font-size:44px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase; color:#1C1C20;">{{ r.name }}</div>
       {% if r.title %}<div style="font-size:15px; letter-spacing:3.2px; text-transform:uppercase; color:#A32638; margin-top:8px;">{{ r.title }}</div>{% endif %}
       {% if r.summary %}<div style="font-size:12.5px; line-height:1.7; color:#3C3C44; margin-top:12px;">{{ r.summary }}</div>{% endif %}
     </div>
@@ -99,7 +99,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ BH }}">{{ t('Experience') }}</div>
+      <div class="cv-section" style="{{ BH }}">{{ t('Experience') }}</div>
       <div style="display:flex; flex-direction:column; gap:18px;">
         {% for job in r.experience %}
         <div>
@@ -121,7 +121,7 @@
 
     {% if r.education %}
     <div>
-      <div style="{{ BH }}">{{ t('Education') }}</div>
+      <div class="cv-section" style="{{ BH }}">{{ t('Education') }}</div>
       <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 24px; font-size:12.5px; line-height:1.5;">
         {% for ed in r.education %}
         <div><b style="color:#1C1C20;">{{ ed.degree }}</b>{% if ed.school or ed.end %}<br><span style="color:#5C5C66;">{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}</span>{% endif %}</div>
@@ -132,7 +132,7 @@
 
     {% if r.tools %}
     <div>
-      <div style="{{ BH }}">{{ t('Tools') }}</div>
+      <div class="cv-section" style="{{ BH }}">{{ t('Tools') }}</div>
       <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px 20px; font-size:12.5px; color:#33333A;">
         {% for tool in r.tools %}<div>{{ tool }}</div>{% endfor %}
       </div>

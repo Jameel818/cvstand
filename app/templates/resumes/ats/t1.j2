@@ -9,7 +9,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 56px; display:flex; flex-direction:column; gap:25px; font-family:Archivo,sans-serif; color:#0F172A;">
 
   <div style="border-bottom:2px solid #0F172A; padding-bottom:14px;">
-    <div style="font-weight:900; font-size:44px; line-height:1; letter-spacing:-0.5px;">{{ r.name }}</div>
+    <div class="cv-name" style="font-weight:900; font-size:44px; line-height:1; letter-spacing:-0.5px;">{{ r.name }}</div>
     {% if r.title %}<div style="font-weight:700; font-size:14px; letter-spacing:2px; color:#2563EB; margin-top:9px; text-transform:uppercase;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

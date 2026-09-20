@@ -89,15 +89,47 @@ def test_the_real_text_survives_for_assistive_technology(name):
         "  fix: venv/Scripts/python tools/outline_text.py --build-hero")
 
 
-def test_the_outlines_are_hidden_from_assistive_technology():
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_the_outlines_are_hidden_from_assistive_technology(name):
     """Both halves or neither: visible text that is also announced would make a
     screen reader read the headline twice."""
-    src = _partial()
-    svgs = re.findall(r"<svg\b[^>]*>", src)
-    assert len(svgs) == len(HERO_MSGIDS), (
-        f"expected {len(HERO_MSGIDS)} outlined runs, found {len(svgs)}")
-    for tag in svgs:
+    for tag in re.findall(r"<svg\b[^>]*>", _partial(name)):
         assert 'aria-hidden="true"' in tag, f"outline not hidden from AT: {tag[:80]}"
+
+
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_there_is_one_outlined_run_per_word(name):
+    """One <svg> per WORD, not per phrase.
+
+    A phrase is a single box with a fixed aspect ratio and cannot break, so the
+    ATS heading was one 1374-unit run that overflowed a phone as soon as the
+    size was corrected. Per-word runs let the flex row wrap the way live text
+    would, and Arabic never joins across a space, so no glyph changes.
+
+    Counting WORDS is what makes this a drift test: if the copy gains or loses
+    a word and the outlines are not rebuilt, the count stops matching. That is
+    the only way anyone would notice a missing word in a wall of path data."""
+    words = sum(len(str(ui_t(t, "ar")).split()) for t, _ in OUTLINED[name])
+    runs = len(re.findall(r"<svg\b", _partial(name)))
+    assert runs == words, (
+        f"{name}: {runs} outlined runs for {words} words - the copy and the "
+        "outlines have drifted. "
+        "fix: venv/Scripts/python tools/outline_text.py --build-hero")
+
+
+@pytest.mark.parametrize("name", sorted(OUTLINED))
+def test_every_run_declares_its_em_box(name):
+    """--outline-box is how the stylesheet knows the box is taller than the em.
+
+    Without it, `height: 1em` squeezes a 1.25em box into 1em and every outlined
+    headline renders at 0.80em - which is what shipped, measured in the browser
+    as 57.6px asked for and 46.1px painted. app.css falls back to 1, so a run
+    that loses this attribute does not break the page; it silently goes back to
+    being 20% small. That is why it is a test and not a reviewer's eye."""
+    for tag in re.findall(r"<svg\b[^>]*>", _partial(name)):
+        assert "--outline-box:" in tag, (
+            f"{name}: a run carries no --outline-box, so it renders at 1/1.25 "
+            f"of the size asked for: {tag[:90]}")
 
 
 def test_the_accent_run_keeps_the_brand_colour():

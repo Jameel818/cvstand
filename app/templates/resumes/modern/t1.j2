@@ -9,7 +9,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:64px 60px 56px; font-family:'Source Sans 3',sans-serif; color:#16161A; display:flex; flex-direction:column; gap:21px;">
 
   <div>
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:64px; line-height:0.94; letter-spacing:-2.2px; text-transform:uppercase;">{{ name_parts[0] }}{% if name_parts|length > 1 %}<br>{{ name_parts[1] }}{% endif %}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:64px; line-height:0.94; letter-spacing:-2.2px; text-transform:uppercase;">{{ name_parts[0] }}{% if name_parts|length > 1 %}<br>{{ name_parts[1] }}{% endif %}</div>
     {% if r.summary %}
     <div style="font-size:16px; line-height:1.6; color:#3A3A42; margin-top:14px; max-width:560px;">
       {%- if r.summary_highlight and r.summary_highlight in r.summary -%}
@@ -29,7 +29,7 @@
     <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:32px;">
       {% if r.experience %}
       <div>
-        <div style="{{ H }} margin-bottom:14px;">{{ t('Experience') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:14px;">{{ t('Experience') }}</div>
         <div style="display:flex; flex-direction:column; gap:20px;">
           {% for job in r.experience %}
           {{ m.experience_entry(job) }}
@@ -40,7 +40,7 @@
 
       {% if r.recognition %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Recognition') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Recognition') }}</div>
         <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px; line-height:1.5;">
           {% for rec in r.recognition %}
           <div><b>{{ rec.title }}</b>{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>
@@ -51,7 +51,7 @@
 
       {% if r.education %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Education') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Education') }}</div>
         <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.5;">
           {% for ed in r.education %}
           {{ m.education_entry(ed) }}
@@ -64,14 +64,14 @@
     <div style="width:236px; flex-shrink:0; border-inline-start:1px solid #D6D6DA; padding-inline-start:30px; display:flex; flex-direction:column; gap:51px;">
       {% if r.contact and (r.contact.email or r.contact.phone or r.contact.address or r.contact.site or r.contact.social) %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Contact') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Contact') }}</div>
         {{ m.contact_lines(r.contact) }}
       </div>
       {% endif %}
 
       {% if r.skills %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Capabilities') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Capabilities') }}</div>
         <div style="display:flex; flex-direction:column; gap:11px;">
           {% for sk in r.skills %}
           {{ m.skill_dotrow(sk) }}
@@ -82,7 +82,7 @@
 
       {% if r.tools %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Tools') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Tools') }}</div>
         <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px 14px; font-size:12px; color:#3A3A42;">
           {% for tool in r.tools %}<div>{{ tool }}</div>{% endfor %}
         </div>
@@ -91,7 +91,7 @@
 
       {% if r.languages %}
       <div>
-        <div style="{{ H }} margin-bottom:12px;">{{ t('Languages') }}</div>
+        <div class="cv-section" style="{{ H }} margin-bottom:12px;">{{ t('Languages') }}</div>
         <div style="font-size:12.5px; line-height:1.7; color:#3A3A42;">
           {% for lang in r.languages %}{{ lang.name }} — {{ lang.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}
         </div>

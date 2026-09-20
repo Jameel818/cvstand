@@ -32,14 +32,14 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#f7f7f5; overflow:hidden; padding:44px 46px; display:flex; flex-direction:column; gap:20px; font-family:Inter,sans-serif; color:#111111;">
 
   <div style="display:flex; align-items:baseline; justify-content:space-between; gap:20px;">
-    <div style="font-family:Anton,sans-serif; font-weight:400; font-size:66px; color:#111111; letter-spacing:0.5px; line-height:0.9; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Anton,sans-serif; font-weight:400; font-size:66px; color:#111111; letter-spacing:0.5px; line-height:0.9; text-transform:uppercase;">{{ r.name }}</div>
     {# `white-space:nowrap` here meant the headline could NEVER wrap: an ordinary 50-character title ran 39px past the 850px canvas (65px in Arabic) and the canvas is overflow:hidden, so it was simply gone from the PDF with nothing raised. Measured 2026-09-09, tools/verify_overflow.py. The name beside it is the masthead and keeps the row; the title wraps instead of escaping. #}
     {% if r.title %}<div style="font-family:Anton,sans-serif; font-weight:400; font-size:24px; color:#111111; letter-spacing:1px; text-transform:uppercase; text-align:end;">{{ r.title }}</div>{% endif %}
   </div>
 
   {% if r.summary %}
   <div style="display:flex; align-items:center; gap:18px;">
-    <span style="{{ AH }} font-size:32px;">{{ t('ABOUT ME') }}</span>
+    <span class="cv-section" style="{{ AH }} font-size:32px;">{{ t('ABOUT ME') }}</span>
     <div style="flex:1; height:2px; background:#111111;"></div>
   </div>
   <p style="font-size:12.5px; color:#222222; line-height:1.75; margin:0; text-align:justify;">{{ r.summary }}</p>
@@ -60,10 +60,10 @@
 
   <div style="{{ PAIR }}">
     <div style="flex:1; display:flex; align-items:center; gap:16px;">
-      <span style="{{ AH }}">{{ t('WORK EXPERIENCE') }}</span>
+      <span class="cv-section" style="{{ AH }}">{{ t('WORK EXPERIENCE') }}</span>
       <div style="flex:1; height:2px; background:#111111;"></div>
     </div>
-    <div style="{{ SIDECOL }} text-align:end;"><span style="{{ AH }}">{{ t('CONTACT') }}</span></div>
+    <div style="{{ SIDECOL }} text-align:end;"><span class="cv-section" style="{{ AH }}">{{ t('CONTACT') }}</span></div>
   </div>
 
   <div style="display:flex; gap:28px; align-items:flex-start;">
@@ -90,7 +90,7 @@
   <div style="{{ PAIR }} flex:1; min-height:0; align-items:flex-start;">
     <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:12px;">
       <div style="display:flex; align-items:center; gap:16px;">
-        <span style="{{ AH }}">{{ t('EDUCATIONAL HISTORY') }}</span>
+        <span class="cv-section" style="{{ AH }}">{{ t('EDUCATIONAL HISTORY') }}</span>
         <div style="flex:1; height:2px; background:#111111;"></div>
       </div>
       {% if r.education %}
@@ -108,7 +108,7 @@
     </div>
 
     <div style="{{ SIDECOL }} display:flex; flex-direction:column; gap:12px;">
-      <div style="text-align:end;"><span style="{{ AH }}">{{ t('SKILLS') }}</span></div>
+      <div style="text-align:end;"><span class="cv-section" style="{{ AH }}">{{ t('SKILLS') }}</span></div>
       {% if r.skills %}
       <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 6px; align-content:start; justify-items:center;">
         {% for sk in r.skills %}

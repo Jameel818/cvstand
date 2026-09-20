@@ -27,7 +27,7 @@
   </div>
 
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:0; top:70px; width:483px; background:#B93E12; color:#ffffff; padding-block: 22px 24px; padding-inline: 50px 34px;">
-    <div style="font-family:Anton,sans-serif; font-size:38px; letter-spacing:5px; text-transform:uppercase; line-height:1.1;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Anton,sans-serif; font-size:38px; letter-spacing:5px; text-transform:uppercase; line-height:1.1;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:18px; color:#F6DDD3; margin-top:2px;">{{ r.title }}</div>{% endif %}
     {% if r.summary %}<p style="margin:14px 0 0; font-size:12.5px; line-height:1.55; text-align:justify; color:#FBE9E2;">{{ r.summary }}</p>{% endif %}
   </div>
@@ -35,7 +35,7 @@
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:0; top:360px; width:383px; bottom:24px; display:flex; flex-direction:column; gap:13px;">
     {% set c = r.contact %}
     {% if c.phone or c.email or c.address or c.site or c.social %}
-    <div style="{{ FLAG }}">{{ t('Contact') }}</div>
+    <div class="cv-section" style="{{ FLAG }}">{{ t('Contact') }}</div>
     <div style="padding-block: 0 0; padding-inline: 78px 24px; display:flex; flex-direction:column; gap:10px; font-size:12.5px;">
       {% if c.phone %}<div><div style="font-size:9.5px; letter-spacing:1.6px; font-weight:700; text-transform:uppercase; color:#B93E12;">{{ t('Phone') }}</div><div>{{ c.phone }}</div></div>{% endif %}
       {% if c.email %}<div><div style="font-size:9.5px; letter-spacing:1.6px; font-weight:700; text-transform:uppercase; color:#B93E12;">{{ t('Email') }}</div><div style="overflow-wrap:anywhere;">{{ c.email }}</div></div>{% endif %}
@@ -45,7 +45,7 @@
     {% endif %}
 
     {% if r.skills %}
-    <div style="{{ FLAG }}">{{ t('Skills') }}</div>
+    <div class="cv-section" style="{{ FLAG }}">{{ t('Skills') }}</div>
     <div style="padding-block: 0 0; padding-inline: 78px 24px; display:flex; flex-direction:column; gap:9px;">
       {% for sk in r.skills %}
       <div>
@@ -67,7 +67,7 @@
     {% endif %}
 
     {% if r.languages %}
-    <div style="{{ FLAG }}">{{ t('Languages') }}</div>
+    <div class="cv-section" style="{{ FLAG }}">{{ t('Languages') }}</div>
     <div style="padding-block: 0 0; padding-inline: 78px 24px; font-size:12.5px; line-height:1.7;">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
     {% endif %}
   </div>
@@ -75,7 +75,7 @@
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:366px; top:346px; inset-inline-end:0; bottom:24px; padding-block: 0 0; padding-inline: 44px 40px; display:flex; flex-direction:column; gap:16px;">
     {% if r.education %}
     <div>
-      <div style="{{ NAVY_H }}">{{ t('Education') }}</div>
+      <div class="cv-section" style="{{ NAVY_H }}">{{ t('Education') }}</div>
       <div style="height:1px; background:#8A8A93; margin:9px 0 14px;"></div>
       <div style="border-inline-start:1px solid #8A8A93; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
         {% for ed in r.education %}
@@ -97,7 +97,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ NAVY_H }}">{{ t('Experience') }}</div>
+      <div class="cv-section" style="{{ NAVY_H }}">{{ t('Experience') }}</div>
       <div style="height:1px; background:#8A8A93; margin:9px 0 14px;"></div>
       <div style="border-inline-start:1px solid #8A8A93; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
         {% for job in r.experience %}
@@ -123,7 +123,7 @@
       <div style="height:1px; background:#8A8A93; margin:9px 0 12px;"></div>
       <div style="font-size:12px; line-height:1.55; color:#CFCFD5;">
         {% for rec in r.recognition %}<div><b style="color:#ffffff;">{{ rec.title }}</b>{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
-        {% if r.tools %}<div style="margin-top:{{ '6px' if r.recognition else '0' }};">{% if r.recognition %}<b style="color:#ffffff;">{{ t('Tools') }}</b> — {% endif %}{{ r.tools | join(" · ") }}</div>{% endif %}
+        {% if r.tools %}<div style="margin-top:{{ '6px' if r.recognition else '0' }};">{% if r.recognition %}<b class="cv-section" style="color:#ffffff;">{{ t('Tools') }}</b> — {% endif %}{{ r.tools | join(" · ") }}</div>{% endif %}
       </div>
     </div>
     {% endif %}

@@ -25,7 +25,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:52px 56px 44px; font-family:Inter,sans-serif; color:#1B1B22; display:flex; flex-direction:column; gap:22px;">
 
   <div>
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:46px; line-height:1.0; letter-spacing:-1.6px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:46px; line-height:1.0; letter-spacing:-1.6px; text-transform:uppercase;">{{ r.name }}</div>
     <div style="display:flex; justify-content:space-between; align-items:baseline; gap:24px; border-top:2px solid #1B1B22; margin-top:14px; padding-top:11px;">
       {% if r.title %}<span style="font-size:13.5px; letter-spacing:3.2px; text-transform:uppercase; color:#6B2A5A;">{{ r.title }}</span>{% endif %}
       {% set c = r.contact %}
@@ -56,14 +56,14 @@
 
     {% if r.summary %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Profile') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Profile') }}</div>
       <div style="flex:1; min-width:0; font-size:12.5px; line-height:1.7; color:#2E2E38;">{{ r.summary }}</div>
     </div>
     {% endif %}
 
     {% if r.experience %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Experience') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Experience') }}</div>
       <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:16px;">
         {% for job in r.experience %}
         <div>
@@ -85,7 +85,7 @@
 
     {% if r.skills %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Skills') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Skills') }}</div>
       <div style="flex:1; min-width:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px 34px;">
         {% for sk in r.skills %}
         {{ m.skill_bar(sk, {'stacked': True, 'track': '#E4E2E7', 'fill': '#6B2A5A',
@@ -99,7 +99,7 @@
 
     {% if r.tools %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Tooling') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Tooling') }}</div>
       <div style="flex:1; min-width:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px 24px; font-size:12.5px; color:#2E2E38;">
         {% for tool in r.tools %}<div>{{ tool }}</div>{% endfor %}
       </div>
@@ -108,7 +108,7 @@
 
     {% if r.education %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Education') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Education') }}</div>
       <div style="flex:1; min-width:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 34px; font-size:12.5px; line-height:1.5;">
         {% for ed in r.education %}
         <div><b>{{ ed.degree }}</b>{% if ed.school or ed.end %}<br><span style="color:#5A5A64;">{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}</span>{% endif %}</div>
@@ -119,7 +119,7 @@
 
     {% if r.languages %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Languages') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Languages') }}</div>
       <div style="flex:1; min-width:0; font-size:12.5px; color:#2E2E38; line-height:1.6;">
         {% for l in r.languages %}{{ l.name }} <span style="color:#6B2A5A; font-weight:600;">{{ l.level }}</span>{% if not loop.last %} &nbsp;·&nbsp; {% endif %}{% endfor %}
       </div>
@@ -128,7 +128,7 @@
 
     {% if r.recognition %}
     <div style="{{ ROW }}">
-      <div style="{{ GUT }}">{{ t('Certifications') }}</div>
+      <div class="cv-section" style="{{ GUT }}">{{ t('Certifications') }}</div>
       <div style="flex:1; min-width:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 34px; font-size:12.5px; line-height:1.5;">
         {% for rec in r.recognition %}
         <div><b>{{ rec.title }}</b>{% if rec.detail %}<br><span style="color:#5A5A64;">{{ rec.detail }}</span>{% endif %}</div>

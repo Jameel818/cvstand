@@ -18,7 +18,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:50px 60px 44px; font-family:'Source Sans 3',sans-serif; color:#16161A; display:flex; flex-direction:column; gap:15px;">
 
   <div style="border-bottom:1px solid #16161A; padding-bottom:14px;">
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.96; letter-spacing:-1.8px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; line-height:0.96; letter-spacing:-1.8px; text-transform:uppercase;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:14px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#5C5C66; margin-top:10px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
@@ -31,7 +31,7 @@
 
   {% if r.summary %}
   <div>
-    <div style="{{ H }}">{{ t('Summary') }}</div>
+    <div class="cv-section" style="{{ H }}">{{ t('Summary') }}</div>
     <p style="margin:0; font-size:12.5px; line-height:1.65;">
       {%- if r.summary_highlight and r.summary_highlight in r.summary -%}
         {%- set around = r.summary.split(r.summary_highlight, 1) -%}
@@ -45,7 +45,7 @@
 
   {% if r.achievements %}
   <div>
-    <div style="{{ H }}">{{ t('Key Achievements') }}</div>
+    <div class="cv-section" style="{{ H }}">{{ t('Key Achievements') }}</div>
     <div style="font-size:12px; line-height:1.8;">
       {% for a in r.achievements %}
       <div><span style="font-family:Archivo,sans-serif; font-weight:900;">{{ a.metric }}</span> — {{ a.label }}</div>
@@ -56,7 +56,7 @@
 
   {% if r.experience %}
   <div>
-    <div style="{{ H }}">{{ t('Experience') }}</div>
+    <div class="cv-section" style="{{ H }}">{{ t('Experience') }}</div>
     <div style="display:flex; flex-direction:column; gap:12px;">
       {% for job in r.experience %}
       <div>
@@ -78,7 +78,7 @@
 
   {% if r.skills %}
   <div>
-    <div style="{{ H }}">{{ t('Capabilities') }}</div>
+    <div class="cv-section" style="{{ H }}">{{ t('Capabilities') }}</div>
     <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
       {% for sk in r.skills %}
       <div style="display:flex; align-items:center; gap:14px;">
@@ -103,7 +103,7 @@
 
   {% if r.tools %}
   <div>
-    <div style="{{ H }}">{{ t('Tools') }}</div>
+    <div class="cv-section" style="{{ H }}">{{ t('Tools') }}</div>
     <p style="margin:0; font-size:12px; line-height:1.7; color:#3A3A42;">{% for tool in r.tools %}<span style="white-space:nowrap;">{{ tool }}</span>{% if not loop.last %} · {% endif %}{% endfor %}</p>
   </div>
   {% endif %}

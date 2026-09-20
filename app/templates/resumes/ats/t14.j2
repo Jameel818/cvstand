@@ -18,12 +18,12 @@
 {% set ns = namespace(n=0) %}
 {% macro sec(label) %}
 {% set ns.n = ns.n + 1 %}
-<div style="display:flex; align-items:baseline; gap:11px; margin-bottom:8px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">{{ '%02d' % ns.n }}</span><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">{{ label }}</span></div>
+<div style="display:flex; align-items:baseline; gap:11px; margin-bottom:8px;"><span style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:19px; color:#B93E12;">{{ '%02d' % ns.n }}</span><span class="cv-section" style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:14px; letter-spacing:2.4px; text-transform:uppercase;">{{ label }}</span></div>
 {% endmacro %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 64px; display:flex; flex-direction:column; gap:16px; font-family:'Source Sans 3',sans-serif; color:#181614;">
 
   <div>
-    <div style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:46px; line-height:1.02; letter-spacing:-0.4px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:'Archivo Narrow',sans-serif; font-weight:700; font-size:46px; line-height:1.02; letter-spacing:-0.4px; text-transform:uppercase;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:13.5px; font-weight:600; letter-spacing:3.4px; text-transform:uppercase; color:#B93E12; margin-top:8px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

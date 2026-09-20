@@ -115,7 +115,33 @@ def outline(text: str, family: str = "serif-display", size: int = 100) -> dict:
         "width": x,
         "ascent": hhea.ascent * scale,
         "descent": abs(hhea.descent) * scale,
+        # The em square itself. The SVG box is ascent+descent, which is TALLER
+        # than the em (1.25x for this face), so a call site that sets the box
+        # to 1em renders the type at 1/1.25 = 0.8em. Reported here so the size
+        # can be expressed against the em, the way font-size is.
+        "em": float(size),
     }
+
+
+def space_advance(family: str = "serif-display", size: int = 100) -> float:
+    """The font's own word space, in `size` units.
+
+    The runs are laid out by CSS, so the gap between them has to be the space
+    the FONT would have drawn. A hand-picked gap is a guess that goes wrong on
+    the first headline with a different word count."""
+    import uharfbuzz as hb
+
+    face = hb.Face(_font_path(family).read_bytes())
+    font = hb.Font(face)
+    font.scale = (size * 64, size * 64)
+    hb.ot_font_set_funcs(font)
+    buf = hb.Buffer()
+    buf.add_str("ا ا")          # alef SPACE alef - a real shaped space
+    buf.direction, buf.script, buf.language = "rtl", "Arab", "ar"
+    hb.shape(font, buf)
+    adv = [p.x_advance / 64 for p in buf.glyph_positions]
+    # middle glyph is the space
+    return adv[1] if len(adv) == 3 else size * 0.25
 
 
 def svg(text: str, family: str = "serif-display", size: int = 100,
@@ -128,9 +154,15 @@ def svg(text: str, family: str = "serif-display", size: int = 100,
     o = outline(text, family, size)
     h = o["ascent"] + o["descent"]
     body = "".join(o["parts"])
+    # --outline-box is the box's height in EMS. CSS multiplies 1em by it, so
+    # the EM SQUARE ends up equal to the font-size and the outlines match the
+    # size that live text at the same font-size would have been. Emitted per
+    # run rather than hardcoded in the stylesheet because it is a property of
+    # the FACE (ascent+descent over upem) and would silently go stale.
     return (
         f'<svg class="outlined" viewBox="0 0 {o["width"]:.2f} {h:.2f}" '
         f'width="{o["width"]:.2f}" height="{h:.2f}" fill="{fill}" '
+        f'style="--outline-box:{h / o["em"]:.4f}" '
         f'role="img" aria-hidden="true" focusable="false" '
         f'xmlns="http://www.w3.org/2000/svg">'
         f'<g transform="translate(0,{o["ascent"]:.2f})">{body}</g></svg>'
@@ -185,11 +217,19 @@ def _build_one(name: str, parts: list[tuple[str, bool]]) -> tuple[int, str]:
         '<span class="sr-only">',
         "  " + " ".join(arabic),
         "</span>",
-        '<span class="hero-outlined" aria-hidden="true">',
+        f'<span class="hero-outlined" aria-hidden="true"'
+        f' style="--outline-space:{space_advance("serif-display", 100) / 100:.4f}">',
     ]
+    # ONE RUN PER WORD, not one per phrase. A phrase is a single <svg> with a
+    # fixed aspect ratio: it cannot break, so "قوالب متوافقة مع أنظمة التوظيف" was
+    # one 1374-unit box that overflowed a phone the moment the size was
+    # corrected. Arabic words are independent shaping units - letters never
+    # join across a space - so splitting on spaces changes no glyph, and the
+    # flex row can then wrap the way live text would.
     for (_text, is_accent), ar in zip(parts, arabic):
-        out.append("  " + svg(ar, "serif-display", 100,
-                              "var(--brand)" if is_accent else "currentColor"))
+        fill = "var(--brand)" if is_accent else "currentColor"
+        for word in ar.split():
+            out.append("  " + svg(word, "serif-display", 100, fill))
     out.append("</span>")
     path = TEMPLATES / name
     path.write_text("\n".join(out) + "\n", encoding="utf-8")

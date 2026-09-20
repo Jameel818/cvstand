@@ -40,6 +40,9 @@
   --font-heading: var(--font-ui);
   --font-body: var(--font-ui);
   --font-cta: var(--font-ui);
+  /* The policy names a face for site NAVIGATION separately from body copy.
+     In English it is the same family, so this moves nothing. */
+  --font-nav: var(--font-ui);
   --leading-body: 1.6;
 
   /* shape */
@@ -629,22 +632,52 @@ html { overflow-x: hidden; }
   --font-heading: "Cairo", "Tajawal", var(--font-ui);
   --font-body: "IBM Plex Sans Arabic", "Tajawal", var(--font-ui);
   --font-cta: "Tajawal", "IBM Plex Sans Arabic", var(--font-ui);
+  /* The policy asks for Thmanyah Sans on site navigation. It cannot ship as a
+     font file (FONTS.md), and Cairo is its recorded stand-in: the two measured
+     nearly metric-compatible, 232.5 vs 230.4 wide and 94 vs 99 ink. So the nav
+     gets the face the policy's own fallback chain points at, not body copy. */
+  --font-nav: "Cairo", "Tajawal", var(--font-ui);
   /* 1.9 per the policy: Arabic ascenders and descenders need more room than
      the 1.6 Latin is set at, and dense Arabic body copy is the case it is for. */
   --leading-body: 1.9;
 }
 
-/* The outlined Arabic hero. Each run is an <svg> whose viewBox was measured at
-   font-size:100, so `height: 1em` makes it scale with whatever the h1's
-   font-size already is — the headline stays responsive without a second set of
-   breakpoints. `width:auto` keeps the aspect ratio the shaper produced. */
+/* The outlined Arabic hero.
+   SIZE THE EM SQUARE, NOT THE BOX. Each run's viewBox is the face's
+   ascent+descent, which for Thmanyah Serif Display is 1.25x the em — so
+   `height: 1em` was squeezing a 1.25em box into 1em and rendering every
+   outlined headline at 0.80em. Measured in the browser before the fix: the
+   landing h1 asked for 57.6px and painted a 46.1px em; the gallery asked for
+   41.6px and painted 33.3px. Both are exactly 0.80.
+
+   `--outline-box` is written onto each <svg> by tools/outline_text.py as the
+   box height in ems. Multiplying 1em by it makes the EM equal the font-size,
+   which is what live text at that font-size would have done. It is emitted
+   per run because it is a property of the FACE, and a number hardcoded here
+   would go stale the first time the typeface changed, silently and by 25%.
+
+   No extra leading: the glyphs' own ascent and descent are already inside the
+   box, so a margin here would double-count them.
+
+   THE SIZE IS THEN CORRECT WITH NO FUDGE FACTOR. Measured against the live
+   Arabic beside it, Thmanyah's x-height (medial heh, the letter with no dots,
+   ascender or descender) is 0.695em, against Cairo 0.770 and Tajawal 0.560 —
+   it sits between the faces the shell already uses. Against Latin it is 0.695
+   to Inter's 0.730 CAP height, and a display headline reads by its caps, so
+   the Arabic h1 wants the SAME clamp() as the English one — which is what it
+   already had. The headline looked wrong because of the 0.80, not the scale. */
 .hero-ar { display: block; }
 .hero-outlined { display: flex; flex-wrap: wrap; align-items: baseline;
-                 gap: 0 0.28em; justify-content: flex-start; }
-.hero-outlined svg { height: 1em; width: auto; display: block;
-                     /* The glyphs' own ascent/descent are inside the viewBox,
-                        so no extra leading is needed or wanted. */
-                     margin-block: 0.06em; }
+                 /* The font's own word space, measured by the shaper and
+                    written onto the wrapper — a hand-picked gap is a guess
+                    that breaks on the next headline with a different rhythm. */
+                 gap: 0 calc(var(--outline-space, .25) * 1em);
+                 justify-content: flex-start; }
+.hero-outlined svg { height: calc(var(--outline-box, 1) * 1em); width: auto;
+                     display: block;
+                     /* Last-resort guard: a single word wider than the column
+                        scales to fit instead of pushing the page sideways. */
+                     max-width: 100%; }
 
 [dir="rtl"] body { font-family: var(--font-body); }
 
@@ -660,12 +693,57 @@ html { overflow-x: hidden; }
    that range, so these weights finally mean what they say. While it was pinned
    at `font-weight: 900` every heading rendered Black no matter what was asked
    for — which is why they looked oversized. 700 is what the policy specifies. */
-[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3 {
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
   font-family: var(--font-heading); font-weight: 700;
 }
 [dir="rtl"] .hero h1 { font-family: var(--font-hero); font-weight: 800; }
-[dir="rtl"] .btn, [dir="rtl"] button { font-family: var(--font-cta); font-weight: 700; }
+
+/* HEADING-ROLE SURFACES THAT ARE NOT <h*>. The policy assigns faces by ROLE,
+   and h1-h4 is not the same set as "things that read as headings". These were
+   all inheriting body copy from `body`, so the audit showed IBM Plex Sans
+   Arabic where the policy asks for Cairo:
+
+     .eyebrow      the kicker above a section title - part of the heading
+     .stat-strip b the big numerals, and .num beside them - display figures
+     .faq summary  the question, which is the heading of its answer
+
+   English is unaffected: --font-heading resolves to --font-ui there. */
+[dir="rtl"] .eyebrow,
+[dir="rtl"] .stat-strip b,
+[dir="rtl"] .num,
+[dir="rtl"] .faq summary { font-family: var(--font-heading); }
+
+/* NAVIGATION. Its own role in the policy, and it was falling through to body. */
+[dir="rtl"] .site-nav a,
+[dir="rtl"] .footer-cols a,
+[dir="rtl"] .lang-switch a { font-family: var(--font-nav); }
+
+/* CTA. The policy says Tajawal ExtraBold, and this shipped at 700.
+   Scoped to `.btn` -- the button COMPONENT -- rather than every <button>:
+   `button.x` is a 22px close glyph and `button.rm` a remove control, and
+   ExtraBold on those is weight where no call to action exists. */
+[dir="rtl"] .btn { font-family: var(--font-cta); font-weight: 800; }
+[dir="rtl"] button { font-family: var(--font-cta); }
+
+/* The gallery tabs are controls that happen not to be <button>s. They sat on
+   body copy while the buttons beside them were on the CTA face. */
+[dir="rtl"] .tab { font-family: var(--font-cta); font-weight: 700; }
+
+/* CHIPS DECLARE THEIR OWN FACE, because inheritance made them TWO faces.
+   `[dir=rtl] button` sets the CTA family on every descendant, so the same
+   .chip-modern rendered in Tajawal inside the drawer's button and in IBM Plex
+   Sans Arabic on the landing page's card. Measured, not guessed: the audit
+   listed `span.chip.chip-modern` twice, under two different families. A label
+   is body copy wherever it happens to sit. */
+[dir="rtl"] .chip { font-family: var(--font-body); }
+
 [dir="rtl"] table, [dir="rtl"] .tpl-meta { font-family: var(--font-body); font-weight: 500; }
+
+/* Form controls inherit nothing from `body` (see the base rule above), so in
+   Arabic they need the body face named for them as well. */
+[dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea {
+  font-family: var(--font-body);
+}
 
 /* ---------------------------------------------------------------------------
    RTL. Every directional rule above is logical, so the interface mirrors on

@@ -189,7 +189,7 @@
 {# --- section head with a trailing hairline rule ------------------- #}
 {% macro rule_head(title, opts={}) %}
   <div style="display:flex; align-items:center; gap:{{ opts.get('gap') or 14 }}px; margin-bottom:{{ opts.get('mb') or 10 }}px;">
-    <span style="{{ opts.get('label_css') or 'font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;' }}">{{ title }}</span>
+    <span class="cv-section" style="{{ opts.get('label_css') or 'font-weight:900; font-size:14px; letter-spacing:2.5px; color:#0F172A;' }}">{{ title }}</span>
     <div style="flex:1; height:1px; background:{{ opts.get('rule') or '#64748B' }};"></div>
   </div>
 {% endmacro %}

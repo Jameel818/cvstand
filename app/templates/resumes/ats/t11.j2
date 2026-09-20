@@ -14,12 +14,12 @@
      4. Ref ends Summary / KeyAch / Exp / Skills / Edu+Certs / Languages; Tools,
         when present, is added as its own tick section in the same rhythm. #}
 {% macro tick(label) %}
-<div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">{{ label }}</span></div>
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="width:22px; height:4px; background:#0F766E;"></span><span class="cv-section" style="font-family:Montserrat,sans-serif; font-weight:800; font-size:12.5px; letter-spacing:2.6px; text-transform:uppercase;">{{ label }}</span></div>
 {% endmacro %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:18px; font-family:'Open Sans',sans-serif; color:#14201E;">
 
   <div>
-    <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:38px; line-height:1.08; letter-spacing:-0.6px;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Montserrat,sans-serif; font-weight:800; font-size:38px; line-height:1.08; letter-spacing:-0.6px;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:13.5px; font-weight:600; letter-spacing:3.2px; text-transform:uppercase; color:#0F766E; margin-top:8px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

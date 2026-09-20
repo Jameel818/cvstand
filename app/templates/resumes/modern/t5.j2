@@ -40,17 +40,17 @@
     {% if c.site %}{% set _ = cl.append(c.site) %}{% endif %}
     {% for s in c.social %}{% if s.label %}{% set _ = cl.append(s.label) %}{% endif %}{% endfor %}
     {% if cl %}
-    <div style="{{ WHITE_PILL }}">{{ t('Contact') }}</div>
+    <div class="cv-section" style="{{ WHITE_PILL }}">{{ t('Contact') }}</div>
     <div style="font-size:12.5px; line-height:1.7; padding-inline-start:6px; overflow-wrap:anywhere;">{{ cl | br_join }}</div>
     {% endif %}
 
     {% if r.summary %}
-    <div style="{{ WHITE_PILL }}">{{ t('SUMMARY') }}</div>
+    <div class="cv-section" style="{{ WHITE_PILL }}">{{ t('SUMMARY') }}</div>
     <p style="font-size:12px; line-height:1.6; margin:0 6px;">{{ r.summary }}</p>
     {% endif %}
 
     {% if r.education %}
-    <div style="{{ DARK_PILL_SM }}">{{ t('EDUCATION') }}</div>
+    <div class="cv-section" style="{{ DARK_PILL_SM }}">{{ t('EDUCATION') }}</div>
     <div style="display:flex; flex-direction:column; gap:10px;">
       {% for ed in r.education %}
       <div style="background:#e6e8ec; color:#1a1a1a; border-radius:12px; padding:12px 14px; display:flex; gap:12px; font-size:11.5px;">
@@ -67,7 +67,7 @@
     {% endif %}
 
     {% if r.languages %}
-    <div style="{{ DARK_PILL_SM }}">{{ t('LANGUAGES') }}</div>
+    <div class="cv-section" style="{{ DARK_PILL_SM }}">{{ t('LANGUAGES') }}</div>
     <div style="font-size:12px; line-height:1.7; padding-inline-start:6px;">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
     {% endif %}
 
@@ -77,7 +77,7 @@
 
     <div style="padding:8px 6px 0;">
       {% set nm = r.name.split(" ", 1) %}
-      <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; color:#1a1a1a; letter-spacing:-1px; line-height:0.95; text-transform:uppercase;">{{ nm[0] }}{% if nm|length > 1 %}<br>{{ nm[1] }}{% endif %}</div>
+      <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:52px; color:#1a1a1a; letter-spacing:-1px; line-height:0.95; text-transform:uppercase;">{{ nm[0] }}{% if nm|length > 1 %}<br>{{ nm[1] }}{% endif %}</div>
       {% if r.title %}<div style="font-size:18px; color:#333; margin-top:8px; letter-spacing:1px;">{{ r.title }}</div>{% endif %}
     </div>
 
@@ -93,7 +93,7 @@
     {% endif %}
 
     {% if r.experience %}
-    <div style="{{ DARK_PILL }}">{{ t('PROFESSIONAL EXPERIENCE') }}</div>
+    <div class="cv-section" style="{{ DARK_PILL }}">{{ t('PROFESSIONAL EXPERIENCE') }}</div>
     <div style="padding:0 6px; display:flex; flex-direction:column; gap:12px;">
       {% for job in r.experience %}
       <div style="display:flex; gap:16px;">
@@ -114,7 +114,7 @@
     {% endif %}
 
     {% if r.skills %}
-    <div style="{{ DARK_PILL }}">{{ t('CREATIVE & TECHNICAL SKILLS') }}</div>
+    <div class="cv-section" style="{{ DARK_PILL }}">{{ t('CREATIVE & TECHNICAL SKILLS') }}</div>
     <div style="display:grid; grid-template-columns:repeat(3,1fr); padding:6px 4px 0; border-top:1px solid #d9d9d9; border-inline-start:1px solid #d9d9d9;">
       {% for sk in r.skills %}
       {% set _pc = sk.get('percent') %}
@@ -139,7 +139,7 @@
     {% endif %}
 
     {% if r.recognition %}
-    <div style="{{ DARK_PILL }}">{{ t('CERTIFICATIONS') }}</div>
+    <div class="cv-section" style="{{ DARK_PILL }}">{{ t('CERTIFICATIONS') }}</div>
     <div style="padding:0 6px; display:flex; flex-direction:column; gap:6px; font-size:12px; color:#333;">
       {% for rec in r.recognition %}
       <div><b>{{ rec.title }}</b>{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>

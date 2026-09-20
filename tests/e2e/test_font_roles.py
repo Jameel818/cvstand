@@ -118,20 +118,70 @@ def test_the_arabic_stylesheet_is_not_sent_to_english_readers(page, live_server)
         f"the Arabic page did not link fonts_ar_shell.css: {links}")
 
 
-def test_the_resume_templates_are_not_affected(page, live_server):
-    """Scope boundary. The policy's roles are INTERFACE roles; the 49 templates
-    are locked designs with their own pixel and HTML gates, and their Arabic
-    already resolves through the unicode-range aliases in fonts_ar.css. A
-    preview is a separate document in an iframe, so `[dir=rtl]` on the shell
-    cannot reach it — this asserts that rather than assuming it."""
+def test_an_english_resume_keeps_its_own_latin_face(page, live_server):
+    """THE SCOPE BOUNDARY, and the half that matters.
+
+    The font policy is about Arabic type. An English CV must render exactly the
+    family its template declares -- modern-t2 says Archivo -- with no Arabic
+    face anywhere, even while the INTERFACE around it is Arabic. The preview is
+    a separate document in an iframe, so `[dir=rtl]` on the shell cannot reach
+    it; this asserts that rather than assuming it."""
+    page.context.clear_cookies()
+    page.context.add_cookies([{"name": "ui_lang", "value": "en",
+                               "domain": "127.0.0.1", "path": "/"}])
+    page.goto(f"{live_server.url}/preview?template_key=modern-t2&showcase=1",
+              wait_until="networkidle")
+    page.wait_for_timeout(600)
+    got = page.evaluate("""() => {
+      const f = el => el ? getComputedStyle(el).fontFamily : null;
+      return {tpl: f(document.querySelector('.tpl')),
+              name: f(document.querySelector('.cv-name')),
+              sec: f(document.querySelector('.cv-section'))};
+    }""")
+    assert "Archivo" in got["tpl"], (
+        f"modern-t2 should declare Archivo in English, got {got['tpl']!r}")
+    for role in ("tpl", "name", "sec"):
+        if got[role]:
+            for face in ("Cairo", "Tajawal", "IBM Plex Sans Arabic", "Amiri"):
+                assert face not in got[role], (
+                    f"an Arabic face reached the ENGLISH resume's {role}: "
+                    f"{got[role]!r}. The CV role stylesheet is emitted only for "
+                    f"dir=rtl (app/rendering.py::RTL_TYPOGRAPHY) and must never "
+                    f"be carried by an English document.")
+
+
+def test_an_arabic_resume_uses_the_policys_cv_roles(page, live_server):
+    """The policy's CV roles, in the document itself.
+
+    Name Tajawal ExtraBold, section titles Cairo Bold, body IBM Plex Sans
+    Arabic. These cannot come from the alias layer in fonts_ar.css: that keys
+    on (family, weight) and so can only say "Archivo becomes Tajawal", never
+    "the name becomes Tajawal". Measured across all 49, weight does not
+    separate role either -- Archivo 900 is used at 25px AND at 12px. So the
+    roles are marked in the markup (.cv-name / .cv-section) and named in an
+    RTL-only stylesheet, and this is what proves the wiring reaches the page.
+    """
     page.context.clear_cookies()
     page.context.add_cookies([{"name": "ui_lang", "value": "ar",
                                "domain": "127.0.0.1", "path": "/"}])
     page.goto(f"{live_server.url}/preview?template_key=modern-t2&showcase=1",
               wait_until="networkidle")
     page.wait_for_timeout(600)
-    fam = page.evaluate(
-        "() => getComputedStyle(document.querySelector('.tpl')).fontFamily")
-    assert "Archivo" in fam, (
-        f"modern-t2 should still declare Archivo (Arabic arrives via the "
-        f"unicode-range alias), got {fam!r}")
+    got = page.evaluate("""() => {
+      const cs = el => el ? getComputedStyle(el) : null;
+      const f = el => el ? cs(el).fontFamily.split(',')[0].replace(/["']/g,'').trim() : null;
+      const name = document.querySelector('.tpl .cv-name');
+      return {dir: document.documentElement.getAttribute('dir'),
+              body: f(document.querySelector('.tpl')),
+              name: f(name),
+              nameWeight: name ? cs(name).fontWeight : null,
+              sec: f(document.querySelector('.tpl .cv-section'))};
+    }""")
+    if got["dir"] != "rtl":
+        pytest.skip("the showcase resume is not Arabic on this build")
+    assert got["body"] == "IBM Plex Sans Arabic", got["body"]
+    assert got["name"] == "Tajawal", got["name"]
+    assert got["nameWeight"] == "800", (
+        f"the policy says the name is Tajawal ExtraBold, got weight "
+        f"{got['nameWeight']}")
+    assert got["sec"] == "Cairo", got["sec"]

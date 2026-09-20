@@ -16,12 +16,12 @@
      5. Section gap 17->13 to seat the shared sample once Tools + Languages are
         added. #}
 {% macro ah(label) %}
-<div style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">{{ label }}</div>
+<div class="cv-section" style="font-family:Anton,sans-serif; font-size:15px; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-bottom:7px;">{{ label }}</div>
 {% endmacro %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:44px 62px; display:flex; flex-direction:column; gap:12px; font-family:Inter,sans-serif; color:#141A17;">
 
   <div style="border-bottom:3px solid #1F4436; padding-bottom:12px;">
-    <div style="font-family:Anton,sans-serif; font-size:52px; line-height:0.98; letter-spacing:0.5px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Anton,sans-serif; font-size:52px; line-height:0.98; letter-spacing:0.5px; text-transform:uppercase;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:13px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#1F4436; margin-top:10px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

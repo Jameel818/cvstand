@@ -18,7 +18,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:54px 70px; display:flex; flex-direction:column; gap:15px; font-family:'Source Sans 3',sans-serif; color:#1A1A1A;">
 
   <div>
-    <div style="font-family:Merriweather,serif; font-weight:700; font-size:34px; line-height:1.15; letter-spacing:-0.4px;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Merriweather,serif; font-weight:700; font-size:34px; line-height:1.15; letter-spacing:-0.4px;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:13px; font-weight:600; letter-spacing:2.6px; text-transform:uppercase; color:#7A5C1E; margin-top:8px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
@@ -32,14 +32,14 @@
 
   {% if r.summary %}
   <div>
-    <div style="{{ HEAD }}">{{ t('Summary') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Summary') }}</div>
     <p style="margin:0; font-size:12px; line-height:1.6;">{{ r.summary }}</p>
   </div>
   {% endif %}
 
   {% if r.achievements %}
   <div>
-    <div style="{{ HEAD }}">{{ t('Key Achievements') }}</div>
+    <div class="cv-section" style="{{ HEAD }}">{{ t('Key Achievements') }}</div>
     <div style="font-size:12px; line-height:1.75;">
       {% for a in r.achievements %}
       <div><span style="font-weight:700; color:#7A5C1E; font-variant-numeric:tabular-nums;">{{ a.metric }}</span> — {{ a.label }}</div>
@@ -50,7 +50,7 @@
 
   {% if r.experience %}
   <div>
-    <div style="{{ HEAD_RULE }}">{{ t('Experience') }}</div>
+    <div class="cv-section" style="{{ HEAD_RULE }}">{{ t('Experience') }}</div>
     <div style="display:flex; flex-direction:column; gap:12px;">
       {% for job in r.experience %}
       <div>
@@ -72,7 +72,7 @@
 
   {% if r.skills %}
   <div>
-    <div style="{{ HEAD_RULE }} margin-bottom:9px;">{{ t('Skills') }}</div>
+    <div class="cv-section" style="{{ HEAD_RULE }} margin-bottom:9px;">{{ t('Skills') }}</div>
     <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
       {% for sk in r.skills %}
       <div style="display:flex; gap:12px;"><span style="width:230px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700; color:#7A5C1E;">{{ sk.level }}</span></div>
@@ -83,7 +83,7 @@
 
   {% if r.education or r.recognition or r.tools or r.languages %}
   <div>
-    <div style="{{ HEAD_RULE }} margin-bottom:8px;">{{ t('Education and Certifications') }}</div>
+    <div class="cv-section" style="{{ HEAD_RULE }} margin-bottom:8px;">{{ t('Education and Certifications') }}</div>
     <div style="font-size:12px; line-height:1.7;">
       {% for ed in r.education %}
       <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}{% if ed.gpa %} &nbsp;·&nbsp; {{ t('GPA') }} {{ ed.gpa }}{% endif %}</div>

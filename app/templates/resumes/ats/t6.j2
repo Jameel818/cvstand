@@ -6,7 +6,7 @@
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:48px 68px; display:flex; flex-direction:column; gap:13px; font-family:'Source Sans 3',sans-serif; color:#111318;">
 
   <div>
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.02; letter-spacing:-1px; text-transform:uppercase;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:14px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#1F4E79; margin-top:7px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
@@ -18,13 +18,13 @@
   <div style="height:2px; background:#111318;"></div>
 
   {% if r.summary %}
-  <div><div style="{{ HEAD }}">{{ t('SUMMARY') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('SUMMARY') }}</div>
     <p style="margin:0; font-size:12px; line-height:1.6;">{{ r.summary }}</p>
   </div>
   {% endif %}
 
   {% if r.achievements %}
-  <div><div style="{{ HEAD }}">{{ t('KEY ACHIEVEMENTS') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('KEY ACHIEVEMENTS') }}</div>
     <div style="font-size:12px; line-height:1.75;">
       {% for a in r.achievements %}<div><span style="font-weight:700; color:#1F4E79;">{{ a.metric }}</span> — {{ a.label }}</div>{% endfor %}
     </div>
@@ -32,7 +32,7 @@
   {% endif %}
 
   {% if r.experience %}
-  <div><div style="{{ HEAD }} margin-bottom:10px;">{{ t('EXPERIENCE') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }} margin-bottom:10px;">{{ t('EXPERIENCE') }}</div>
     <div style="display:flex; flex-direction:column; gap:12px;">
       {% for job in r.experience %}
       <div>
@@ -53,7 +53,7 @@
   {% endif %}
 
   {% if r.skills %}
-  <div><div style="{{ HEAD }}">{{ t('SKILLS') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('SKILLS') }}</div>
     <div style="display:flex; flex-direction:column; gap:5px; font-size:12px;">
       {% for sk in r.skills %}
       <div style="display:flex; gap:12px;"><span style="width:220px; flex-shrink:0;">{{ sk.name }}</span><span style="font-weight:700;">{{ sk.level }}</span></div>
@@ -63,13 +63,13 @@
   {% endif %}
 
   {% if r.tools %}
-  <div><div style="{{ HEAD }}">{{ t('TOOLS') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('TOOLS') }}</div>
     <div style="font-size:12px; line-height:1.65;">{{ r.tools | join(" · ") }}</div>
   </div>
   {% endif %}
 
   {% if r.education %}
-  <div><div style="{{ HEAD }}">{{ t('EDUCATION') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('EDUCATION') }}</div>
     <div style="font-size:12px; line-height:1.65;">
       {% for ed in r.education %}
       <div><b>{{ ed.degree }}</b>{% if ed.school %} — {{ ed.school }}{% endif %}{% if ed.start or ed.end %}, {{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}{% endif %}</div>
@@ -81,13 +81,13 @@
   {% endif %}
 
   {% if r.languages %}
-  <div><div style="{{ HEAD }}">{{ t('LANGUAGES') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('LANGUAGES') }}</div>
     <div style="font-size:12px; line-height:1.65;">{% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
   </div>
   {% endif %}
 
   {% if r.recognition %}
-  <div><div style="{{ HEAD }}">{{ t('CERTIFICATIONS') }}</div>
+  <div><div class="cv-section" style="{{ HEAD }}">{{ t('CERTIFICATIONS') }}</div>
     <div style="font-size:12px; line-height:1.65;">
       {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}</div>{% endfor %}
     </div>

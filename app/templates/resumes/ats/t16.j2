@@ -17,12 +17,12 @@
      5. Section gap 14->10, head padding 6->4 / margin 9->6 to seat the shared
         sample once Tools + Languages are added as their own sections. #}
 {% macro dh(label) %}
-<div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:4px 0; margin-bottom:6px;"><span style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">{{ label }}</span></div>
+<div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:4px 0; margin-bottom:6px;"><span class="cv-section" style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">{{ label }}</span></div>
 {% endmacro %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:42px 64px; display:flex; flex-direction:column; gap:10px; font-family:'Source Sans 3',sans-serif; color:#1A1714;">
 
   <div>
-    <div style="font-family:Fraunces,serif; font-weight:700; font-size:44px; line-height:1.04;">{{ r.name }}</div>
+    <div class="cv-name" style="font-family:Fraunces,serif; font-weight:700; font-size:44px; line-height:1.04;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#A6462B; margin-top:8px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

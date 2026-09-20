@@ -17,13 +17,13 @@
      5. Section gap 28->14, Key Achievements leading 2.0->1.6, skills gap 9->4 to
         seat the shared sample once Tools + Languages are added. #}
 {% macro sh(label) %}
-<div style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:7px;">{{ label }}</div>
+<div class="cv-section" style="font-weight:800; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-bottom:7px;">{{ label }}</div>
 {% endmacro %}
 {% set SEC = "border-inline-start:4px solid #DADCEC; padding-inline-start:16px;" %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:46px 60px; display:flex; flex-direction:column; gap:14px; font-family:Montserrat,sans-serif; color:#16182B;">
 
   <div style="border-inline-start:4px solid #35408E; padding-inline-start:16px;">
-    <div style="font-weight:800; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">{{ r.name }}</div>
+    <div class="cv-name" style="font-weight:800; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">{{ r.name }}</div>
     {% if r.title %}<div style="font-size:12.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#35408E; margin-top:8px;">{{ r.title }}</div>{% endif %}
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}

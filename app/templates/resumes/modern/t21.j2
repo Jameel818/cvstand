@@ -35,7 +35,7 @@
         {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% else %}{{ t('PHOTO') }}{% endif %}
       </div>
       <div style="flex:1; min-width:0; text-align:end;">
-        <div style="font-family:Montserrat,sans-serif; font-weight:800; font-size:44px; line-height:1.05; color:#013F32;">{{ r.name }}</div>
+        <div class="cv-name" style="font-family:Montserrat,sans-serif; font-weight:800; font-size:44px; line-height:1.05; color:#013F32;">{{ r.name }}</div>
         {% if r.title %}<div style="font-size:18px; color:#013F32; margin-top:2px;">{{ r.title }}</div>{% endif %}
       </div>
     </div>
@@ -56,14 +56,14 @@
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:24px; top:252px; width:300px; bottom:24px; border-radius:18px; background:#013F32; color:#E8EDEA; padding-block: 24px 24px; padding-inline: 26px 24px; display:flex; flex-direction:column; gap:18px;">
     {% if r.summary %}
     <div>
-      <div style="{{ PILL }}">{{ t('About Me') }}</div>
+      <div class="cv-section" style="{{ PILL }}">{{ t('About Me') }}</div>
       <div style="font-size:12px; line-height:1.7; margin-top:12px;">{{ r.summary }}</div>
     </div>
     {% endif %}
 
     {% if r.skills %}
     <div>
-      <div style="{{ PILL }}">{{ t('Skills') }}</div>
+      <div class="cv-section" style="{{ PILL }}">{{ t('Skills') }}</div>
       <div style="display:flex; flex-direction:column; gap:11px; margin-top:12px;">
         {% for sk in r.skills %}
         {{ m.skill_dotrow(sk, {'dot_size': 9, 'dot_on': '#E1F04A', 'dot_off_border': '#2A5C4E',
@@ -76,14 +76,14 @@
 
     {% if r.tools %}
     <div>
-      <div style="{{ PILL }}">{{ t('Tools') }}</div>
+      <div class="cv-section" style="{{ PILL }}">{{ t('Tools') }}</div>
       <div style="font-size:12px; line-height:1.7; margin-top:10px;">{{ r.tools | join(" · ") }}</div>
     </div>
     {% endif %}
 
     {% if r.languages %}
     <div style="margin-top:auto;">
-      <div style="{{ PILL }}">{{ t('Languages') }}</div>
+      <div class="cv-section" style="{{ PILL }}">{{ t('Languages') }}</div>
       <div style="font-size:12px; line-height:1.7; margin-top:10px;">
         {% for l in r.languages %}{{ l.name }} — {{ l.level }}{% if not loop.last %}<br>{% endif %}{% endfor %}
       </div>
@@ -94,7 +94,7 @@
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:348px; top:252px; inset-inline-end:24px; bottom:24px; display:flex; flex-direction:column; gap:18px;">
     {% if r.education %}
     <div>
-      <div style="{{ PILL_R }}">{{ t('Education') }}</div>
+      <div class="cv-section" style="{{ PILL_R }}">{{ t('Education') }}</div>
       <div style="{{ RAIL }}">
         {% for ed in r.education %}
         <div>
@@ -113,7 +113,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ PILL_R }}">{{ t('Work Experience') }}</div>
+      <div class="cv-section" style="{{ PILL_R }}">{{ t('Work Experience') }}</div>
       <div style="{{ RAIL }}">
         {% for job in r.experience %}
         <div>
@@ -128,7 +128,7 @@
 
     {% if r.recognition %}
     <div>
-      <div style="{{ PILL_R }}">{{ t('Certifications') }}</div>
+      <div class="cv-section" style="{{ PILL_R }}">{{ t('Certifications') }}</div>
       <div style="{{ RAIL }}">
         {% for rec in r.recognition %}
         <div>

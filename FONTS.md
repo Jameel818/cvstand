@@ -44,6 +44,127 @@ declaration was changed to `font-weight: 200 1000`.
 to. Tajawal has no `fvar` table and is correctly declared per static weight —
 check before assuming, in either direction.
 
+## Roles, and where they are applied
+
+The policy assigns faces by ROLE, not by element. The roles live as CSS custom
+properties in `app.css` (`--font-hero`, `--font-heading`, `--font-body`,
+`--font-cta`, `--font-nav`), and in English every one of them resolves to what
+the shell already used, so the Arabic block is the only thing that moves.
+
+| role | Arabic | reaches |
+|---|---|---|
+| hero | Tajawal 800 (Thmanyah, outlined) | the landing h1 |
+| heading | Cairo 700 | `h1`-`h4`, `.eyebrow`, `.stat-strip b`, `.num`, `.faq summary` |
+| nav | Cairo | `.site-nav a`, `.footer-cols a`, `.lang-switch a` |
+| body | IBM Plex Sans Arabic | everything else, plus `input`/`select`/`textarea` |
+| CTA | Tajawal 800 | `.btn`, `.tab` |
+
+**`--font-nav` exists because the policy names Thmanyah Sans for site
+navigation specifically.** Thmanyah cannot ship as a file, and Cairo is its
+recorded stand-in: the two measured nearly metric-compatible (232.5 vs 230.4
+wide, 94 vs 99 ink). Navigation was falling through to body copy until this.
+
+**Heading role is not the same set as `h1`-`h4`.** `.eyebrow`, the stat
+numerals and a `<summary>` all read as headings and all inherited body copy.
+A role map that only lists tags will keep missing them.
+
+**Chips declare their own face.** `[dir="rtl"] button { font-family: ... }`
+sets the CTA family on every DESCENDANT, so the same `.chip-modern` rendered in
+Tajawal inside a button and in IBM Plex Sans Arabic on a card. A component's
+face must not depend on what contains it.
+
+## The CV roles, inside the 49 templates
+
+The policy names three faces for a CV by role, and they are applied to the
+résumé documents themselves — **in Arabic only**:
+
+| role | face | hook |
+|---|---|---|
+| name | Tajawal ExtraBold 800 | `class="cv-name"` (49, one per template) |
+| section title | Cairo Bold | `class="cv-section"` (229) |
+| body | IBM Plex Sans Arabic | everything else under `.tpl` |
+
+The rules live in `app/rendering.py::RTL_TYPOGRAPHY`, which `document_html()`
+emits **only for `dir="rtl"`**. An English CV never carries a byte of it, and
+the classes are inert in LTR because nothing selects them there. Verified: all
+49 templates render the three roles in Arabic, and **zero** of the 49 show any
+Arabic face in English.
+
+**The alias layer could not express this, and that is why the markup changed.**
+`fonts_ar.css` keys on (family, weight), so it can say "Archivo becomes
+Tajawal" but never "the name becomes Tajawal". Weight is not a usable proxy
+for role, measured across all 49: `Archivo 900` appears at 25px (×30) **and**
+at 12px (×25), and `Open Sans 700` is 12px in 42 of its uses — the heavy
+weights are mostly bold words inside paragraphs. Mapping them to a display
+face would have put Cairo and Tajawal inside body copy everywhere.
+
+**`!important` is required, not emphasis.** All 49 templates set `font-family`
+in inline `style` attributes, which outrank any stylesheet rule. The inline
+styles carry no `!important` themselves, so ordinary specificity still decides
+between the three rules: `.tpl .cv-name` (0,2,0) beats `.tpl *` (0,1,0).
+
+**Family only.** Size, colour, tracking and layout stay as each template set
+them — that is the template's identity, and the policy assigns faces.
+
+**`cv-section` is not `sec-head`.** `sec-head` already existed, on four
+templates only, and `RTL_TYPOGRAPHY` forces it to `font-size: 14px !important`
+to rescue headings that read as body text. Reusing that name for the role hook
+would have crushed every section heading in all 49 Arabic templates to 14px,
+including 24px mastheads. The two classes coexist: ten elements carry both.
+
+**What this cost.** All 196 HTML goldens changed, and nothing else: strip the
+two class attributes back out and the HTML is byte-identical to what shipped
+before. All 50 pixel goldens pass unchanged, which is the real proof English
+did not move. The Arabic overflow gate stays 49/49 clean after the face swap.
+
+## The outlined headline is sized by its EM, not its box
+
+`tools/outline_text.py` writes `--outline-box` onto every run: the SVG box
+height in ems. The box is the face's ascent+descent, which for Thmanyah Serif
+Display is **1.25x the em** — so `height: 1em` squeezed a 1.25em box into 1em
+and rendered every outlined headline at **0.80em**. Measured in the browser
+before the fix: the landing h1 asked for 57.6px and painted a 46.1px em; the
+gallery asked for 41.6px and painted 33.3px.
+
+`app.css` multiplies `1em` by that property, so the em square equals the
+font-size and the outlines match what live text at that size would do.
+
+**No optical correction is applied on top, and that is a measured decision.**
+Thmanyah's Arabic x-height (medial heh — no dots, ascender or descender) is
+0.695em, against Cairo 0.770 and Tajawal 0.560: it sits between the two faces
+the shell already uses. Against Latin it is 0.695 to Inter's 0.730 CAP height,
+and a display headline reads by its caps — so the Arabic h1 wants the SAME
+`clamp()` as the English one, which is what it already had. The headline was
+wrong by 0.80, not by its scale.
+
+**Runs are one per WORD.** A phrase is a single box with a fixed aspect ratio
+and cannot break; the ATS gallery heading was one 1374-unit run that overflowed
+a phone the moment the size was corrected. Arabic never joins across a space,
+so splitting on spaces changes no glyph. The gap between runs is the font's own
+space advance, measured by the shaper and written onto the wrapper.
+
+## Every family a template names must be real
+
+`tests/test_template_fonts.py` asserts that the FIRST family of every
+`font-family` stack in the 49 templates is in `fonts.css` AND has a pairing in
+`fetch_fonts_ar.py`. Later entries may be generic or system families — naming
+Helvetica as a fallback engages no licence and renders nowhere Archivo exists.
+
+`modern/t10.j2` declares `'DM Sans'`, which is vendored nowhere. It therefore
+renders in the browser's default sans in Latin -- which differs between
+Windows and macOS -- and in the OS default in Arabic, making it **the one
+template of 49 the Arabic font work does not reach**. The pixel golden was
+captured with that fallback in place, so the baseline agrees with it.
+
+**It is left as it is, on purpose.** Correcting it moves that template's
+ENGLISH pixels, and the standing instruction is that the Arabic font policy
+must not alter English CV templates. There is no Arabic-only fix available:
+the alias generator only emits rules for families present in `fonts.css`, so a
+family absent there cannot be given Arabic coverage without also making it
+render in English. `tests/test_template_fonts.py::EXEMPT` names it, and
+`test_every_exemption_is_still_real` fails if it is ever fixed and the
+carve-out left behind.
+
 ## Never
 
 **Paid families.** Named explicitly so a search finds them: `29LT Bukra`,

@@ -37,7 +37,7 @@
     {% set c = r.contact %}
     {% if c.email or c.phone or c.address or c.site or c.social %}
     <div>
-      <div style="{{ SH }}">{{ t('CONTACT') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('CONTACT') }}</div>
       <div style="display:flex; flex-direction:column; gap:9px;">
         {% if c.email %}<div><div style="{{ KICK }}">{{ t('EMAIL') }}</div><div style="font-size:12px; color:#1B1717; overflow-wrap:anywhere;">{{ c.email }}</div></div>{% endif %}
         {% if c.phone %}<div><div style="{{ KICK }}">{{ t('PHONE') }}</div><div style="font-size:12px; color:#1B1717;">{{ c.phone }}</div></div>{% endif %}
@@ -50,7 +50,7 @@
 
     {% if r.skills %}
     <div>
-      <div style="{{ SH }}">{{ t('EXPERTISE') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('EXPERTISE') }}</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         {% for sk in r.skills %}
         {{ m.skill_dotrow(sk, {'dot_size': 9, 'dot_on': '#810100', 'dot_off_border': '#b3ae99'}) }}
@@ -61,7 +61,7 @@
 
     {% if r.languages %}
     <div>
-      <div style="{{ SH }}">{{ t('LANGUAGES') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('LANGUAGES') }}</div>
       <div style="display:flex; flex-direction:column; gap:6px; font-size:12px; color:#1B1717;">
         {% for l in r.languages %}<div>{{ l.name }} — <span style="color:#630000; font-weight:700;">{{ l.level }}</span></div>{% endfor %}
       </div>
@@ -70,14 +70,14 @@
 
     {% if r.tools %}
     <div>
-      <div style="{{ SH }}">{{ t('TOOLS') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('TOOLS') }}</div>
       <div style="font-size:12px; color:#1B1717; line-height:1.6;">{{ r.tools | join(" · ") }}</div>
     </div>
     {% endif %}
 
     {% if r.recognition %}
     <div>
-      <div style="{{ SH }}">{{ t('CERTIFICATIONS') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('CERTIFICATIONS') }}</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         {% for rec in r.recognition %}
         <div>
@@ -91,7 +91,7 @@
 
     {% if r.references %}
     <div>
-      <div style="{{ SH }}">{{ t('REFERENCES') }}</div>
+      <div class="cv-section" style="{{ SH }}">{{ t('REFERENCES') }}</div>
       <div style="display:flex; flex-direction:column; gap:12px;">
         {% for ref in r.references %}
         <div>
@@ -108,7 +108,7 @@
 
   <div style="flex:1; min-width:0; padding:40px 38px 34px; display:flex; flex-direction:column; gap:26px; box-sizing:border-box;">
     <div>
-      <div style="font-size:42px; font-weight:900; color:#1B1717; letter-spacing:0.5px; line-height:1;">{{ r.name }}</div>
+      <div class="cv-name" style="font-size:42px; font-weight:900; color:#1B1717; letter-spacing:0.5px; line-height:1;">{{ r.name }}</div>
       {% if r.title %}<div style="font-size:18px; font-weight:700; color:#810100; margin-top:10px;">{{ r.title }}</div>{% endif %}
     </div>
 
@@ -131,7 +131,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ BH }}">{{ t('WORK EXPERIENCE') }}</div>
+      <div class="cv-section" style="{{ BH }}">{{ t('WORK EXPERIENCE') }}</div>
       <div style="{{ RAIL }}">
         {% for job in r.experience %}
         <div style="position:relative;">
@@ -156,7 +156,7 @@
 
     {% if r.education %}
     <div>
-      <div style="{{ BH }}">{{ t('EDUCATION') }}</div>
+      <div class="cv-section" style="{{ BH }}">{{ t('EDUCATION') }}</div>
       <div style="{{ RAIL }}">
         {% for ed in r.education %}
         <div style="position:relative;">

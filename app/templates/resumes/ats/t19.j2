@@ -17,13 +17,13 @@
      5. Section gap 28->14 to seat the shared sample once Tools + Languages are
         added. #}
 {% macro mh(label) %}
-<div class="sec-head" style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">{{ label }}</div>
+<div class="sec-head cv-section" style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-bottom:7px;">{{ label }}</div>
 {% endmacro %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:46px 62px; display:flex; flex-direction:column; gap:14px; font-family:'Source Sans 3',sans-serif; color:#1C1A15;">
 
   <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:24px; border-bottom:1px solid #1C1A15; padding-bottom:11px;">
     <div>
-      <div style="font-weight:900; font-size:42px; line-height:1.02; letter-spacing:-0.8px;">{{ r.name }}</div>
+      <div class="cv-name" style="font-weight:900; font-size:42px; line-height:1.02; letter-spacing:-0.8px;">{{ r.name }}</div>
       {% if r.title %}<div style="font-size:13px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#B0761A; margin-top:8px;">{{ r.title }}</div>{% endif %}
     </div>
     {% set c = r.contact %}{% set bits = [] %}

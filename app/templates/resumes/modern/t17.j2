@@ -25,7 +25,7 @@
 
   <div style="width:360px; flex-shrink:0; display:flex; flex-direction:column; background:#e5e8f5;">
     <div style="background:#003366; color:#ffffff; padding:40px 34px 26px;">
-      <div style="font-weight:900; font-size:44px; letter-spacing:2px; line-height:1; text-transform:uppercase;">{{ r.name }}</div>
+      <div class="cv-name" style="font-weight:900; font-size:44px; letter-spacing:2px; line-height:1; text-transform:uppercase;">{{ r.name }}</div>
       {% if r.title %}<div style="font-size:17px; opacity:0.8; margin-top:8px;">{{ r.title }}</div>{% endif %}
       {% if r.summary %}<p style="font-size:12px; line-height:1.6; margin:16px 0 0; opacity:0.95;">{{ r.summary }}</p>{% endif %}
     </div>
@@ -33,7 +33,7 @@
       {% set c = r.contact %}
       {% if c.phone or c.email or c.address or c.site or c.social %}
       <div>
-        <div style="{{ RIBBON }}">{{ t('CONTACT') }}</div>
+        <div class="cv-section" style="{{ RIBBON }}">{{ t('CONTACT') }}</div>
         <div style="display:flex; flex-direction:column; gap:9px; margin-top:16px; font-size:12.5px; color:#111111;">
           {% if c.phone %}<div>{{ c.phone }}</div>{% endif %}
           {% if c.email %}<div style="overflow-wrap:anywhere;">{{ c.email }}</div>{% endif %}
@@ -46,7 +46,7 @@
 
       {% if r.languages %}
       <div>
-        <div style="{{ RIBBON }}">{{ t('LANGUAGES') }}</div>
+        <div class="cv-section" style="{{ RIBBON }}">{{ t('LANGUAGES') }}</div>
         <div style="margin-top:16px; display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:#111111;">
           {% for l in r.languages %}<div>{{ l.name }} — {{ l.level }}</div>{% endfor %}
         </div>
@@ -55,14 +55,14 @@
 
       {% if r.tools %}
       <div>
-        <div style="{{ RIBBON }}">{{ t('TOOLS') }}</div>
+        <div class="cv-section" style="{{ RIBBON }}">{{ t('TOOLS') }}</div>
         <div style="margin-top:16px; font-size:12.5px; color:#111111; line-height:1.6;">{{ r.tools | join(" · ") }}</div>
       </div>
       {% endif %}
 
       {% if r.recognition %}
       <div>
-        <div style="{{ RIBBON }}">{{ t('CERTIFICATIONS') }}</div>
+        <div class="cv-section" style="{{ RIBBON }}">{{ t('CERTIFICATIONS') }}</div>
         <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px; font-size:12.5px; color:#111111;">
           {% for rec in r.recognition %}<div><b>{{ rec.title }}</b>{% if rec.detail %}<br>{{ rec.detail }}{% endif %}</div>{% endfor %}
         </div>
@@ -92,7 +92,7 @@
 
       {% if r.education %}
       <div>
-        <div style="{{ BH }} margin-bottom:8px;">{{ t('Education') }}</div>
+        <div class="cv-section" style="{{ BH }} margin-bottom:8px;">{{ t('Education') }}</div>
         <div style="height:1px; background:#cccccc; margin-bottom:10px;"></div>
         <div style="display:flex; flex-direction:column; gap:10px;">
           {% for ed in r.education %}
@@ -111,7 +111,7 @@
 
       {% if r.experience %}
       <div>
-        <div style="{{ BH }} margin-bottom:8px;">{{ t('Experience') }}</div>
+        <div class="cv-section" style="{{ BH }} margin-bottom:8px;">{{ t('Experience') }}</div>
         <div style="height:1px; background:#cccccc; margin-bottom:10px;"></div>
         <div style="display:flex; flex-direction:column; gap:10px;">
           {% for job in r.experience %}
@@ -130,7 +130,7 @@
 
       {% if r.skills %}
       <div>
-        <div style="{{ BH }} margin-bottom:8px;">{{ t('Skills') }}</div>
+        <div class="cv-section" style="{{ BH }} margin-bottom:8px;">{{ t('Skills') }}</div>
         <div style="height:1px; background:#cccccc; margin-bottom:12px;"></div>
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
           {% for sk in r.skills %}

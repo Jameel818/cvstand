@@ -15,7 +15,7 @@
   <div style="box-sizing:border-box; flex-shrink:0; background:#0E2D55; color:#E9EEF5; padding:38px 48px 32px;">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:30px;">
       <div>
-        <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:46px; line-height:1.0; letter-spacing:-1.2px; text-transform:uppercase; color:#ffffff;">{{ r.name }}</div>
+        <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:46px; line-height:1.0; letter-spacing:-1.2px; text-transform:uppercase; color:#ffffff;">{{ r.name }}</div>
         {% if r.title %}<div style="font-size:14px; letter-spacing:3.6px; text-transform:uppercase; color:#D8C79A; margin-top:9px;">{{ r.title }}</div>{% endif %}
       </div>
       {% set c = r.contact %}{% set bits = [] %}
@@ -43,7 +43,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ H }} margin-bottom:16px;">{{ t('Experience') }}</div>
+      <div class="cv-section" style="{{ H }} margin-bottom:16px;">{{ t('Experience') }}</div>
       <div style="position:relative; padding-inline-start:24px;">
         <span style="position:absolute; inset-inline-start:0; top:11px; bottom:11px; width:2px; background:#D8C79A;"></span>
         <div style="display:flex; flex-direction:column; gap:20px;">
@@ -69,7 +69,7 @@
 
     {% if r.skills %}
     <div>
-      <div style="{{ H }} margin-bottom:14px;">{{ t('Skills') }}</div>
+      <div class="cv-section" style="{{ H }} margin-bottom:14px;">{{ t('Skills') }}</div>
       <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px 40px;">
         {% for sk in r.skills %}
         {{ m.skill_dotrow(sk, {'dot_on': '#0E2D55', 'dot_off_border': '#C2C6CE'}) }}
@@ -82,7 +82,7 @@
     <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:40px; border-top:1px solid #D8DAE0; padding-top:20px;">
       {% if r.education %}
       <div>
-        <div style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Education') }}</div>
+        <div class="cv-section" style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Education') }}</div>
         <div style="display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.5;">
           {% for ed in r.education %}
           <div><b style="color:#0E2D55;">{{ ed.degree }}</b><br><span style="color:#5C6474;">{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}</span></div>
@@ -92,7 +92,7 @@
       {% endif %}
       {% if r.recognition %}
       <div>
-        <div style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Certifications') }}</div>
+        <div class="cv-section" style="{{ H }} font-size:19px; margin-bottom:12px;">{{ t('Certifications') }}</div>
         <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px; color:#2E3646;">
           {% for rec in r.recognition %}<div>{{ rec.title }}{% if rec.detail %} · {{ rec.detail }}{% endif %}</div>{% endfor %}
         </div>

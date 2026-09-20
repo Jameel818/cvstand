@@ -88,7 +88,12 @@ def test_each_rescued_template_renders_marked_headings():
     question, and is asserted in the browser test below.
     """
     for key in RESCUED:
-        n = canvas_html(ENGLISH_SAMPLE, key).count('class="sec-head"')
+        # Count the class TOKEN, not the whole attribute. These headings now
+        # also carry `cv-section` (the font policy's role hook), so the
+        # attribute reads `class="sec-head cv-section"` and an exact-string
+        # count reported 0 marked headings on a template that had eight.
+        n = len(re.findall(r'class="[^"]*sec-head[^"]*"',
+                           canvas_html(ENGLISH_SAMPLE, key)))
         assert n >= 5, f"{key} rendered only {n} marked headings"
 
 

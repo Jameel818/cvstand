@@ -16,7 +16,7 @@
   <div style="position:absolute; inset-inline-start:319px; top:820px; width:24px; height:24px; border-radius:50%; background:#151517;"></div>
 
   <div style="box-sizing:border-box; position:absolute; inset-inline-start:0; top:0; width:330px; bottom:0; padding-block: 56px 34px; padding-inline: 30px 24px; display:flex; flex-direction:column; gap:28px;">
-    <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.02; text-transform:uppercase; letter-spacing:-0.5px;">{{ name_parts[0] }}{% if name_parts|length > 1 %}<br>{{ name_parts[1] }}{% endif %}</div>
+    <div class="cv-name" style="font-family:Archivo,sans-serif; font-weight:900; font-size:40px; line-height:1.02; text-transform:uppercase; letter-spacing:-0.5px;">{{ name_parts[0] }}{% if name_parts|length > 1 %}<br>{{ name_parts[1] }}{% endif %}</div>
 
     {% set c = r.contact %}{% set bits = [] %}
     {% if c.email %}{% set _ = bits.append(c.email) %}{% endif %}
@@ -25,21 +25,21 @@
     {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
     {% if bits %}
     <div>
-      <div style="{{ SH }} margin-bottom:10px;">{{ t('Contact') }}</div>
+      <div class="cv-section" style="{{ SH }} margin-bottom:10px;">{{ t('Contact') }}</div>
       <div style="font-size:12px; line-height:1.85; color:#3C3C40;">{{ bits | br_join }}</div>
     </div>
     {% endif %}
 
     {% if r.summary %}
     <div>
-      <div style="{{ SH }} margin-bottom:10px;">{{ t('Summary') }}</div>
+      <div class="cv-section" style="{{ SH }} margin-bottom:10px;">{{ t('Summary') }}</div>
       <div style="font-size:12px; line-height:1.65; color:#3C3C40;">{{ r.summary }}</div>
     </div>
     {% endif %}
 
     {% if r.skills %}
     <div>
-      <div style="{{ SH }} margin-bottom:12px;">{{ t('Skills') }}</div>
+      <div class="cv-section" style="{{ SH }} margin-bottom:12px;">{{ t('Skills') }}</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         {% for sk in r.skills %}
         {{ m.skill_bar(sk, {'stacked': true, 'track': '#DCDCDC', 'fill': '#151517', 'track_h': 7, 'radius': '999px',
@@ -52,7 +52,7 @@
 
     {% if r.education %}
     <div style="margin-top:auto;">
-      <div style="{{ SH }} margin-bottom:8px;">{{ t('Education') }}</div>
+      <div class="cv-section" style="{{ SH }} margin-bottom:8px;">{{ t('Education') }}</div>
       <div style="font-size:12px; line-height:1.6; color:#3C3C40;">
         {% for ed in r.education %}
         <b style="color:#151517;">{{ ed.degree }}</b><br>{{ ed.school }}{% if ed.school and ed.end %} · {% endif %}{{ ed.end }}{% if not loop.last %}<br>{% endif %}
@@ -80,7 +80,7 @@
 
     {% if r.experience %}
     <div>
-      <div style="{{ SH }} margin-bottom:14px;">{{ t('Work Experience') }}</div>
+      <div class="cv-section" style="{{ SH }} margin-bottom:14px;">{{ t('Work Experience') }}</div>
       <div style="display:flex; flex-direction:column; gap:18px;">
         {% for job in r.experience %}
         <div>
