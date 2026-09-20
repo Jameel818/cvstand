@@ -212,6 +212,29 @@ So:
 3. **Never** touch `MX`, or any `TXT` record containing `v=spf1`,
    `v=DMARC1`, or a `._domainkey` name.
 
+### D0. Where this stands (measured 2026-09-20)
+
+**`cvstand.com` does not serve the app.** It returns Hostinger's "Parked
+Domain name on Hostinger DNS system" page — verified by fetching
+`https://cvstand.com/static/css/app.css`, which came back as that HTML page,
+not CSS, with zero of this project's rules in it.
+
+So section D below has **not** been done. Until it is, the app is reachable
+only at its `*.up.railway.app` address, and any change you deploy will be
+invisible at `cvstand.com` no matter how many times you push. That is not a
+deploy failure and no amount of re-deploying fixes it.
+
+**The Railway URL is not recorded anywhere in this repo.** Get it from
+Railway → the `cooperative-healing` project → the service → Settings →
+Networking → Public Networking. Write it here once you have it, so the next
+person does not have to go looking:
+
+    Railway public URL: __________________________________
+
+Check the deploy against THAT address, not the custom domain:
+
+    venv/Scripts/python tools/smoke_deploy.py https://<that-url>
+
 ### D1. Get the target from Railway
 
 Railway → Settings → **Networking** → Custom Domain → enter `cvstand.com`.
