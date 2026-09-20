@@ -1,0 +1,12 @@
+# The CV font policy, as the user wrote it (2026-09-20)
+#
+# This is the brief `FONTS.md` implements. Kept verbatim, including the
+# internal contradiction about CV section titles - it assigns them to Tajawal
+# in the prose and to Cairo Bold in the Word spec block, which is why the
+# catalogue carries both (27 Tajawal / 22 Cairo). See FONTS.md.
+#
+# NOT the same document as font-policy-brief.txt, which is an earlier and
+# broader brief about a store selling courses and data sheets. This one is
+# specific to the CV product and is the one that was implemented.
+
+You are building brand identity for Arabic website that sells only one digital product which is CV resume templates Word docx and PDF use ONLY free fonts with full commercial license allowing selling inside editable CV templates no paid fonts allowed product is CV resume must be professional clean ATS friendly and elegant for infographic and corporate jobs fonts are IBM Plex Sans Arabic Regular Medium Bold for CV body text work experience education skills 10-12pt line-height 1.6 safest for editable embedding in Word and PDF selling Tajawal Bold ExtraBold for CV name headline and section titles inside CV template Cairo Bold for website landing page section headings and hero title fallback Thmanyah Sans Regular Medium Bold for website UI navigation and Thmanyah Serif Display Bold for website hero main title selling CV templates self-hosted from font.thmanyah.com woff2 in public fonts thmanyah Amiri Regular for optional classic CV version long paragraphs implementation website import Google Fonts Cairo Tajawal IBM Plex Sans Arabic Amiri via Google Fonts plus self-host Thmanyah via font-face CSS variables font-hero Thmanyah Serif Display fallback Tajawal font-heading Cairo font-body IBM Plex Sans Arabic font-cta Tajawal ExtraBold Word CV template styles Name Tajawal ExtraBold 18pt Section Title Cairo Bold 12pt all caps Body IBM Plex Sans Arabic 10.5pt enable Embed fonts only characters used do not embed Thmanyah as extractable font inside docx CV sell as embedded subset or flattened PDF confirm OFL allows commercial sale inside CV templates and Thmanyah allows compiled obfuscated embedding deliver landing page CSS with variables and one professional CV Word structure no 29LT no paid fonts focus only on CV resume product

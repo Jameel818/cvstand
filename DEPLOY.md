@@ -229,7 +229,7 @@ Railway → the `cooperative-healing` project → the service → Settings →
 Networking → Public Networking. Write it here once you have it, so the next
 person does not have to go looking:
 
-    Railway public URL: __________________________________
+    Railway public URL: https://cvstand-production.up.railway.app
 
 Check the deploy against THAT address, not the custom domain:
 

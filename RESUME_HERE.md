@@ -1,12 +1,16 @@
-# RESUME HERE — paused 2026-09-20 (FONT POLICY APPLIED · DEPLOYED · nothing blocked)
+# RESUME HERE — paused 2026-09-20 (FONT POLICY APPLIED · TWO DEAD UI BUGS FIXED · nothing blocked)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
 
-Working tree clean, 3 commits pushed, `66e86b5` deployed and LIVE, smoke test
-25/25, full suite 2501 passed / 24 skipped / 0 failed.
+Working tree clean. `aef9b32` is deployed and LIVE; **`5136522` is committed
+and NOT PUSHED** — one `git push origin main` away. Smoke test 25/25 against
+production, full suite 2504 passed / 24 skipped / 0 failed.
 
-**The live URL is `https://cvstand-production.up.railway.app`.** Write that
-down — it was in no file in this repo before today.
+A push can never run from inside Claude Code here (GCM device-flow is broken),
+so the last commit always waits for the user.
+
+**The live URL is `https://cvstand-production.up.railway.app`**, now recorded
+in DEPLOY.md §D0. It was in no file in this repo before today.
 
 ### The one thing still open
 
@@ -94,6 +98,42 @@ Open Sans 700 is 12px in 42 of its uses. Hence markup hooks + an RTL-only sheet.
    for families present in `fonts.css`. Named exemption in
    `tests/test_template_fonts.py`, with a staleness guard.
 
+## ✅ TWO DEAD UI BUGS, both only on a DEPLOYMENT
+
+Found because the user previewed the real site. Neither could reproduce
+locally, and that is the whole lesson: **`CVSTAND_SERVER_STORE=0` is a
+different application**, and the default test fixture runs with it ON.
+
+### 1. The gallery's "Use this" button did nothing, on every deployment
+
+`POST /api/template` answers **403** when the server holds nothing, and the
+gallery's script navigated only on `res.ok` — its entire failure path was
+`else { b.disabled = false; }`. So all 49 buttons re-enabled themselves and
+stayed put, silently.
+
+`builder.js` already had the right order: write `localStorage` FIRST, mirror
+to the server only `if (S.serverStore)`. The gallery did the opposite. It now
+stores under `cvstand:template`, the key `builder.js` already reads on boot —
+**the POST never carried the choice on a deployment; the localStorage write
+is what does.**
+
+**Why no test caught it:** `test_the_deployed_server_refuses_to_hold_a_resume`
+asserts the server correctly says no. Nothing asserted the USER CAN STILL
+PROCEED after it says no. Those are different claims and only one was tested.
+
+### 2. The builder's bar named the wrong template
+
+Found while verifying fix 1 on production: localStorage held `ats-t8` ("Big
+Type"), the canvas rendered ats-t8, the exports used ats-t8 — and the bar read
+"Editorial Redline", the deployed default. `#tpl-label` is Jinja-rendered from
+`load_meta()` and was only ever repainted inside the drawer's switch handler,
+never on boot. **The bar was the single surface lying, which is why it
+survived: everything else agreed with itself.**
+
+Both are covered against the `deployed_server` fixture and mutation-tested.
+
+---
+
 ## Instrument errors — three, and none of them reported a number
 
 A new measurement is wrong until it has been pointed at something whose answer
@@ -119,8 +159,8 @@ eight. They match the class token now.
 
 ## Verification at the pause
 
-    fast suite                     1939 passed, 584 skipped
-    full suite (--e2e)             2501 passed, 24 skipped, 0 failed
+    fast suite                     1941 passed, 586 skipped
+    full suite (--e2e)             2504 passed, 24 skipped, 0 failed
     pixel goldens                  50/50 unchanged (English did not move)
     verify_overflow en / ar        49/49 clean both
     smoke_deploy (LIVE)            all 25 checks passed
