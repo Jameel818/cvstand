@@ -33,6 +33,7 @@ import pytest
 
 from app import create_app
 from app.i18n import COOKIE
+from app.store import seed_resume
 
 _SEED = re.compile(r'<script id="resume-data" type="application/json">(.*?)</script>', re.S)
 
@@ -105,7 +106,6 @@ def test_the_arabic_seed_renders_as_an_arabic_document(deployment, client):
     body = client.get("/preview?template_key=ats-t1").get_data(as_text=True)
 
     assert 'dir="rtl"' in body
-    from app.store import seed_resume
     assert seed_resume("ar")["name"] in body
 
 
@@ -169,3 +169,25 @@ def test_a_document_that_exists_ignores_the_interface(own_resume_file, client):
     """
     seed_of(client, "en")                      # writes the English sample
     assert seed_of(client, "ar").get("lang") is None
+
+
+# ------------------------------------------- every template, not a sample
+
+def test_every_live_template_opens_in_the_selected_language(deployment, client):
+    """"The whole opened templates", asserted over the whole catalogue.
+
+    `tests/e2e/test_selected_language_everywhere.py` walks the real journey in
+    a browser but can only afford to look at a handful of gallery cards. The
+    claim is about all 49, and at request level it costs a second: a template
+    that hard-codes an English heading, or renders `dir` from something other
+    than the document, fails here and nowhere else.
+    """
+    from app import registry
+
+    client.set_cookie(COOKIE, "ar")
+    arabic_name = seed_resume("ar")["name"]
+
+    for key in registry.ported_keys():
+        body = client.get(f"/preview?template_key={key}").get_data(as_text=True)
+        assert 'dir="rtl"' in body, key
+        assert arabic_name.split()[0] in body, key
