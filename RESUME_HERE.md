@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-22 (ARABIC BUILDER SEED FIXED · nothing blocked)
+# RESUME HERE — paused 2026-09-22 (ARABIC BUILDER SEED FIXED · SHIPPED & VERIFIED LIVE · nothing blocked)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
 
@@ -26,20 +26,41 @@ visibly sparser). **The three added Arabic strings are awaiting the user's
 wording review** — دار الرواق للنشر / مصممة أولى, ماجستير الاتصال البصري, and
 نوشن + كي نوت.
 
-**Gates:** `tests/test_builder_seed_language.py` (12) and
+**Gates:** `tests/test_builder_seed_language.py` (13) and
 `tests/e2e/test_seed_language_journey.py` (3). Both mutation-tested: restore
 either the write or the read and the two-visitor tests fail. One visitor
 passes either way, which is how this shipped.
 
-Full suite **2518 passed / 24 skipped / 0 failed** (`--e2e`, 12m15s), plus a
-deployment-mode rerun of the five language/store e2e files after the final
-edit (44 passed).
+**Then the claim was widened to the whole site**, because selecting a language
+reaching every surface was true and asserted nowhere:
+`tests/e2e/test_selected_language_everywhere.py` (6) picks العربية ONCE on the
+landing page and checks what the app decides on its own — the shells, the
+builder's browser-generated form labels, the hero and gallery cards, a
+template opened with "Use this", and the drawer minis across a template
+switch. `test_every_live_template_opens_in_the_selected_language` makes the
+same claim over all 49 at request level. No app change was needed: the seed
+fix was the missing piece.
+
+**SHIPPED.** `d125c58` (the fix) and `c947ac1` (the whole-site gates), both
+pushed and confirmed with `git ls-remote` — the local ref lies after a push.
+
+**VERIFIED ON THE LIVE SITE** after deploy, both languages in one container:
+
+    [ar] seed lang='ar'  name='ليلى خليل'     preview <html lang="ar" dir="rtl">
+    [en] seed lang=None  name='Wren Ashworth' preview <html lang="en" dir="ltr">
+
+Full suite **2526 passed / 24 skipped / 0 failed** (`--e2e`, 12m44s).
 
 ### Still open
 
-- **NOT PUSHED AND NOT DEPLOYED.** A push never runs from inside Claude Code
-  here (GCM device-flow is broken), so this waits for the user. Until it is
-  deployed, production still serves the English seed to Arabic readers.
+- **A visitor who has selected NOTHING gets English**, even with an Arabic
+  browser: `app/i18n.py::current_lang` reads the cookie and nothing else, so
+  `Accept-Language: ar` is ignored. Measured on production. This is what an
+  incognito window shows, and it reads exactly like the bug that was fixed —
+  it is not one. A plan exists (cookie → `best_match` → English, plus
+  `Vary: Accept-Language, Cookie`); the user has not asked for it.
+- **The three added Arabic strings still await a wording review** (see above).
+  They are live.
 - **`/builder` has no language switcher at all** — it blanks the site header
   (`{% block chrome %}{% endblock %}`). The language is chosen on the landing
   or gallery page and carried in by the cookie. That is the reported journey
