@@ -179,6 +179,11 @@ def no_document(live_server):
 def seed_resume(live_server):
     """Write a résumé straight into the live server's data dir, retry-guarded.
 
+    Not `app.store.seed_resume`, which is the app's own function for the
+    sample a visitor with nothing yet starts from. This one PUTS a document
+    where the server will find it; that one READS a repo file and writes
+    nothing.
+
     Same job as `clean_state`, exposed for tests that need a *different*
     starting résumé (a heavy one, say). Going through `PUT /api/resume` instead
     would be slower and would couple the fixture to the autosave path several of

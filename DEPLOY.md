@@ -69,6 +69,19 @@ Without a volume the app works perfectly and then every deploy silently
 deletes every account that has ever been created — `app/db.py` puts
 `cvstand.db` under `CVSTAND_DATA_DIR`, which the Dockerfile sets to `/data`.
 
+**What the volume must NOT hold is `resume.json`.** Only `cvstand.db` belongs
+here. At `CVSTAND_SERVER_STORE=0` nothing may write a résumé server-side, and
+`app/store.py::load_resume` neither reads nor writes that path there — a
+leftover from an older build is ignored rather than served to every visitor.
+Deleting it is optional tidying, not a step: it is inert.
+
+That is deliberate, because a persistent volume makes stale state outlive a
+deploy. Until 2026-09-22 the seed was WRITTEN on first read, so the language
+of the first request to reach the container became everyone's — an Arabic
+visitor got the English builder and switching the header changed nothing.
+A fix that only stopped the write would have shipped green and changed nothing
+on the live site, because the file was already on the volume.
+
 ### C4. Set the variables
 
 Copy from `.env.example`. The minimum:

@@ -1,25 +1,52 @@
-# RESUME HERE — paused 2026-09-20 (FONT POLICY APPLIED · TWO DEAD UI BUGS FIXED · nothing blocked)
+# RESUME HERE — paused 2026-09-22 (ARABIC BUILDER SEED FIXED · nothing blocked)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
 
-Working tree clean. `aef9b32` is deployed and LIVE; **`5136522` is committed
-and NOT PUSHED** — one `git push origin main` away. Smoke test 25/25 against
-production, full suite 2504 passed / 24 skipped / 0 failed.
+**Reported from production:** choosing العربية and then opening `/builder`
+gave an Arabic *interface* around an *English* CV. Confirmed on the live site
+before touching anything — `curl -b "ui_lang=ar" .../builder` returned
+`<html lang="ar" dir="rtl">` wrapped around a seed of `"name": "Wren
+Ashworth"`.
 
-A push can never run from inside Claude Code here (GCM device-flow is broken),
-so the last commit always waits for the user.
+**Cause, and it was not the language code.** Seeding by interface language was
+already wired (`load_resume(seed_lang)`, `data/sample_resume_ar.json`). It
+also WROTE the seed to `data/resume.json` — one file for the whole server,
+which nothing rewrites at `CVSTAND_SERVER_STORE=0`. So the language of the
+first request to reach the container became everyone's, permanently.
 
-**The live URL is `https://cvstand-production.up.railway.app`**, now recorded
-in DEPLOY.md §D0. It was in no file in this repo before today.
+**Fixed** in `app/store.py`: with the store off, `load_resume()` neither reads
+nor writes that path — it is `seed_resume(lang)` and nothing else. Not reading
+it is the half that makes the fix arrive on its own: `/data` is a PERSISTENT
+volume, so the stale file outlives every deploy, and a version that only
+stopped writing would have shipped green and changed nothing on the live site.
 
-### The one thing still open
+`data/sample_resume_ar.json` also came up to parity with the English sample
+(3 posts, 2 degrees, 6 tools — it was 2/1/4, so the Arabic default rendered
+visibly sparser). **The three added Arabic strings are awaiting the user's
+wording review** — دار الرواق للنشر / مصممة أولى, ماجستير الاتصال البصري, and
+نوشن + كي نوت.
 
-**`cvstand.com` is a Hostinger PARKED DOMAIN and has never served this app.**
-Confirmed twice: fetching its `/static/css/app.css` returns Hostinger's parked
-page as HTML, and Railway reports `customDomains: []`. DEPLOY.md §D is the
-procedure and §D0 now records that it has not been done. Until it is, every
-deploy is invisible at that address — which reads exactly like a broken deploy
-and is not one. **This is what "nothing changed when I previewed" was.**
+**Gates:** `tests/test_builder_seed_language.py` (12) and
+`tests/e2e/test_seed_language_journey.py` (3). Both mutation-tested: restore
+either the write or the read and the two-visitor tests fail. One visitor
+passes either way, which is how this shipped.
+
+Full suite **2518 passed / 24 skipped / 0 failed** (`--e2e`, 12m15s), plus a
+deployment-mode rerun of the five language/store e2e files after the final
+edit (44 passed).
+
+### Still open
+
+- **NOT PUSHED AND NOT DEPLOYED.** A push never runs from inside Claude Code
+  here (GCM device-flow is broken), so this waits for the user. Until it is
+  deployed, production still serves the English seed to Arabic readers.
+- **`/builder` has no language switcher at all** — it blanks the site header
+  (`{% block chrome %}{% endblock %}`). The language is chosen on the landing
+  or gallery page and carried in by the cookie. That is the reported journey
+  and it now works, but a visitor already sitting on the builder cannot switch
+  from there. Not changed: it is new UI, not a bug fix.
+- **`cvstand.com` is still a Hostinger PARKED DOMAIN** and has never served
+  this app (see below) — unchanged from 2026-09-20.
 
 ---
 

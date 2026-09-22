@@ -73,6 +73,15 @@ venv/Scripts/python -m pytest --e2e -q --junitxml=junit.xml    # machine-readabl
     `education_entry`, `contact_lines`.
   - Divergences logged in each `.j2` header comment. Stale registry accents were
     corrected to the real template hex during the ring/slider batch.
+- **The builder's first document follows the reader's language.** A résumé
+  that does not exist yet has no language of its own to respect, so the seed —
+  and only the seed — reads the `ui_lang` cookie: an Arabic visitor opens the
+  builder onto `data/sample_resume_ar.json`, RTL, with `lang: "ar"` already
+  set. Past that moment everything follows the DOCUMENT (`app/i18n.py`) and an
+  edited résumé is never reseeded. At `SERVER_STORE=0` the seed is computed per
+  request and never written, which is what stops the first visitor's language
+  becoming the container's. `tests/test_builder_seed_language.py` +
+  `tests/e2e/test_seed_language_journey.py`.
 - **Auto-fit**: real user content is variable-length, so every document
   carries `app/static/js/autofit.js` and fits itself to the 1100px page before
   the preview settles or the PDF prints. Two stages — vertical rhythm to 0.85,
