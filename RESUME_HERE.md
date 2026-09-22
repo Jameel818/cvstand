@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-22 (ARABIC BUILDER SEED FIXED · SHIPPED & VERIFIED LIVE · nothing blocked)
+# RESUME HERE — paused 2026-09-22 (ONE LANGUAGE EVERYWHERE · nothing blocked)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
 
@@ -51,14 +51,40 @@ pushed and confirmed with `git ls-remote` — the local ref lies after a push.
 
 Full suite **2526 passed / 24 skipped / 0 failed** (`--e2e`, 12m44s).
 
-### Still open
+## ⏭ THEN THE MODEL CHANGED, ON THE USER'S CALL
 
-- **A visitor who has selected NOTHING gets English**, even with an Arabic
-  browser: `app/i18n.py::current_lang` reads the cookie and nothing else, so
-  `Accept-Language: ar` is ignored. Measured on production. This is what an
-  incognito window shows, and it reads exactly like the bug that was fixed —
-  it is not one. A plan exists (cookie → `best_match` → English, plus
-  `Vary: Accept-Language, Cookie`); the user has not asked for it.
+Two asks, and they are one change:
+
+1. **`Accept-Language`** — "every Arabic-browser visitor lands in Arabic
+   without clicking anything, every English-browser visitor in English."
+   `current_lang()` is now cookie → `best_match` → English: a CHOICE beats a
+   HINT beats the default, so an Arabic speaker who picked English is not
+   argued with on every page load. Responses carry
+   `Vary: Accept-Language, Cookie`.
+
+2. **The `Résumé language` control is GONE** — "completely useless after I
+   have checked it." It was: it restated the choice already made in the
+   header. **Removing it is only safe because the document now follows the
+   interface** — otherwise someone who began an English CV and switched the
+   header would have no way back. The level words remap by position on boot,
+   silently and losslessly (switch back, they come back); the text the user
+   wrote is never touched.
+
+**WHAT THIS GIVES UP, deliberately:** an Arabic interface around an English
+résumé. That pair was the reason the two languages were independent, and it is
+no longer expressible. If it is ever wanted back, the way in is a per-document
+override that DEFAULTS to the interface — not a second control that restates
+it. `tests/test_document_language.py` carries the reasoning.
+
+Rewritten around the new model rather than deleted: `test_document_language.py`
+(the three tests that asserted the old invariant), `test_ui_language.py`'s
+"the two must be able to disagree" section, and
+`tests/e2e/test_language_control.py` → **`tests/e2e/test_language_switch.py`**,
+which drives the header switch and keeps every claim underneath the control
+(turns the document round, re-offers the vocabulary, translates the stored
+words, reversible, survives a reload).
+
+### Still open
 - **The three added Arabic strings still await a wording review** (see above).
   They are live.
 - **`/builder` has no language switcher at all** — it blanks the site header

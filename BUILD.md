@@ -73,15 +73,23 @@ venv/Scripts/python -m pytest --e2e -q --junitxml=junit.xml    # machine-readabl
     `education_entry`, `contact_lines`.
   - Divergences logged in each `.j2` header comment. Stale registry accents were
     corrected to the real template hex during the ring/slider batch.
-- **The builder's first document follows the reader's language.** A résumé
-  that does not exist yet has no language of its own to respect, so the seed —
-  and only the seed — reads the `ui_lang` cookie: an Arabic visitor opens the
-  builder onto `data/sample_resume_ar.json`, RTL, with `lang: "ar"` already
-  set. Past that moment everything follows the DOCUMENT (`app/i18n.py`) and an
-  edited résumé is never reseeded. At `SERVER_STORE=0` the seed is computed per
-  request and never written, which is what stops the first visitor's language
-  becoming the container's. `tests/test_builder_seed_language.py` +
-  `tests/e2e/test_seed_language_journey.py`.
+- **One language, chosen once, for the app AND the document** (2026-09-22).
+  The two used to be independent: the interface followed the `ui_lang` cookie
+  and each résumé carried its own `lang`, set by a `Résumé language` control in
+  Basics. In front of a real user that control restated the choice already made
+  in the header, so it was removed — and the document follows the interface
+  now, because a control that is gone and a language that is stuck are
+  different things. What is given up, stated rather than discovered later: an
+  Arabic interface around an English résumé. The level words are remapped by
+  position on boot, silently and losslessly; the text the user wrote is never
+  touched. `tests/test_document_language.py` + `tests/e2e/test_language_switch.py`.
+- **A visitor who has chosen nothing is read from their browser.**
+  `current_lang()` is cookie → `Accept-Language` → English: a choice beats a
+  hint beats the default. Responses carry `Vary: Accept-Language, Cookie`,
+  without which a shared cache serves one visitor's language to the next.
+- **The seed is computed per request and never written** at `SERVER_STORE=0`,
+  which is what stops the first visitor's language becoming the container's.
+  `tests/test_builder_seed_language.py` + `tests/e2e/test_seed_language_journey.py`.
 - **Auto-fit**: real user content is variable-length, so every document
   carries `app/static/js/autofit.js` and fits itself to the 1100px page before
   the preview settles or the PDF prints. Two stages — vertical rhythm to 0.85,

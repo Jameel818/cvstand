@@ -14,11 +14,22 @@ WHAT THIS PROTECTS
 
     Two things here are easy to get wrong and silent when wrong.
 
-    THE CONTROL MUST NOT READ THE INTERFACE LANGUAGE. The `ui_lang` cookie is
-    the reader's preference and is deliberately independent (app/i18n.py).
-    Wiring the control to it would look right in every case where the two
-    agree - which is most of them - and would put an Arabic level word into an
-    English résumé for the bilingual user the independence exists for.
+    THE CONTROL IS GONE (2026-09-22). It let a résumé carry a language of its
+    own, independent of the interface. The independence was real - a bilingual
+    applicant writing an English CV from an Arabic UI - but in front of an
+    actual user the control restated a choice already made in the header, and
+    the user removed it.
+
+    So the document follows the interface now, and the file has been rewritten
+    around that: what used to be "the control must not read the interface
+    language" is now "there is no control, and the document adopts the chosen
+    language on boot". What is LOST is the Arabic-interface-English-résumé
+    pair, which is no longer expressible. That is a product decision, recorded
+    here rather than discovered later.
+
+    The one guard that survives unchanged: `builder.js` still must not parse
+    `document.cookie`. The language reaches it in the payload, computed once,
+    server-side - two places that can disagree is how this kind of thing rots.
 
     THE REMAP IS POSITIONAL. Changing the language offers to translate the
     level words already stored, and the client does that by index: `Expert` is
@@ -130,62 +141,80 @@ def test_the_builder_ships_both_vocabularies(client):
     assert payload["doc_langs"] == list(SUPPORTED_LANGS)
 
 
-def test_the_shipped_document_language_follows_the_file(client, restore_resume):
+@pytest.mark.parametrize("stored", ["en", "ar", None])
+def test_the_shipped_document_language_is_the_one_the_visitor_CHOSE(
+        client, restore_resume, stored):
+    """It used to follow the FILE. It follows the reader's choice now, and the
+    parametrisation is the point: whatever `lang` the stored document carries
+    — including none at all — the page ships the chosen language, because that
+    is the only one the visitor can see a reason for."""
     resume = load_resume()
-    resume["lang"] = "ar"
+    resume.pop("lang", None)
+    if stored:
+        resume["lang"] = stored
     save_resume(resume)
+
+    client.set_cookie(COOKIE, "ar")
     payload = _payload(client.get("/builder").get_data(as_text=True))
     assert payload["doc_lang"] == "ar"
     assert payload["levels"]["skill"] == SKILL_LEVELS["ar"]
 
 
-def test_an_absent_lang_is_shipped_as_english(client, restore_resume):
+def test_no_language_chosen_still_means_english(client, restore_resume):
     """Absent-means-English is the degrade path that kept every pre-bilingual
-    résumé working. The control has to show `English`, not a blank."""
+    résumé working, and it now hangs off `current_lang()` instead of the file.
+    An English-browser visitor who has chosen nothing gets English."""
     resume = load_resume()
     resume.pop("lang", None)
     save_resume(resume)
     assert lang_of(resume) == "en"
-    payload = _payload(client.get("/builder").get_data(as_text=True))
+    body = client.get("/builder", headers={"Accept-Language": "en-GB,en;q=0.9"})
+    payload = _payload(body.get_data(as_text=True))
     assert payload["doc_lang"] == "en"
 
 
-def test_the_control_ignores_the_interface_language(client, restore_resume):
-    """THE SHARP CASE: an English document read through an Arabic interface.
+# --- the control is GONE, and that is the claim ---------------------------
 
-    The bilingual user this app is for applies to English-speaking employers
-    from an Arabic UI. The form's LABELS follow the reader; the level words
-    and the document language must not, because they are stored in the file
-    and printed on the page."""
-    resume = load_resume()
-    resume.pop("lang", None)
-    save_resume(resume)
-    client.set_cookie(COOKIE, "ar")
-    payload = _payload(client.get("/builder").get_data(as_text=True))
-    assert payload["doc_lang"] == "en"
-    assert payload["levels"]["skill"] == SKILL_LEVELS["en"]
+def test_the_basics_section_no_longer_offers_a_language_control():
+    """Removed 2026-09-22 as useless: it restated the choice already made in
+    the header. Asserted by absence because a redundant control is the kind of
+    thing that grows back — and because its removal is only safe while the
+    test below holds."""
+    assert 'F("lang"' not in BUILDER_JS, "the Résumé language field is back"
+    assert 'type: "doclang"' not in BUILDER_JS
+    assert "data-doc-lang" not in BUILDER_JS
 
 
-# --- the control exists, and is wired to the document ---------------------
+def test_the_document_adopts_the_chosen_language_on_boot():
+    """WHAT MAKES REMOVING THE CONTROL SAFE.
 
-def test_the_basics_section_offers_the_control():
-    assert 'F("lang"' in BUILDER_JS, "no `lang` field in the form spec"
-    assert 'type: "doclang"' in BUILDER_JS
-    assert "data-doc-lang" in BUILDER_JS
+    A control that is gone and a language that is stuck are different things.
+    Someone who wrote an English CV and then switched the header has a stored
+    document in the other language and, with the control removed, no way back
+    — unless the document follows. This is that line, guarded as code rather
+    than as a comment, because deleting it would leave a silent trap rather
+    than a visible break."""
+    assert 'if ((data.lang || "en") !== docLang)' in BUILDER_CODE
+    assert 'setPath(data, "lang", docLang)' in BUILDER_CODE
 
 
-def test_changing_it_writes_the_document_not_the_cookie():
-    """The interface switcher is a link to /lang/<code>; this control must
-    never become a second one. A cookie write from the builder would tie the
-    two languages together in exactly the place phase 6 kept them apart."""
-    assert 'setPath(data, "lang"' in BUILDER_CODE
+def test_the_builder_still_never_reads_the_cookie():
+    """The language reaches the client in the PAYLOAD (`I18N.doc_lang`), which
+    the server computed. That the two languages are now one does not make
+    `document.cookie` the client's business: parsing it here would put the
+    decision in two places that can disagree."""
     assert "ui_lang" not in BUILDER_CODE
     assert "document.cookie" not in BUILDER_CODE
 
 
-def test_the_remap_is_offered_rather_than_applied():
-    """A level word is user content that gets printed. `LEVEL_DOTS` maps both
-    vocabularies, so declining leaves a working résumé - the words just read
-    in the other script. Rewriting them unasked would not."""
-    assert "window.confirm" in BUILDER_JS
+def test_the_remap_is_applied_without_asking():
+    """The inverse of what this asserted before, deliberately.
+
+    The old control raised `window.confirm` because the user had just picked
+    something and a level word is printed content. There is nothing to ask
+    now: the remap runs on page load, where a dialog would be an ambush, and
+    it is lossless — switch back and the words come back. Only values that ARE
+    in the old vocabulary move; anything typed by hand is in neither list and
+    is left alone."""
     assert "levelRemapPlan" in BUILDER_JS
+    assert "window.confirm" not in BUILDER_CODE

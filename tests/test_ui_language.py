@@ -118,22 +118,21 @@ def test_english_ships_no_translation_table():
     assert ui_catalogue("ar")
 
 
-# --- the two languages must be able to disagree ---------------------------
+# --- the two languages became one -----------------------------------------
 
-def test_interface_language_does_not_touch_the_document(client):
-    """An Arabic interface must not relabel an English resume.
+def test_the_document_follows_the_chosen_interface_language(client):
+    """This asserted the OPPOSITE until 2026-09-22, and the reversal is the
+    product decision, not a bug fix.
 
-    The English résumé is written HERE rather than assumed. Without this the
-    test passed in a full run and failed when run alone — it needed an earlier
-    test to have left a document behind, and when none had, the seed rule
-    (session 2026-09-16) created an ARABIC one from the `ar` cookie, so the
-    level words came back Arabic and the assertion below fired.
+    The two languages were deliberately independent, and the `Résumé language`
+    control in Basics was how a résumé kept its own. In front of a real user
+    that control restated the choice already made in the header, so it was
+    removed — and with it gone, a document that did NOT follow would be a
+    document with no way to change its language at all.
 
-    Both outcomes were correct behaviour. The test simply never stated the
-    premise its own name depends on: there has to BE an English resume for an
-    Arabic interface to leave alone. `tests/conftest.py` already wipes the rate
-    limits and the user table per test for exactly this reason - the résumé
-    file is the one piece of shared state that was left implicit.
+    What is given up: an Arabic interface around an English résumé. The level
+    words move with it, which is the visible half — they are stored in the
+    document and printed on the page.
     """
     from app import store
     from tests import samples
@@ -141,12 +140,37 @@ def test_interface_language_does_not_touch_the_document(client):
     client.set_cookie(COOKIE, "ar")
     store.save_resume(samples.ENGLISH)
     page = client.get("/builder").get_data(as_text=True)
-    assert 'lang="ar" dir="rtl"' in page          # the shell mirrored
+    assert 'lang="ar" dir="rtl"' in page
     payload = json.loads(re.search(
         r'<script id="i18n-data" type="application/json">(.*?)</script>',
         page, re.S).group(1))
-    # ...but the level words follow the RESUME, which is English
-    assert payload["levels"]["skill"] == SKILL_LEVELS["en"]
+    assert payload["doc_lang"] == "ar"
+    assert payload["levels"]["skill"] == SKILL_LEVELS["ar"]
+
+
+def test_a_visitor_who_chose_nothing_is_read_from_their_browser(client):
+    """The other half of "without clicking anything": an Arabic browser lands
+    in Arabic, an English browser in English, and a choice already made still
+    beats both."""
+    assert 'dir="rtl"' in client.get(
+        "/", headers={"Accept-Language": "ar,en;q=0.8"}).get_data(as_text=True)
+    assert 'dir="ltr"' in client.get(
+        "/", headers={"Accept-Language": "en-GB,en;q=0.9"}).get_data(as_text=True)
+    assert 'dir="ltr"' in client.get(
+        "/", headers={"Accept-Language": "fr-FR,fr;q=0.9"}).get_data(as_text=True)
+
+    client.set_cookie(COOKIE, "en")
+    assert 'dir="ltr"' in client.get(
+        "/", headers={"Accept-Language": "ar"}).get_data(as_text=True)
+
+
+def test_the_response_says_what_its_language_depended_on(client):
+    """One URL now has two correct answers for two visitors with no cookie.
+    Without `Vary`, a shared cache serves whichever it saw first to everyone —
+    the same shape as the seed bug, one layer out."""
+    vary = client.get("/").headers.get("Vary", "")
+    assert "Accept-Language" in vary
+    assert "Cookie" in vary
 
 
 def test_level_words_follow_the_resume_not_the_reader():

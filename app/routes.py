@@ -62,7 +62,7 @@ from .limits import RenderBusy, rate_limited, render_slot
 from .labels import all_levels, levels_for, ui_catalogue, ui_t
 from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
-from .schema import SUPPORTED_LANGS, ResumeValidationError, lang_of, validate
+from .schema import SUPPORTED_LANGS, ResumeValidationError, validate
 from .store import load_meta, load_resume, load_showcase, save_resume, set_template
 
 bp = Blueprint("main", __name__)
@@ -152,13 +152,30 @@ def templates_gallery():
 @bp.get("/builder")
 def builder():
     resume = load_resume(i18n_mod.current_lang())
-    doc_lang = lang_of(resume)
+    # ONE LANGUAGE, chosen once, for the app AND the document.
+    #
+    # There used to be two: the interface followed the reader and the résumé
+    # carried its own `lang`, set by a `Résumé language` control in Basics.
+    # The independence was real - a bilingual applicant writing an English CV
+    # from an Arabic interface - but in front of an actual user it was a
+    # control that restated a choice they had already made in the header, and
+    # it was removed on 2026-09-22 as useless.
+    #
+    # Removing it is only safe BECAUSE the document now follows the interface.
+    # A control that is gone and a language that is stuck are different
+    # things: someone who began an English CV and then switched the header
+    # would otherwise have no way back, which is worse than the redundancy.
+    #
+    # What is lost, stated rather than discovered later: an Arabic interface
+    # around an English résumé is no longer expressible. See
+    # tests/test_document_language.py.
+    doc_lang = i18n_mod.current_lang()
     # The builder generates its form in the browser, so its labels cannot go
-    # through a Jinja call - the page ships the table instead. Two DIFFERENT
-    # languages travel here on purpose:
-    #   strings  the reader's interface language (the ui_lang cookie)
-    #   levels   the RESUME's language, because a level word is stored in the
-    #            document and printed on the page, not just shown in the form
+    # through a Jinja call - the page ships the table instead. `levels` is the
+    # document's vocabulary, which is now the same language as `strings`; it
+    # stays a separate key because a level word is STORED in the document and
+    # printed on the page, and the client has to remap the stored ones when
+    # the language changes.
     return render_template(
         "builder.html",
         resume=resume,

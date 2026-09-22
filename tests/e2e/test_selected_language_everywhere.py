@@ -8,10 +8,13 @@ Two nouns, and the word between them is what keeps this honest:
 
   webpages   the shell — nav, buttons, form labels, direction. Follows the
              selection, always. There is nothing of the user's in it.
-  templates  the CV. Follows the selection as its DEFAULT — what a template
-             opens in when the visitor has no document of their own yet.
-             A résumé they have already typed into keeps its own language,
-             because by then the language is theirs, not a default.
+  templates  the CV — its direction, headings and level words. It follows the
+             selection too, and keeps doing so after the visitor has typed
+             into it: the `Résumé language` control that used to hold a
+             document apart from the interface was removed on 2026-09-22 as
+             redundant, and without it a document that did not follow could
+             never change language at all. What never moves is the TEXT they
+             wrote.
 
 Everything here is one browser context that selects العربية exactly once, on
 the landing page, the way a visitor does — then never mentions language again.
@@ -110,7 +113,6 @@ def test_a_template_opened_from_the_gallery_opens_in_the_selected_language(
     pg.wait_for_url("**/builder")
 
     expect(pg.locator("#f_name")).to_have_value(AR_NAME)
-    expect(pg.locator("#f_lang")).to_have_value("ar")
     assert _doc(pg).get_attribute("dir") == "rtl"
 
 
@@ -132,15 +134,13 @@ def test_switching_template_in_the_drawer_keeps_the_selected_language(
 
 # ------------------------------------------- default, not "overwrite yours"
 
-def test_a_resume_already_typed_into_keeps_its_own_language(
+def test_what_the_visitor_wrote_survives_the_switch(
         page, deployed_server):
-    """The line the word "default" draws.
+    """The line between "follows the language" and "rewrites your work".
 
-    This visitor has an English CV they have typed into. Selecting العربية
-    translates the app around it — nav, buttons, form labels, direction — and
-    leaves the DOCUMENT alone: the content is English, and Arabic headings
-    over English text would be worse than the mixed pair the user chose. The
-    `Résumé language` control in Basics is how they change it, deliberately.
+    This visitor has typed into their CV. Selecting العربية turns the app AND
+    the document round — nav, buttons, labels, direction, headings — and does
+    not touch one character of what they wrote.
     """
     page.goto(deployed_server.url + "/builder")
     page.fill("#f_name", EN_NAME)
@@ -150,5 +150,56 @@ def test_a_resume_already_typed_into_keeps_its_own_language(
 
     assert page.locator("html").get_attribute("dir") == "rtl", "the app switched"
     expect(page.locator("body")).to_contain_text(AR["Full name"])
-    expect(page.locator("#f_name")).to_have_value(EN_NAME)
-    assert _doc(page).get_attribute("dir") == "ltr", "the document is theirs"
+    expect(page.locator("#f_name")).to_have_value(EN_NAME)   # their text, untouched
+    assert _doc(page).get_attribute("dir") == "rtl", "the document followed"
+
+
+# ------------------------------------------ nobody clicked anything at all
+
+@pytest.mark.parametrize("locale,expect_dir,marker", [
+    ("ar-SA", "rtl", "ar"),
+    ("en-GB", "ltr", "en"),
+    ("fr-FR", "ltr", "en"),
+])
+def test_a_browser_that_states_its_language_is_believed(
+        browser, deployed_server, locale, expect_dir, marker):
+    """"Without clicking anything" — the requirement in the user's words.
+
+    A visitor who has chosen nothing still has a browser that says what they
+    read. Honouring it is the difference between an Arabic speaker landing on
+    an Arabic site and landing on an English one they have to go and fix. A
+    language the app does not have (fr) degrades to English rather than
+    failing, because this is a header any client can send.
+
+    Playwright's `locale` sets `Accept-Language` on every request, so this is
+    a real browser stating a real preference, not a header glued on by hand.
+    """
+    ctx = browser.new_context(viewport={"width": 1440, "height": 950}, locale=locale)
+    try:
+        pg = ctx.new_page()
+        pg.set_default_timeout(20_000)
+        pg.goto(deployed_server.url + "/builder")
+        assert pg.locator("html").get_attribute("dir") == expect_dir
+        assert pg.locator("html").get_attribute("lang") == marker
+        # Wait for the preview to actually render: the iframe is filled by a
+        # fetch, and reading `dir` off an empty frame returns None, which is
+        # not equal to either answer and fails for the wrong reason.
+        expect(pg.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
+        assert pg.frame_locator("#preview-frame").locator("html")                  .get_attribute("dir") == expect_dir, "the CV too, not just the shell"
+    finally:
+        ctx.close()
+
+
+def test_a_language_already_chosen_beats_the_browser(browser, deployed_server):
+    """An Arabic speaker who picked English must not be argued with on every
+    page load. A choice is a decision; the header is a hint."""
+    ctx = browser.new_context(viewport={"width": 1440, "height": 950}, locale="ar-SA")
+    try:
+        pg = ctx.new_page()
+        pg.set_default_timeout(20_000)
+        pg.goto(deployed_server.url + "/lang/en?next=/builder")
+        assert pg.locator("html").get_attribute("dir") == "ltr"
+        pg.reload()
+        assert pg.locator("html").get_attribute("dir") == "ltr"
+    finally:
+        ctx.close()

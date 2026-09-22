@@ -90,9 +90,6 @@ def test_choosing_arabic_then_entering_the_builder_gives_an_arabic_document(page
     expect(page.locator("#f_name")).to_have_value(AR_NAME)
     assert _doc_html(page).get_attribute("dir") == "rtl"
     assert _doc_html(page).get_attribute("lang") == "ar"
-    # The Résumé-language control agrees with what is on screen — otherwise
-    # the next thing the visitor does in Basics silently flips it back.
-    expect(page.locator("#f_lang")).to_have_value("ar")
 
 
 def test_a_later_visitor_is_not_stuck_with_the_first_ones_language(browser, deployed_server):
@@ -127,13 +124,13 @@ def test_a_later_visitor_is_not_stuck_with_the_first_ones_language(browser, depl
 # ------------------------------------------------ what must NOT be swept away
 
 def test_a_resume_you_have_typed_into_survives_the_switch(page, deployed_server):
-    """The seed is for a visitor who has nothing yet.
+    """The CONTENT survives; the language follows.
 
-    Once there is a document, its language is the document's and the reader's
-    preference does not touch it — editing an English CV from an Arabic
-    interface is an ordinary case, not a mistake to correct. `builder.js`
-    writes localStorage only on a real edit, which is what keeps these two
-    behaviours from needing a dialog to tell them apart.
+    This asserted the opposite until 2026-09-22, when the `Résumé language`
+    control was removed as redundant: with no control, a document that did not
+    follow the header would be one whose language could never be changed. What
+    must never move is the text the user typed — that is what is asserted
+    here, and `tests/e2e/test_language_switch.py` holds the rest.
     """
     page.goto(deployed_server.url + "/builder")
     page.fill("#f_name", MINE)
@@ -143,7 +140,5 @@ def test_a_resume_you_have_typed_into_survives_the_switch(page, deployed_server)
 
     expect(page.locator("#f_name")).to_have_value(MINE)
     assert _stored(page)["name"] == MINE
-    assert _doc_html(page).get_attribute("dir") == "ltr", "the document is still English"
-    # The INTERFACE did change — otherwise this passes by the click doing
-    # nothing at all.
-    assert page.locator("html").get_attribute("dir") == "rtl"
+    assert page.locator("html").get_attribute("dir") == "rtl", "the app switched"
+    assert _doc_html(page).get_attribute("dir") == "rtl", "and the document with it"

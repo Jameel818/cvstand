@@ -522,14 +522,13 @@ _UI_AR: dict[str, str] = {
     "+ Add": "+ إضافة",
 
     # --- builder: the DOCUMENT's language (not the interface's) -------------
-    # The option labels are autonyms ("English", "العربية"), like the header
-    # switcher's, so they are not in the catalogue: a language names itself the
-    # same way whoever is reading.
-    "Résumé language": "لغة السيرة الذاتية",
-    "The language the résumé is written in — sets its direction, its headings and its level words. Not the interface language.":
-        "اللغة التي كُتبت بها السيرة الذاتية — تحدد اتجاهها وعناوين أقسامها وكلمات المستوى فيها. وهي ليست لغة الواجهة.",
-    "Translate the level words already chosen? ":
-        "هل تريد ترجمة كلمات المستوى المختارة مسبقاً؟ ",
+    # `Résumé language` and its hint lived here until 2026-09-22, alongside
+    # `Translate the level words already chosen? `. All three belonged to a
+    # control in Basics that let a résumé carry a language of its own. It
+    # restated the choice already made in the header, so it was removed; the
+    # document follows the interface now and the remap it used to offer runs
+    # on boot without asking. Rows removed with it: a translation nothing
+    # renders is a dead row, and tests/test_labels.py fails on one.
 
     # --- the template catalogue (gallery cards + the builder's drawer) ------
     # 49 layout names and 49 one-line blurbs live as English tuples in

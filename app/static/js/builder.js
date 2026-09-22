@@ -101,18 +101,15 @@
      language's list we are about to switch to. */
   const SKILL_LEVELS = I18N.levels.skill.slice();
   const LANGUAGE_LEVELS = I18N.levels.language.slice();
-  /* The DOCUMENT's language. Not the reader's - T() above follows the cookie,
-     this follows the file (app/i18n.py). Held here as well as in `data.lang`
-     because the remap needs to know which language the stored level words are
-     IN, and by the time the change event fires `data.lang` is already the new
-     one. */
-  const DOC_LANGS = I18N.doc_langs || ["en"];
-  let docLang = I18N.doc_lang || "en";
+  /* The language of the DOCUMENT, handed down by the server, which is now
+     the one the visitor chose in the header (app/routes.py::builder). It used
+     to be a separate per-résumé setting with its own control in Basics; that
+     control restated a choice already made and was removed on 2026-09-22.
 
-  /* Autonyms: a language names itself the same way whoever is reading, which
-     is why these are not in the translation catalogue. Same convention as the
-     header's interface switcher (EN / العربية). */
-  const DOC_LANG_NAMES = { en: "English", ar: "العربية" };
+     Read from the payload, never from the cookie: `builder.js` has no business
+     parsing `document.cookie`, and a static guard in
+     tests/test_document_language.py keeps it that way. */
+  const docLang = I18N.doc_lang || "en";
 
   function applyLevelVocab(lang) {
     const lv = (I18N.levels_by_lang && I18N.levels_by_lang[lang]) || I18N.levels;
@@ -129,8 +126,6 @@
       F("summary", T("Professional summary"), { type: "textarea" }),
       F("summary_highlight", T("Phrase to highlight"), { hint: T("Must appear word-for-word in the summary above") }),
       F("photo_url", T("Photo"), { type: "photo" }),
-      F("lang", T("Résumé language"), { type: "doclang",
-        hint: T("The language the résumé is written in — sets its direction, its headings and its level words. Not the interface language.") }),
     ]},
     { id: "contact", title: T("Contact"), fields: [
       F("contact.email", T("Email")),
@@ -193,17 +188,6 @@
           ${val ? `<button type="button" class="rm" data-clear-photo="${path}">${T("Remove")}</button>` : ""}
         </div>
       </div>`;
-    }
-    if (fld.type === "doclang") {
-      /* An absent `lang` means English (schema.lang_of) - the degrade path that
-         kept every pre-bilingual résumé working - so the control shows English
-         rather than a blank, and writes nothing until the user picks. */
-      const cur = DOC_LANGS.indexOf(val) >= 0 ? val : "en";
-      const opts = DOC_LANGS.map((code) =>
-        `<option value="${esc(code)}" lang="${esc(code)}"${code === cur ? " selected" : ""}>${esc(DOC_LANG_NAMES[code] || code)}</option>`);
-      return `<div class="field"><label for="${id}">${fld.label}</label>
-        <select id="${id}" name="${path}" data-doc-lang>${opts.join("")}</select>
-        ${fld.hint ? `<small style="color:var(--muted);font-size:11.5px">${fld.hint}</small>` : ""}</div>`;
     }
     if (fld.type === "textarea") {
       return `<div class="field"><label for="${id}">${fld.label}</label>
@@ -433,32 +417,6 @@
     });
     return plan;
   }
-
-  $("#resume-form").addEventListener("change", (e) => {
-    const el = e.target;
-    if (el.dataset.docLang === undefined) return;
-    const from = docLang, to = el.value;
-    if (to === from) return;
-    /* `data.lang` was already set by the generic input handler above - a select
-       fires `input` before `change` - so this only has to do the rest. */
-    setPath(data, "lang", to);
-
-    /* OFFERED, not done silently: a level word is user content that gets
-       printed on the page. Declining is a valid answer - `LEVEL_DOTS` maps both
-       vocabularies, so an English "Expert" in an Arabic résumé still draws five
-       dots; it just reads in Latin. Only asked when there is something to
-       translate. */
-    const plan = levelRemapPlan(from, to);
-    if (plan.length) {
-      const q = T("Translate the level words already chosen? ") +
-        plan.length + " (" + plan[0].from + " → " + plan[0].to + ")";
-      if (window.confirm(q)) plan.forEach((c) => setPath(data, c.path, c.to));
-    }
-
-    docLang = to;
-    applyLevelVocab(to);   // the dropdowns re-offer the new language's words
-    onChange(true);        // re-render form, preview and save
-  });
 
   /* ---------- preview ---------- */
   const frame = $("#preview-frame");
@@ -762,6 +720,28 @@
   $("#dl-docx").addEventListener("click", (e) => { e.preventDefault(); download("Word", EP.docx); });
 
   /* ---------- boot ---------- */
+  /* ADOPT THE CHOSEN LANGUAGE.
+
+     `data` may be a résumé this browser stored under the other language -
+     someone who wrote a CV, then switched the header. The app around them is
+     already in the new language; the document has to follow, or the control
+     that used to reconcile them is gone and nothing else can.
+
+     The level words are remapped by POSITION, which is the translation: both
+     vocabularies are ours, same length, strongest first (the invariant is
+     gated in tests/test_document_language.py). Only values that are actually
+     in the old vocabulary move - anything the user typed themselves is not in
+     either list and is left exactly as written.
+
+     Silently, and that is a deliberate change from the old control's
+     `window.confirm`. A dialog is a reasonable thing to raise when the user
+     just picked something; raising one unprompted on page load is not, and
+     the remap is lossless - switch back and the words come back. */
+  if ((data.lang || "en") !== docLang) {
+    levelRemapPlan(data.lang || "en", docLang).forEach((c) => setPath(data, c.path, c.to));
+    setPath(data, "lang", docLang);
+  }
+  applyLevelVocab(docLang);
   renderForm();
   applyZoom();
   /* After T() exists and before anything is drawn: the bar is server-rendered
