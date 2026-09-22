@@ -4,18 +4,20 @@ WHY A SECOND JOURNEY FILE RATHER THAN A `lang` PARAMETER ON THE FIRST
 
     `test_journey.py` asserts on English strings — "Your résumé", the template
     label, "Saved". Parametrising it would turn every assertion into a lookup
+    (this file does exactly that where it has to, via `ui_t(..., "ar")`)
     and would still not cover what is actually different here, which is not the
     strings but the SHAPE of the page: `dir="rtl"` on the shell, `dir="rtl"`
     inside the preview iframe, a language switcher that has to change one of
     those without changing the other.
 
-    The two languages are independent by design (app/i18n.py): the résumé's
-    `lang` is a property of the document, the `ui_lang` cookie a property of
-    the reader. Every phase-6 test of that independence is a request-level
-    test. This is the only place the two are exercised through a real browser
-    at the same time, which is where they would actually be wired together by
-    accident — a `document.dir` set from the wrong source, a form re-render
-    that reads the shell's language for a level word.
+    The two languages became ONE on 2026-09-22, when the `Résumé language`
+    control was removed as redundant and the document was made to follow the
+    interface. So an Arabic journey now means the Arabic interface as well as
+    the Arabic document, and these tests say so in their fixtures rather than
+    relying on a default. What is still only observable here, through a real
+    browser, is the SHAPE: `dir="rtl"` on the shell, `dir="rtl"` inside the
+    preview iframe, a level dropdown re-offered in the right vocabulary, and a
+    form re-render that keeps `lang` on the document it saves.
 
 WHAT IS DELIBERATELY NOT HERE
 
@@ -83,27 +85,30 @@ AR_SURNAME = _surname(samples.ARABIC["name"])
 
 # ------------------------------------------------------ the document is Arabic
 
-def test_an_arabic_resume_opens_right_to_left_in_the_builder(page, live_server,
+def test_an_arabic_resume_opens_right_to_left_in_the_builder(arabic_ui, live_server,
                                                              arabic_resume):
     """The preview iframe is a whole separate document with its own `dir`.
 
-    Asserted on the iframe's own <html>, not on the builder page: the shell is
-    still English here (no cookie), so a test that only looked at the outer
-    page would pass while the résumé rendered left-to-right."""
+    Asserted on the iframe's own <html> rather than on the builder page: the
+    shell has followed the cookie since phase 6, so a shell-only assertion
+    would pass while the résumé inside it rendered left-to-right — which is
+    the bug reported from production on 2026-09-22."""
+    page = arabic_ui
     page.goto(live_server.url + "/builder")
     expect(_preview(page)).to_contain_text(_surname(arabic_resume["name"]))
 
     frame = page.frame_locator("#preview-frame")
     assert frame.locator("html").get_attribute("dir") == "rtl"
     assert frame.locator("html").get_attribute("lang") == "ar"
-    # ... while the interface around it is untouched
-    assert page.locator("html").get_attribute("dir") == "ltr"
+    # ...and the app around it, which is the point of there being one language
+    assert page.locator("html").get_attribute("dir") == "rtl"
 
 
 def test_editing_an_arabic_field_reaches_the_preview_and_the_server(
-        page, live_server, arabic_resume):
+        arabic_ui, live_server, arabic_resume):
     """The full round trip in Arabic: keystroke -> 350ms debounce -> /api/render
     -> iframe, and 900ms -> PUT /api/resume -> disk -> reload."""
+    page = arabic_ui
     page.goto(live_server.url + "/builder")
     canvas = _preview(page)
     expect(canvas).to_contain_text(_surname(arabic_resume["name"]))
@@ -113,7 +118,7 @@ def test_editing_an_arabic_field_reaches_the_preview_and_the_server(
 
     expect(canvas).to_contain_text(_surname(new_name))
     expect(canvas).not_to_contain_text(AR_SURNAME)
-    expect(page.locator("#save-state")).to_have_text("Saved")
+    expect(page.locator("#save-state")).to_have_text(ui_t("Saved", "ar"))
 
     stored = page.request.get(live_server.url + "/api/resume").json()["resume"]
     assert stored["name"] == new_name
@@ -143,7 +148,7 @@ def test_mixed_content_survives_a_round_trip_through_the_builder(
     company.fill("Halden & Row")
 
     expect(canvas).to_contain_text("Halden & Row")
-    expect(page.locator("#save-state")).to_have_text("Saved")
+    expect(page.locator("#save-state")).to_have_text("Saved")  # English shell here
 
     stored = page.request.get(live_server.url + "/api/resume").json()["resume"]
     assert stored["experience"][0]["company"] == "Halden & Row", (
@@ -154,11 +159,12 @@ def test_mixed_content_survives_a_round_trip_through_the_builder(
         "Halden & Row")
 
 
-def test_switching_template_keeps_the_document_arabic(page, live_server,
+def test_switching_template_keeps_the_document_arabic(arabic_ui, live_server,
                                                       arabic_resume):
     """The drawer sets `meta.template_key`, which is not part of the résumé —
     but the re-render goes through the same route, and a template key is the
     one input to `document_html()` besides the data."""
+    page = arabic_ui
     page.goto(live_server.url + "/builder")
     expect(_preview(page)).to_contain_text(_surname(arabic_resume["name"]))
 
@@ -170,7 +176,7 @@ def test_switching_template_keeps_the_document_arabic(page, live_server,
     item.scroll_into_view_if_needed()
     item.click()
 
-    expect(page.locator("#tpl-label")).to_have_text(registry.get(key).label)
+    expect(page.locator("#tpl-label")).to_have_text(ui_t(registry.get(key).label, "ar"))
     frame = page.frame_locator("#preview-frame")
     expect(frame.locator(".tpl")).to_contain_text(_surname(arabic_resume["name"]))
     assert frame.locator("html").get_attribute("dir") == "rtl"
@@ -251,9 +257,18 @@ def test_the_language_switcher_flips_the_interface_only(page, live_server,
         live_server.url + "/api/resume").json()["resume"]["lang"] == "ar"
 
 
-def test_an_english_resume_in_an_arabic_interface(arabic_ui, live_server):
-    """The other half of the independence, and the commoner one: a bilingual
-    person applying to an English-speaking employer.
+def test_an_english_resume_read_through_an_arabic_interface_follows_it(
+        arabic_ui, live_server):
+    """This was "the other half of the independence" until 2026-09-22.
+
+    A bilingual person applying to an English-speaking employer from an Arabic
+    UI was the case the two-language split existed for, and it is the case the
+    user gave up when they had the `Résumé language` control removed: there is
+    one language now, and the document follows it.
+
+    The English WORDS stay English — nothing translates a résumé — but the
+    document turns round and takes the section headings with it. That is the
+    trade, asserted rather than described.
 
     `clean_state` leaves the English sample in place; only the cookie is
     Arabic."""
@@ -263,10 +278,9 @@ def test_an_english_resume_in_an_arabic_interface(arabic_ui, live_server):
     assert page.locator("html").get_attribute("dir") == "rtl"
 
     frame = page.frame_locator("#preview-frame")
-    expect(frame.locator(".tpl")).to_contain_text("Ashworth")
-    assert frame.locator("html").get_attribute("dir") == "ltr", (
-        "the interface language must not reach the document")
-    assert frame.locator("html").get_attribute("lang") == "en"
+    expect(frame.locator(".tpl")).to_contain_text("Ashworth")   # their words
+    assert frame.locator("html").get_attribute("dir") == "rtl"  # their choice
+    assert frame.locator("html").get_attribute("lang") == "ar"
 
 
 def test_the_level_dropdown_follows_the_document_not_the_reader(
@@ -291,10 +305,18 @@ def test_the_level_dropdown_follows_the_document_not_the_reader(
     assert "Expert" not in options
 
 
-def test_an_english_document_keeps_english_levels_in_an_arabic_interface(
-        arabic_ui, live_server):
-    """The mirror of the test above. `clean_state` leaves the English sample in
-    place, and the interface cookie is Arabic."""
+def test_the_level_words_move_with_the_document(arabic_ui, live_server):
+    """The mirror of the test above, and the visible half of the change.
+
+    Level words are not interface chrome — they are STORED in the résumé and
+    printed on the page. While the two languages were independent, an English
+    document kept English levels under an Arabic interface, and this test
+    asserted exactly that. The document follows the interface now, so the
+    levels follow with it: offered in Arabic, and the ones already stored are
+    remapped by position on boot.
+
+    Losslessly, which is what makes doing it without asking acceptable —
+    `tests/e2e/test_language_switch.py::test_the_switch_is_reversible`."""
     page = arabic_ui
     page.goto(live_server.url + "/builder")
     assert page.locator("html").get_attribute("dir") == "rtl"
@@ -303,8 +325,8 @@ def test_an_english_document_keeps_english_levels_in_an_arabic_interface(
     select = page.locator('select[name="skills.0.level"]')
     select.scroll_into_view_if_needed()
     options = select.locator("option").all_text_contents()
-    assert "Expert" in options, f"English document, English levels expected: {options}"
-    assert "خبير" not in options
+    assert "خبير" in options, f"Arabic interface, Arabic levels expected: {options}"
+    assert "Expert" not in options
 
 
 def test_the_interface_language_survives_a_reload(arabic_ui, live_server):
@@ -364,17 +386,18 @@ def test_the_gallery_ignores_the_documents_language(page, live_server,
     assert _surname(arabic_resume["name"]) not in body
 
 
-def test_the_arabic_journey_leaves_the_data_dir_valid(page, live_server,
+def test_the_arabic_journey_leaves_the_data_dir_valid(arabic_ui, live_server,
                                                       arabic_resume):
     """After the round trip the file on disk is still a valid résumé.
 
     Autosave writes whatever the form serialised. A form that dropped `lang`
     on a structural re-render would leave a file that still validates but has
     silently become English — valid, saved, and wrong."""
+    page = arabic_ui
     page.goto(live_server.url + "/builder")
     expect(_preview(page)).to_contain_text(_surname(arabic_resume["name"]))
     page.fill("#f_title", "مديرة فنية")
-    expect(page.locator("#save-state")).to_have_text("Saved")
+    expect(page.locator("#save-state")).to_have_text(ui_t("Saved", "ar"))
 
     from app.schema import validate
 

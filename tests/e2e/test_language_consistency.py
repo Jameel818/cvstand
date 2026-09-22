@@ -127,11 +127,12 @@ def test_a_new_resume_opens_in_the_language_the_visitor_chose(
         page, live_server, ui_lang, no_document, code):
     """The whole point of the seed fix, asserted the way a visitor meets it.
 
-    No dropdown is touched. A visitor who picked Arabic in the header and then
-    opened the builder must find an Arabic document already there — the
-    `Résumé language` control in Basics is a control they may never notice,
-    and whose purpose is not obvious if they do. Requiring it to get a
-    correctly-languaged résumé is the defect this closes.
+    A visitor who picked Arabic in the header and then opened the builder must
+    find an Arabic document already there. This was first closed while a
+    `Résumé language` control still existed in Basics — a control they might
+    never notice, and whose purpose was not obvious if they did. That control
+    is gone now, so the seed is not merely the convenient path to a
+    correctly-languaged résumé; it is the path.
 
     Asserted on the PREVIEW iframe's `dir`, not the shell's: the shell has
     followed the cookie all along, so a shell assertion would pass with the
@@ -144,21 +145,35 @@ def test_a_new_resume_opens_in_the_language_the_visitor_chose(
     expect(doc).to_have_attribute("dir", dir_for(code))
 
 
-def test_the_seed_never_overrides_a_resume_that_already_exists(
+def test_the_seed_never_overrides_the_CONTENT_of_a_resume_that_exists(
         page, live_server, ui_lang, seed_resume):
-    """The invariant the seed fix must not cost us.
+    """What the seed may and may not touch, after the model changed.
 
-    An ARABIC document opened through an ENGLISH interface stays Arabic. The
-    reader's language decides what a NEW résumé starts as and nothing more; a
-    document that exists owns its own language (app/i18n.py). Were the seed
-    ever widened into "the résumé follows the interface", this is the test
-    that would catch it, and the user would watch their CV change language
-    because they changed the menu.
+    This test used to assert that an Arabic document opened through an English
+    interface STAYS Arabic, and said in as many words that if the résumé were
+    ever made to follow the interface, "the user would watch their CV change
+    language because they changed the menu".
+
+    That is now the behaviour, asked for on 2026-09-22 when the `Résumé
+    language` control was removed as redundant. The warning was not wrong — it
+    is the price, and here is exactly what it costs: an Arabic CV read through
+    an English interface lays its Arabic text out left-to-right under English
+    headings. Two things keep that rare rather than routine: a new document is
+    seeded in the chosen language, and a visitor who chose nothing is read
+    from their browser's `Accept-Language`. Someone who ends up in the mixed
+    state switches the header, which is now the only language control there is.
+
+    What must STILL never happen, and is the whole of this test now: the seed
+    replacing a document that exists. The language may follow the reader; the
+    words may not.
     """
     seed_resume(samples.ARABIC)
     ui_lang("en")
     page.goto(live_server.url + "/builder")
 
-    expect(page.locator("html")).to_have_attribute("dir", "ltr")
-    doc = page.frame_locator("#preview-frame").locator("html")
-    expect(doc).to_have_attribute("dir", "rtl")
+    canvas = page.frame_locator("#preview-frame").locator(".tpl")
+    expect(canvas).to_contain_text(samples.ARABIC["name"].split(" ", 1)[-1])
+    expect(page.locator("#f_name")).to_have_value(samples.ARABIC["name"])
+    # ...and the language followed the reader, which is the new model.
+    expect(page.frame_locator("#preview-frame").locator("html")).to_have_attribute(
+        "dir", "ltr")
