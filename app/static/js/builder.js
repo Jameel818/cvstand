@@ -152,6 +152,9 @@
     { id: "references", title: T("References"),
       list: { path: "references", label: T("Reference"), titleKey: "name",
         item: [F("name", T("Name")), F("title", T("Title")), F("phone", T("Phone")), F("email", T("Email"))] } },
+    /* Rendered by fontsBody(), not by the generic field/list machinery: its
+       controls depend on each other (a font decides which weights exist). */
+    { id: "fonts", title: T("Fonts"), custom: "fonts" },
   ];
 
   /* ---------- path helpers ---------- */
@@ -243,8 +246,131 @@
     </div>`;
   }
 
+  /* ---------- Fonts section (docs/CVSTAND_FONT_CONTROLS.md §3.5) ----------
+     Six optional controls: Font / Weight / Size for Headlines (the name and
+     section titles) and Details (everything else). Every list comes from the
+     server's registry for the DOCUMENT's language (#typography-data); nothing
+     here knows a font name. "Template default" (null) is the first option of
+     all six and keeps the template exactly as designed.
+
+     The selects carry data-ty, never a `name`, so the generic input handler
+     (which writes strings by path) ignores them; they have their own change
+     handler below, which writes numbers and nulls. */
+  const TY = JSON.parse($("#typography-data").textContent);
+  const TY_KEYS = {
+    heading: ["font_heading", "font_heading_weight", "font_heading_size"],
+    body: ["font_body", "font_body_weight", "font_body_size"],
+  };
+  const TY_ROLE_TITLE = { heading: "Headlines", body: "Details" };
+  const TY_FIELD_TITLE = ["Font", "Weight", "Size"];
+
+  function tyFamily(role, name) {
+    for (const g of TY.roles[role].groups) {
+      for (const f of g.families) if (f.family === name) return f;
+    }
+    return null;
+  }
+  const tyNum = (v) => (v == null || v === "" ? null : Number(v));
+
+  function tyRoleHTML(role) {
+    const [fk, wk, sk] = TY_KEYS[role];
+    const R = TY.roles[role];
+    const fam = tyFamily(role, data[fk]);
+    const w = tyNum(data[wk]), size = tyNum(data[sk]);
+    const id = (f) => `ty_${role}_${f}`;
+
+    const fontOpts = [`<option value="">${T("Template default")}</option>`].concat(
+      R.groups.map((g) => `<optgroup label="${esc(T(g.label))}">` +
+        g.families.map((f) => `<option value="${esc(f.family)}"${fam && fam.family === f.family ? " selected" : ""}>${esc(f.family)}</option>`).join("") +
+        `</optgroup>`)).join("");
+
+    /* Weight follows the font: nothing to choose without one (a weight on
+       the template's own face could be a faux bold), and a font with a
+       single weight shows that weight, disabled, rather than hiding the
+       control - the layout stays still (§3.5). */
+    let weightSel;
+    if (!fam) {
+      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="">${T("Template default")}</option></select>`;
+    } else if (fam.single) {
+      const only = fam.weights[0];
+      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="${only}">${only} — ${T("only weight")}</option></select>`;
+    } else {
+      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}"><option value="">${T("Template default")}</option>` +
+        fam.weights.map((x) => `<option value="${x}"${x === w ? " selected" : ""}>${x} — ${T(TY.weight_labels[String(x)])}</option>`).join("") +
+        `</select>`;
+    }
+    const sizeSel = `<select id="${id("size")}" data-ty="size" data-role="${role}"><option value="">${T("Template default")}</option>` +
+      R.sizes.map((x) => `<option value="${x}"${x === size ? " selected" : ""}>${x} ${T("pt")}</option>`).join("") + `</select>`;
+
+    /* The sample draws in the chosen face at the weight the CV uses for plain
+       text, so it is also what makes the browser fetch that one face. */
+    const sampleW = w || (fam ? fam.nearest[role === "heading" ? "700" : "400"] : 400);
+    const sample = fam ? `<div class="ty-sample" dir="auto" style="font-family:${esc(fam.stack)};font-weight:${sampleW}">${esc(TY.sample)}</div>` : "";
+    const tag = fam && fam.playful ? `<small class="ty-tag">${T("Creative, best for design/creative roles")}</small>` : "";
+    const effSize = size == null ? R.default_size : size;
+    const faint = role === "body" && fam && w === TY.light.weight && effSize < TY.light.below_pt
+      ? `<small class="ty-hint">${T("Very light text may look faint when printed.")}</small>` : "";
+
+    return `<div class="ty-group" data-ty-role="${role}"><h4>${T(TY_ROLE_TITLE[role])}</h4>
+      <div class="field"><label for="${id("font")}">${T("Font")}</label>
+        <select id="${id("font")}" data-ty="font" data-role="${role}">${fontOpts}</select>${sample}${tag}</div>
+      <div class="grid-2">
+        <div class="field"><label for="${id("weight")}">${T("Weight")}</label>${weightSel}</div>
+        <div class="field"><label for="${id("size")}">${T("Size")}</label>${sizeSel}</div>
+      </div>${faint}</div>`;
+  }
+
+  function fontsBody() {
+    return `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${T("Optional. Anything left on Template default keeps the template's own look.")}</p>` +
+      tyRoleHTML("heading") + tyRoleHTML("body");
+  }
+
+  /* Re-draw the section in place, keeping keyboard focus on the control the
+     user was on - a re-render must not throw them back to the top. */
+  function refreshFonts() {
+    const body = $('#resume-form .sec[data-sid="fonts"] .sec-body');
+    if (!body) return;
+    const active = document.activeElement;
+    const keep = active && active.dataset && active.dataset.ty
+      ? `select[data-ty="${active.dataset.ty}"][data-role="${active.dataset.role}"]` : null;
+    body.innerHTML = fontsBody();
+    if (keep) { const el = $(keep, body); if (el) el.focus(); }
+  }
+
+  /* The server rendered these as template default because they are not
+     offered for this document's language - after a language switch, most
+     often. Clear them here too, so the stored résumé agrees with the page,
+     and say so. Values are written as text, never as HTML. */
+  function applyTypographyResets(resets) {
+    const lines = [];
+    resets.forEach((r) => {
+      for (const role of Object.keys(TY_KEYS)) {
+        const at = TY_KEYS[role].indexOf(r.key);
+        if (at < 0) continue;
+        data[r.key] = null;
+        const v = at === 2 && r.value != null ? `${r.value} ${T("pt")}` : String(r.value);
+        lines.push("• " + T(TY_ROLE_TITLE[role]) + " · " + T(TY_FIELD_TITLE[at]) + " — " + v);
+      }
+    });
+    if (!lines.length) return;
+    const box = $("#form-notice");
+    box.textContent = "";
+    const text = document.createElement("span");
+    text.textContent = T("Some font choices are not available in this language and were reset to the template default:")
+      + "\n" + lines.join("\n");
+    const close = document.createElement("button");
+    close.type = "button";
+    close.textContent = T("Dismiss");
+    close.addEventListener("click", () => { box.hidden = true; });
+    box.append(text, close);
+    box.hidden = false;
+    refreshFonts();
+    scheduleSave();
+  }
+
   function sectionHTML(sec, n) {
     let body = "";
+    if (sec.custom === "fonts") body += fontsBody();
     (sec.fields || []).forEach((f) => { body += inputHTML(f, f.path); });
     if (sec.hint) body += `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${sec.hint}</p>`;
     if (sec.list) {
@@ -334,6 +460,29 @@
       ensureArray(path).splice(+idx, 1);
     } else return;
     onChange(true);
+  });
+
+  /* Fonts section: its selects have no `name`, so only this handler sees them. */
+  $("#resume-form").addEventListener("change", (e) => {
+    const el = e.target.closest("select[data-ty]");
+    if (!el) return;
+    const role = el.dataset.role;
+    const [fk, wk, sk] = TY_KEYS[role];
+    if (el.dataset.ty === "font") {
+      /* Keep the nearest valid weight across a font change (§3.5: Montserrat
+         900 -> Almarai gives 800). The table is the server's nearest_weight(). */
+      const prev = tyNum(data[wk]);
+      data[fk] = el.value || null;
+      const fam = tyFamily(role, data[fk]);
+      data[wk] = fam && !fam.single && prev != null ? fam.nearest[String(prev)] : null;
+    } else if (el.dataset.ty === "weight") {
+      data[wk] = tyNum(el.value);
+    } else {
+      data[sk] = tyNum(el.value);
+    }
+    refreshFonts();
+    scheduleRender();
+    scheduleSave();
   });
 
   /* photo upload */
@@ -445,6 +594,7 @@
       }
       showErrors(null);
       const j = await res.json();
+      if (j.resets && j.resets.length) applyTypographyResets(j.resets);
       frame.srcdoc = j.doc;
       frame.onload = checkOverflow;
     } catch (_) {

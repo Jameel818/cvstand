@@ -17,7 +17,8 @@ from markupsafe import Markup
 
 from . import registry
 from .labels import join_labels, reset_lang, set_lang, t
-from .schema import dir_of, lang_of, normalize
+from .schema import dir_of, lang_of, normalize, typography_of
+from .typography.render import document_blocks
 
 _TPL_DIR = Path(__file__).resolve().parent / "templates" / "resumes"
 
@@ -341,7 +342,7 @@ _DOC_TMPL = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 {fonts}
-{rtl_css}
+{rtl_css}{typography_head}
 <style>
   html, body {{ margin: 0; padding: 0; background: #eef0f2; }}
   *, *::before, *::after {{ box-sizing: border-box; }}
@@ -357,7 +358,7 @@ _DOC_TMPL = """<!DOCTYPE html>
 </head>
 <body>
 {canvas}
-{autofit}
+{typography_body}{autofit}
 </body>
 </html>"""
 
@@ -375,6 +376,16 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
     """
     canvas = canvas_html(data, template_key)
     name = (data.get("name") or "Resume").strip()
+    # The user's font choices (docs/CVSTAND_FONT_CONTROLS.md), VALIDATED -
+    # never the raw keys. Both blocks are "" when nothing was chosen, and they
+    # are concatenated rather than given lines of their own, so a résumé with
+    # no typography keys emits byte-for-byte the document it always did.
+    #
+    # Not for the PDF yet: its fonts must be inlined (no base URL - see
+    # font_head), which is step 4 of the spec. Until then an export keeps the
+    # template's own faces rather than silently falling back.
+    ty_head, ty_body = ("", "") if for_pdf else document_blocks(
+        typography_of(data)[0], lang_of(data))
     # `dir` on <html> is what makes the whole document mirror: it is what the
     # logical CSS properties in the templates resolve against, and what the
     # RTL-scoped rules below select on. For lang="en" this emits dir="ltr",
@@ -385,6 +396,8 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
         dir=dir_of(data),
         fonts=font_head(for_pdf=for_pdf, lang=lang_of(data)),
         rtl_css=RTL_TYPOGRAPHY if dir_of(data) == "rtl" else "",
+        typography_head=ty_head,
         canvas=canvas,
+        typography_body=ty_body,
         autofit=autofit_script(),
     )

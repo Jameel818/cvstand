@@ -460,6 +460,33 @@ body.builder-body { overflow: hidden; }
 }
 .form-errors.show { display: block; }
 
+/* Language-switch reset notice for the Fonts section: information, not an
+   error, so it borrows the brand tint rather than the danger red. */
+.form-notice {
+  background: var(--brand-50); border: 1px solid var(--brand-100); color: var(--ink-2);
+  border-radius: var(--r-xs); padding: 10px 12px; font-size: 12.5px;
+  white-space: pre-wrap; margin-bottom: 12px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.form-notice[hidden] { display: none; }
+.form-notice span { flex: 1; min-width: 0; }
+.form-notice button {
+  border: none; background: none; color: var(--brand); cursor: pointer;
+  font: inherit; font-size: 12px; font-weight: 700; padding: 0;
+}
+
+/* Fonts section */
+.ty-group { margin-top: 14px; }
+.ty-group + .ty-group { border-top: 1px solid var(--line); padding-top: 4px; }
+.ty-group h4 { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-2); }
+.ty-sample {
+  margin-top: 6px; font-size: 20px; line-height: 1.3; color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.ty-tag, .ty-hint { display: block; margin-top: 6px; font-size: 11.5px; color: var(--muted); }
+.ty-hint { color: #92400e; }
+.field select:disabled { opacity: .7; cursor: not-allowed; }
+
 /* preview pane */
 .builder-preview {
   grid-area: preview; background: #e9ebef; position: relative; overflow: hidden;

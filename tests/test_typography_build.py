@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 from fontTools.ttLib import TTFont
 
-from app.typography import CSS_FAMILY_PREFIX, OFFERED, built_faces, offered_weights
+from app.typography import CSS_FAMILY_PREFIX, OFFERED, built_faces, built_weights
 
 ROOT = Path(__file__).resolve().parent.parent
 FONT_DIR = ROOT / "app" / "static" / "fonts"
@@ -65,19 +65,34 @@ def _files(face: dict) -> list[str]:
 
 # ---- the build covers the registry, exactly ---------------------------------
 
-def test_every_offered_face_is_built_and_nothing_else():
+def test_every_requestable_face_is_built_and_nothing_else():
+    """Offered weights, plus the Details emphasis face (registry.EMPHASIS_WEIGHT)."""
     wanted = {(fam, w) for (lang, role), fams in OFFERED.items() for fam in fams
-              for w in offered_weights(lang, role, fam)}
+              for w in built_weights(lang, role, fam)}
     assert set(built_faces()) == wanted
 
 
 def test_the_build_is_not_vacuous():
-    """106 faces as planned: 69 instanced, 20 official statics subset, 17 unmodified."""
+    """112 faces: the 106 offered (69 instanced, 20 official statics subset,
+    17 unmodified) plus 6 emphasis faces for the Details families that had no
+    700 (Inter and Noto Sans Arabic instanced; Poppins and Amiri subset; Lora
+    and IBM Plex Sans Arabic unmodified)."""
     methods = {}
     for f in FACES:
         methods[f["method"]] = methods.get(f["method"], 0) + 1
-    assert len(FACES) == 106
-    assert methods == {"instanced": 69, "subset-static": 20, "unmodified": 17}
+    assert len(FACES) == 112
+    assert methods == {"instanced": 71, "subset-static": 22, "unmodified": 19}
+
+
+@pytest.mark.parametrize("family", sorted(BUILD["families"]))
+def test_latin_ext_flag_is_measured(family):
+    """Rendering adds a Latin fallback to the stack exactly where this is
+    false, so it must be what the files say, not what the build assumed."""
+    faces = [f for f in FACES if f["family"] == family]
+    has = all(LATIN_EXT_SAMPLE <= set(_font(f["ttf"]).getBestCmap()) for f in faces)
+    assert BUILD["families"][family]["latin_ext"] is has
+    if family in ARABIC_FAMILIES:
+        assert has == (family not in ARABIC_WITHOUT_LATIN_EXT)
 
 
 # ---- per file ---------------------------------------------------------------

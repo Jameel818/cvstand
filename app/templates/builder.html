@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ t('Builder') }} — {{ brand_name }}{% endblock %}
 {% block body_class %}builder-body{% endblock %}
+{# The Fonts section draws a sample line in each chosen face. Declaring all
+   the faces costs one small stylesheet; the browser fetches a face only when
+   a sample actually uses it. #}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='fonts/typography.css') }}">{% endblock %}
 {% block chrome %}{% endblock %}
 {% block footer %}{% endblock %}
 
@@ -27,6 +31,7 @@
   <form class="builder-form" id="resume-form" autocomplete="off">
     <p class="form-intro">{{ t('Fill in what applies. Empty sections are hidden from the résumé automatically.') }}</p>
     <div class="form-errors" id="form-errors"></div>
+    <div class="form-notice" id="form-notice" role="status" hidden></div>
     <!-- sections injected by builder.js -->
   </form>
 
@@ -64,6 +69,7 @@
 <script id="resume-data" type="application/json">{{ resume | tojson }}</script>
 <script id="catalogue-data" type="application/json">{{ catalogue | tojson }}</script>
 <script id="i18n-data" type="application/json">{{ i18n | tojson }}</script>
+<script id="typography-data" type="application/json">{{ typography | tojson }}</script>
 <script>
   window.__STATE__ = {
     templateKey: {{ meta.template_key | tojson }},

@@ -64,6 +64,7 @@ from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
 from .schema import SUPPORTED_LANGS, ResumeValidationError, typography_of, validate
 from .store import load_meta, load_resume, load_showcase, save_resume, set_template
+from .typography.ui import builder_payload as typography_payload
 
 bp = Blueprint("main", __name__)
 
@@ -193,6 +194,8 @@ def builder():
             "doc_lang": doc_lang,
             "doc_langs": list(SUPPORTED_LANGS),
         },
+        # The Fonts section: the registry's lists for the DOCUMENT language.
+        typography=typography_payload(doc_lang),
     )
 
 
@@ -262,7 +265,14 @@ def api_render():
         doc = document_html(data, key)
     except UnknownTemplate as exc:
         abort(400, str(exc))
-    return jsonify({"ok": True, "html": html, "doc": doc, "template_key": key})
+    # Typography the registry does not offer for this document's language was
+    # rendered as template default; say which, so the builder can clear it and
+    # tell the user. Carried HERE and not only on PUT /api/resume, because a
+    # deployment never sends that PUT (the browser is the store), while every
+    # preview comes through this route.
+    _, resets = typography_of(data)
+    return jsonify({"ok": True, "html": html, "doc": doc, "template_key": key,
+                    "resets": resets})
 
 
 @bp.get("/preview")

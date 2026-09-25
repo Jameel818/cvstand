@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 2 done, step 3 not planned)
+# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 3 done, step 4 not planned)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -35,6 +35,24 @@ Found while building, for later steps:
 - Root `Fonts/` (Thmanyah + unlicensed retail faces) is now `/Fonts/` in
   `.dockerignore` (the Dockerfile does `COPY . .`), and
   `verify_docker_context.py` fails if anything under it enters the context.
+
+**Step 3 DONE — committed on this branch, NOT pushed.** Plan:
+`~/.claude/plans/stateful-humming-waffle.md`. User decisions: template-bold
+Details keeps a real 700 (6 emphasis faces added, 112 total, +1.43 MB);
+sizes are PROPORTIONAL per role (autofit multiplies a factor from
+`typography.js`); the section is **"Fonts" / "الخطوط"**, last, collapsed.
+- `app/typography/render.py` emits link + family CSS (`html[data-cvt]`,
+  switched on by the runtime AFTER weights are written) + config + runtime,
+  and NOTHING when no key is set. `for_pdf` emits none (step-4 pin test).
+- `/api/render` returns `resets` (a deployment never sends PUT); the builder
+  nulls them, saves, and shows `#form-notice`.
+- A headline that INHERITS its family was restyled by a Details-only choice;
+  found by the browser suite, fixed in the runtime (pins pre-switch family).
+- Horizontal overflow at max Headlines size: modern-t3 clips the name from
+  36pt, modern-t9 from 38pt (default 32 is clean on all 49). NOT fixed —
+  a design question for the user.
+- Step 4 must: inline the chosen faces into the PDF doc (the runtime + config
+  already work there), delete `test_pdf_keeps_the_template_look_until_step_4`.
 
 ### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
 - **IBM Plex Sans Arabic in the older Arabic alias layer.** `fonts_ar.css`

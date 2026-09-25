@@ -79,7 +79,7 @@ from fetch_fonts import (  # noqa: E402  - path set above
     _write_licences,
 )
 from app.typography.registry import (  # noqa: E402
-    CSS_FAMILY_PREFIX, FONTS, OFFERED, offered_weights,
+    CSS_FAMILY_PREFIX, FONTS, OFFERED, built_weights,
 )
 
 TTF_DIR = OUT_DIR / "ttf"
@@ -146,6 +146,8 @@ ARABIC = _ranges(
 # printable ASCII character (an email address, a URL), and the 36 base
 # letters of the Arabic alphabet.
 ASCII_PRINTABLE = set(range(0x20, 0x7F))
+# Latin-Ext a name may need (Łukasz, Dvořák, Şahin): the `latin_ext` probe.
+LATIN_EXT_SAMPLE = {0x0141, 0x0142, 0x0159, 0x015E}
 ARABIC_LETTERS = set(range(0x0621, 0x063B)) | set(range(0x0641, 0x064B))
 
 ARABIC_FAMILIES = {f for (lang, _role), fams in OFFERED.items() if lang == "ar"
@@ -158,11 +160,13 @@ def script_ranges(family: str) -> set[int]:
 
 
 def needed_faces() -> dict[str, list[int]]:
-    """family -> the weights some dropdown offers, sorted. Nothing else is built."""
+    """family -> the weights a document can request, sorted: what some dropdown
+    offers, plus the Details emphasis face (registry.EMPHASIS_WEIGHT). Nothing
+    else is built."""
     out: dict[str, set[int]] = {}
     for (lang, role), fams in OFFERED.items():
         for fam in fams:
-            out.setdefault(fam, set()).update(offered_weights(lang, role, fam))
+            out.setdefault(fam, set()).update(built_weights(lang, role, fam))
     return {f: sorted(w) for f, w in sorted(out.items())}
 
 
@@ -537,6 +541,11 @@ def _build_family(family: str, weights: list[int], sha: str) -> tuple[dict, list
             face["woff2_bytes"] = 0
         face.update(_inspect(family, w, _load(ttf_bytes)))
         out.append(face)
+    # Does the family carry Latin-Ext? Measured on what was BUILT (every face
+    # of a family shares a cmap in practice; all of them must have it).
+    # Rendering adds a Latin fallback to the stack where this is false.
+    info["latin_ext"] = all(LATIN_EXT_SAMPLE <= cmap(_load((OUT_DIR / f["ttf"]).read_bytes()))
+                            for f in out)
     return info, out
 
 

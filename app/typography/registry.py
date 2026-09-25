@@ -39,10 +39,48 @@ CSS_FAMILY_PREFIX = "CVT "
 # §3: headlines are heavy, details are light.
 WEIGHT_RANGE = {"heading": (700, 900), "body": (200, 400)}
 
+# Details text the TEMPLATE set bold (a job title at 900, a company at 600)
+# keeps its emphasis under a chosen Details font: it renders in that family's
+# real 700, not at the chosen light weight. Not a user choice - it is never in
+# a dropdown - but it is a built face for every Details family, so nothing is
+# synthesised (hard rule 1). EMPHASIS_FROM is the template weight at which
+# text counts as emphasis.
+EMPHASIS_WEIGHT = 700
+EMPHASIS_FROM = 600
+
+# §4 derived size: section titles = clamp(name size x 0.42, lo, hi) pt.
+SECTION_RATIO = 0.42
+SECTION_CLAMP_PT = {"en": (11, 18), "ar": (12, 20)}
+
+# §3.5 light-weight hint: Details at weight 200 below this size (pt) may print
+# faint. Informational only.
+LIGHT_WEIGHT = 200
+LIGHT_WARNING_PT = {"en": 10, "ar": 11}
+
+# Eight Arabic families stop at Latin-1 upstream (measured, build.json
+# `latin_ext`), so a rare Latin letter (Ł, ř, Ş) needs a Latin family that has
+# it. Chosen by the family's generic, and built at every weight 200-900 so the
+# fallback never has to synthesise either. Loaded by the browser only when a
+# glyph actually falls through.
+LATIN_EXT_FALLBACK = {"sans-serif": "Work Sans", "serif": "Source Serif 4"}
+
 # Dropdown group keys (§3.5). Display text belongs to the label catalogue.
 SANS, SERIF, DISPLAY = "sans", "serif", "display"
 KUFI, NASKH, CALLIGRAPHIC, STYLISED = "kufi", "naskh", "calligraphic", "stylised"
 PLAYFUL = "playful"
+
+# §3.5 <optgroup> order per language, and each group's label (an English msgid,
+# translated by the builder's T(); Arabic in labels._UI_AR).
+GROUP_ORDER = {"en": (SANS, SERIF, DISPLAY),
+               "ar": (KUFI, STYLISED, NASKH, CALLIGRAPHIC, PLAYFUL)}
+GROUP_LABEL = {SANS: "Sans", SERIF: "Serif", DISPLAY: "Display",
+               KUFI: "Kufi / Sans", STYLISED: "Modern / stylised", NASKH: "Naskh",
+               CALLIGRAPHIC: "Calligraphic", PLAYFUL: "Display / Playful"}
+
+# Weight names as the dropdown shows them ("800 — ExtraBold"). msgids too.
+WEIGHT_LABEL = {100: "Thin", 200: "ExtraLight", 300: "Light", 400: "Regular",
+                500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold",
+                900: "Black"}
 
 
 @dataclass(frozen=True)
@@ -189,3 +227,12 @@ def nearest_weight(lang: str, role: str, family: str, wanted: int) -> int | None
 
 def size_scale(lang: str, role: str) -> SizeScale:
     return SIZES[(lang, role)]
+
+
+def built_weights(lang: str, role: str, family: str) -> tuple[int, ...]:
+    """Every weight of `family` a document can request in this role: the
+    offered ones, plus the emphasis face for Details (see EMPHASIS_WEIGHT)."""
+    weights = set(offered_weights(lang, role, family))
+    if weights and role == "body":
+        weights.add(EMPHASIS_WEIGHT)
+    return tuple(sorted(weights))

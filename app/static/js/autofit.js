@@ -106,16 +106,33 @@
    * `d` scales rhythm, `f` scales type. Leading is a product of both: at type
    * scale f the line boxes must come down with the glyphs or the text floats in
    * its own leading. */
+  /* The user's size choice, as a per-element factor from typography.js (only
+   * present when the résumé chose a size). Multiplied into what this file
+   * already writes, because autofit OWNS inline font-size: a size written
+   * anywhere else would be cleared by reset() on the next fit. Written
+   * !important where it applies, since an !important stylesheet size (the
+   * Arabic `.sec-head` rescue) would otherwise swallow it. Absent, k is 1 and
+   * every write below is exactly what it was before this hook existed. */
+  function typeScale(el) {
+    var T = window.CVTypography;
+    return T ? T.scale(el) : 1;
+  }
+
   function apply(d, f) {
-    var els = elements(), i, k, o, el;
+    var els = elements(), i, k, o, el, s;
     for (i = 0; i < els.length; i++) capture(els[i]);
     for (i = 0; i < els.length; i++) {
       el = els[i];
       o = origins.get(el);
+      s = typeScale(el);
       for (k in o) {
-        if (k === "fontSize") el.style.fontSize = (o[k] * f) + "px";
-        else if (k === "lineHeight") el.style.lineHeight = (o[k] * d * f) + "px";
-        else el.style[k] = (o[k] * d) + "px";
+        if (k === "fontSize") {
+          if (s === 1) el.style.fontSize = (o[k] * f) + "px";
+          else el.style.setProperty("font-size", (o[k] * f * s) + "px", "important");
+        } else if (k === "lineHeight") {
+          if (s === 1) el.style.lineHeight = (o[k] * d * f) + "px";
+          else el.style.setProperty("line-height", (o[k] * d * f * s) + "px", "important");
+        } else el.style[k] = (o[k] * d) + "px";
       }
     }
   }
@@ -193,6 +210,10 @@
 
   function fit() {
     reset();
+    // A chosen size is part of the design, not a compression: apply it
+    // before measuring, and keep it even when nothing needs fitting.
+    var scaled = !!(window.CVTypography && window.CVTypography.active);
+    if (scaled) apply(1, 1);
     var natural = measure();
     var d = 1, f = 1, h = natural;
 
@@ -207,7 +228,7 @@
       h = measure();
     }
 
-    if (d === 1 && f === 1) reset();      // nothing was needed; leave the DOM clean
+    if (d === 1 && f === 1 && !scaled) reset();   // nothing was needed; leave the DOM clean
     lastResult = {
       natural: natural,
       height: h,

@@ -713,6 +713,44 @@ _UI_AR: dict[str, str] = {
         "لمسة زيتونية، وخط مضغوط، وخطوط متقاربة",
     "Steel blue, built for long multi-role histories":
         "أزرق فولاذي، مصمّم للمسيرات الطويلة متعددة الأدوار",
+
+    # --- builder: the Fonts section (docs/CVSTAND_FONT_CONTROLS.md) -------
+    "Fonts": "الخطوط",
+    "Optional. Anything left on Template default keeps the template's own look.":
+        "اختياري. كل ما يبقى على افتراضي القالب يحتفظ بمظهر القالب الأصلي.",
+    "Headlines": "العناوين",
+    "Details": "التفاصيل",
+    "Font": "الخط",
+    "Weight": "السماكة",
+    "Size": "الحجم",
+    "Template default": "افتراضي القالب",
+    "only weight": "السماكة الوحيدة",
+    "pt": "نقطة",
+    "Creative, best for design/creative roles": "إبداعي، الأنسب لوظائف التصميم والإبداع",
+    "Very light text may look faint when printed.":
+        "قد يبدو النص الرفيع جداً باهتاً عند الطباعة.",
+    "Some font choices are not available in this language and were reset to the template default:":
+        "بعض خيارات الخطوط غير متاحة في هذه اللغة، فأُعيدت إلى افتراضي القالب:",
+    "Dismiss": "إخفاء",
+    # font groups (registry.GROUP_LABEL)
+    "Sans": "بلا زوائد",
+    "Serif": "بزوائد",
+    "Display": "عناوين عريضة",
+    "Kufi / Sans": "كوفي / بلا زوائد",
+    "Modern / stylised": "حديث / مزخرف",
+    "Naskh": "نسخ",
+    "Calligraphic": "خطّي (رقعة)",
+    "Display / Playful": "عناوين / مرح",
+    # weight names (registry.WEIGHT_LABEL)
+    "Thin": "نحيف جداً",
+    "ExtraLight": "رفيع جداً",
+    "Light": "رفيع",
+    "Regular": "عادي",
+    "Medium": "متوسط",
+    "SemiBold": "شبه عريض",
+    "Bold": "عريض",
+    "ExtraBold": "عريض جداً",
+    "Black": "أسود",
 }
 
 

@@ -344,6 +344,41 @@ Google's own served subsets count as the Original Version is not settled here.
 optical-size measurement that "Adding a family" asks for Arabic faces (spec
 step 7), and the Word embedding (step 6).
 
+### Applying the choices (spec step 3)
+
+`app/typography/render.py` writes the choices into the preview document, and
+only when the résumé chose something. A CV with no typography keys carries
+none of it. There is no link to `typography.css`, no rules, and no runtime.
+
+- **The family is CSS.** The rules are `!important` on the role hooks
+  (`.cv-name`, `.cv-section`, everything else under `.tpl`) for the same
+  reason `RTL_TYPOGRAPHY` is: every template sets `font-family` inline. The
+  selectors carry one more type selector than the Arabic policy's rules, so a
+  chosen font wins in RTL, while a role left on "Template default" keeps the
+  policy's face. The Details rule excludes the headline hooks. A headline
+  that INHERITS its family (ats-t1's name has none of its own) is pinned to
+  its pre-switch face by the runtime; the browser suite found this.
+- **Weight and size are the runtime** (`static/js/typography.js`). Weight
+  "Template default" means `nearest_weight()` of each element's own weight,
+  from a table the server computes. Template-bold Details text (600 and up)
+  renders in the family's real **700 emphasis face**. That face is built for
+  every Details family and never offered in a dropdown. Sizes scale each role
+  by one factor, through autofit, so a job title that was 1.17× body stays
+  1.17× body.
+- **Rules switch on only after the weights are written** (`html[data-cvt]`).
+  Otherwise Chromium could lay the text out in a chosen family at the
+  template's raw weight and fetch a face nobody chose. Mutation-tested: without
+  the gate, the "only chosen faces download" test fails.
+- **The Latin-Ext fallback.** For the eight Arabic families that stop at
+  Latin-1, the stack is `'CVT <Family>', 'CVT Work Sans'` (sans) or
+  `'CVT Source Serif 4'` (serif), then the generic. Both fallbacks are built
+  at every weight, and the browser fetches one only when a glyph falls
+  through. Measured: in Tajawal, "Dvořák Şahin" draws exactly 2 glyphs from
+  Work Sans.
+- **Not the PDF yet.** The export still renders the template's own faces
+  until spec step 4 inlines the chosen ones. A linked face would fail
+  silently there, since the PDF document has no base URL.
+
 ## Word masters are a deliberate exception
 
 `word_masters/*.docx` reference **Arial, Courier, Georgia and Times New Roman**

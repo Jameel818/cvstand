@@ -110,6 +110,10 @@ def test_engine_only_scales_vertical_and_type_properties():
     # rather than words keeps this immune to the prose in the header, which
     # names `transform` precisely to explain why it is NOT used.
     assert set(re.findall(r"\.style\.(\w+)\s*=", src)) == {"fontSize", "lineHeight"}
+    # The typography hook writes the same two properties, !important, when a
+    # size was chosen - and nothing else.
+    assert set(re.findall(r"\.style\.setProperty\(\s*\"([\w-]+)\"", src)) == {
+        "font-size", "line-height"}
 
     props = re.search(r"var PROPS = \[(.*?)\];", src, re.S).group(1)
     assert set(re.findall(r'"(\w+)"', props)) == {

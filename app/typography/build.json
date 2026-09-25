@@ -14,7 +14,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/alexandria/Alexandria[wght].ttf",
-   "source": "ofl/alexandria"
+   "source": "ofl/alexandria",
+   "latin_ext": true
   },
   "Almarai": {
    "script": "arabic",
@@ -22,7 +23,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/almarai"
+   "source": "ofl/almarai",
+   "latin_ext": false
   },
   "Amiri": {
    "script": "arabic",
@@ -30,7 +32,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/amiri"
+   "source": "ofl/amiri",
+   "latin_ext": true
   },
   "Anton": {
    "script": "latin",
@@ -38,7 +41,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/anton"
+   "source": "ofl/anton",
+   "latin_ext": true
   },
   "Anton SC": {
    "script": "latin",
@@ -46,7 +50,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/antonsc"
+   "source": "ofl/antonsc",
+   "latin_ext": true
   },
   "Archivo": {
    "script": "latin",
@@ -55,7 +60,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/archivo/Archivo[wdth,wght].ttf",
-   "source": "ofl/archivo"
+   "source": "ofl/archivo",
+   "latin_ext": true
   },
   "Archivo Black": {
    "script": "latin",
@@ -63,7 +69,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/archivoblack"
+   "source": "ofl/archivoblack",
+   "latin_ext": true
   },
   "Aref Ruqaa": {
    "script": "arabic",
@@ -71,7 +78,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/arefruqaa"
+   "source": "ofl/arefruqaa",
+   "latin_ext": false
   },
   "Baloo Bhaijaan 2": {
    "script": "arabic",
@@ -80,7 +88,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/baloobhaijaan2/BalooBhaijaan2[wght].ttf",
-   "source": "ofl/baloobhaijaan2"
+   "source": "ofl/baloobhaijaan2",
+   "latin_ext": true
   },
   "Bebas Neue": {
    "script": "latin",
@@ -88,7 +97,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/bebasneue"
+   "source": "ofl/bebasneue",
+   "latin_ext": true
   },
   "Cairo": {
    "script": "arabic",
@@ -97,7 +107,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/cairo/Cairo[slnt,wght].ttf",
-   "source": "ofl/cairo"
+   "source": "ofl/cairo",
+   "latin_ext": true
   },
   "El Messiri": {
    "script": "arabic",
@@ -106,7 +117,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/elmessiri/ElMessiri[wght].ttf",
-   "source": "ofl/elmessiri"
+   "source": "ofl/elmessiri",
+   "latin_ext": false
   },
   "IBM Plex Sans Arabic": {
    "script": "arabic",
@@ -118,7 +130,8 @@
     "Plex"
    ],
    "method": "unmodified",
-   "source": "ofl/ibmplexsansarabic"
+   "source": "ofl/ibmplexsansarabic",
+   "latin_ext": false
   },
   "Inter": {
    "script": "latin",
@@ -127,7 +140,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/inter/Inter[opsz,wght].ttf",
-   "source": "ofl/inter"
+   "source": "ofl/inter",
+   "latin_ext": true
   },
   "Jomhuria": {
    "script": "arabic",
@@ -135,7 +149,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/jomhuria"
+   "source": "ofl/jomhuria",
+   "latin_ext": false
   },
   "Lalezar": {
    "script": "arabic",
@@ -143,7 +158,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/lalezar"
+   "source": "ofl/lalezar",
+   "latin_ext": true
   },
   "Lateef": {
    "script": "arabic",
@@ -156,7 +172,8 @@
     "Lateef"
    ],
    "method": "unmodified",
-   "source": "ofl/lateef"
+   "source": "ofl/lateef",
+   "latin_ext": false
   },
   "Lemonada": {
    "script": "arabic",
@@ -165,7 +182,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/lemonada/Lemonada[wght].ttf",
-   "source": "ofl/lemonada"
+   "source": "ofl/lemonada",
+   "latin_ext": true
   },
   "Lora": {
    "script": "latin",
@@ -177,7 +195,8 @@
     "Lora"
    ],
    "method": "unmodified",
-   "source": "fonts.google.com download"
+   "source": "fonts.google.com download",
+   "latin_ext": true
   },
   "Mada": {
    "script": "arabic",
@@ -188,7 +207,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/mada/Mada[wght].ttf",
-   "source": "ofl/mada"
+   "source": "ofl/mada",
+   "latin_ext": true
   },
   "Marhey": {
    "script": "arabic",
@@ -197,7 +217,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/marhey/Marhey[wght].ttf",
-   "source": "ofl/marhey"
+   "source": "ofl/marhey",
+   "latin_ext": true
   },
   "Markazi Text": {
    "script": "arabic",
@@ -206,7 +227,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/markazitext/MarkaziText[wght].ttf",
-   "source": "ofl/markazitext"
+   "source": "ofl/markazitext",
+   "latin_ext": true
   },
   "Montserrat": {
    "script": "latin",
@@ -215,7 +237,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/montserrat/Montserrat[wght].ttf",
-   "source": "ofl/montserrat"
+   "source": "ofl/montserrat",
+   "latin_ext": true
   },
   "Noto Kufi Arabic": {
    "script": "arabic",
@@ -224,7 +247,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/notokufiarabic/NotoKufiArabic[wght].ttf",
-   "source": "ofl/notokufiarabic"
+   "source": "ofl/notokufiarabic",
+   "latin_ext": true
   },
   "Noto Naskh Arabic": {
    "script": "arabic",
@@ -233,7 +257,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/notonaskharabic/NotoNaskhArabic[wght].ttf",
-   "source": "ofl/notonaskharabic"
+   "source": "ofl/notonaskharabic",
+   "latin_ext": true
   },
   "Noto Sans Arabic": {
    "script": "arabic",
@@ -242,7 +267,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/notosansarabic/NotoSansArabic[wdth,wght].ttf",
-   "source": "ofl/notosansarabic"
+   "source": "ofl/notosansarabic",
+   "latin_ext": true
   },
   "Playfair Display": {
    "script": "latin",
@@ -254,7 +280,8 @@
     "Playfair Display"
    ],
    "method": "unmodified",
-   "source": "fonts.google.com download"
+   "source": "fonts.google.com download",
+   "latin_ext": true
   },
   "Poppins": {
    "script": "latin",
@@ -262,7 +289,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/poppins"
+   "source": "ofl/poppins",
+   "latin_ext": true
   },
   "Rakkas": {
    "script": "arabic",
@@ -270,7 +298,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/rakkas"
+   "source": "ofl/rakkas",
+   "latin_ext": true
   },
   "Raleway": {
    "script": "latin",
@@ -282,7 +311,8 @@
     "Raleway"
    ],
    "method": "unmodified",
-   "source": "fonts.google.com download"
+   "source": "fonts.google.com download",
+   "latin_ext": true
   },
   "Readex Pro": {
    "script": "arabic",
@@ -293,7 +323,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/readexpro/ReadexPro[HEXP,wght].ttf",
-   "source": "ofl/readexpro"
+   "source": "ofl/readexpro",
+   "latin_ext": true
   },
   "Scheherazade New": {
    "script": "arabic",
@@ -306,7 +337,8 @@
     "Scheherazade"
    ],
    "method": "unmodified",
-   "source": "ofl/scheherazadenew"
+   "source": "ofl/scheherazadenew",
+   "latin_ext": false
   },
   "Source Serif 4": {
    "script": "latin",
@@ -315,7 +347,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/sourceserif4/SourceSerif4[opsz,wght].ttf",
-   "source": "ofl/sourceserif4"
+   "source": "ofl/sourceserif4",
+   "latin_ext": true
   },
   "Tajawal": {
    "script": "arabic",
@@ -323,7 +356,8 @@
    "reserved_font_names_declared": [],
    "reserved_font_names": [],
    "method": "subset-static",
-   "source": "ofl/tajawal"
+   "source": "ofl/tajawal",
+   "latin_ext": false
   },
   "Work Sans": {
    "script": "latin",
@@ -332,7 +366,8 @@
    "reserved_font_names": [],
    "method": "instanced",
    "variable_source": "ofl/worksans/WorkSans[wght].ttf",
-   "source": "ofl/worksans"
+   "source": "ofl/worksans",
+   "latin_ext": true
   }
  },
  "faces": [
@@ -521,6 +556,26 @@
    "full_name": "Amiri Regular",
    "postscript_name": "Amiri-Regular",
    "codepoints": 1672
+  },
+  {
+   "family": "Amiri",
+   "weight": 700,
+   "css_family": "CVT Amiri",
+   "method": "subset-static",
+   "source": "ofl/amiri/Amiri-Bold.ttf",
+   "source_sha256": "cfccb794268e7d573d857e6d6a67f89cf8a053e8ffd85dfa0c8ec1bb36fc4827",
+   "ttf": "ttf/amiri-700.ttf",
+   "ttf_bytes": 398628,
+   "ttf_sha256": "da091b10da8a337c646243dd05f66295f853b0e2723f87450b5cc21abdd53f12",
+   "woff2": "web/amiri-700.woff2",
+   "woff2_bytes": 133812,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "Amiri",
+   "word_bold": true,
+   "full_name": "Amiri Bold",
+   "postscript_name": "Amiri-Bold",
+   "codepoints": 1528
   },
   {
    "family": "Anton",
@@ -1064,6 +1119,26 @@
    "codepoints": 1032
   },
   {
+   "family": "IBM Plex Sans Arabic",
+   "weight": 700,
+   "css_family": "CVT IBM Plex Sans Arabic",
+   "method": "unmodified",
+   "source": "ofl/ibmplexsansarabic/IBMPlexSansArabic-Bold.ttf",
+   "source_sha256": "691e0c891a38637ae6bbdb69700f8042cb0724a137bee615068ffdb92244f61f",
+   "ttf": "ttf/ibm-plex-sans-arabic-700.ttf",
+   "ttf_bytes": 246992,
+   "ttf_sha256": "691e0c891a38637ae6bbdb69700f8042cb0724a137bee615068ffdb92244f61f",
+   "woff2": null,
+   "woff2_bytes": 0,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "IBM Plex Sans Arabic",
+   "word_bold": true,
+   "full_name": "IBM Plex Sans Arabic Bold",
+   "postscript_name": "IBMPlexSansArabic-Bold",
+   "codepoints": 1032
+  },
+  {
    "family": "Inter",
    "weight": 200,
    "css_family": "CVT Inter",
@@ -1130,6 +1205,29 @@
    "word_bold": false,
    "full_name": "Inter Regular",
    "postscript_name": "Inter-Regular",
+   "codepoints": 1003
+  },
+  {
+   "family": "Inter",
+   "weight": 700,
+   "css_family": "CVT Inter",
+   "method": "instanced",
+   "pinned_axes": {
+    "opsz": 14.0
+   },
+   "source": "ofl/inter/Inter[opsz,wght].ttf",
+   "source_sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+   "ttf": "ttf/inter-700.ttf",
+   "ttf_bytes": 176288,
+   "ttf_sha256": "e85cbecb5f2a75bb455cc99892f5b5a957df3f50f4a180a5688bcfc0aacda186",
+   "woff2": "web/inter-700.woff2",
+   "woff2_bytes": 61532,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "Inter",
+   "word_bold": true,
+   "full_name": "Inter Bold",
+   "postscript_name": "Inter-Bold",
    "codepoints": 1003
   },
   {
@@ -1311,6 +1409,26 @@
    "word_bold": false,
    "full_name": "Lora Regular",
    "postscript_name": "Lora-Regular",
+   "codepoints": 778
+  },
+  {
+   "family": "Lora",
+   "weight": 700,
+   "css_family": "CVT Lora",
+   "method": "unmodified",
+   "source": "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787z5vCJGmKxemMeZ.ttf",
+   "source_sha256": "7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87",
+   "ttf": "ttf/lora-700.ttf",
+   "ttf_bytes": 133828,
+   "ttf_sha256": "7d74015e950c2fb66519c7295b8155621d22200ae2ca2a4c6b43ce3c490cac87",
+   "woff2": null,
+   "woff2_bytes": 0,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "Lora",
+   "word_bold": true,
+   "full_name": "Lora Bold",
+   "postscript_name": "Lora-Bold",
    "codepoints": 778
   },
   {
@@ -1866,6 +1984,29 @@
    "codepoints": 1542
   },
   {
+   "family": "Noto Sans Arabic",
+   "weight": 700,
+   "css_family": "CVT Noto Sans Arabic",
+   "method": "instanced",
+   "pinned_axes": {
+    "wdth": 100.0
+   },
+   "source": "ofl/notosansarabic/NotoSansArabic[wdth,wght].ttf",
+   "source_sha256": "63111b5b2e074dd48cc67692e0a2726d86ee94c1c37fe8598257b7b4e87e869e",
+   "ttf": "ttf/noto-sans-arabic-700.ttf",
+   "ttf_bytes": 175004,
+   "ttf_sha256": "e8da2db1c7ee00879656f77c504526d2f57ef23bf409af77506268c2fd3f6d78",
+   "woff2": "web/noto-sans-arabic-700.woff2",
+   "woff2_bytes": 62176,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "Noto Sans Arabic",
+   "word_bold": true,
+   "full_name": "Noto Sans Arabic Bold",
+   "postscript_name": "NotoSansArabic-Bold",
+   "codepoints": 1542
+  },
+  {
    "family": "Playfair Display",
    "weight": 700,
    "css_family": "CVT Playfair Display",
@@ -1983,6 +2124,26 @@
    "word_bold": false,
    "full_name": "Poppins Regular",
    "postscript_name": "Poppins-Regular",
+   "codepoints": 353
+  },
+  {
+   "family": "Poppins",
+   "weight": 700,
+   "css_family": "CVT Poppins",
+   "method": "subset-static",
+   "source": "ofl/poppins/Poppins-Bold.ttf",
+   "source_sha256": "983676516167748b74de6f4771fb384c664fd913acb8b471122ecacf5da5ea6c",
+   "ttf": "ttf/poppins-700.ttf",
+   "ttf_bytes": 26236,
+   "ttf_sha256": "5b3fa29d35b498daadbbda9c6f8342759554eca63a5717c2469b886b1e35eb88",
+   "woff2": "web/poppins-700.woff2",
+   "woff2_bytes": 11336,
+   "us_weight_class": 700,
+   "fs_type": 0,
+   "word_family_name": "Poppins",
+   "word_bold": true,
+   "full_name": "Poppins Bold",
+   "postscript_name": "Poppins-Bold",
    "codepoints": 353
   },
   {
