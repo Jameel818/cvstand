@@ -58,6 +58,10 @@ FORBIDDEN_GLOBS = [
     "data/*.db",
     "tests/*.py",
     "venv/*",
+    # Font SOURCES (Thmanyah, the unlicensed retail faces): never shipped,
+    # never uploaded. The Dockerfile does `COPY . .`, so only .dockerignore
+    # keeps them out of the image. See .gitignore and FONTS.md.
+    "Fonts/**/*",
 ]
 
 
@@ -77,6 +81,17 @@ def ignored(rel: str, rules) -> bool:
     state = False
     for pattern, negated in rules:
         pat = pattern.rstrip("/")
+        if pat.startswith("/"):
+            # Root-anchored, as Docker reads every rule: the path or one of
+            # its leading directories must match. Case-SENSITIVE, because the
+            # build runs on Linux - fnmatch folds case on Windows, which would
+            # read `/Fonts/` as excluding app/static/fonts/ too.
+            parts = rel.split("/")
+            hit = any(fnmatch.fnmatchcase("/".join(parts[:k]), pat[1:])
+                      for k in range(1, len(parts) + 1))
+            if hit:
+                state = not negated
+            continue
         hit = (
             fnmatch.fnmatch(rel, pat)
             or fnmatch.fnmatch(rel, pat + "/*")

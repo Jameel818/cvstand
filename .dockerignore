@@ -23,6 +23,12 @@ junit_e2e.xml
 screenshots/
 tools/
 
+# Font SOURCES in the project root: Thmanyah (its licence forbids uploading
+# or hosting the files) and fourteen retail faces with no licence at all.
+# `COPY . .` would otherwise put them in the image. Anchored and case-exact:
+# the SHIPPED fonts live in app/static/fonts/ and must stay in.
+/Fonts/
+
 # Design sources and working documents -- large, and not served.
 *.dc.html
 *.md

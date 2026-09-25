@@ -32,11 +32,19 @@ Found while building, for later steps:
   `word_family_name` + `word_bold` from build.json, not assume RIBBI.
 - `typography.css` is linked nowhere yet, and there is no inline copy for PDF
   (set_content has no base URL) — step 4 must inline only the used faces.
-- Open question: the older alias layer serves IBM Plex Sans Arabic as
-  Google-subset woff2 under its RFN name (FONTS.md notes it; unchanged).
-- Root `Fonts/` (incl. Thmanyah) is NOT in `.dockerignore`, so a plain
-  `docker build` context includes it. Whether `railway up` uploads it depends
-  on it honouring `.gitignore` — UNVERIFIED. Not changed.
+- Root `Fonts/` (Thmanyah + unlicensed retail faces) is now `/Fonts/` in
+  `.dockerignore` (the Dockerfile does `COPY . .`), and
+  `verify_docker_context.py` fails if anything under it enters the context.
+
+### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
+- **IBM Plex Sans Arabic in the older Arabic alias layer.** `fonts_ar.css`
+  serves it as Google-CSS-API woff2 subsets (`ibm-plex-sans-arabic-*.woff2`)
+  under its Reserved Font Name ("Plex"). Under OFL FAQ 2.2.2 / 2.6 a subset or
+  converted file is a Modified Version and may not keep that name. Decide:
+  serve the unmodified official TTF (as the typography build does), or keep
+  it on the view that Google's served subsets are the Original Version.
+  Either way it moves ARABIC rendering of the 49 templates — Arabic overflow
+  gate + Arabic pixel check required; English must not move.
 
 Standing notes for steps 3/6/7 are in the typography memory file; the key one
 for step 3: a chosen font with weight None renders at `nearest_weight()` to
