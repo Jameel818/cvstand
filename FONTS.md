@@ -22,6 +22,14 @@ by a template.
 | Amiri | OFL 1.1 | Arabic behind Fraunces, Merriweather (Naskh, for serif pairings) |
 | Noto Kufi Arabic | OFL 1.1 | Arabic behind Anton (display weight) |
 | Anton, Archivo, Archivo Narrow, Fraunces, IBM Plex Mono, Inter, Merriweather, Montserrat, Open Sans, Poppins, Source Sans 3 | OFL 1.1 | the Latin families the 49 templates declare |
+| Anton SC, Archivo Black, Bebas Neue, Raleway, Playfair Display, Source Serif 4, Work Sans, Lora | OFL 1.1 | typography controls, English (user's choice) |
+| Almarai, Alexandria, Mada, Readex Pro, Noto Sans Arabic, El Messiri, Markazi Text, Scheherazade New, Lateef, Aref Ruqaa, Lalezar, Jomhuria, Rakkas, Marhey, Baloo Bhaijaan 2, Lemonada | OFL 1.1 | typography controls, Arabic (user's choice) |
+
+The typography controls also offer families already listed above (Anton,
+Archivo, Montserrat, Poppins, Inter, Tajawal, Cairo, Amiri, Noto Kufi Arabic,
+Noto Naskh Arabic, IBM Plex Sans Arabic), from their own files — see
+"Typography controls" below. All 35 are licensed OFL 1.1, which permits use in
+a sold product; each OFL.txt is in `app/static/fonts/licenses/`.
 
 **Noto Naskh Arabic** is allowed by the policy as an alternative to Amiri and
 is not currently used. **Noto Kufi Arabic** is used instead, and is the same
@@ -236,6 +244,105 @@ holds fourteen commercial retail faces — `sakkal-majalla`, `bahij-muna`,
 `lyon-arabic-display`, `alyamama` and others — with **zero licence files
 between them**. Not shipped, not in `app/static/fonts/`, and not to be added
 without written terms.
+
+## Typography controls: the user's font choices
+
+`docs/CVSTAND_FONT_CONTROLS.md` lets the user pick a font, weight and size for
+headlines and details. Every face a dropdown can offer — 106 of them across
+35 families — is built by `tools/build_fonts.py` from `google/fonts` (pinned
+to one commit, recorded in `app/typography/build.json`) into:
+
+| path | what | used by |
+|---|---|---|
+| `ttf/<slug>-<weight>.ttf` | every face | Word embedding (spec §6.3) |
+| `web/<slug>-<weight>.woff2` | every face EXCEPT the six below | preview and PDF |
+| `typography.css` | one `@font-face` per face | preview and PDF |
+
+**The CSS families are `'CVT <Family>'`.** `fonts.css` already declares
+`'Montserrat'`, `'Inter'` and others for the 49 templates, from different
+files at different weights. Reusing those names would add faces to families
+the templates already render with, and could move an existing CV. With the
+prefix, nothing a template names can resolve to these files.
+`tests/test_typography_build.py` asserts no collision.
+
+**These are static files, so they declare ONE weight each.** The
+variable-font rule above (declare the RANGE) is about serving a variable
+file. Here every variable source is cut into static instances first, one per
+offered weight, so a single `font-weight` per rule is correct.
+
+Each face is made in one of three ways, decided per family from its own
+`OFL.txt`:
+
+| method | faces | what happens |
+|---|---|---|
+| instanced | 69 | variable font → static instance (wght pinned, other axes at default), renamed per spec §5.3, then subset |
+| subset-static | 20 | official static TTF, subset |
+| unmodified | 17 | official static TTF, byte-for-byte, **no woff2** |
+
+**Subsetting is by script, never by a CV's characters:** Latin + Latin-Ext
+for every family, plus Arabic for Arabic ones. **Arabic families keep their
+Latin**, so English words, emails and URLs in an Arabic CV render in the
+same family. The build fails if an Arabic face lacks printable ASCII, or if
+subsetting dropped any Latin character the source had. Measured: eight Arabic
+families stop at Latin-1 UPSTREAM (Almarai, Aref Ruqaa, El Messiri, IBM Plex
+Sans Arabic, Jomhuria, Lateef, Scheherazade New, Tajawal), so a "Ł" or "ř"
+in those falls through to the generic fallback. The test pins that list.
+
+**Thin/ExtraLight weight class.** Google's official static TTFs store
+ExtraLight as `usWeightClass` 275 (Poppins, Tajawal) or 250 (Raleway), a
+Windows GDI convention. The build reads the weight from the style name and
+accepts only those legacy values; instances it makes always get the exact
+weight.
+
+### Why six families ship as unmodified TTF
+
+Raleway, Playfair Display, Lora, IBM Plex Sans Arabic ("Plex"), Scheherazade
+New and Lateef each declare a **Reserved Font Name** in their `OFL.txt` that
+their own name contains. OFL 1.1 condition 3 says a Modified Version may not
+use a Reserved Font Name. So for these six, anything this project changes must
+be renamed, and a renamed "Raleway" is not what the user picked. The
+alternative is to change nothing. The OFL FAQ
+(https://openfontlicense.org/ofl-faq/) settles what counts as a change:
+
+- **Subsetting is modification.** FAQ **2.6**: *"Removing any parts of the
+  font when delivering a webfont to a browser, including unused glyphs and
+  smart font code, is considered modification. This is permitted by the OFL
+  but would not normally allow the use of RFNs."* So these six are not subset.
+  They ship with every glyph.
+- **WOFF/WOFF2 conversion is modification unless it provably is not.** FAQ
+  **2.2**: *"A change in font format normally is considered modification, and
+  Reserved Font Names (RFNs) cannot be used."* **2.2.1** allows a WOFF version
+  under the original name *"only if the original font data remains unchanged
+  except for WOFF compression"* and the metadata is carried unaltered. **2.2.2**:
+  *"Some WOFF conversion tools and online services do not meet the two
+  requirements… and so their output must be considered a Modified Version."*
+  The converter here (fontTools) decompiles and recompiles every table, and
+  WOFF2 applies its glyf/loca transform. So we cannot show the font data is
+  unchanged, and under 2.2.2 that output counts as modified. The browser
+  therefore gets the official `.ttf` (`format('truetype')`), and the cost is
+  size, not legality.
+- **Embedding in a document is allowed in full or subset.** FAQ **1.12**: *"So
+  can I embed OFL fonts in my document? Yes, either in full or a subset. The
+  restrictions regarding font modification and redistribution do not apply,
+  as the font is not intended for use outside the document."* So when Chromium
+  subsets a face into a PDF, or step 6 embeds the TTF in a `.docx`, no Reserved
+  Font Name question arises. That applies to these six too.
+
+`tests/test_typography_build.py` enforces this. It re-derives the RFN
+families from the vendored `OFL.txt` files and requires exactly these six. It
+also requires each of their files to hash to the upstream bytes, with no
+woff2 present. Raleway, Playfair Display and Lora exist only as variable fonts
+in `google/fonts`, so their statics come from Google Fonts' own family
+download (the official statics; the URL and hash are in `build.json`).
+
+**Open question, not changed here:** the older alias layer (`fonts_ar.css`)
+serves IBM Plex Sans Arabic as `.woff2` subsets fetched from Google's CSS API
+under the original name. That predates this rule and is Arabic-only. Whether
+Google's own served subsets count as the Original Version is not settled here.
+
+**Not yet done for these families** (later steps of the spec): the
+optical-size measurement that "Adding a family" asks for Arabic faces (spec
+step 7), and the Word embedding (step 6).
 
 ## Word masters are a deliberate exception
 

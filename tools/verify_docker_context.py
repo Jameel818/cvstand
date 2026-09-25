@@ -35,6 +35,15 @@ REQUIRED_GLOBS = [
     "app/static/js/*.js",
     "app/static/fonts/fonts.css",
     "app/static/fonts/*.woff2",
+    "app/static/fonts/licenses/*.txt",
+    # Typography controls: the registry package, what the font build
+    # produced, and the faces themselves (tools/build_fonts.py). A missing
+    # face does not fail anything at build time - Chromium silently falls back.
+    "app/typography/*.py",
+    "app/typography/build.json",
+    "app/static/fonts/typography.css",
+    "app/static/fonts/ttf/*.ttf",
+    "app/static/fonts/web/*.woff2",
     "app/static/icons/*.png",
     # The showcase samples the landing hero and gallery cards render.
     "data/sample_resume.json",

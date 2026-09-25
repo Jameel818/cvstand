@@ -43,6 +43,13 @@ ALLOWED = {
     "Anton", "Archivo", "Archivo Narrow", "Fraunces", "IBM Plex Mono",
     "Inter", "Merriweather", "Montserrat", "Open Sans", "Poppins",
     "Source Sans 3",
+    # Typography controls (app/typography/registry.py) — the families a user
+    # may choose, beyond those already above. FONTS.md, "Typography controls".
+    "Anton SC", "Archivo Black", "Bebas Neue", "Raleway", "Playfair Display",
+    "Source Serif 4", "Work Sans", "Lora",
+    "Almarai", "Alexandria", "Mada", "Readex Pro", "Noto Sans Arabic",
+    "El Messiri", "Markazi Text", "Scheherazade New", "Lateef", "Aref Ruqaa",
+    "Lalezar", "Jomhuria", "Rakkas", "Marhey", "Baloo Bhaijaan 2", "Lemonada",
 }
 
 #: Named so a grep finds them. All are licensed per-seat or per-domain and are
@@ -54,19 +61,29 @@ PAID = ("29LT Bukra", "29LT Zarid", "GE SS", "DIN Next LT Arabic", "FF Shamel")
 LICENCE_BLOCKED = ("thmanyah", "Thmanyah")
 
 
-def _families_on_disk() -> set[str]:
-    """Families inferred from the shipped .woff2 filenames.
+#: Every font file format that can be served or embedded.
+FONT_SUFFIXES = (".woff2", ".woff", ".ttf", ".otf")
 
-    `tools/fetch_fonts.py` names them `<family-slug>-<weight>-normal-<hash>`,
-    so the slug is everything before the weight. Read from the FILES rather
-    than from LICENSES.md, which is generated from the same fetch and would
-    agree with a wrong answer.
+
+def _families_on_disk() -> set[str]:
+    """Families inferred from every font file under app/static/fonts/,
+    subfolders included.
+
+    `tools/fetch_fonts.py` names them `<family-slug>-<weight>-normal-<hash>`
+    and `tools/build_fonts.py` `ttf/<family-slug>-<weight>.ttf` and
+    `web/<family-slug>-<weight>.woff2`, so the slug is everything before the
+    weight. Read from the FILES rather than from LICENSES.md, which is
+    generated from the same fetch and would agree with a wrong answer.
+
+    A font file that matches neither pattern is returned under its own name,
+    so it fails the allowlist instead of escaping the check.
     """
     out: set[str] = set()
-    for f in FONT_DIR.glob("*.woff2"):
-        m = re.match(r"^(.*?)-\d{3}-", f.name)
-        if m:
-            out.add(m.group(1))
+    for f in FONT_DIR.rglob("*"):
+        if f.suffix.lower() not in FONT_SUFFIXES:
+            continue
+        m = re.match(r"^(.*?)-\d{3}(?:-|\.)", f.name)
+        out.add(m.group(1) if m else f.name)
     return out
 
 
@@ -173,7 +190,7 @@ def test_the_allowlist_is_not_vacuous():
     having nothing to check - the exact shape of failure this repo has shipped
     twice (a pixel gate that never ran, and its baselines gitignored)."""
     found = _families_on_disk()
-    assert len(found) >= 10, (
+    assert len(found) >= 35, (
         f"only {len(found)} families detected on disk ({sorted(found)}) - the "
         "filename pattern in _families_on_disk() has probably drifted, and "
         "every other assertion in this file is passing vacuously")

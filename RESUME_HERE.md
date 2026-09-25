@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 2 approved, not started)
+# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 2 done, step 3 not planned)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -12,29 +12,31 @@ returns and logs `resets`. Off-whitelist values reset to null; only a wrong
 JSON type is 422. 105 new tests; full fast suite 2063 passed; HTML goldens
 unchanged. Pixel goldens not run (nothing renders the keys yet).
 
-**Step 2 PLAN APPROVED, NOT YET IMPLEMENTED.** `tools/build_fonts.py` +
-`app/typography/build.json` + generated `app/static/fonts/typography.css`
-(families prefixed `'CVT …'` so no existing template face can change) +
-`tests/test_typography_build.py`. 106 faces: 20 official statics subset,
-69 instanced from variable fonts, 17 unmodified (Reserved Font Name applies:
-Raleway, Playfair Display, Lora, IBM Plex Sans Arabic, Scheherazade New,
-Lateef). Approved with option **(a)**: RFN families are served to the browser
-as their unmodified TTF, no woff2. Plus two additions from the user:
+**Step 2 DONE — committed on this branch, NOT pushed.** `tools/build_fonts.py`
+built 106 faces over 35 families (69 instanced, 20 subset-static, 17
+unmodified) from google/fonts @ 23e54b51ddff; rebuild is byte-identical.
+Output: `app/static/fonts/{ttf,web}/`, `typography.css` (families `'CVT …'`),
+`app/typography/build.json` (+ `faces.py` accessor). **+19.05 MB** to
+`app/static/fonts/` (ttf 15.15, woff2 3.77, licences 0.11). The six RFN
+families ship byte-for-byte TTF, no woff2 — FONTS.md cites OFL FAQ 2.2/2.2.1/
+2.2.2, 2.6, 1.12. `.gitignore` `Fonts/` → `/Fonts/`, verified with
+`git check-ignore`. `tests/test_typography_build.py` (707); fast suite 2770
+passed; pixel goldens 50/50.
 
-1. **Arabic fonts keep their Latin coverage** — subset Arabic faces to Arabic
-   + Latin + Latin-Ext, never Arabic alone (English words, emails and URLs in
-   an Arabic CV render in the same family, §3.4).
-2. **Root `Fonts/` stays ignored after the `.gitignore` fix** — the fix
-   anchors `Fonts/` to `/Fonts/` (unanchored, with `core.ignorecase=true`, it
-   silently ignores every NEW file under `app/static/fonts/`); verify with
-   `git check-ignore` that `Fonts/Thmanyah/…` and `Fonts/Nice fonts/…` are
-   still ignored AND the new font paths are not.
-
-Also in the approved plan: reuse `fetch_fonts.py` helpers by import, never
-re-run it; extend `test_font_policy.py` to scan subfolders and `.ttf`; add the
-new globs (and `app/typography/*.py`) to `tools/verify_docker_context.py`;
-add the 24 families to FONTS.md via "Adding a family". Estimated +12–20 MB
-to `app/static/fonts/` — measure and report the real figure.
+Found while building, for later steps:
+- 8 Arabic families stop at Latin-1 UPSTREAM (Almarai, Aref Ruqaa, El Messiri,
+  IBM Plex Sans Arabic, Jomhuria, Lateef, Scheherazade New, Tajawal): "Ł", "ř"
+  fall to the fallback. Step 3's font stack must account for it.
+- Official ExtraLight statics say usWeightClass 275/250 (GDI convention).
+- `Almarai Bold` is its own nameID 1 WITH the bold bit — step 5 must read
+  `word_family_name` + `word_bold` from build.json, not assume RIBBI.
+- `typography.css` is linked nowhere yet, and there is no inline copy for PDF
+  (set_content has no base URL) — step 4 must inline only the used faces.
+- Open question: the older alias layer serves IBM Plex Sans Arabic as
+  Google-subset woff2 under its RFN name (FONTS.md notes it; unchanged).
+- Root `Fonts/` (incl. Thmanyah) is NOT in `.dockerignore`, so a plain
+  `docker build` context includes it. Whether `railway up` uploads it depends
+  on it honouring `.gitignore` — UNVERIFIED. Not changed.
 
 Standing notes for steps 3/6/7 are in the typography memory file; the key one
 for step 3: a chosen font with weight None renders at `nearest_weight()` to

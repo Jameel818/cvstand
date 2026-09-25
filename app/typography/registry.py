@@ -31,6 +31,11 @@ TYPOGRAPHY_KEYS = tuple(
     k for role in ROLES for k in (FONT_KEY[role], WEIGHT_KEY[role], SIZE_KEY[role])
 )
 
+# Every @font-face the typography build writes (tools/build_fonts.py) uses
+# this prefix, so a family a template already names ('Montserrat', 'Inter')
+# can never resolve to one of the new files and change an existing render.
+CSS_FAMILY_PREFIX = "CVT "
+
 # §3: headlines are heavy, details are light.
 WEIGHT_RANGE = {"heading": (700, 900), "body": (200, 400)}
 

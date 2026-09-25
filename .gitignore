@@ -52,4 +52,9 @@ data/resume.json
 #                       without copying this folder in by hand.
 #   Fonts/Nice fonts/   fourteen commercial retail faces with ZERO licence
 #                       files between them. See FONTS.md.
-Fonts/
+#
+# ANCHORED to the root on purpose. Unanchored, `Fonts/` matches a directory
+# named Fonts at ANY depth, and with core.ignorecase=true (the Windows default)
+# that includes app/static/fonts/ - every NEW font file there was silently
+# ignored. The shipped fonts were only tracked because they predate the rule.
+/Fonts/
