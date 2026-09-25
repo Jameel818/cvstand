@@ -1,4 +1,48 @@
-# RESUME HERE — paused 2026-09-22 (ONE LANGUAGE EVERYWHERE · nothing blocked)
+# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 2 approved, not started)
+
+## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
+
+Spec: `docs/CVSTAND_FONT_CONTROLS.md` (§8 is the step order; §9 governs every
+push and merge). One §8 step at a time: plan → user approval → implement →
+tests → commit → report verified / not verified → ask before the next step.
+
+**Step 1 DONE — `0d8de14`.** `app/typography/` (registry + whitelist), the six
+optional keys in the schema, `normalize()` fills them, `PUT /api/resume`
+returns and logs `resets`. Off-whitelist values reset to null; only a wrong
+JSON type is 422. 105 new tests; full fast suite 2063 passed; HTML goldens
+unchanged. Pixel goldens not run (nothing renders the keys yet).
+
+**Step 2 PLAN APPROVED, NOT YET IMPLEMENTED.** `tools/build_fonts.py` +
+`app/typography/build.json` + generated `app/static/fonts/typography.css`
+(families prefixed `'CVT …'` so no existing template face can change) +
+`tests/test_typography_build.py`. 106 faces: 20 official statics subset,
+69 instanced from variable fonts, 17 unmodified (Reserved Font Name applies:
+Raleway, Playfair Display, Lora, IBM Plex Sans Arabic, Scheherazade New,
+Lateef). Approved with option **(a)**: RFN families are served to the browser
+as their unmodified TTF, no woff2. Plus two additions from the user:
+
+1. **Arabic fonts keep their Latin coverage** — subset Arabic faces to Arabic
+   + Latin + Latin-Ext, never Arabic alone (English words, emails and URLs in
+   an Arabic CV render in the same family, §3.4).
+2. **Root `Fonts/` stays ignored after the `.gitignore` fix** — the fix
+   anchors `Fonts/` to `/Fonts/` (unanchored, with `core.ignorecase=true`, it
+   silently ignores every NEW file under `app/static/fonts/`); verify with
+   `git check-ignore` that `Fonts/Thmanyah/…` and `Fonts/Nice fonts/…` are
+   still ignored AND the new font paths are not.
+
+Also in the approved plan: reuse `fetch_fonts.py` helpers by import, never
+re-run it; extend `test_font_policy.py` to scan subfolders and `.ttf`; add the
+new globs (and `app/typography/*.py`) to `tools/verify_docker_context.py`;
+add the 24 families to FONTS.md via "Adding a family". Estimated +12–20 MB
+to `app/static/fonts/` — measure and report the real figure.
+
+Standing notes for steps 3/6/7 are in the typography memory file; the key one
+for step 3: a chosen font with weight None renders at `nearest_weight()` to
+the template's own weight, never the raw template weight.
+
+---
+
+# Previous pause — 2026-09-22 (ONE LANGUAGE EVERYWHERE · nothing blocked)
 
 ## ⏸ EXACTLY WHERE THIS STOPPED
 
