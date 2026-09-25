@@ -298,3 +298,21 @@ For **Arabic runs** you must set the complex-script attributes, not just `run.fo
 7. Calibration script → fill in `optical_scale` / `line_height` → review the calibration page
 
 Commit after each step. Report what was verified at each step and what wasn't.
+
+---
+
+## 9. Deployment (GitHub → Railway)
+
+`DEPLOY.md` is the full runbook. These are the rules for this feature.
+
+1. **Branch.** All work happens on `feature/typography-controls`. Never commit this feature directly to `main`.
+2. **Ask before every push or merge.** Claude Code does not push, merge or deploy without an explicit go-ahead for that specific action. Approving one push does not approve the next.
+3. **Merge gate.** Merge into `main` only when every §7 test passes, the §7.9 regression shows existing CVs unchanged, and the §7.8 manual Word check has been done and its Word version recorded. A step marked "not verified" blocks the merge.
+4. **Audit before pushing.** Run `git ls-files` and confirm nothing from `.env`, `*.db`, `venv/`, `data/resume.json` or a hardcoded key is tracked. Font files under the font build output are expected; check their licences against the §5 Reserved Font Name report first.
+5. **Push form.** Always use the non-interactive form, never a bare `git push`:
+   `GIT_TERMINAL_PROMPT=0 git -c credential.interactive=never -c core.askPass= push origin <branch>`
+   Confirm it landed with `git ls-remote origin refs/heads/<branch>`. The local `origin/*` ref can be stale.
+6. **A push does not deploy.** Railway has no GitHub auto-deploy on this repo. The deploy path is `venv/Scripts/python tools/verify_deploy_target.py && railway up --detach`, run from an up-to-date `main` (`git status -sb` shows no "ahead"). Never run `railway up` without the guard.
+7. **Fonts must ship in the image.** Before deploying, run `tools/verify_docker_context.py` and confirm `.dockerignore` does not exclude the font files. A missing font does not fail the build; Chromium silently falls back and the §7.5 guarantee breaks in production only.
+8. **Verify after deploying.** Run `tools/smoke_deploy.py` against the Railway address, then export one EN and one AR PDF with a non-default font and confirm the embedded font names as in §7.5.
+9. **Do not touch production settings** (env vars, the `/data` volume, DNS) as part of this feature.

@@ -39,3 +39,5 @@ Standing requirements for every template here, checked every time:
   with a `<!-- N -->` marker and an `id="tN"` wrapper. Keep that convention.
 - Colors always diverge from any uploaded reference, for copyright reasons.
 - Deliverable format is coded HTML that Claude Code can port to Jinja2.
+
+Typography feature spec: docs/CVSTAND_FONT_CONTROLS.md. Follow it for any font/weight/size work, and its §9 rules for any git push or merge.
