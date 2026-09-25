@@ -54,6 +54,24 @@ sizes are PROPORTIONAL per role (autofit multiplies a factor from
 - Step 4 must: inline the chosen faces into the PDF doc (the runtime + config
   already work there), delete `test_pdf_keeps_the_template_look_until_step_4`.
 
+**Step 3b DONE — name fit, committed, NOT pushed.** autofit.js shrinks a
+`.cv-name` wider than its room (ancestors' PADDING boxes + canvas; its own box
+only if it clips) in font-size only, floor 0.70, never wraps. Runs on EVERY
+document, typography or not. Before it: long EN name clipped modern-t2/t3/t9
+(+9.8/+17.9/+18.6px) with no keys; 44pt clipped t3/t9. After: nothing clips in
+49 x EN/AR x {long name, max headline}. At the floor: only modern-t9 at 44pt,
+2.8px past its yellow panel (not clipped, not off-canvas). Normal names: never
+touched (98/98; 50/50 pixel goldens).
+- **INSTRUMENT TRAP, hit once here:** `set_content()` + `<base>` = about:blank
+  origin, so every LINKED font is a blocked cross-origin fetch and the page
+  silently renders in system fallbacks (Arial Black for Montserrat 900). Serve
+  documents same-origin (page.route) — `test_name_fit.py::test_fonts_really_load`.
+- **PRE-EXISTING PDF BUG, not fixed (moves English goldens — user's call):**
+  `fonts_inline.css` keeps ONE font-weight per variable file, so the PDF (and
+  the pixel goldens) draw Montserrat 900 from the variable font pinned at 400
+  ("Montserrat-Thin"), while the preview draws real Black. The FONTS.md
+  variable-font trap, in the inline sheet.
+
 ### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
 - **IBM Plex Sans Arabic in the older Arabic alias layer.** `fonts_ar.css`
   serves it as Google-CSS-API woff2 subsets (`ibm-plex-sans-arabic-*.woff2`)

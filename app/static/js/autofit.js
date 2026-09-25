@@ -118,13 +118,124 @@
     return T ? T.scale(el) : 1;
   }
 
+  /* ---- the name must fit its WIDTH ------------------------------------------
+   * The one horizontal problem this file takes on, because it is the one that
+   * loses the most important text on the page. A long name ("Mohammed
+   * Abdulrahman Al-Hashimi") or a large chosen headline size can make a
+   * `.cv-name` line wider than the box it sits in; the overflow is then cut by
+   * a clipping ancestor or painted off the canvas - and the PDF page IS the
+   * canvas. Measured before this existed: the long English name already lost
+   * 8-18px on modern-t2/t3/t9 with no typography chosen at all.
+   *
+   * The fix is font-size, the same horizontally-safe lever as stage 2: only
+   * that name's text shrinks, inside boxes that do not move. Never below
+   * NAME_FLOOR of the size it was designed (or chosen) at, and never by
+   * wrapping - white-space is not touched, so a name the template sets on one
+   * line stays on one line. A name that fits is not touched at all, which is
+   * what keeps the 50 pixel goldens identical. */
+  var NAME_FLOOR = 0.70;
+  var NAME_STEP = 0.01;
+  var NAME_SLACK = 0.5;     // px; sub-pixel antialiasing is not overflow
+  var nameK = new WeakMap();
+
+  function nameScale(el) {
+    var k = nameK.get(el);
+    return k === undefined ? 1 : k;
+  }
+
+  function nameRoots() {
+    var t = tplEl();
+    if (!t) return [];
+    return Array.prototype.filter.call(t.querySelectorAll(".cv-name"), function (n) {
+      return !n.parentElement.closest(".cv-name");
+    });
+  }
+
+  function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+
+  /* How far the name's text reaches past the room it has, in px (<= 0: fits).
+   * The room is the intersection of the canvas and every block-level box from
+   * the name up to `.tpl` - PADDING boxes, not content boxes: modern-t9's
+   * "ASHWORTH" runs into its sidebar's 20px padding by design, fully visible
+   * on the yellow panel, and its pixel golden says so. The name's OWN box
+   * counts only if it clips: a block name is just its column's content width,
+   * so modern-t17's Black "ASHWORTH" reaching 9px into the sidebar padding
+   * is inside the panel, not outside its box. Once an absolutely positioned box
+   * is passed, its ancestors no longer bound it - only those that actually
+   * clip (overflow-x not visible) still count. A transformed ancestor makes
+   * rects unreliable for this purpose, so such a name is left as designed. */
+  function nameOverflow(root) {
+    var t = tplEl();
+    var tr = t.getBoundingClientRect();
+    var L = tr.left, R = tr.right, escaped = false;
+    for (var a = root; a && a !== t; a = a.parentElement) {
+      var cs = getComputedStyle(a);
+      if (cs.transform && cs.transform !== "none") return null;
+      var inline = cs.display.indexOf("inline") === 0 || cs.display === "contents";
+      var clips = cs.overflowX !== "visible";
+      if (!inline && (a !== root || clips) && (!escaped || clips)) {
+        var r = a.getBoundingClientRect();
+        L = Math.max(L, r.left + num(cs.borderLeftWidth));
+        R = Math.min(R, r.right - num(cs.borderRightWidth));
+      }
+      if (cs.position === "absolute" || cs.position === "fixed") escaped = true;
+    }
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var rng = document.createRange(), n, left = Infinity, right = -Infinity;
+    while ((n = walker.nextNode())) {
+      if (!n.nodeValue.trim()) continue;
+      rng.selectNodeContents(n);
+      var rects = rng.getClientRects();
+      for (var i = 0; i < rects.length; i++) {
+        if (!rects[i].width) continue;
+        left = Math.min(left, rects[i].left);
+        right = Math.max(right, rects[i].right);
+      }
+    }
+    if (left === Infinity) return null;
+    return { excess: Math.max(L - left, right - R), room: R - L, width: right - left };
+  }
+
+  function setNameScale(root, k) {
+    nameK.set(root, k);
+    var all = root.querySelectorAll("*");
+    for (var i = 0; i < all.length; i++) nameK.set(all[i], k);
+  }
+
+  /* Shrink each overflowing name until it fits or reaches the floor. Returns
+   * how many names were shrunk (0 leaves the document exactly as it was). */
+  var nameMin = 1;
+
+  function fitNames(d, f) {
+    var shrunk = 0;
+    nameMin = 1;
+    nameRoots().forEach(function (root) {
+      var o = nameOverflow(root);
+      if (!o || !(o.excess > NAME_SLACK)) return;
+      // Width is close to linear in font-size: start at the ratio, then step.
+      var k = Math.max(NAME_FLOOR, Math.min(1, o.room / o.width));
+      setNameScale(root, k);
+      apply(d, f);
+      o = nameOverflow(root);
+      while (o && o.excess > NAME_SLACK && k > NAME_FLOOR + 1e-9) {
+        k = Math.max(NAME_FLOOR, Number((k - NAME_STEP).toFixed(4)));
+        setNameScale(root, k);
+        apply(d, f);
+        o = nameOverflow(root);
+      }
+      nameMin = Math.min(nameMin, k);
+      shrunk++;
+    });
+    return shrunk;
+  }
+
   function apply(d, f) {
     var els = elements(), i, k, o, el, s;
     for (i = 0; i < els.length; i++) capture(els[i]);
     for (i = 0; i < els.length; i++) {
       el = els[i];
       o = origins.get(el);
-      s = typeScale(el);
+      s = typeScale(el) * nameScale(el);
       for (k in o) {
         if (k === "fontSize") {
           if (s === 1) el.style.fontSize = (o[k] * f) + "px";
@@ -214,6 +325,10 @@
     // before measuring, and keep it even when nothing needs fitting.
     var scaled = !!(window.CVTypography && window.CVTypography.active);
     if (scaled) apply(1, 1);
+    // Then the name's width, before any height is measured: a shrunk name is
+    // also a shorter one.
+    nameK = new WeakMap();
+    var names = fitNames(1, 1);
     var natural = measure();
     var d = 1, f = 1, h = natural;
 
@@ -228,12 +343,14 @@
       h = measure();
     }
 
-    if (d === 1 && f === 1 && !scaled) reset();   // nothing was needed; leave the DOM clean
+    if (d === 1 && f === 1 && !scaled && !names) reset();   // nothing was needed; leave the DOM clean
     lastResult = {
       natural: natural,
       height: h,
       density: d,
       typeScale: f,
+      namesShrunk: names,
+      nameScaleMin: nameMin,
       fitted: h <= MAX_H + SLACK,
       compressed: d < 1 || f < 1
     };
@@ -260,6 +377,10 @@
 
   window.ResumeAutofit = {
     fit: fit,
+    /* px each name still reaches past its room (<= 0.5: fits) - for the gate. */
+    nameExcess: function () {
+      return nameRoots().map(function (r) { var o = nameOverflow(r); return o ? o.excess : null; });
+    },
     reset: reset,
     measure: measure,
     ready: ready,
