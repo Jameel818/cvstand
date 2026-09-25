@@ -45,10 +45,15 @@ TEMPLATES = [t.key for t in registry.by_category() if t.ported]
 #: One choice per language, weights left None so the nearest-weight path runs.
 #: Each language pairs an unmodified reserved-name family (served as .ttf)
 #: with a built one (served as .woff2), so both delivery paths are exercised.
+#: Three DIFFERENT fonts per language (Name, Headings, Details) so a role
+#: that picked up the wrong group's font cannot pass by coincidence.
 CHOICE = {
-    "en": {"font_heading": "Playfair Display", "font_body": "Poppins"},
-    "ar": {"font_heading": "Cairo", "font_body": "Lateef"},
+    "en": {"font_name": "Montserrat", "font_heading": "Playfair Display", "font_body": "Poppins"},
+    "ar": {"font_name": "Alexandria", "font_heading": "Cairo", "font_body": "Lateef"},
 }
+#: document role -> (résumé key, registry role whose weight rule applies)
+ROLE_KEY = {"name": ("font_name", "name"), "section": ("font_heading", "heading"),
+            "body": ("font_body", "body")}
 BASE = {"en": EN, "ar": AR}
 
 FONT_FILE = re.compile(r"/static/fonts/((?:web|ttf)/[^?#]+)")
@@ -60,7 +65,7 @@ COLLECT = """() => {
     const cs = getComputedStyle(el);
     return {
       i, own,
-      role: el.closest('.cv-name') ? 'heading' : el.closest('.cv-section') ? 'heading' : 'body',
+      role: el.closest('.cv-name') ? 'name' : el.closest('.cv-section') ? 'section' : 'body',
       family: cs.fontFamily.split(',')[0].trim().replace(/^["']|["']$/g, ''),
       weight: parseInt(cs.fontWeight, 10),
       size: parseFloat(cs.fontSize),
@@ -150,12 +155,13 @@ def test_choices_apply_to_every_role(browser, live_server, key, lang):
         for b, a in zip(before, after):
             if not a["own"]:
                 continue
-            fam = choice["font_heading" if a["role"] == "heading" else "font_body"]
+            key_, reg = ROLE_KEY[a["role"]]
+            fam = choice[key_]
             own = _hundred(b["weight"])
             if a["role"] == "body" and own >= 600:
                 want = 700
             else:
-                want = nearest_weight(lang, a["role"], fam, own)
+                want = nearest_weight(lang, reg, fam, own)
             got = (a["family"], a["weight"])
             if got != (CSS_FAMILY_PREFIX + fam, want):
                 wrong.append(f"#{a['i']} {a['role']} own={own}: got {got}, want "
@@ -169,7 +175,7 @@ def test_choices_apply_to_every_role(browser, live_server, key, lang):
         assert fetched == expected, (f"fetched {sorted(fetched)}, text uses {sorted(expected)}")
 
         # And the glyphs really came from the chosen faces.
-        for role, fam in (("name", choice["font_heading"]), ("body", choice["font_body"])):
+        for role, fam in (("name", choice["font_name"]), ("body", choice["font_body"])):
             sel = _probe(pg, role)
             if not sel:
                 continue
@@ -185,8 +191,8 @@ def test_choices_apply_to_every_role(browser, live_server, key, lang):
 
 #: Inside each language's own range (Arabic runs one step larger, §4) - an
 #: out-of-range size is reset to template default by the validator.
-SIZED = {"en": {"font_heading_size": 32, "font_body_size": 9.5},
-         "ar": {"font_heading_size": 34, "font_body_size": 10.5}}
+SIZED = {"en": {"font_name_size": 32, "font_heading_size": 13, "font_body_size": 9.5},
+         "ar": {"font_name_size": 34, "font_heading_size": 16, "font_body_size": 10.5}}
 SIZE_CASES = [("ats-t1", "en"), ("ats-t1", "ar"), ("modern-t1", "en"),
               # ats-t13 carries the Arabic `.sec-head` 14px !important rescue:
               # the section size must still win.
@@ -210,7 +216,6 @@ SIZES_JS = """() => {
 
 @pytest.mark.parametrize("key,lang", SIZE_CASES)
 def test_sizes_scale_each_role_and_keep_the_hierarchy(browser, live_server, key, lang):
-    from app.typography.render import section_size_pt
     ctx = browser.new_context()
     try:
         pg, _ = _open(ctx, live_server.url, document_html(BASE[lang], key))
@@ -222,8 +227,9 @@ def test_sizes_scale_each_role_and_keep_the_hierarchy(browser, live_server, key,
     f = after["f"]                                   # autofit's own type scale
     px = 4 / 3
     sized = SIZED[lang]
-    assert after["name"] == pytest.approx(sized["font_heading_size"] * px * f, rel=1e-3)
-    sec = section_size_pt(sized["font_heading_size"], lang) * px * f
+    assert after["name"] == pytest.approx(sized["font_name_size"] * px * f, rel=1e-3)
+    # Step 3c: the Headings size IS the section-title size.
+    sec = sized["font_heading_size"] * px * f
     assert after["sections"] and all(s == pytest.approx(sec, rel=1e-3) for s in after["sections"])
 
     # Details: the dominant size lands on the target, every other size keeps
@@ -277,34 +283,51 @@ def test_the_fallback_is_not_fetched_when_nothing_needs_it(browser, live_server)
         ctx.close()
 
 
-# ---- one role chosen leaves the other alone --------------------------------------
+# ---- one group chosen leaves the others alone ------------------------------------
 
-@pytest.mark.parametrize("chosen", ["body", "heading"])
+#: case -> (keys chosen, the document roles that may change)
+ONE_GROUP = {
+    "details": (lambda c: {"font_body": c["font_body"]}, {"body"}),
+    # Name defaults to "Same as Headings", so a Headings font moves both.
+    "headings": (lambda c: {"font_heading": c["font_heading"]}, {"name", "section"}),
+    "headings, name on template": (
+        lambda c: {"font_heading": c["font_heading"], "font_name": "template"}, {"section"}),
+    "name": (lambda c: {"font_name": c["font_name"]}, {"name"}),
+    # The case the name pin exists for: the Details rule overrides .tpl, and
+    # a name with no font-family of its own would inherit the Details font.
+    "details + headings, name on template": (
+        lambda c: {"font_body": c["font_body"], "font_heading": c["font_heading"],
+                   "font_name": "template"}, {"body", "section"}),
+}
+
+
+@pytest.mark.parametrize("case", list(ONE_GROUP))
 @pytest.mark.parametrize("lang", ["en", "ar"])
 @pytest.mark.parametrize("key", TEMPLATES)
-def test_one_role_chosen_leaves_the_other_alone(browser, live_server, key, lang, chosen):
-    """Choosing only a Details font must not touch the name or the section
-    titles, and choosing only a Headlines font must not touch the details -
-    in Arabic the untouched role keeps the font policy's faces, in English
-    the template's own.
+def test_one_group_chosen_leaves_the_others_alone(browser, live_server, key, lang, case):
+    """A group left on "Template default" keeps the template's face - in
+    Arabic, the font policy's own - whatever the other groups chose.
 
-    Found by this test: a headline that sets no font-family of its own
-    INHERITS it (ats-t1's name inherits Archivo from .tpl), so overriding .tpl
-    for Details silently restyled the name. typography.js now pins the
-    unchosen headlines to their pre-switch family."""
-    fam = CHOICE[lang]["font_body" if chosen == "body" else "font_heading"]
-    key_name = "font_body" if chosen == "body" else "font_heading"
+    Found by this test in step 3: a headline that sets no font-family of its
+    own INHERITS it (ats-t1's name inherits Archivo from .tpl), so overriding
+    .tpl for Details silently restyled the name. typography.js pins every
+    unchosen headline role to its pre-switch family - which is also what
+    keeps the name untouched under "Template default" (step 3c)."""
+    make, changes = ONE_GROUP[case]
+    keys = make(CHOICE[lang])
     ctx = browser.new_context()
     try:
         pg, _ = _open(ctx, live_server.url, document_html(BASE[lang], key))
         before = pg.evaluate(COLLECT)
-        pg, _ = _open(ctx, live_server.url, document_html(dict(BASE[lang], **{key_name: fam}), key))
+        pg, _ = _open(ctx, live_server.url, document_html(dict(BASE[lang], **keys), key))
         after = pg.evaluate(COLLECT)
     finally:
         ctx.close()
-    other = [(b, a) for b, a in zip(before, after) if a["own"] and a["role"] != chosen]
-    moved = [(b["i"], b["family"], a["family"]) for b, a in other
-             if (a["family"], a["weight"]) != (b["family"], b["weight"])]
+    moved = [(b["i"], a["role"], b["family"], a["family"]) for b, a in zip(before, after)
+             if a["own"] and a["role"] not in changes
+             and (a["family"], a["weight"]) != (b["family"], b["weight"])]
     assert not moved, moved[:8]
-    assert any(a["family"] == CSS_FAMILY_PREFIX + fam
-               for a in after if a["own"] and a["role"] == chosen)
+    chosen = {v for v in keys.values() if v != "template"}
+    for role in changes:
+        fams = {a["family"] for a in after if a["own"] and a["role"] == role}
+        assert fams and fams <= {CSS_FAMILY_PREFIX + f for f in chosen}, (role, fams)

@@ -20,13 +20,24 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 LANGS = ("en", "ar")
-ROLES = ("heading", "body")
+# Three groups (spec §2): the NAME (.cv-name), the section HEADINGS
+# (.cv-section), and the DETAILS (everything else). Name and Headings were one
+# "Headlines" group until step 3c; they share their font lists and weight rule.
+ROLES = ("name", "heading", "body")
 
-# The six résumé keys (spec §2), by role. Fonts are family names, weights are
+# The nine résumé keys (spec §2), by role. Fonts are family names, weights are
 # CSS numeric weights, sizes are points.
-FONT_KEY = {"heading": "font_heading", "body": "font_body"}
-WEIGHT_KEY = {"heading": "font_heading_weight", "body": "font_body_weight"}
-SIZE_KEY = {"heading": "font_heading_size", "body": "font_body_size"}
+FONT_KEY = {"name": "font_name", "heading": "font_heading", "body": "font_body"}
+WEIGHT_KEY = {"name": "font_name_weight", "heading": "font_heading_weight",
+              "body": "font_body_weight"}
+SIZE_KEY = {"name": "font_name_size", "heading": "font_heading_size",
+            "body": "font_body_size"}
+
+# `font_name` is null by default, which means "Same as Headings": the name
+# takes the Headings font AND weight (unless font_name_weight is set). The one
+# way to keep the template's own face for the name while Headings has a font
+# is this reserved value - it can never be a registry family.
+NAME_TEMPLATE = "template"
 TYPOGRAPHY_KEYS = tuple(
     k for role in ROLES for k in (FONT_KEY[role], WEIGHT_KEY[role], SIZE_KEY[role])
 )
@@ -36,8 +47,8 @@ TYPOGRAPHY_KEYS = tuple(
 # can never resolve to one of the new files and change an existing render.
 CSS_FAMILY_PREFIX = "CVT "
 
-# §3: headlines are heavy, details are light.
-WEIGHT_RANGE = {"heading": (700, 900), "body": (200, 400)}
+# §3: the name and the headings are heavy, details are light.
+WEIGHT_RANGE = {"name": (700, 900), "heading": (700, 900), "body": (200, 400)}
 
 # Details text the TEMPLATE set bold (a job title at 900, a company at 600)
 # keeps its emphasis under a chosen Details font: it renders in that family's
@@ -48,9 +59,12 @@ WEIGHT_RANGE = {"heading": (700, 900), "body": (200, 400)}
 EMPHASIS_WEIGHT = 700
 EMPHASIS_FROM = 600
 
-# §4 derived size: section titles = clamp(name size x 0.42, lo, hi) pt.
-SECTION_RATIO = 0.42
-SECTION_CLAMP_PT = {"en": (11, 18), "ar": (12, 20)}
+# MIGRATION ONLY (step 3c). Until then `font_heading_size` was the NAME size
+# and section titles were derived as clamp(size x 0.42, lo, hi). A stored
+# résumé still carrying such a value is moved over by validate.py - the name
+# keeps its size and the sections keep their derived size, to the nearest 1pt.
+LEGACY_SECTION_RATIO = 0.42
+LEGACY_SECTION_CLAMP_PT = {"en": (11, 18), "ar": (12, 20)}
 
 # §3.5 light-weight hint: Details at weight 200 below this size (pt) may print
 # faint. Informational only.
@@ -157,6 +171,9 @@ OFFERED: dict[tuple[str, str], tuple[str, ...]] = {
                      "Noto Sans Arabic", "Lateef", "Mada", "Baloo Bhaijaan 2", "Tajawal",
                      "Cairo", "Alexandria", "El Messiri"),
 }
+# The Name lists ARE the Headings lists (spec §3.1 / §3.3).
+OFFERED[("en", "name")] = OFFERED[("en", "heading")]
+OFFERED[("ar", "name")] = OFFERED[("ar", "heading")]
 
 
 @dataclass(frozen=True)
@@ -182,9 +199,11 @@ class SizeScale:
 
 
 SIZES: dict[tuple[str, str], SizeScale] = {
-    ("en", "heading"): SizeScale(24, 44, 2, 32),
+    ("en", "name"): SizeScale(24, 44, 2, 32),
+    ("en", "heading"): SizeScale(11, 18, 1, 13),
     ("en", "body"): SizeScale(9, 12, 0.5, 10),
-    ("ar", "heading"): SizeScale(26, 48, 2, 34),
+    ("ar", "name"): SizeScale(26, 48, 2, 34),
+    ("ar", "heading"): SizeScale(12, 20, 1, 14),
     ("ar", "body"): SizeScale(10, 14, 0.5, 11.5),
 }
 

@@ -54,8 +54,7 @@ from pathlib import Path
 from .faces import built_faces
 from .registry import (
     CSS_FAMILY_PREFIX, EMPHASIS_FROM, EMPHASIS_WEIGHT, FONT_KEY, FONTS,
-    LATIN_EXT_FALLBACK, ROLES, SECTION_CLAMP_PT, SECTION_RATIO, SIZE_KEY,
-    WEIGHT_KEY, nearest_weight,
+    LATIN_EXT_FALLBACK, NAME_TEMPLATE, SIZE_KEY, WEIGHT_KEY, nearest_weight,
 )
 
 TYPOGRAPHY_CSS_URL = "/static/fonts/typography.css"
@@ -63,8 +62,13 @@ _RUNTIME = Path(__file__).resolve().parent.parent / "static" / "js" / "typograph
 
 PT_TO_PX = 4 / 3
 
-_HEADLINE_ROOTS = ".cv-name, .cv-section"
 _HEADLINE_ALL = ".cv-name, .cv-name *, .cv-section, .cv-section *"
+
+#: The document's three roles -> the registry role whose lists apply and the
+#: elements they style. Section titles are the registry's "heading" role.
+DOC_ROLES = {"name": "name", "section": "heading", "body": "body"}
+_ROLE_SELECTORS = {"name": (".cv-name", ".cv-name *"),
+                   "section": (".cv-section", ".cv-section *")}
 
 
 @lru_cache(maxsize=1)
@@ -88,10 +92,31 @@ def family_stack(family: str) -> str:
     return ", ".join(parts)
 
 
-def section_size_pt(name_pt: float, lang: str) -> float:
-    """§4: section titles = clamp(name size x 0.42, lo, hi) pt."""
-    lo, hi = SECTION_CLAMP_PT[lang]
-    return min(max(name_pt * SECTION_RATIO, lo), hi)
+def effective(values: dict) -> dict[str, dict]:
+    """Per document role: the family, weight and size that actually apply.
+
+    Only the NAME needs resolving. Its font null means "Same as Headings" -
+    the Headings font AND weight, unless the name has its own weight - which
+    is also exactly how a résumé saved before the split rendered its name, so
+    an old CV looks the same without migrating a weight. NAME_TEMPLATE means
+    the template's own face."""
+    heading = {"family": values[FONT_KEY["heading"]], "weight": values[WEIGHT_KEY["heading"]],
+               "size": values[SIZE_KEY["heading"]]}
+    font = values[FONT_KEY["name"]]
+    if font == NAME_TEMPLATE:
+        name_family, inherited_weight = None, None
+    elif font is None:
+        name_family, inherited_weight = heading["family"], heading["weight"]
+    else:
+        name_family, inherited_weight = font, None
+    name_weight = values[WEIGHT_KEY["name"]] or inherited_weight
+    return {
+        "name": {"family": name_family, "weight": name_weight if name_family else None,
+                 "size": values[SIZE_KEY["name"]]},
+        "section": heading,
+        "body": {"family": values[FONT_KEY["body"]], "weight": values[WEIGHT_KEY["body"]],
+                 "size": values[SIZE_KEY["body"]]},
+    }
 
 
 def _nearest_table(lang: str, role: str, family: str) -> dict[str, int]:
@@ -100,41 +125,42 @@ def _nearest_table(lang: str, role: str, family: str) -> dict[str, int]:
 
 def config(values: dict, lang: str) -> dict | None:
     """The runtime's instructions, or None when nothing was chosen."""
-    if all(v is None for v in values.values()):
+    eff = effective(values)
+    # Judged on what APPLIES, not on the raw keys: `font_name: "template"` on
+    # its own is a choice to keep the template's look, and emits nothing.
+    if all(e["family"] is None and e["size"] is None for e in eff.values()):
         return None
     out: dict = {}
-    for role in ROLES:
-        family = values[FONT_KEY[role]]
-        size = values[SIZE_KEY[role]]
+    for role, e in eff.items():
+        family, size = e["family"], e["size"]
         r = {
             "family": family and CSS_FAMILY_PREFIX + family,
-            "weight": values[WEIGHT_KEY[role]],
-            "nearest": _nearest_table(lang, role, family) if family else None,
+            "weight": e["weight"],
+            "nearest": _nearest_table(lang, DOC_ROLES[role], family) if family else None,
             "size_px": size * PT_TO_PX if size is not None else None,
         }
         if role == "body":
             r["emphasis"] = EMPHASIS_WEIGHT if family else None
             r["emphasis_from"] = EMPHASIS_FROM
-        else:
-            r["section_px"] = (section_size_pt(size, lang) * PT_TO_PX
-                               if size is not None else None)
         out[role] = r
     return out
 
 
 def _css(values: dict) -> str:
+    eff = effective(values)
     rules = []
-    heading, body = values[FONT_KEY["heading"]], values[FONT_KEY["body"]]
     # Hard rule 1: never fake a weight. Scoped to documents that chose a font,
     # so a template's own faces render exactly as they always have.
     rules.append("html[data-cvt] .tpl { font-synthesis: none !important; }")
-    if body:
+    if eff["body"]["family"]:
         rules.append(
             f"html[data-cvt] .tpl,\nhtml[data-cvt] .tpl :not(:where({_HEADLINE_ALL})) "
-            f"{{ font-family: {family_stack(body)} !important; }}")
-    if heading:
-        sel = ",\n".join(f"html[data-cvt] .tpl {s.strip()}" for s in _HEADLINE_ALL.split(","))
-        rules.append(f"{sel} {{ font-family: {family_stack(heading)} !important; }}")
+            f"{{ font-family: {family_stack(eff['body']['family'])} !important; }}")
+    for role in ("section", "name"):
+        fam = eff[role]["family"]
+        if fam:
+            sel = ",\n".join(f"html[data-cvt] .tpl {s}" for s in _ROLE_SELECTORS[role])
+            rules.append(f"{sel} {{ font-family: {family_stack(fam)} !important; }}")
     return '<style id="cv-typography">\n' + "\n".join(rules) + "\n</style>"
 
 
@@ -148,7 +174,7 @@ def document_blocks(values: dict, lang: str) -> tuple[str, str]:
     cfg = config(values, lang)
     if cfg is None:
         return "", ""
-    chose_family = any(values[FONT_KEY[r]] for r in ROLES)
+    chose_family = any(e["family"] for e in effective(values).values())
     head = ""
     if chose_family:
         head = f'<link rel="stylesheet" href="{TYPOGRAPHY_CSS_URL}">' + _css(values)
@@ -165,9 +191,8 @@ def faces_for(values: dict, lang: str) -> set[tuple[str, int]]:
     tests that assert only these faces are ever downloaded."""
     from .registry import built_weights
     out: set[tuple[str, int]] = set()
-    for role in ROLES:
-        fam = values[FONT_KEY[role]]
-        if fam:
-            out |= {(fam, w) for w in built_weights(lang, role, fam)}
+    for role, e in effective(values).items():
+        if e["family"]:
+            out |= {(e["family"], w) for w in built_weights(lang, DOC_ROLES[role], e["family"])}
     assert out <= set(built_faces())
     return out

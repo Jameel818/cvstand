@@ -47,6 +47,10 @@ SPEC_OFFERED = {
     },
 }
 
+# Step 3c: the Name group lists exactly what the Headings group lists.
+SPEC_OFFERED[("en", "name")] = SPEC_OFFERED[("en", "heading")]
+SPEC_OFFERED[("ar", "name")] = SPEC_OFFERED[("ar", "heading")]
+
 # §3.5: the six fonts that carry the "creative roles" tag.
 SPEC_PLAYFUL = {"Marhey", "Baloo Bhaijaan 2", "Lemonada", "Jomhuria", "Rakkas", "Lalezar"}
 
@@ -56,7 +60,9 @@ SLOTS = [(lang, role) for lang in LANGS for role in ROLES]
 def test_the_spec_table_covers_every_slot():
     """Guards the guard: an empty or partial SPEC_OFFERED would pass vacuously."""
     assert set(SPEC_OFFERED) == set(OFFERED) == set(SLOTS)
-    assert sum(len(v) for v in SPEC_OFFERED.values()) == 51
+    # 51 in the spec's four tables, plus the Name group's copy of the two
+    # heading tables (10 EN + 19 AR).
+    assert sum(len(v) for v in SPEC_OFFERED.values()) == 51 + 10 + 19
 
 
 @pytest.mark.parametrize("slot", SLOTS)
@@ -118,9 +124,11 @@ def test_font_weights_are_real_css_weights():
 # ---- sizes (§4) -------------------------------------------------------------
 
 SPEC_SIZES = {
-    ("en", "heading"): (24, 44, 2, 32),
+    ("en", "name"): (24, 44, 2, 32),
+    ("en", "heading"): (11, 18, 1, 13),       # section titles, set directly (3c)
     ("en", "body"): (9, 12, 0.5, 10),
-    ("ar", "heading"): (26, 48, 2, 34),
+    ("ar", "name"): (26, 48, 2, 34),
+    ("ar", "heading"): (12, 20, 1, 14),
     ("ar", "body"): (10, 14, 0.5, 11.5),
 }
 
@@ -156,15 +164,29 @@ def test_every_dropdown_size_is_accepted_and_the_ends_are_exact(slot):
 
 
 def test_size_grid_checks_are_exact_multiples():
-    body, head = size_scale("en", "body"), size_scale("en", "heading")
+    body, name = size_scale("en", "body"), size_scale("en", "name")
+    head = size_scale("en", "heading")
     assert body.allows(9.5) and body.allows(12)
     assert not body.allows(9.7) and not body.allows(9.25) and not body.allows(12.5)
-    assert head.allows(32) and not head.allows(33) and not head.allows(32.5)
-    assert not head.allows(22) and not head.allows(46)
+    assert name.allows(32) and not name.allows(33) and not name.allows(32.5)
+    assert not name.allows(22) and not name.allows(46)
+    assert head.allows(13) and not head.allows(13.5) and not head.allows(19)
 
 
-def test_sizes_cover_both_roles_in_both_languages():
+def test_sizes_cover_every_role_in_both_languages():
     assert set(SIZES) == set(SLOTS)
+
+
+def test_three_groups():
+    assert ROLES == ("name", "heading", "body")
+
+
+@pytest.mark.parametrize("lang", LANGS)
+def test_old_and_new_heading_ranges_do_not_overlap(lang):
+    """The pre-3c migration recognises an old headline size by VALUE alone,
+    which is only sound while the Name and Headings ranges are disjoint."""
+    name, head = size_scale(lang, "name"), size_scale(lang, "heading")
+    assert head.max < name.min
 
 
 # ---- weight carry-over (§3.5) ----------------------------------------------

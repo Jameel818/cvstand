@@ -15,7 +15,8 @@ from playwright.sync_api import expect
 pytestmark = [pytest.mark.e2e]
 
 STORE_KEY = "cvstand:resume"
-SELECTS = [f"#ty_{role}_{f}" for role in ("heading", "body") for f in ("font", "weight", "size")]
+SELECTS = [f"#ty_{role}_{f}" for role in ("name", "heading", "body")
+           for f in ("font", "weight", "size")]
 
 
 def _open_fonts(page, live_server, lang="en"):
@@ -36,12 +37,16 @@ def _preview_name(page):
     return page.frame_locator("#preview-frame").locator(".cv-name").first
 
 
-def test_six_selects_template_default_first_and_grouped(page, live_server):
+def test_nine_selects_template_default_first_and_grouped(page, live_server):
     _open_fonts(page, live_server)
     expect(page.locator('.sec[data-sid="fonts"] summary')).to_contain_text("Fonts")
+    titles = page.locator('.sec[data-sid="fonts"] .ty-group h4').all_inner_texts()
+    assert titles == ["Name", "Headings", "Details"]
     for sel in SELECTS:
         expect(page.locator(sel)).to_have_count(1)
-        assert page.locator(f"{sel} option").first.inner_text() == "Template default"
+        # The Name's weight follows the Headings while its font does.
+        first = "Same as Headings" if sel == "#ty_name_weight" else "Template default"
+        assert page.locator(f"{sel} option").first.inner_text() == first
     groups = page.locator("#ty_heading_font optgroup").evaluate_all(
         "els => els.map(e => e.label)")
     assert groups == ["Sans", "Serif", "Display"]
@@ -57,6 +62,54 @@ def test_arabic_interface_names_the_section_and_its_groups(page, live_server):
     groups = page.locator("#ty_heading_font optgroup").evaluate_all(
         "els => els.map(e => e.label)")
     assert groups[0] == "كوفي / بلا زوائد" and len(groups) == 5
+
+
+def test_name_offers_template_default_then_same_as_headings(page, live_server):
+    _open_fonts(page, live_server)
+    opts = page.locator("#ty_name_font > option").all_inner_texts()
+    assert opts[:2] == ["Template default", "Same as Headings"]
+    expect(page.locator("#ty_name_font")).to_have_value("")          # Same as Headings
+    # The name follows a Headings font...
+    page.select_option("#ty_heading_font", "Montserrat")
+    name = page.frame_locator("#preview-frame").locator(".cv-name").first
+    expect(name).to_have_css("font-family", re.compile(r"CVT Montserrat"))
+    expect(page.locator("#ty_name_weight option").first).to_have_text("Same as Headings")
+    # ...until it is set back to the template's own face.
+    before = page.evaluate("""() => { const f = document.querySelector('#preview-frame');
+        return f.contentDocument.querySelector('.cv-section').textContent; }""")
+    page.select_option("#ty_name_font", "template")
+    expect(name).not_to_have_css("font-family", re.compile(r"CVT"))
+    section = page.frame_locator("#preview-frame").locator(".cv-section").first
+    expect(section).to_have_css("font-family", re.compile(r"CVT Montserrat"))
+    assert before
+    page.wait_for_timeout(1200)
+    assert _stored(page)["font_name"] == "template"
+
+
+def test_arabic_name_labels(page, live_server):
+    _open_fonts(page, live_server, "ar")
+    titles = page.locator('.sec[data-sid="fonts"] .ty-group h4').all_inner_texts()
+    assert titles[1:] == ["عناوين الأقسام", "التفاصيل"]
+    assert page.locator("#ty_name_font > option").nth(1).inner_text() == "مثل عناوين الأقسام"
+
+
+def test_a_pre_split_resume_opens_migrated(page, live_server):
+    """Stored before Name/Headings were split: 32pt headline. It opens with
+    Name 32 and Headings 13 selected, silently, and the stored copy follows."""
+    page.goto(live_server.url + "/builder")
+    expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
+    page.evaluate(f"""() => {{
+      const d = JSON.parse(localStorage.getItem('{STORE_KEY}') || document.querySelector('#resume-data').textContent);
+      d.font_heading = 'Montserrat'; d.font_heading_size = 32; delete d.font_name_size;
+      localStorage.setItem('{STORE_KEY}', JSON.stringify(d)); }}""")
+    page.reload()
+    page.click('.sec[data-sid="fonts"] > summary')
+    expect(page.locator("#ty_name_size")).to_have_value("32")
+    expect(page.locator("#ty_heading_size")).to_have_value("13")
+    expect(page.locator("#form-notice")).to_be_hidden()
+    page.wait_for_timeout(1200)
+    stored = _stored(page)
+    assert (stored["font_name_size"], stored["font_heading_size"]) == (32, 13)
 
 
 def test_single_weight_font_shows_its_one_weight_disabled(page, live_server):

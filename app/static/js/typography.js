@@ -7,7 +7,7 @@
  * WEIGHT. Each element's own weight is read from computed style - the
  * template's inline weight, or the Arabic policy's 800 on the name - and
  * replaced, inline and !important, by:
- *   headlines                  the chosen weight, else nearest[own weight]
+ *   name, section titles       the chosen weight, else nearest[own weight]
  *   details, own weight < 600  the chosen weight, else nearest[own weight]
  *   details, own weight >= 600 the emphasis face (700): template-bold text
  *                              such as a job title stays bold
@@ -74,15 +74,22 @@
   // Details font would silently restyle the headlines too. Each is pinned to
   // the family it had before the rules switch on (read above, while
   // data-cvt is still absent), which in Arabic is the font policy's own face.
-  if (C.body.family && !C.heading.family) {
+  //
+  // Since step 3c this applies per headline role: the name can be on
+  // "Template default" while the Headings have a font, and vice versa.
+  // Pinning an element to the family it already has is a no-op, so this is
+  // safe to do for every unchosen headline role whenever anything is chosen.
+  if (C.body.family || C.name.family || C.section.family) {
     info.forEach(function (i) {
-      if (i.role !== "body") i.el.style.setProperty("font-family", i.family, "important");
+      if (i.role !== "body" && !C[i.role].family) {
+        i.el.style.setProperty("font-family", i.family, "important");
+      }
     });
   }
 
   // ---- weight
   info.forEach(function (i) {
-    var c = i.role === "body" ? C.body : C.heading;
+    var c = C[i.role];
     if (!c.family) return;
     var w;
     if (i.role === "body" && c.emphasis && i.weight >= c.emphasis_from) w = c.emphasis;
@@ -106,15 +113,15 @@
     if (Math.abs(k - 1) > 1e-9) active = true;
   }
 
-  setRole(info.filter(function (i) { return i.role === "name"; }), C.heading.size_px);
+  setRole(info.filter(function (i) { return i.role === "name"; }), C.name.size_px);
 
-  if (C.heading.section_px) {
+  if (C.section.size_px) {
     var roots = Array.prototype.slice.call(tpl.querySelectorAll(".cv-section"))
       .filter(function (s) { return !s.parentElement.closest(".cv-section"); });
     roots.forEach(function (root) {
       setRole(info.filter(function (i) {
         return i.el === root || root.contains(i.el);
-      }), C.heading.section_px);
+      }), C.section.size_px);
     });
   }
 

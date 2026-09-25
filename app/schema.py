@@ -19,7 +19,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-from .typography import clean_typography
+from .typography import clean_typography, migrate_typography
 from .typography.registry import FONT_KEY, TYPOGRAPHY_KEYS
 
 _STR = {"type": "string"}
@@ -212,6 +212,12 @@ def typography_of(data: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, 
     """The résumé's whitelisted typography for its own language, plus what had
     to be reset to reach it. See app/typography/validate.py."""
     return clean_typography(data, lang_of(data))
+
+
+def typography_migrations(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Keys a pre-step-3c résumé must rewrite to keep its look (validate.py
+    ::migrate_typography). Empty for anything saved since."""
+    return migrate_typography(data, lang_of(data))[1]
 
 
 class ResumeValidationError(ValueError):

@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · step 3 done, step 4 not planned)
+# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · steps 3, 3b, 3c done; step 4 not planned)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -66,7 +66,19 @@ touched (98/98; 50/50 pixel goldens).
   origin, so every LINKED font is a blocked cross-origin fetch and the page
   silently renders in system fallbacks (Arial Black for Montserrat 900). Serve
   documents same-origin (page.route) — `test_name_fit.py::test_fonts_really_load`.
-- **PRE-EXISTING PDF BUG, not fixed (moves English goldens — user's call):**
+- User ACCEPTED modern-t9 at 44pt (2.8px past its panel, visible).
+
+**Step 3c DONE — Name / Headings / Details, committed, NOT pushed.** Nine
+keys. `font_name` null = "Same as Headings" (font AND weight unless
+`font_name_weight` set); `"template"` = template's face. `font_heading_size`
+= section titles directly (EN 11-18 / AR 12-20, 1pt); Name 24-44 / 26-48.
+Pre-split résumés migrate BY VALUE (ranges disjoint): old headline size ->
+`font_name_size`, sections -> round(clamp(old x 0.42)) (32 -> 13). Reported
+as `migrations` on render and PUT; builder applies silently. Old-format CVs:
+name pixel-identical to step 3; sections move <= 0.5pt (reflow below).
+
+- **PRE-EXISTING PDF BUG — FIX IN STEP 4 (user decision), show before/after
+  images of the affected goldens BEFORE updating them:**
   `fonts_inline.css` keeps ONE font-weight per variable file, so the PDF (and
   the pixel goldens) draw Montserrat 900 from the variable font pinned at 400
   ("Montserrat-Thin"), while the preview draws real Black. The FONTS.md

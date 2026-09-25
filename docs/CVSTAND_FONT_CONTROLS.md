@@ -7,14 +7,15 @@
 
 ## 0. Goal
 
-Give the user **three optional dropdowns** for each of the two text groups on every template:
+Give the user **three optional dropdowns** for each of the three text groups on every template:
 
 | Group | Dropdown 1 | Dropdown 2 | Dropdown 3 |
 |---|---|---|---|
-| **Headlines** (name and section titles) | Font | Weight | Size |
+| **Name** (`.cv-name`) | Font | Weight | Size |
+| **Headings** (section titles, `.cv-section`) | Font | Weight | Size |
 | **Details** (body text, bullets, dates, contact lines) | Font | Weight | Size |
 
-That makes 6 controls in total. The **language of the CV** (`language`) decides which font lists appear.
+That makes 9 controls in total. (Until step 3c, Name and Headings were one "Headlines" group; see §2 for how résumés saved then are carried over.) The **language of the CV** (`language`) decides which font lists appear.
 
 Every control is optional. Its first option is always **"Template default"**, which keeps the template's current look (for example, the existing Cormorant Garamond + Inter pairing). CVs saved before this feature must render exactly as they do today.
 
@@ -33,21 +34,33 @@ Every control is optional. Its first option is always **"Template default"**, wh
 
 ---
 
-## 2. Data model (flat schema, 6 new optional keys)
+## 2. Data model (flat schema, 9 new optional keys)
 
 ```json
 {
   "language": "en",
+  "font_name": null,
+  "font_name_weight": 900,
+  "font_name_size": 32,
   "font_heading": "Montserrat",
   "font_heading_weight": 800,
-  "font_heading_size": 32,
+  "font_heading_size": 13,
   "font_body": "Inter",
   "font_body_weight": 400,
   "font_body_size": 10
 }
 ```
 
-- `null` or a missing key means template default.
+- `null` or a missing key means template default, **except `font_name`**:
+  - `font_name: null` (or missing) means **"Same as Headings"**, the default. The name uses the Headings font **and the Headings weight**, unless `font_name_weight` is set. With no Headings font, that is the template's own face.
+  - `font_name: "template"` (a reserved value that is never a font name) means **"Template default"**. The name keeps the template's face even when Headings has a font.
+  - `font_name_weight` is checked against the name's *effective* font. Without one it resets (`needs_font`), like every weight without a font.
+- `font_heading_size` sets the **section titles directly** (§4).
+- **Résumés saved before the split** stored the name size in `font_heading_size` (EN 24–44, AR 26–48). The old and new Headings ranges don't overlap, so such a value is recognised by value alone.
+  - It moves to `font_name_size`, unless that is already set.
+  - `font_heading_size` becomes the section size those résumés used to derive, `clamp(old × 0.42, 11, 18)` (AR `12, 20`), rounded to the nearest point (32 → 13).
+  - The server reports this as `migrations` on `/api/render` and `PUT /api/resume`, and the builder applies it silently.
+  - The name renders exactly as before. Section titles move by at most 0.5 pt.
 - Sizes are in **points (pt)**, because this is a print document. Use `pt` in the CSS and `Pt()` in python-docx so PDF and Word match.
 - If the user switches `language`, reset any value that isn't valid in the new language to the default and show a short notice.
 
@@ -58,7 +71,8 @@ Every control is optional. Its first option is always **"Template default"**, wh
 The weights below were checked against the Fontsource packages on npm, which mirror Google Fonts (checked 2026-09-25). **Re-verify** them when you download the files: the build script in §5 must assert that every weight listed here really exists in the downloaded files, and fail loudly if one doesn't.
 
 **Weight rule:** Allowed weights = (the role's range) ∩ (the weights the font has).
-- Headlines range: **700–900**. Details range: **200–400**.
+- Name and Headings range: **700–900**. Details range: **200–400**.
+- **Name uses exactly the Headings lists** (§3.1 / §3.3) and the same rule.
 - If the intersection is empty, offer the font's **single nearest weight** with a label, e.g. `400 — only weight (heavy by design)`.
 
 ### 3.1 English, Headlines (700–900)
@@ -152,16 +166,19 @@ The values below are starting design recommendations. They are not measured indu
 
 | Language / Group | Dropdown values | Step | Default |
 |---|---|---|---|
-| EN Headlines (**name size**) | 24 → 44 pt | 2 | 32 |
+| EN Name | 24 → 44 pt | 2 | 32 |
+| EN Headings (section titles) | 11 → 18 pt | 1 | 13 |
 | EN Details | 9 → 12 pt | 0.5 | 10 |
-| AR Headlines (**name size**) | 26 → 48 pt | 2 | 34 |
+| AR Name | 26 → 48 pt | 2 | 34 |
+| AR Headings (section titles) | 12 → 20 pt | 1 | 14 |
 | AR Details | 10 → 14 pt | 0.5 | 11.5 |
 
-**Derived sizes**, computed from the two dropdowns so the hierarchy stays coherent:
+**Each group sets its own size (as built):**
 
-- Section titles = `clamp(name_size × 0.42, 11, 18)` pt (AR: `clamp(…, 12, 20)`)
-- Job title / subheadings = `body_size × 1.15`
-- Meta text (dates, locations) = `body_size × 0.9`, never below **8 pt** (AR: **9 pt**)
+- **Name:** the name, at the chosen size. If a name is wider than its box, autofit shrinks it to fit, never below 70% of that size and never by wrapping (step 3b).
+- **Headings:** every section title, at the chosen size. The earlier `clamp(name × 0.42)` derivation was removed in step 3c; it survives only in the migration (§2).
+- **Details:** *proportional*. The chosen size becomes the template's dominant body size, and every other details element scales by the same ratio, so job titles and dates keep the template's own hierarchy. This replaced the earlier ×1.15 / ×0.9 derived sizes, which the templates have no hooks for (step 3 decision).
+- Autofit may still shrink everything by up to 10% to seat one page.
 
 Arabic ranges are about one step larger because Arabic glyphs look smaller at the same point size.
 

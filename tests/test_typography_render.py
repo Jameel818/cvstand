@@ -20,7 +20,7 @@ from app.typography import (
     CSS_FAMILY_PREFIX, EMPHASIS_WEIGHT, FONTS, LATIN_EXT_FALLBACK, OFFERED,
     TYPOGRAPHY_KEYS, built_faces, built_weights, nearest_weight,
 )
-from app.typography.render import family_stack, section_size_pt
+from app.typography.render import effective, family_stack
 
 EN = json.loads(open("data/sample_resume.json", encoding="utf-8").read())
 AR = json.loads(open("data/sample_resume_ar.json", encoding="utf-8").read())
@@ -111,29 +111,77 @@ def test_a_size_alone_needs_no_stylesheet():
 
 
 def test_config_tables_are_the_registry_nearest_weight():
-    doc = _doc(AR, font_heading="Almarai", font_body="Tajawal", font_heading_size=40)
+    doc = _doc(AR, font_heading="Almarai", font_body="Tajawal", font_heading_size=16)
     cfg = _config(doc)
-    for role, fam in (("heading", "Almarai"), ("body", "Tajawal")):
+    for role, reg, fam in (("section", "heading", "Almarai"), ("name", "name", "Almarai"),
+                           ("body", "body", "Tajawal")):
         assert cfg[role]["family"] == CSS_FAMILY_PREFIX + fam
         assert cfg[role]["nearest"] == {
-            str(w): nearest_weight("ar", role, fam, w) for w in range(100, 1000, 100)}
+            str(w): nearest_weight("ar", reg, fam, w) for w in range(100, 1000, 100)}
     assert cfg["body"]["emphasis"] == EMPHASIS_WEIGHT
-    assert cfg["heading"]["section_px"] == pytest.approx(section_size_pt(40, "ar") * 4 / 3)
     # §3.5's example, through the table the builder and runtime both use.
-    assert cfg["heading"]["nearest"]["900"] == 800
+    assert cfg["section"]["nearest"]["900"] == 800
 
 
-def test_section_size_is_the_spec_clamp():
-    assert section_size_pt(24, "en") == 11          # 10.08 -> floor 11
-    assert section_size_pt(44, "en") == 18          # 18.48 -> cap 18
-    assert section_size_pt(32, "en") == pytest.approx(13.44)
-    assert section_size_pt(26, "ar") == 12
-    assert section_size_pt(48, "ar") == 20
+def test_section_size_is_set_directly():
+    """Step 3c: no more derivation from the name size."""
+    cfg = _config(_doc(EN, font_heading_size=15, font_name_size=40))
+    assert cfg["section"]["size_px"] == pytest.approx(15 * 4 / 3)
+    assert cfg["name"]["size_px"] == pytest.approx(40 * 4 / 3)
+
+
+# ---- the Name group (step 3c) ------------------------------------------------------
+
+def test_name_same_as_headings_takes_the_headings_font_and_weight():
+    cfg = _config(_doc(EN, font_heading="Montserrat", font_heading_weight=800))
+    assert cfg["name"]["family"] == cfg["section"]["family"] == "CVT Montserrat"
+    assert cfg["name"]["weight"] == 800
+
+
+def test_name_own_weight_beats_the_inherited_one():
+    cfg = _config(_doc(EN, font_heading="Montserrat", font_heading_weight=800,
+                       font_name_weight=900))
+    assert (cfg["name"]["weight"], cfg["section"]["weight"]) == (900, 800)
+
+
+def test_name_template_default_gets_no_rule():
+    doc = _doc(EN, font_heading="Montserrat", font_name="template")
+    cfg = _config(doc)
+    assert cfg["name"]["family"] is None and cfg["section"]["family"] == "CVT Montserrat"
+    assert "html[data-cvt] .tpl .cv-name" not in doc
+    assert "html[data-cvt] .tpl .cv-section" in doc
+
+
+def test_name_with_its_own_font():
+    doc = _doc(EN, font_heading="Montserrat", font_name="Playfair Display")
+    assert _config(doc)["name"]["family"] == "CVT Playfair Display"
+    assert f"font-family: {family_stack('Playfair Display')} !important" in doc
+
+
+def test_name_template_alone_emits_nothing():
+    """`font_name: "template"` with nothing else chosen is the template's look."""
+    for marker in MARKERS:
+        assert marker not in _own(_doc(EN, font_name="template")), marker
+
+
+@pytest.mark.parametrize("lang, heading, size", [("en", "Montserrat", 32), ("ar", "Cairo", 34)])
+def test_a_pre_split_resume_keeps_its_name(lang, heading, size):
+    """A résumé saved in step 3 (font_heading + a headline size) renders its
+    NAME exactly as step 3 did - same family, same weight, same px - and its
+    section titles at the old derived size to the nearest point."""
+    base = EN if lang == "en" else AR
+    cfg = _config(_doc(base, font_heading=heading, font_heading_weight=800 if lang == "en" else None,
+                       font_heading_size=size))
+    assert cfg["name"]["family"] == CSS_FAMILY_PREFIX + heading
+    assert cfg["name"]["size_px"] == pytest.approx(size * 4 / 3)
+    lo, hi = (11, 18) if lang == "en" else (12, 20)
+    old_section = min(max(size * 0.42, lo), hi)
+    assert abs(cfg["section"]["size_px"] / (4 / 3) - old_section) <= 0.5
 
 
 def test_typography_comes_after_the_rtl_rules():
     """Equal-looking specificity is decided by source order; ours must win."""
-    doc = _doc(AR, font_heading="Cairo")
+    doc = _doc(AR, font_heading="Cairo", font_name="Tajawal")
     assert doc.index(RTL_TYPOGRAPHY) < doc.index('id="cv-typography"')
     assert doc.index('id="cv-typography-config"') < doc.index("window.ResumeAutofit")
 

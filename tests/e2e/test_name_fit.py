@@ -103,7 +103,7 @@ def test_the_name_never_clips(doc_page, key, case, lang):
     if case == "long-name":
         data = dict(BASE[lang], name=LONG[lang])
     else:
-        data = dict(BASE[lang], font_heading_size=MAX_HEADLINE[lang])
+        data = dict(BASE[lang], font_name_size=MAX_HEADLINE[lang])
     r = load(data, key)
     assert r["nameScaleMin"] >= FLOOR - 1e-9, r
     clip = _name_clip(pg, data["name"])

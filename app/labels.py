@@ -718,7 +718,8 @@ _UI_AR: dict[str, str] = {
     "Fonts": "الخطوط",
     "Optional. Anything left on Template default keeps the template's own look.":
         "اختياري. كل ما يبقى على افتراضي القالب يحتفظ بمظهر القالب الأصلي.",
-    "Headlines": "العناوين",
+    "Headings": "عناوين الأقسام",
+    "Same as Headings": "مثل عناوين الأقسام",
     "Details": "التفاصيل",
     "Font": "الخط",
     "Weight": "السماكة",

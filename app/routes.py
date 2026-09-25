@@ -62,7 +62,9 @@ from .limits import RenderBusy, rate_limited, render_slot
 from .labels import all_levels, levels_for, ui_catalogue, ui_t
 from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
-from .schema import SUPPORTED_LANGS, ResumeValidationError, typography_of, validate
+from .schema import (
+    SUPPORTED_LANGS, ResumeValidationError, typography_migrations, typography_of, validate,
+)
 from .store import load_meta, load_resume, load_showcase, save_resume, set_template
 from .typography.ui import builder_payload as typography_payload
 
@@ -222,13 +224,17 @@ def put_resume():
     # the stored value becomes null (template default) and `resets` tells the
     # builder what changed. Only keys the client sent are rewritten, so a
     # résumé that never chose a font is stored exactly as it was sent.
+    # A résumé saved before Name/Headings were split is migrated too (its old
+    # headline size moves to the name); those keys are written even though
+    # the client did not send them, or the stored file would never converge.
+    migrations = typography_migrations(data)
     typography, resets = typography_of(data)
-    for key in typography.keys() & data.keys():
+    for key in typography.keys() & (data.keys() | {m["key"] for m in migrations}):
         data[key] = typography[key]
     if resets:
         current_app.logger.info("typography reset on save: %s", resets)
     save_resume(data)
-    return jsonify({"ok": True, "resets": resets})
+    return jsonify({"ok": True, "resets": resets, "migrations": migrations})
 
 
 @bp.post("/api/template")
@@ -270,9 +276,11 @@ def api_render():
     # tell the user. Carried HERE and not only on PUT /api/resume, because a
     # deployment never sends that PUT (the browser is the store), while every
     # preview comes through this route.
+    # `migrations` carry a pre-split résumé onto the Name/Headings model; the
+    # builder applies them silently to its stored copy (nothing visible moves).
     _, resets = typography_of(data)
     return jsonify({"ok": True, "html": html, "doc": doc, "template_key": key,
-                    "resets": resets})
+                    "resets": resets, "migrations": typography_migrations(data)})
 
 
 @bp.get("/preview")

@@ -258,10 +258,14 @@
      handler below, which writes numbers and nulls. */
   const TY = JSON.parse($("#typography-data").textContent);
   const TY_KEYS = {
+    name: ["font_name", "font_name_weight", "font_name_size"],
     heading: ["font_heading", "font_heading_weight", "font_heading_size"],
     body: ["font_body", "font_body_weight", "font_body_size"],
   };
-  const TY_ROLE_TITLE = { heading: "Headlines", body: "Details" };
+  const TY_ROLE_TITLE = { name: "Name", heading: "Headings", body: "Details" };
+  /* The Name font is null by default, meaning "Same as Headings" (the
+     Headings font and weight); this reserved value is "Template default". */
+  const NAME_TEMPLATE = "template";
   const TY_FIELD_TITLE = ["Font", "Weight", "Size"];
 
   function tyFamily(role, name) {
@@ -272,16 +276,32 @@
   }
   const tyNum = (v) => (v == null || v === "" ? null : Number(v));
 
+  /* The font a group actually uses: for the Name, "Same as Headings"
+     resolves to the Headings font (the two share their lists). */
+  function tyEffective(role) {
+    if (role !== "name") return tyFamily(role, data[TY_KEYS[role][0]]);
+    if (data.font_name === NAME_TEMPLATE) return null;
+    if (data.font_name == null) return tyFamily("name", data.font_heading);
+    return tyFamily("name", data.font_name);
+  }
+
   function tyRoleHTML(role) {
     const [fk, wk, sk] = TY_KEYS[role];
     const R = TY.roles[role];
-    const fam = tyFamily(role, data[fk]);
+    const fam = tyEffective(role);
     const w = tyNum(data[wk]), size = tyNum(data[sk]);
     const id = (f) => `ty_${role}_${f}`;
+    const follows = role === "name" && data.font_name == null;     // Same as Headings
+    const own = role === "name" && data.font_name !== NAME_TEMPLATE && !follows ? data.font_name : data[fk];
+    const noChoice = follows ? T("Same as Headings") : T("Template default");
 
-    const fontOpts = [`<option value="">${T("Template default")}</option>`].concat(
+    const firstOpts = role === "name"
+      ? `<option value="${NAME_TEMPLATE}"${data.font_name === NAME_TEMPLATE ? " selected" : ""}>${T("Template default")}</option>` +
+        `<option value=""${follows ? " selected" : ""}>${T("Same as Headings")}</option>`
+      : `<option value="">${T("Template default")}</option>`;
+    const fontOpts = [firstOpts].concat(
       R.groups.map((g) => `<optgroup label="${esc(T(g.label))}">` +
-        g.families.map((f) => `<option value="${esc(f.family)}"${fam && fam.family === f.family ? " selected" : ""}>${esc(f.family)}</option>`).join("") +
+        g.families.map((f) => `<option value="${esc(f.family)}"${own === f.family ? " selected" : ""}>${esc(f.family)}</option>`).join("") +
         `</optgroup>`)).join("");
 
     /* Weight follows the font: nothing to choose without one (a weight on
@@ -290,12 +310,12 @@
        control - the layout stays still (§3.5). */
     let weightSel;
     if (!fam) {
-      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="">${T("Template default")}</option></select>`;
+      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="">${noChoice}</option></select>`;
     } else if (fam.single) {
       const only = fam.weights[0];
       weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="${only}">${only} — ${T("only weight")}</option></select>`;
     } else {
-      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}"><option value="">${T("Template default")}</option>` +
+      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}"><option value="">${noChoice}</option>` +
         fam.weights.map((x) => `<option value="${x}"${x === w ? " selected" : ""}>${x} — ${T(TY.weight_labels[String(x)])}</option>`).join("") +
         `</select>`;
     }
@@ -304,7 +324,8 @@
 
     /* The sample draws in the chosen face at the weight the CV uses for plain
        text, so it is also what makes the browser fetch that one face. */
-    const sampleW = w || (fam ? fam.nearest[role === "heading" ? "700" : "400"] : 400);
+    const inherited = follows ? tyNum(data.font_heading_weight) : null;
+    const sampleW = w || inherited || (fam ? fam.nearest[role === "body" ? "400" : "700"] : 400);
     const sample = fam ? `<div class="ty-sample" dir="auto" style="font-family:${esc(fam.stack)};font-weight:${sampleW}">${esc(TY.sample)}</div>` : "";
     const tag = fam && fam.playful ? `<small class="ty-tag">${T("Creative, best for design/creative roles")}</small>` : "";
     const effSize = size == null ? R.default_size : size;
@@ -322,7 +343,7 @@
 
   function fontsBody() {
     return `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${T("Optional. Anything left on Template default keeps the template's own look.")}</p>` +
-      tyRoleHTML("heading") + tyRoleHTML("body");
+      tyRoleHTML("name") + tyRoleHTML("heading") + tyRoleHTML("body");
   }
 
   /* Re-draw the section in place, keeping keyboard focus on the control the
@@ -472,9 +493,15 @@
       /* Keep the nearest valid weight across a font change (§3.5: Montserrat
          900 -> Almarai gives 800). The table is the server's nearest_weight(). */
       const prev = tyNum(data[wk]);
-      data[fk] = el.value || null;
-      const fam = tyFamily(role, data[fk]);
+      data[fk] = el.value || null;               // Name: "" = Same as Headings
+      const fam = tyEffective(role);
       data[wk] = fam && !fam.single && prev != null ? fam.nearest[String(prev)] : null;
+      /* A Name that follows the Headings follows a font change too: its own
+         weight, if it has one, moves to the nearest the new font offers. */
+      if (role === "heading" && data.font_name == null && data.font_name_weight != null) {
+        const nf = tyEffective("name");
+        data.font_name_weight = nf && !nf.single ? nf.nearest[String(data.font_name_weight)] : null;
+      }
     } else if (el.dataset.ty === "weight") {
       data[wk] = tyNum(el.value);
     } else {
@@ -594,6 +621,14 @@
       }
       showErrors(null);
       const j = await res.json();
+      /* A résumé saved before Name and Headings were split: the server says
+         which keys carry its old choices over (its headline size becomes the
+         Name size). Applied silently - nothing the user sees changes. */
+      if (j.migrations && j.migrations.length) {
+        j.migrations.forEach((m) => { data[m.key] = m.value; });
+        refreshFonts();
+        scheduleSave();
+      }
       if (j.resets && j.resets.length) applyTypographyResets(j.resets);
       frame.srcdoc = j.doc;
       frame.onload = checkOverflow;

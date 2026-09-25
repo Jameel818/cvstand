@@ -16,7 +16,9 @@ import pytest
 from app import create_app
 from app.config import RESUME_PATH
 from app.schema import ResumeValidationError, normalize, validate
-from app.typography import NO_FONT, NOT_OFFERED, TYPOGRAPHY_KEYS, clean_typography
+from app.typography import (
+    NAME_TEMPLATE, NO_FONT, NOT_OFFERED, TYPOGRAPHY_KEYS, clean_typography, migrate_typography,
+)
 from tests import samples
 
 GOLDEN = Path(__file__).resolve().parent / "golden" / "normalize"
@@ -55,15 +57,18 @@ def test_missing_and_null_both_mean_template_default():
 # ---- valid values survive ---------------------------------------------------
 
 def test_a_full_valid_english_choice_survives_unchanged():
-    choice = {"font_heading": "Montserrat", "font_heading_weight": 800,
-              "font_heading_size": 32, "font_body": "Inter",
+    choice = {"font_name": "Playfair Display", "font_name_weight": 900,
+              "font_name_size": 36,
+              "font_heading": "Montserrat", "font_heading_weight": 800,
+              "font_heading_size": 13, "font_body": "Inter",
               "font_body_weight": 400, "font_body_size": 10}
     assert _clean(**choice) == (choice, [])
 
 
 def test_a_full_valid_arabic_choice_survives_unchanged():
-    choice = {"font_heading": "Almarai", "font_heading_weight": 800,
-              "font_heading_size": 34, "font_body": "Readex Pro",
+    choice = {"font_name": "Cairo", "font_name_weight": 900, "font_name_size": 40,
+              "font_heading": "Almarai", "font_heading_weight": 800,
+              "font_heading_size": 16, "font_body": "Readex Pro",
               "font_body_weight": 200, "font_body_size": 11.5}
     assert _clean("ar", **choice) == (choice, [])
 
@@ -76,9 +81,10 @@ def test_size_without_a_font_is_kept():
 
 def test_whole_number_floats_are_stored_as_ints():
     values, _ = _clean(font_heading="Montserrat", font_heading_weight=800.0,
-                       font_heading_size=32.0)
+                       font_name_size=32.0, font_heading_size=14.0)
     assert values["font_heading_weight"] == 800 and type(values["font_heading_weight"]) is int
-    assert values["font_heading_size"] == 32 and type(values["font_heading_size"]) is int
+    assert values["font_name_size"] == 32 and type(values["font_name_size"]) is int
+    assert values["font_heading_size"] == 14 and type(values["font_heading_size"]) is int
 
 
 # ---- invalid values reset ---------------------------------------------------
@@ -153,8 +159,83 @@ def test_off_grid_or_out_of_range_body_size_resets(size):
     ("en", 32, True), ("en", 33, False), ("en", 46, False),
     ("ar", 48, True), ("ar", 24, False),
 ])
-def test_heading_size_grid_is_even_points(lang, size, ok):
-    assert (_clean(lang, font_heading_size=size)[0]["font_heading_size"] is not None) is ok
+def test_name_size_grid_is_even_points(lang, size, ok):
+    assert (_clean(lang, font_name_size=size)[0]["font_name_size"] is not None) is ok
+
+
+@pytest.mark.parametrize("lang, size, ok", [
+    ("en", 11, True), ("en", 18, True), ("en", 13.5, False), ("en", 10, False),
+    ("en", 19, False), ("ar", 12, True), ("ar", 20, True), ("ar", 11, False),
+])
+def test_heading_size_is_whole_points_in_the_section_range(lang, size, ok):
+    values, _ = _clean(lang, font_heading_size=size)
+    assert (values["font_heading_size"] is not None) is ok
+
+
+# ---- the Name group (step 3c) -------------------------------------------------
+
+def test_name_font_null_means_same_as_headings():
+    values, resets = _clean(font_heading="Montserrat", font_name_weight=900)
+    assert values["font_name"] is None and resets == []
+    # its weight is checked against the HEADINGS font it follows
+    assert values["font_name_weight"] == 900
+    assert _clean(font_heading="Anton", font_name_weight=900)[0]["font_name_weight"] is None
+
+
+def test_name_template_is_kept_and_takes_no_weight():
+    values, resets = _clean(font_heading="Montserrat", font_name=NAME_TEMPLATE,
+                            font_name_weight=800, font_name_size=30)
+    assert values["font_name"] == NAME_TEMPLATE and values["font_name_size"] == 30
+    assert _reset_keys(resets) == {"font_name_weight": NO_FONT}
+
+
+def test_name_weight_needs_a_font_somewhere():
+    """Same as Headings with no Headings font is the template's face."""
+    _, resets = _clean(font_name_weight=800)
+    assert _reset_keys(resets) == {"font_name_weight": NO_FONT}
+
+
+def test_name_uses_the_heading_lists_not_the_details_ones():
+    assert _clean(font_name="Inter")[0]["font_name"] is None
+    assert _clean("ar", font_name="Almarai", font_name_weight=900)[0]["font_name_weight"] is None
+
+
+# ---- migration of pre-3c résumés ------------------------------------------------
+
+@pytest.mark.parametrize("lang, old, name, section", [
+    ("en", 32, 32, 13),      # 13.44 -> 13
+    ("en", 24, 24, 11),      # 10.08 -> floor 11
+    ("en", 44, 44, 18),      # 18.48 -> cap 18
+    ("en", 36, 36, 15),      # 15.12
+    ("ar", 34, 34, 14),      # 14.28
+    ("ar", 26, 26, 12),
+    ("ar", 48, 48, 20),
+])
+def test_an_old_headline_size_moves_to_the_name(lang, old, name, section):
+    data = {"font_heading": "Cairo" if lang == "ar" else "Montserrat", "font_heading_size": old}
+    moved, migrations = migrate_typography(data, lang)
+    assert moved["font_name_size"] == name and moved["font_heading_size"] == section
+    assert {m["key"] for m in migrations} == {"font_name_size", "font_heading_size"}
+    values, resets = _clean(lang, **data)
+    assert resets == []
+    assert (values["font_name_size"], values["font_heading_size"]) == (name, section)
+
+
+def test_a_new_range_heading_size_is_not_migrated():
+    data = {"font_heading_size": 14}
+    assert migrate_typography(data, "en") == (data, [])
+
+
+def test_an_explicit_name_size_wins_over_the_migration():
+    moved, migrations = migrate_typography({"font_heading_size": 32, "font_name_size": 40}, "en")
+    assert moved["font_name_size"] == 40 and moved["font_heading_size"] == 13
+    assert [m["key"] for m in migrations] == ["font_heading_size"]
+
+
+def test_off_grid_old_size_is_not_migrated_but_reset():
+    """33 was never a valid headline size; it is simply off the whitelist."""
+    assert migrate_typography({"font_heading_size": 33}, "en")[1] == []
+    assert _reset_keys(_clean(font_heading_size=33)[1]) == {"font_heading_size": NOT_OFFERED}
 
 
 def test_arabic_body_size_uses_the_arabic_range():
@@ -240,8 +321,20 @@ def test_put_returns_resets_and_stores_the_cleaned_values(client, caplog):
 
 def test_put_without_typography_stores_the_resume_as_sent(client):
     res = client.put("/api/resume", json=samples.ENGLISH)
-    assert res.status_code == 200 and res.get_json() == {"ok": True, "resets": []}
+    assert res.status_code == 200
+    assert res.get_json() == {"ok": True, "resets": [], "migrations": []}
     assert json.loads(RESUME_PATH.read_text(encoding="utf-8")) == samples.ENGLISH
+
+
+def test_put_migrates_an_old_headline_size_and_stores_both_keys(client):
+    body = {"name": "A", "title": "B", "font_heading": "Montserrat", "font_heading_size": 32}
+    got = client.put("/api/resume", json=body).get_json()
+    assert got["resets"] == []
+    assert {m["key"]: m["value"] for m in got["migrations"]} == {
+        "font_name_size": 32, "font_heading_size": 13}
+    stored = json.loads(RESUME_PATH.read_text(encoding="utf-8"))
+    assert stored["font_name_size"] == 32 and stored["font_heading_size"] == 13
+    assert client.put("/api/resume", json=stored).get_json()["migrations"] == []
 
 
 def test_put_with_a_wrong_type_is_422(client):

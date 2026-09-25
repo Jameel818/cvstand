@@ -116,3 +116,32 @@ def test_fonts_for_matches_offered():
     """Sanity: the payload's source helper and OFFERED agree."""
     for (lang, role), fams in OFFERED.items():
         assert [f.family for f in fonts_for(lang, role)] == list(fams)
+
+
+# ---- step 3c: Name / Headings / Details ------------------------------------------
+
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_payload_has_three_groups_and_name_mirrors_headings(lang):
+    p = builder_payload(lang)
+    assert list(p["roles"]) == ["name", "heading", "body"]
+    assert p["roles"]["name"]["groups"] == p["roles"]["heading"]["groups"]
+    assert p["roles"]["name"]["sizes"] != p["roles"]["heading"]["sizes"]
+    assert max(p["roles"]["heading"]["sizes"]) < min(p["roles"]["name"]["sizes"])
+
+
+def test_group_titles_and_the_name_options_are_translated():
+    src = BUILDER_JS.read_text(encoding="utf-8")
+    assert 'const TY_ROLE_TITLE = { name: "Name", heading: "Headings", body: "Details" };' in src
+    for msgid, ar in (("Headings", "عناوين الأقسام"), ("Same as Headings", "مثل عناوين الأقسام")):
+        assert str(ui_t(msgid, "ar")) == ar
+
+
+def test_render_reports_migrations_for_a_pre_split_resume():
+    from app import create_app
+    client = create_app().test_client()
+    data = json.loads((ROOT / "data" / "sample_resume.json").read_text(encoding="utf-8"))
+    data.update(font_heading="Montserrat", font_heading_size=32)
+    j = client.post("/api/render", json={"data": data, "template_key": "ats-t1"}).get_json()
+    assert j["resets"] == []
+    assert {m["key"]: m["value"] for m in j["migrations"]} == {
+        "font_name_size": 32, "font_heading_size": 13}

@@ -350,6 +350,9 @@ step 7), and the Word embedding (step 6).
 only when the résumé chose something. A CV with no typography keys carries
 none of it. There is no link to `typography.css`, no rules, and no runtime.
 
+- **Three groups since step 3c:** Name (`.cv-name`), Headings (`.cv-section`)
+  and Details. The Name defaults to "Same as Headings" (font and weight), and
+  `font_name: "template"` keeps the template's own face. See spec §2.
 - **The family is CSS.** The rules are `!important` on the role hooks
   (`.cv-name`, `.cv-section`, everything else under `.tpl`) for the same
   reason `RTL_TYPOGRAPHY` is: every template sets `font-family` inline. The
@@ -357,7 +360,8 @@ none of it. There is no link to `typography.css`, no rules, and no runtime.
   chosen font wins in RTL, while a role left on "Template default" keeps the
   policy's face. The Details rule excludes the headline hooks. A headline
   that INHERITS its family (ats-t1's name has none of its own) is pinned to
-  its pre-switch face by the runtime; the browser suite found this.
+  its pre-switch face by the runtime; the browser suite found this. The
+  same pin keeps a Name on "Template default" untouched under a Headings font.
 - **Weight and size are the runtime** (`static/js/typography.js`). Weight
   "Template default" means `nearest_weight()` of each element's own weight,
   from a table the server computes. Template-bold Details text (600 and up)
