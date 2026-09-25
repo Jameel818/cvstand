@@ -62,7 +62,7 @@ from .limits import RenderBusy, rate_limited, render_slot
 from .labels import all_levels, levels_for, ui_catalogue, ui_t
 from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
-from .schema import SUPPORTED_LANGS, ResumeValidationError, validate
+from .schema import SUPPORTED_LANGS, ResumeValidationError, typography_of, validate
 from .store import load_meta, load_resume, load_showcase, save_resume, set_template
 
 bp = Blueprint("main", __name__)
@@ -215,8 +215,17 @@ def put_resume():
         validate(data)
     except ResumeValidationError as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 422
+    # Typography off the registry's whitelist is RESET, not refused (spec §2):
+    # the stored value becomes null (template default) and `resets` tells the
+    # builder what changed. Only keys the client sent are rewritten, so a
+    # résumé that never chose a font is stored exactly as it was sent.
+    typography, resets = typography_of(data)
+    for key in typography.keys() & data.keys():
+        data[key] = typography[key]
+    if resets:
+        current_app.logger.info("typography reset on save: %s", resets)
     save_resume(data)
-    return jsonify({"ok": True})
+    return jsonify({"ok": True, "resets": resets})
 
 
 @bp.post("/api/template")

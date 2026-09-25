@@ -1,0 +1,153 @@
+{
+ "achievements": [
+  {
+   "label": "Designers led",
+   "metric": "14"
+  },
+  {
+   "label": "Brand systems shipped",
+   "metric": "4"
+  },
+  {
+   "label": "Production budget",
+   "metric": "$3.2M"
+  },
+  {
+   "label": "Industry awards",
+   "metric": "2×"
+  }
+ ],
+ "contact": {
+  "address": "دبي",
+  "email": "wren.ashworth@examplemail.com",
+  "phone": "555-0138-64",
+  "site": "wrenashworth.example.com",
+  "social": []
+ },
+ "dir": "ltr",
+ "education": [
+  {
+   "bullets": [],
+   "degree": "MA Visual Communication",
+   "end": "2014",
+   "gpa": "",
+   "school": "Harbour School of Art",
+   "start": ""
+  },
+  {
+   "bullets": [],
+   "degree": "BA Graphic Design",
+   "end": "2012",
+   "gpa": "",
+   "school": "Northfield University",
+   "start": ""
+  }
+ ],
+ "experience": [
+  {
+   "bullets": [
+    "Runs the ديوان للتصميم studio across brand and motion.",
+    "Replaced four divergent sub-brands with one documented system, cutting new-campaign setup from three weeks to four days.",
+    "Presents creative strategy to the executive group each quarter and defends the roadmap against it."
+   ],
+   "company": "ديوان للتصميم",
+   "end": "Present",
+   "location": "Portside",
+   "role": "Creative Lead",
+   "start": "2021"
+  },
+  {
+   "bullets": [
+    "Built the studio's first design-system practice and hired the six people who ran it.",
+    "Led two national campaign launches end to end, both delivered inside budget."
+   ],
+   "company": "Bellrock Studio",
+   "end": "2021",
+   "location": "Northfield",
+   "role": "Design Director",
+   "start": "2017"
+  },
+  {
+   "bullets": [
+    "Art-directed long-form editorial to a weekly press deadline."
+   ],
+   "company": "Kiln Press",
+   "end": "2017",
+   "location": "Northfield",
+   "role": "Senior Designer",
+   "start": "2014"
+  }
+ ],
+ "lang": "en",
+ "languages": [
+  {
+   "level": "Native",
+   "name": "English"
+  },
+  {
+   "level": "Fluent",
+   "name": "German"
+  }
+ ],
+ "name": "Wren Ashworth",
+ "photo_url": "",
+ "recognition": [
+  {
+   "detail": "Portside Design Awards, 2024",
+   "title": "Brand System of the Year"
+  },
+  {
+   "detail": "Northfield Print Guild, 2019",
+   "title": "Editorial Redesign, Gold"
+  }
+ ],
+ "references": [],
+ "skills": [
+  {
+   "dot_total": 5,
+   "dots": 5,
+   "level": "Expert",
+   "name": "Brand Systems",
+   "percent": 95
+  },
+  {
+   "dot_total": 5,
+   "dots": 5,
+   "level": "Expert",
+   "name": "Team Leadership",
+   "percent": 90
+  },
+  {
+   "dot_total": 5,
+   "dots": 4,
+   "level": "Advanced",
+   "name": "Art Direction",
+   "percent": 80
+  },
+  {
+   "dot_total": 5,
+   "dots": 4,
+   "level": "Advanced",
+   "name": "Budget Ownership",
+   "percent": 75
+  },
+  {
+   "dot_total": 5,
+   "dots": 3,
+   "level": "Proficient",
+   "name": "Motion Direction",
+   "percent": 65
+  }
+ ],
+ "summary": "Creative lead building brand systems that survive handover — fourteen designers, four launches, one set of rules everyone can follow.",
+ "summary_highlight": "survive handover",
+ "title": "Creative Lead",
+ "tools": [
+  "Figma",
+  "InDesign",
+  "Illustrator",
+  "After Effects",
+  "Notion",
+  "Keynote"
+ ]
+}

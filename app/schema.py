@@ -19,6 +19,9 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from .typography import clean_typography
+from .typography.registry import FONT_KEY, TYPOGRAPHY_KEYS
+
 _STR = {"type": "string"}
 _STR_LIST = {"type": "array", "items": {"type": "string"}}
 
@@ -37,6 +40,15 @@ RESUME_SCHEMA: dict[str, Any] = {
         # back to English layout, which is precisely the class of failure this
         # project keeps finding (a wrong render that raises nothing).
         "lang": {"type": "string", "enum": ["en", "ar"]},
+        # Typography choices (docs/CVSTAND_FONT_CONTROLS.md §2). OPTIONAL;
+        # null or absent means "template default". The schema checks the JSON
+        # TYPE only — a wrong type is a 422. Whether a value is on the
+        # registry's whitelist depends on `lang`, so that is `normalize()`'s
+        # job, and it resets rather than refuses (app/typography/validate.py).
+        # Weights are "number", not "integer": 800.5 is the right type and
+        # simply not offered, so it is reset like any other off-list value.
+        **{key: {"type": ["string" if key in FONT_KEY.values() else "number", "null"]}
+           for key in TYPOGRAPHY_KEYS},
         "photo_url": _STR,
         "summary": _STR,
         # A short highlighted phrase inside the summary (the marker swipe in
@@ -196,6 +208,12 @@ def dir_of(data: dict[str, Any]) -> str:
     return "rtl" if lang_of(data) in _RTL_LANGS else "ltr"
 
 
+def typography_of(data: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """The résumé's whitelisted typography for its own language, plus what had
+    to be reset to reach it. See app/typography/validate.py."""
+    return clean_typography(data, lang_of(data))
+
+
 class ResumeValidationError(ValueError):
     def __init__(self, errors: list[str]):
         self.errors = errors
@@ -296,6 +314,9 @@ def normalize(data: dict[str, Any]) -> dict[str, Any]:
     # StrictUndefined means anything they read must always be present.
     out["lang"] = lang_of(out)
     out["dir"] = dir_of(out)
+    # All six typography keys, always present (None = template default), and
+    # only ever registry values for THIS language — never the raw input.
+    out.update(typography_of(out)[0])
 
     contact = out.get("contact") or {}
     _fill(contact, _CONTACT_BLANKS)
