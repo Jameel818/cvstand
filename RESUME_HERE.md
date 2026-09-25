@@ -1,10 +1,37 @@
-# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · steps 3, 3b, 3c done; step 4 not planned)
+# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · steps 1–3c done, user-tested; next: ECC /e2e, plan step 4)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
 Spec: `docs/CVSTAND_FONT_CONTROLS.md` (§8 is the step order; §9 governs every
 push and merge). One §8 step at a time: plan → user approval → implement →
 tests → commit → report verified / not verified → ask before the next step.
+
+### ✅ USER TESTED THE BUILDER — 2026-09-25 (branch at `d6b21ec`, local run)
+- **The Fonts section works and looks great** (user's words). Name /
+  Headings / Details, all three groups, in the live preview.
+- **PDF export ignores the chosen fonts** — expected; that is step 4.
+- **Word export ignores the chosen fonts** — expected; steps 5–6.
+- **Word export ALSO does not follow the selected template's design.** This
+  is separate from typography and NOT yet investigated.
+
+### ⏭ NEXT SESSION, in this order
+1. **ECC `/e2e` check** (the `everything-claude-code:e2e` skill) on this branch.
+2. **Plan step 4** (PDF pipeline). It must also fix the pre-existing PDF
+   variable-weight bug (`fonts_inline.css`, see step 3b notes below) and show
+   the user BEFORE/AFTER images of every affected pixel golden before
+   updating any.
+3. **Before planning step 5, investigate the Word export** and report to the
+   user (investigation only, no code): how it is built (`word_masters/*.docx`,
+   `tools/build_word_masters.py`, `app/exporters/`), whether it maps to the
+   49 templates at all or uses a few generic masters, and what it would take
+   to make the .docx follow the selected template's design. Read FONTS.md
+   "Word masters are a deliberate exception" and the step-6 note in the
+   typography memory first; embedding broke the masters once before.
+
+The local dev server is STOPPED (`venv/Scripts/python run.py` restarts it on
+http://127.0.0.1:5000). An open builder tab then shows "تعذّر الوصول إلى خدمة
+المعاينة" / "Could not reach the preview service": that means the server is
+off, not a code fault.
 
 **Step 1 DONE — `0d8de14`.** `app/typography/` (registry + whitelist), the six
 optional keys in the schema, `normalize()` fills them, `PUT /api/resume`
