@@ -20,7 +20,10 @@ from app.typography import (
     CSS_FAMILY_PREFIX, EMPHASIS_WEIGHT, FONTS, LATIN_EXT_FALLBACK, OFFERED,
     TYPOGRAPHY_KEYS, built_faces, built_weights, nearest_weight,
 )
-from app.typography.render import effective, family_stack
+from app.schema import typography_of
+from app.typography import face
+from app.typography.faces import FONT_DIR
+from app.typography.render import effective, family_stack, pdf_faces
 
 EN = json.loads(open("data/sample_resume.json", encoding="utf-8").read())
 AR = json.loads(open("data/sample_resume_ar.json", encoding="utf-8").read())
@@ -186,14 +189,75 @@ def test_typography_comes_after_the_rtl_rules():
     assert doc.index('id="cv-typography-config"') < doc.index("window.ResumeAutofit")
 
 
-def test_pdf_keeps_the_template_look_until_step_4():
-    """STEP-4 PIN. The PDF path has no base URL, so /static fonts would fail
-    silently; until step 4 inlines the chosen faces, an export renders the
-    template's own look rather than a fallback. Step 4 deletes this test."""
-    doc = _own(_doc(EN, for_pdf=True, font_heading="Montserrat", font_body="Inter",
-                    font_body_size=11))
+# ---- the PDF (spec step 4) ---------------------------------------------------
+
+def _faces_block(doc: str) -> str:
+    m = re.search(r'<style id="cv-typography-faces">(.*?)</style>', doc, re.S)
+    assert m, "no inlined faces"
+    return m.group(1)
+
+
+def _inlined(doc: str) -> set[tuple[str, int]]:
+    block = _faces_block(doc)
+    return {(fam.removeprefix(CSS_FAMILY_PREFIX), int(w)) for fam, w in re.findall(
+        r"font-family: '([^']+)'; font-style: normal; font-weight: (\d+);", block)}
+
+
+@pytest.mark.parametrize("base", [EN, AR], ids=["en", "ar"])
+def test_pdf_with_no_keys_emits_nothing(base):
+    doc = _own(_doc(base, for_pdf=True))
     for marker in MARKERS:
         assert marker not in doc, marker
+
+
+PDF_CASES = [
+    (EN, dict(font_heading="Montserrat", font_body="Inter", font_body_size=11)),
+    (EN, dict(font_name="Playfair Display", font_heading="Raleway", font_body="Lora")),
+    (AR, dict(font_heading="Cairo", font_body="IBM Plex Sans Arabic", font_name="Tajawal")),
+    (AR, dict(font_heading="Almarai", font_body="Scheherazade New")),
+]
+
+
+@pytest.mark.parametrize("base,keys", PDF_CASES, ids=[str(i) for i in range(len(PDF_CASES))])
+def test_pdf_inlines_exactly_the_faces_it_can_request(base, keys):
+    """No <link> (it would resolve to nothing on about:blank); instead every
+    face pdf_faces() names, as data: - and nothing else."""
+    doc = _doc(base, for_pdf=True, **keys)
+    assert "typography.css" not in doc
+    assert "/static/fonts/" not in _faces_block(doc)
+    values, _ = typography_of(dict(base, **keys))
+    assert _inlined(doc) == pdf_faces(values, base.get("lang") or "en")
+
+
+@pytest.mark.parametrize("base,keys", PDF_CASES, ids=[str(i) for i in range(len(PDF_CASES))])
+def test_pdf_carries_the_previews_rules_config_and_runtime(base, keys):
+    """Only how the faces arrive may differ: the family rules, the config and
+    the runtime are byte-identical, so the PDF resolves roles as the preview."""
+    pdf, preview = _doc(base, for_pdf=True, **keys), _doc(base, **keys)
+    for pattern in (r'<style id="cv-typography">.*?</style>',
+                    r'<script type="application/json" id="cv-typography-config">.*?</script>'):
+        a, b = re.search(pattern, pdf, re.S), re.search(pattern, preview, re.S)
+        assert a and b and a.group(0) == b.group(0)
+    assert "window.CVTypography" in _own(pdf)
+
+
+def test_pdf_adds_the_latin_ext_fallback_only_where_the_stack_names_it():
+    with_fb = _inlined(_doc(AR, for_pdf=True, font_body="Tajawal"))
+    assert {f for f, _w in with_fb} == {"Tajawal", "Work Sans"}
+    without = _inlined(_doc(AR, for_pdf=True, font_body="Cairo"))
+    assert {f for f, _w in without} == {"Cairo"}
+
+
+def test_pdf_embeds_rfn_families_as_their_unmodified_ttf():
+    """The Reserved-Font-Name families ship no woff2 (FONTS.md); the PDF
+    embeds the same TTF bytes the preview links."""
+    import base64
+    block = _faces_block(_doc(AR, for_pdf=True, font_body="IBM Plex Sans Arabic"))
+    payloads = re.findall(r"url\(data:font/ttf;base64,([^)]+)\) format\('truetype'\)", block)
+    assert payloads
+    ttf = {(FONT_DIR / face("IBM Plex Sans Arabic", w)["ttf"]).read_bytes()
+           for w in built_weights("ar", "body", "IBM Plex Sans Arabic")}
+    assert {base64.b64decode(p) for p in payloads} == ttf
 
 
 # ---- Latin-Ext fallback --------------------------------------------------------

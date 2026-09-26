@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-25 (TYPOGRAPHY CONTROLS · steps 1–3c done, user-tested; next: ECC /e2e, plan step 4)
+# RESUME HERE — paused 2026-09-26 (TYPOGRAPHY CONTROLS · steps 1–4 done; next: investigate Word export, then plan step 5)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -14,13 +14,35 @@ tests → commit → report verified / not verified → ask before the next step
 - **Word export ALSO does not follow the selected template's design.** This
   is separate from typography and NOT yet investigated.
 
+### ✅ STEP 4 DONE — PDF (2026-09-26, committed + pushed)
+- Full suite before starting: 4462 passed / 24 skipped / 0 failed.
+- **Weight bug fixed.** `fonts_inline.css` is now `fonts.css` rule for rule
+  (`tools/fetch_fonts.py --inline`, offline; `--check` compares rule for
+  rule). 1.38 -> 4.2 MB per render: user chose exact preview parity over a
+  weight range (a range differs from the preview on modern-t5/t8/t24,
+  ats-t19, which use undeclared weights). **48/49 EN pixel goldens moved,
+  user-approved from before/after images**; measured 49/49 pixel-identical to
+  the preview; ats-t23 unchanged; no Arabic document uses these families.
+- **Chosen faces in the PDF.** `document_blocks(for_pdf=True)` inlines
+  `pdf_faces()` (faces_for + Latin-Ext fallback) from typography.css's own
+  rules (RFN families as TTF). `pdf.py` loads + checks every chosen face
+  (`Promise.allSettled`) and refuses to print a fallback.
+- **§7.5 test:** `tests/e2e/test_pdf_fonts.py`, 3 combos per language via
+  POST /export/pdf, pypdf listing. Mutation: reverting the PDF path fails 6/6.
+  Chromium writes STROKED text (modern-t22 "RESUME") and variable fonts as
+  Type3; Arabic Type3 ToUnicode maps glyph skeletons, not letters.
+- **Item 5 (font-load race): none.** Chosen faces are loaded when autofit
+  measures, EN and AR; the preview did not change.
+- **modern-t13:** real weights exposed a wide-contact overflow (+12.8px; the
+  preview always had it). User approved `overflow-wrap:anywhere` in the
+  contact column; sample pixels unchanged, 3 HTML goldens changed only by
+  that style.
+- Full suite after: 4482 passed / 24 skipped / 0 failed. Overflow EN/AR 49/49,
+  autofit all pass, voids 0/49.
+
 ### ⏭ NEXT SESSION, in this order
-1. **ECC `/e2e` check** (the `everything-claude-code:e2e` skill) on this branch.
-2. **Plan step 4** (PDF pipeline). It must also fix the pre-existing PDF
-   variable-weight bug (`fonts_inline.css`, see step 3b notes below) and show
-   the user BEFORE/AFTER images of every affected pixel golden before
-   updating any.
-3. **Before planning step 5, investigate the Word export** and report to the
+1. ~~ECC `/e2e` check~~ passed (912 typography tests). ~~Step 4~~ done above.
+2. **Before planning step 5, investigate the Word export** and report to the
    user (investigation only, no code): how it is built (`word_masters/*.docx`,
    `tools/build_word_masters.py`, `app/exporters/`), whether it maps to the
    49 templates at all or uses a few generic masters, and what it would take
@@ -112,6 +134,15 @@ name pixel-identical to step 3; sections move <= 0.5pt (reflow below).
   variable-font trap, in the inline sheet.
 
 ### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
+- **Arabic autofit first-pass compression (found in step 4, 2026-09-26).**
+  Arabic sample on modern-t1 with Cairo headings / Amiri details / Tajawal
+  name: the FIRST fit measures natural 1131px and compresses to d=0.94; an
+  immediate second `ResumeAutofit.fit()` measures 1100px and fits at d=1.
+  All chosen faces were already `loaded` at the first fit, so it is not a
+  font-loading race. Same in preview and PDF (both print the first pass), so
+  parity holds; the document is just compressed when it need not be. Likely
+  the step-3 size factor / autofit interplay. Probe: add a `resume-autofit`
+  listener, compare `detail.natural` with a second `fit().natural`.
 - **IBM Plex Sans Arabic in the older Arabic alias layer.** `fonts_ar.css`
   serves it as Google-CSS-API woff2 subsets (`ibm-plex-sans-arabic-*.woff2`)
   under its Reserved Font Name ("Plex"). Under OFL FAQ 2.2.2 / 2.6 a subset or

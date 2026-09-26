@@ -10,11 +10,37 @@ The page box is exactly 850x1100px (Letter @ 100dpi). We set the PDF `width`
 """
 from __future__ import annotations
 
+import logging
+
 from ..rendering import document_html
+from ..schema import lang_of, typography_of
+from ..typography import CSS_FAMILY_PREFIX
+from ..typography.render import faces_for
+
+log = logging.getLogger(__name__)
+
+# Spec §6.1: load every chosen face explicitly, then check it. fonts.ready
+# alone only covers the faces the layout happened to request, and a face that
+# failed to load is drawn in a fallback with no error at all. allSettled, not
+# all: a face that cannot load REJECTS its load(), and the check must still
+# name it rather than abort on the first one.
+_LOAD_AND_CHECK = """async (faces) => {
+    await Promise.allSettled(faces.map(f => document.fonts.load(f)));
+    return faces.filter(f => !document.fonts.check(f));
+}"""
 
 
 class PdfExportError(RuntimeError):
     pass
+
+
+def chosen_faces(data: dict) -> list[str]:
+    """CSS font shorthands for every face the user's choices can request.
+    The Latin-Ext fallbacks are not here: they are used only if a glyph falls
+    through, so a document may rightly never load them."""
+    values = typography_of(data)[0]
+    return [f'{w} 16px "{CSS_FAMILY_PREFIX}{fam}"'
+            for fam, w in sorted(faces_for(values, lang_of(data)))]
 
 
 def render_pdf(data: dict, template_id: str) -> bytes:
@@ -29,6 +55,7 @@ def render_pdf(data: dict, template_id: str) -> bytes:
     # about:blank, so a linked /static/fonts/... URL would resolve to nothing
     # and Chromium would silently fall back to a default face.
     html = document_html(data, template_id, for_pdf=True)
+    faces = chosen_faces(data)
 
     try:
         with sync_playwright() as p:
@@ -38,6 +65,11 @@ def render_pdf(data: dict, template_id: str) -> bytes:
                 page.set_content(html, wait_until="networkidle")
                 # Fonts must be loaded before layout is measured for pagination.
                 page.evaluate("document.fonts && document.fonts.ready")
+                missing = page.evaluate(_LOAD_AND_CHECK, faces) if faces else []
+                if missing:
+                    log.error("PDF export: chosen font(s) did not load: %s", missing)
+                    raise PdfExportError(
+                        f"chosen font(s) did not load, refusing to print a fallback: {missing}")
                 # Auto-fit compresses vertical rhythm until the résumé seats on
                 # one page (app/static/js/autofit.js). It is inlined in every
                 # document and self-starts after fonts.ready; awaiting its

@@ -9,6 +9,14 @@
 Both are "" when every key is None, so a résumé that never chose anything
 emits exactly the document it did before this feature existed.
 
+THE PDF (spec step 4)
+    PDF export renders through `page.set_content()`, whose base URL is
+    about:blank: the <link> would resolve to nothing and Chromium would draw
+    a fallback without a word. With `for_pdf=True` the head carries the
+    faces themselves instead - `pdf_faces()`, each as typography.css's own
+    rule with the url() replaced by the file's bytes. Everything else (the
+    family rules, the config, the runtime) is identical to the preview's.
+
 WHY FAMILY IS CSS BUT WEIGHT AND SIZE ARE NOT
     All 49 templates set font-family, font-weight and font-size in inline
     `style` attributes, so only an `!important` stylesheet rule reaches them -
@@ -47,7 +55,9 @@ registry, having been matched there exactly by `clean_typography`.
 """
 from __future__ import annotations
 
+import base64
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -58,6 +68,8 @@ from .registry import (
 )
 
 TYPOGRAPHY_CSS_URL = "/static/fonts/typography.css"
+_FONT_DIR = Path(__file__).resolve().parent.parent / "static" / "fonts"
+_MIME = {".woff2": "font/woff2", ".ttf": "font/ttf"}
 _RUNTIME = Path(__file__).resolve().parent.parent / "static" / "js" / "typography.js"
 
 PT_TO_PX = 4 / 3
@@ -169,21 +181,68 @@ def _runtime() -> str:
     return "<script>\n" + _RUNTIME.read_text(encoding="utf-8") + "\n</script>"
 
 
-def document_blocks(values: dict, lang: str) -> tuple[str, str]:
-    """(head, body) strings for document_html; ("", "") when nothing was chosen."""
+def document_blocks(values: dict, lang: str, *, for_pdf: bool = False) -> tuple[str, str]:
+    """(head, body) strings for document_html; ("", "") when nothing was chosen.
+
+    `for_pdf` swaps the <link> for the faces inlined (see THE PDF above)."""
     cfg = config(values, lang)
     if cfg is None:
         return "", ""
     chose_family = any(e["family"] for e in effective(values).values())
     head = ""
     if chose_family:
-        head = f'<link rel="stylesheet" href="{TYPOGRAPHY_CSS_URL}">' + _css(values)
+        faces = (_inline_faces(pdf_faces(values, lang)) if for_pdf
+                 else f'<link rel="stylesheet" href="{TYPOGRAPHY_CSS_URL}">')
+        head = faces + _css(values)
     # `</` cannot appear in the JSON (every value is a registry name or a
     # number), but escape it anyway: this sits inside a <script> element.
     blob = json.dumps(cfg, sort_keys=True).replace("</", "<\\/")
     body = (f'<script type="application/json" id="cv-typography-config">{blob}</script>'
             + _runtime())
     return head, body
+
+
+@lru_cache(maxsize=1)
+def _face_rules() -> dict[tuple[str, int], str]:
+    """typography.css's @font-face rule for each (family, weight), verbatim.
+    The PDF reuses the preview's rules rather than writing its own, so the
+    two cannot declare a face differently."""
+    css = (_FONT_DIR / "typography.css").read_text(encoding="utf-8")
+    out = {}
+    for rule in re.findall(r"@font-face \{[^}]*\}", css):
+        family = re.search(r"font-family: '([^']+)'", rule).group(1)
+        weight = int(re.search(r"font-weight: (\d+)", rule).group(1))
+        out[(family.removeprefix(CSS_FAMILY_PREFIX), weight)] = rule
+    return out
+
+
+def _embed(rule: str) -> str:
+    def data_uri(m: re.Match) -> str:
+        path = _FONT_DIR / m.group(1)
+        b64 = base64.b64encode(path.read_bytes()).decode()
+        return f"url(data:{_MIME[path.suffix]};base64,{b64})"
+    return re.sub(r"url\(/static/fonts/([^)]+)\)", data_uri, rule)
+
+
+def _inline_faces(faces: set[tuple[str, int]]) -> str:
+    rules = _face_rules()
+    return ('<style id="cv-typography-faces">\n'
+            + "\n".join(_embed(rules[f]) for f in sorted(faces)) + "\n</style>")
+
+
+def pdf_faces(values: dict, lang: str) -> set[tuple[str, int]]:
+    """Every face a PDF must carry: `faces_for()`, plus the Latin-Ext
+    fallback at the same weights for a family whose stack names one - in the
+    preview the browser fetches that only when a glyph falls through, and a
+    PDF has nowhere to fetch it from."""
+    out = set(faces_for(values, lang))
+    without = _families_without_latin_ext()
+    for family, weight in list(out):
+        if family in without:
+            out.add((LATIN_EXT_FALLBACK[FONTS[family].generic], weight))
+    missing = out - set(built_faces())
+    assert not missing, f"fallback face not built: {sorted(missing)}"
+    return out
 
 
 def faces_for(values: dict, lang: str) -> set[tuple[str, int]]:

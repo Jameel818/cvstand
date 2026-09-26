@@ -76,21 +76,42 @@ def test_both_stylesheets_declare_the_same_families():
     assert link == inline == FAMILIES
 
 
-def test_inline_css_embeds_each_file_exactly_once():
-    """Naive generation base64s a shared file once per subset rule — 4.2 MB
-    instead of 1.35 MB.
+def _rules(css: str) -> list[tuple[str, str, str, str]]:
+    """(family, weight, style, unicode-range) of every @font-face, in order."""
+    out = []
+    for block in re.findall(r"@font-face\s*\{(.*?)\}", css, re.S):
+        def get(prop, default=""):
+            m = re.search(rf"{prop}:\s*([^;]+);", block)
+            return m.group(1).strip() if m else default
+        out.append((get("font-family"), get("font-weight", "400"),
+                    get("font-style", "normal"), get("unicode-range")))
+    return out
 
-    Scoped to the files fonts.css actually references, NOT to everything in the
-    directory: the Arabic faces (tools/fetch_fonts_ar.py) live in the same
-    folder and belong to fonts_ar_inline.css. Counting the directory made this
-    test assert "no other font may ever sit here", which is not the contract it
-    is named for — and is what it started failing on."""
+
+def test_inline_css_has_every_linked_rule():
+    """The PDF sheet must declare exactly the preview's rules - every weight.
+
+    It used to merge the rules that share a file, to embed each payload once
+    (1.4 MB instead of 4.2). For a variable family Google points EVERY weight
+    at one file, so the merge kept only `font-weight: 400`: the PDF, and every
+    pixel golden, drew Montserrat 900 / Archivo 900 / Inter 700 ... at 400
+    while the preview drew them real. Eight families, 48 of 49 templates."""
+    link = _rules((FONTS_DIR / "fonts.css").read_text(encoding="utf-8"))
+    inline = _rules((FONTS_DIR / "fonts_inline.css").read_text(encoding="utf-8"))
+    assert inline == link
+
+
+def test_inline_payloads_are_the_linked_files():
+    """Rule for rule, each data: URI is the bytes of the file the linked rule
+    names - so a re-download that changed a file cannot leave a stale copy."""
+    import base64
     css = (FONTS_DIR / "fonts.css").read_text(encoding="utf-8")
-    latin_files = set(re.findall(r"url\(/static/fonts/([^)]+)\)", css))
+    files = re.findall(r"url\(/static/fonts/([^)]+)\)", css)
     inline = (FONTS_DIR / "fonts_inline.css").read_text(encoding="utf-8")
-    n_payloads = inline.count("data:font/woff2;base64,")
-    assert n_payloads == len(latin_files), (
-        f"{n_payloads} payloads for {len(latin_files)} Latin files")
+    payloads = re.findall(r"url\(data:font/woff2;base64,([^)]+)\)", inline)
+    assert len(payloads) == len(files)
+    for name, b64 in zip(files, payloads):
+        assert base64.b64decode(b64) == (FONTS_DIR / name).read_bytes(), name
 
 
 @pytest.mark.parametrize("key", ["modern-t1", "ats-t23"])

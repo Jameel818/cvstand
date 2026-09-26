@@ -23,7 +23,7 @@
       {% if c.phone %}{% set _ = bits.append(c.phone) %}{% endif %}
       {% if c.address %}{% set _ = bits.append(c.address) %}{% endif %}
       {% if c.site %}{% set _ = bits.append(c.site) %}{% endif %}
-      {% if bits %}<div style="text-align:end; font-size:11.5px; line-height:1.8; color:#C7D4E4; white-space:nowrap;">{{ bits | br_join }}</div>{% endif %}
+      {% if bits %}<div style="text-align:end; font-size:11.5px; line-height:1.8; color:#C7D4E4; min-width:0; overflow-wrap:anywhere;">{{ bits | br_join }}</div>{% endif %}
     </div>
     {% if r.achievements %}
     <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:16px; border-top:1px solid rgba(255,255,255,0.28); margin-top:22px; padding-top:16px;">

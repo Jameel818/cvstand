@@ -52,6 +52,19 @@ declaration was changed to `font-weight: 200 1000`.
 to. Tajawal has no `fvar` table and is correctly declared per static weight —
 check before assuming, in either direction.
 
+**The same trap, in the PDF's inline sheet (fixed in typography step 4).**
+`fonts.css` declares the Latin variable families the way Google emits them:
+one discrete rule per weight, each pointing at the same file. That is
+correct. `fonts_inline.css` used to MERGE the rules sharing a file, to embed
+each payload once, and so kept only the first rule's `font-weight: 400`.
+The PDF, and every pixel golden, drew Inter, Montserrat, Archivo, Archivo
+Narrow, Source Sans 3, Open Sans, Merriweather and Fraunces at 400 while the
+preview drew their real weights (48 of 49 English templates). The inline
+sheet is now `fonts.css` with each url() replaced by the file's bytes, rule
+for rule (~4.2 MB). A weight RANGE would have been smaller but not the
+preview: four templates ask for a weight their family does not declare,
+which discrete rules round to the nearest and a range draws exactly.
+
 ## Roles, and where they are applied
 
 The policy assigns faces by ROLE, not by element. The roles live as CSS custom
@@ -379,9 +392,13 @@ none of it. There is no link to `typography.css`, no rules, and no runtime.
   at every weight, and the browser fetches one only when a glyph falls
   through. Measured: in Tajawal, "Dvořák Şahin" draws exactly 2 glyphs from
   Work Sans.
-- **Not the PDF yet.** The export still renders the template's own faces
-  until spec step 4 inlines the chosen ones. A linked face would fail
-  silently there, since the PDF document has no base URL.
+- **The PDF (spec step 4).** The PDF document has no base URL, so a linked
+  face would fail silently. `document_blocks(..., for_pdf=True)` inlines the
+  faces this document can request instead: `faces_for()` plus the Latin-Ext
+  fallback where the stack names one, from `typography.css`'s own rules
+  (woff2, or the unmodified TTF for the Reserved-Font-Name families).
+  `pdf.py` then loads each chosen face explicitly and refuses to print if
+  one did not load.
 
 ## Word masters are a deliberate exception
 

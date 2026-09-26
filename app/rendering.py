@@ -119,7 +119,8 @@ _FONTS_DIR = Path(__file__).resolve().parent / "static" / "fonts"
 #     `page.set_content()`, whose base URL is `about:blank`: a "/static/..." URL
 #     has nothing to resolve against and fails SILENTLY, Chromium substituting a
 #     fallback face with no error. Embedding the bytes removes the lookup
-#     entirely — there is nothing left to fail. ~1.35 MB per export, which is a
+#     entirely — there is nothing left to fail. ~4.2 MB per export (one rule
+#     per weight, exactly as fonts.css — see tools/fetch_fonts.py), which is a
 #     one-off user action, versus the preview's every-keystroke re-render.
 #
 # _FONT_LINK (the Google CDN) is kept only as the documented fallback if
@@ -381,11 +382,10 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
     # are concatenated rather than given lines of their own, so a résumé with
     # no typography keys emits byte-for-byte the document it always did.
     #
-    # Not for the PDF yet: its fonts must be inlined (no base URL - see
-    # font_head), which is step 4 of the spec. Until then an export keeps the
-    # template's own faces rather than silently falling back.
-    ty_head, ty_body = ("", "") if for_pdf else document_blocks(
-        typography_of(data)[0], lang_of(data))
+    # for_pdf inlines the chosen faces instead of linking typography.css, for
+    # the same reason font_head does (no base URL on the PDF path).
+    ty_head, ty_body = document_blocks(
+        typography_of(data)[0], lang_of(data), for_pdf=for_pdf)
     # `dir` on <html> is what makes the whole document mirror: it is what the
     # logical CSS properties in the templates resolve against, and what the
     # RTL-scoped rules below select on. For lang="en" this emits dir="ltr",
