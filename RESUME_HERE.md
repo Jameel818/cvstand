@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-26 (TYPOGRAPHY CONTROLS · steps 1–4 done; next: investigate Word export, then plan step 5)
+# RESUME HERE — paused 2026-09-26 (TYPOGRAPHY CONTROLS · steps 1–4 done, Word export investigated; next: user picks a Word option, then plan step 5)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -12,7 +12,7 @@ tests → commit → report verified / not verified → ask before the next step
 - **PDF export ignores the chosen fonts** — expected; that is step 4.
 - **Word export ignores the chosen fonts** — expected; steps 5–6.
 - **Word export ALSO does not follow the selected template's design.** This
-  is separate from typography and NOT yet investigated.
+  is separate from typography; investigated 2026-09-26, see below.
 
 ### ✅ STEP 4 DONE — PDF (2026-09-26, committed + pushed)
 - Full suite before starting: 4462 passed / 24 skipped / 0 failed.
@@ -42,13 +42,165 @@ tests → commit → report verified / not verified → ask before the next step
 
 ### ⏭ NEXT SESSION, in this order
 1. ~~ECC `/e2e` check~~ passed (912 typography tests). ~~Step 4~~ done above.
-2. **Before planning step 5, investigate the Word export** and report to the
-   user (investigation only, no code): how it is built (`word_masters/*.docx`,
-   `tools/build_word_masters.py`, `app/exporters/`), whether it maps to the
-   49 templates at all or uses a few generic masters, and what it would take
-   to make the .docx follow the selected template's design. Read FONTS.md
-   "Word masters are a deliberate exception" and the step-6 note in the
-   typography memory first; embedding broke the masters once before.
+2. ~~Investigate the Word export~~ done below (2026-09-26, report only).
+3. **The user picks a Word option** (below). Then plan step 5 around it.
+
+### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
+
+**How it is built.** Word is a PARALLEL template family, not a render of the
+HTML. `tools/build_word_masters.py` (python-docx) GENERATES four masters with
+docxtpl tags: `ats_standard`, `modern_editorial`, and an `_rtl` twin of each.
+`app/exporters/docx.py` picks the master from `registry.Template.docx_master`
+(by CATEGORY) plus the résumé's `lang`, and fills it with docxtpl
+(`autoescape=True`). Skills become dot glyphs, contact becomes one line, and
+the photo is 22 mm on Modern only. Fonts and colours are DIRECT run
+formatting baked in at build time (`_p(..., color=, font=)`), not named styles.
+
+**Word layouts: 2 (4 files with RTL). All 49 templates map by category:**
+
+| Templates | Word master (EN / AR) | What the Word file looks like |
+|---|---|---|
+| modern-t1 … modern-t24 (24) | `modern_editorial` / `_rtl` | one wide column, sidebar content folded into the main flow, navy `#1F3A5F`, Georgia display + Arial body (AR: Times New Roman + Arial), 22 mm photo when set |
+| ats-t1 … ats-t25 (25) | `ats_standard` / `_rtl` | one column, monochrome, Arial (+ Courier), no photo |
+
+Per template, what Word does NOT carry over (all of these columns are lost):
+
+| key | label | skills | accent | photo | template fonts |
+|---|---|---|---|---|---|
+| modern-t1 | Editorial Redline | dot-grid | #D8F035 | - | Source Sans 3, Archivo |
+| modern-t2 | Navy & Gold | bars | #C8A24A | yes | Archivo |
+| modern-t3 | Yellow Photo Rail | bars | #F2C200 | yes | Archivo |
+| modern-t4 | Ribbon Sidebar | dot-grid | #3A6B5C | yes | Source Sans 3, Archivo |
+| modern-t5 | Rounded Dark | bars | #FF6F5E | yes | Open Sans, Archivo |
+| modern-t6 | Centred Symmetric | bars | #2B6CB0 | - | Source Sans 3, Poppins |
+| modern-t7 | Poster Band | bars | #E4572E | yes | Poppins, Archivo |
+| modern-t8 | Interlocking Blocks | dot-grid | #003366 | yes | Archivo |
+| modern-t9 | Boxed Sections | bars | #F2C200 | - | Archivo |
+| modern-t10 | FinTech Elite | bars | #A93005 | yes | DM Sans (not vendored), Archivo |
+| modern-t11 | Colour Header Rail | dot-grid | #2F855A | yes | Open Sans, Archivo |
+| modern-t12 | Typographic Mono | rings | #111111 | - | Inter, Anton |
+| modern-t13 | Band Timeline | dot-grid | #2B6CB0 | - | Inter, Archivo |
+| modern-t14 | Offset Plaque | dot-grid | #B83280 | yes | Source Sans 3, Anton |
+| modern-t15 | Forest & Amber | bars | #2F855A | yes | Archivo |
+| modern-t16 | Charcoal Rings | rings | #A32638 | yes | Open Sans, Montserrat |
+| modern-t17 | Two-Tone Ribbon | rings | #003366 | yes | Montserrat, Archivo |
+| modern-t18 | Interlocking Block | bars | #002B66 | yes | Open Sans, Archivo |
+| modern-t19 | Label Gutter | bars | #6B2A5A | - | Inter, Archivo |
+| modern-t20 | Cotton & Cherry | dot-grid | #810100 | yes | Archivo |
+| modern-t21 | Rounded Card Shell | dot-grid | #013F32 | yes | Source Sans 3, Montserrat |
+| modern-t22 | Vertical Rail Rings | rings | #CB3500 | - | Montserrat, Archivo |
+| modern-t23 | Spine Timeline | bars | #3182CE | - | Inter, Archivo |
+| modern-t24 | Hard-Edged Sidebar | rings | #FFD633 | yes | Open Sans, Archivo |
+| ats-t1 | Tech Lead | dot-grid | #2563EB | - | Archivo, IBM Plex Mono |
+| ats-t2 | Data Scientist | inline | #0D9488 | - | Archivo |
+| ats-t3 | Portal Standard | dot-grid | #334155 | - | Archivo |
+| ats-t4 | Editorial Redline | dot-grid | #D8F035 | - | Source Sans 3, Archivo |
+| ats-t5 | Sectioned Plum | bars | #7C3AED | - | Inter, Archivo |
+| ats-t6 | Rule Stack | inline | #475569 | - | Source Sans 3, Archivo |
+| ats-t7 | Accent Band | inline | #1E3A5F | - | Open Sans, Archivo |
+| ats-t8 | Big Type | inline | #C0392B | - | Source Sans 3, Anton |
+| ats-t9 | Ledger | inline | #1A1A1A | - | Source Sans 3, Merriweather |
+| ats-t10 | Marker | dot-grid | #FDE047 | - | Source Sans 3, Archivo |
+| ats-t11 | Caps Tick | dot-grid | #0D9488 | - | Open Sans, Montserrat |
+| ats-t12 | Serif Executive | inline | #1A1A1A | - | Open Sans, Merriweather |
+| ats-t13 | Mono Tech | dot-grid | #2563EB | - | IBM Plex Mono, Source Sans 3 |
+| ats-t14 | Numbered | inline | #B45309 | - | Source Sans 3, Archivo Narrow |
+| ats-t15 | Split Rule | bars | #7C3AED | - | Open Sans, Poppins |
+| ats-t16 | Fraunces Stack | inline | #C2410C | - | Source Sans 3, Fraunces |
+| ats-t17 | Wide Caps | inline | #166534 | - | Inter, Anton |
+| ats-t18 | Indent Rule | dot-grid | #4F46E5 | - | Montserrat |
+| ats-t19 | Ochre Ledger | inline | #B45309 | - | Source Sans 3, IBM Plex Mono |
+| ats-t20 | Centred Serif | inline | #8B1E3F | - | Inter, Merriweather |
+| ats-t21 | Mono Label | dot-grid | #06B6D4 | - | Inter, IBM Plex Mono |
+| ats-t22 | Accent Bar | inline | #DC2626 | - | Archivo |
+| ats-t23 | Open Air | inline | #0F6E63 | - | Poppins |
+| ats-t24 | Narrow Two-Tone | bars | #4D7C0F | - | Inter, Archivo Narrow |
+| ats-t25 | Dense Career | inline | #3B6EA5 | - | Open Sans, Montserrat |
+
+(template fonts = the two families carrying the most text, measured in
+Chromium; photo = has a photo slot: 16 of 24 Modern, 0 of 25 ATS.)
+
+**Why Word ignores the selected design: BY DESIGN, not a bug.** The mapping
+is per category, so 24 (or 25) designs share one file with ONE fixed palette
+(navy / monochrome), system-font substitutes (Georgia, Arial, Times New Roman,
+Courier), no sidebar (folded into one column), and dot glyphs for every skill
+graphic. Documented in `word_masters/README.md` and the builder's header
+("DIVERGENCES FROM THE HTML FAMILY"). Only the template's CATEGORY reaches the
+.docx; its colour, fonts, layout and skill style never do.
+
+**Options, simplest to closest match:**
+
+0. *Label it* (hours, no risk). Keep Word generic; the download menu says
+   "Word: simple editable version, PDF: exact design". The user sees an
+   honest menu, not a different file.
+1. *Theme per template on the 2 existing layouts* (about 1–2 sessions, low
+   risk). A runtime post-pass over the filled .docx (like `_apply_rtl`, but at
+   export) sets the template's accent, font pairing and heading treatment
+   (caps, letter-spacing, rule). The builder first tags runs by ROLE (name /
+   heading / body character styles) so the pass can find them. The user sees
+   the template's colours and fonts; the shape is still one of two. Catches:
+   light accents (#D8F035, #FDE047, #FFD633, #F2C200) are fills in the HTML
+   and unreadable as text, so a text-safe variant rule is needed. New font
+   widths change pagination, so `--verify` (Word COM) must run per template ×
+   language (98 exports).
+2. *Layout archetypes* (about 3–5 sessions, medium risk). Add about 4 Word
+   layouts (shaded two-column sidebar via a table, full-width header band,
+   centred, timeline), each with an RTL twin; map every Modern template to
+   archetype + theme (option 1's pass). ATS stays single column: tables hurt
+   parsers, and the ATS HTML is already close to its master. The user sees
+   Modern templates in recognisably the same shape. Catches: table sidebars
+   repaginate badly with long content; each archetype needs one-page tuning
+   with and without a photo.
+3. *One master per template* (many sessions, high risk). 49 × 2 bespoke
+   masters. Still not identical: Word has no rings, rotated text (modern-t22's
+   vertical RESUME), overlapping blocks or rounded cards, and 98 files must
+   stay one page under variable content. Not recommended.
+   HTML→DOCX conversion (LibreOffice / pdf2docx) is rejected outright:
+   absolute-positioned text boxes, poor editability, ATS-hostile, and it puts
+   LibreOffice in the Docker image.
+
+**Recommendation: option 1 now, as part of step 5; option 2 later for the
+Modern category only if the user wants a closer shape.** Option 1's runtime
+pass is what step 5 needs anyway (it must restyle runs by role at export), so
+the design work and the font feature share one mechanism.
+
+**How steps 5–6 fit each option:**
+- Step 5 (chosen fonts into runs, incl. `w:cs` / `w:bCs` / `w:szCs` for
+  Arabic, `word_family_name` + `word_bold` from build.json) needs runs
+  findable BY ROLE in every option. Option 0 does it on the 4 masters;
+  option 1 uses the same pass with "user choice, else template font"; option
+  2 adds nothing new per archetype once runs carry role styles; option 3
+  multiplies the tuning, not the mechanism.
+- Step 6 (embed TTFs as obfuscated `.odttf`, `w:embedTrueTypeFonts` in
+  settings.xml) is a post-save ZIP step, identical in every option. But
+  options 1–3 embed the TEMPLATE's own fonts when nothing is chosen, and
+  several are not in the typography build: Open Sans, Source Sans 3,
+  Merriweather, Fraunces, IBM Plex Mono and Archivo Narrow (buildable as
+  "template-default" faces per spec §6.3, more MB). DM Sans is not vendored at
+  all (modern-t10). Decision needed then: embed template defaults, or keep
+  system substitutes when no font is chosen.
+- File size: each embedded face is about 50–300 KB (Arabic larger); a 3-role
+  choice with emphasis faces is about 4–8 faces per .docx.
+
+**"Embedding broke the masters once before": NOT supported by any record.**
+Searched git history (it starts at `8d2aa2f`, 2026-09-14), BUILD.md,
+RESUME_HERE.md, word_masters/README.md, the memory files, and every session
+transcript of this project and of the older template project. No session
+ever embedded a font in a .docx. The sentence entered FONTS.md in `4b595a9`
+(2026-09-19), written in a session that had just listed the masters' fonts;
+nothing it read described an embedding failure. What DID break the masters
+is recorded: the first cut appended `w:pBdr` / `w:spacing` / `w:tblBorders`
+to the END of `w:pPr` / `w:rPr` / `w:tblPr`. That is well-formed but
+schema-invalid, and Word refused to open the files ("unreadable content")
+while every python-docx round-trip test passed. Fixed with
+`insert_element_before`, guarded by `tests/test_docx_validity.py`. The FONTS.md
+line most likely conflates the two. **It still matters for step 6:**
+`w:embedTrueTypeFonts` sits in `settings.xml`'s CT_Settings SEQUENCE, so
+appending it is the same trap (the spec already asks for "a schema-valid
+position"). And `--verify` (Word COM) bypasses Protected View, so it cannot
+prove the double-click path; that is what the §7.8 manual check on a PC
+without the fonts is for. Correct the FONTS.md sentence when step 6 updates
+that section (the user decided Word downloads MUST embed).
 
 The local dev server is STOPPED (`venv/Scripts/python run.py` restarts it on
 http://127.0.0.1:5000). An open builder tab then shows "تعذّر الوصول إلى خدمة
