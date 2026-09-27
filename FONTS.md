@@ -400,33 +400,82 @@ none of it. There is no link to `typography.css`, no rules, and no runtime.
   `pdf.py` then loads each chosen face explicitly and refuses to print if
   one did not load.
 
-## Word masters are a deliberate exception
+## Word downloads embed their fonts
 
-> **Changing (typography step 5, 2026-09-27).** The masters still hold these
-> system fonts, but only as PLACEHOLDERS: every export now names the
-> template's own faces or the user's chosen ones (`app/exporters/docx_theme.py`).
-> Until step 6 embeds them, a PC without those faces shows Word's substitutes.
-> Step 6 rewrites this section; the "broke the masters once before" sentence
-> below has no record behind it (see RESUME_HERE.md, Word investigation).
+*Rewritten in typography step 6 (2026-09-27). This section used to be "Word
+masters are a deliberate exception": the masters named only system fonts
+(Arial, Courier, Georgia, Times New Roman) and embedded nothing. That is no
+longer how a Word download works.*
 
-`word_masters/*.docx` reference **Arial, Courier, Georgia and Times New Roman**
-— system fonts, none of them on the allowlist.
+**What a .docx carries now.** `word_masters/*.docx` still hold Arial, Georgia
+and Times New Roman, but only as PLACEHOLDERS in their role styles. Every
+export rewrites those styles with the template's own faces, or with the
+faces the user chose in the Fonts section (`app/exporters/docx_theme.py`,
+step 5), and then embeds the TTF of every face the document's text actually
+draws (`app/exporters/docx_font_embed.py`, step 6). The user decided Word
+downloads MUST embed (2026-09-25), so the recipient sees the same fonts on a
+PC that has none of them installed, and can keep typing in them.
 
-That is not a violation, and the distinction matters: **naming a font in a
-document is not redistributing it.** Nothing is embedded; Word resolves the
-name against whatever the reader has installed. No licence is engaged at all.
+**The licence basis.** Every embedded family is on this allowlist and under
+the OFL. OFL FAQ 1.12: fonts may be embedded in a document "either in full or
+a subset". Two rules still apply, and the build enforces both:
+- **A Reserved Font Name family ships unmodified.** The file Word embeds is
+  the official TTF, byte for byte (Raleway, Playfair Display, Lora, IBM Plex
+  Sans Arabic, Scheherazade New, Lateef, and since step 6 Source Sans 3,
+  Merriweather and IBM Plex Mono). `tools/build_fonts.py` reads each OFL.txt
+  for the reservation, in any quoting style: Source Sans 3 writes 'Source' in
+  single quotes, which the first parser missed.
+- **fsType must permit embedding** (0 or 8). The build refuses anything else,
+  and so does the exporter.
 
-It is chosen for a reason the allowlist cannot serve. A `.docx` is opened on a
-machine this project does not control. An OFL family would have to be EMBEDDED
-to render, which does engage the licence, inflates every export, and is
-precisely what broke the masters once before. The four system families are
-present on effectively every Windows and macOS install, and all four carry
-Arabic coverage.
+**What gets embedded, and how.**
+- Only the faces the text draws, collected from the filled document, never a
+  guess: a Modern layout never uses the "CV Body Bold" role, so its face is
+  never embedded there.
+- The FULL script-subset TTF from `static/fonts/ttf/`, never a subset of the
+  characters used, so the recipient can edit. `w:saveSubsetFonts` is never
+  written.
+- Each face is obfuscated per ECMA-376 (a fresh GUID key per face) and wired
+  through `fontTable.xml`, its relationships and the `odttf` content type.
+  `w:embedTrueTypeFonts` goes in at its schema position in `settings.xml`.
+- The "template-default" faces the templates draw but no dropdown offers
+  (Open Sans, Source Sans 3, Archivo Narrow, Merriweather, Fraunces, IBM Plex
+  Mono; `registry.TEMPLATE_DEFAULT_FACES`) are built as TTF only: the preview
+  and PDF already draw those families from the templates' own files.
+- Two different faces never share a Word name. Archivo at 900 and the
+  Archivo Black family are both "Archivo Black" in the build: the chosen one
+  wins, and the embedder refuses a clash outright.
+- Export size: 68 KB to 900 KB, median about 250 KB (Merriweather's official
+  file alone is about 1 MB).
 
-The cost is real and worth stating: Arabic in these exports renders in Arial
-rather than in a face chosen for it. **Upgrading this means embedding, and
-embedding is a change to the paid export path — treat it as its own piece of
-work with its own gates, not a font swap.**
+**What the Word file does NOT promise.** Word has no auto-fit. The layouts
+keep Word's natural line spacing (Auto, Multiple 1.15 on each font's own
+height, never "Exactly"), so with the real fonts a résumé may flow onto a
+second page. That is accepted (user decision, 2026-09-27). What is not
+accepted: clipped glyphs or overlapping lines ("Exactly" spacing), a heading
+alone at the bottom of a page, or a job title parted from its company/date
+line. Headings and job lines keep with next, and Normal has widow/orphan
+control. `tests/test_docx_flow.py` checks this in the XML;
+`tools/verify_word_embedding.py` checks it in real Word.
+
+**Proved in real Word (step 6).** On a PC with none of these fonts installed,
+Word drew the embedded files: every font in Word's own PDF matched our TTF's
+advance widths exactly (Tajawal, Cairo, IBM Plex Sans Arabic, Amiri, Almarai,
+Archivo and others). One caveat, also measured: **Microsoft 365 downloads some
+free families itself** ("cloud fonts": Anton, IBM Plex Mono, Merriweather,
+Montserrat, Open Sans, Playfair Display, Poppins on the test PC) and prefers
+that copy to the embedded one. It is the same family, occasionally a slightly
+different version. Readers without Microsoft 365 get the embedded file.
+
+**History, corrected.** An earlier version of this section said embedding
+"broke the masters once before". No record supports that: no session ever
+embedded a font in a .docx before step 6. What did break the masters was
+OOXML **schema order**: properties appended to the end of `w:pPr` / `w:rPr` /
+`w:tblPr` are well-formed but invalid, and Word refused to open the files
+("unreadable content") while every python-docx test passed. That lesson
+applies to embedding too, so every element the embedder adds is inserted at
+its schema position, and `tests/test_docx_validity.py` and
+`tests/test_docx_font_embed.py` check the order.
 
 ## Adding a family
 

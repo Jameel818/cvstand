@@ -16,12 +16,16 @@ so the route can 501 rather than 500.
 """
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from .. import registry
 from ..config import UPLOADS_DIR, WORD_MASTERS_DIR
 from ..schema import DOT_TOTAL, dots_for, lang_of, normalize
-from . import docx_theme
+from . import docx_font_embed, docx_theme
+
+
+log = logging.getLogger(__name__)
 
 
 class DocxExportError(RuntimeError):
@@ -148,7 +152,14 @@ def render_docx(data: dict, template_key: str) -> bytes:
     doc.render(_context(data, doc), autoescape=True)
     # The template's accent and fonts, or the user's chosen fonts (step 5):
     # rewrites the master's role styles, so it runs on the filled document.
-    docx_theme.apply(doc.docx, docx_theme.resolve(data, template_key))
+    resolved = docx_theme.resolve(data, template_key)
+    docx_theme.apply(doc.docx, resolved)
+    faces = docx_theme.faces_drawn(doc.docx, resolved)
     buf = io.BytesIO()
     doc.save(buf)
-    return buf.getvalue()
+    # Step 6: the file carries the faces its text draws, so it looks the same
+    # on a PC that has none of them installed (docx_font_embed.py).
+    out = docx_font_embed.embed_fonts(buf.getvalue(), faces)
+    log.info("docx %s: %d KB, %d embedded face(s) %s", template_key, len(out) // 1024,
+             len(faces), sorted(faces))
+    return out

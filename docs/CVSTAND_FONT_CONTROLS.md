@@ -282,6 +282,10 @@ For **Arabic runs** you must set the complex-script attributes, not just `run.fo
 
 **File size.** Embedding makes the file larger, and Arabic fonts are the biggest. Measure the added size per face during the build, store it in the registry, and log the final .docx size. Don't reduce size by trimming characters, since that breaks editing.
 
+**Page flow (decision, 2026-09-27).** With the real fonts embedded, a Word file may run to a **second page**, and that is accepted. Word has no auto-fit, and the embedded faces are taller than the Arial the layouts were first tuned in. Never make it fit by squeezing: **don't reduce line spacing, don't remove content, don't change the layout** (Word must keep matching the PDF design). Keep Word's natural line spacing ("Auto", never "Exactly", so no Arabic mark is clipped). A Word file **fails** only on: "Exactly" spacing or an exact row height (clipped glyphs, overlapping lines), a section heading alone at the bottom of a page, or a job title parted from its company/date line. So every heading and job title (and its company/date line) keeps with next, and Normal has widow/orphan control. Tested by `tests/test_docx_flow.py` (XML) and `tools/verify_word_embedding.py` (real Word page breaks).
+
+**As built (step 6):** the module is `app/exporters/docx_font_embed.py` (this repo keeps exporters in `app/exporters/`, not `app/export/`). Template-default fonts are `registry.TEMPLATE_DEFAULT_FACES`, built as TTF only. Microsoft 365 "cloud fonts" (e.g. Montserrat, Open Sans, Poppins) may be drawn from Microsoft's own copy instead of the embedded one; every other family, and every reader without Microsoft 365, uses the embedded file.
+
 ---
 
 ## 7. Tests and acceptance criteria
@@ -298,7 +302,7 @@ For **Arabic runs** you must set the complex-script attributes, not just `run.fo
    - **Round-trip:** de-obfuscating each `.odttf` with its `w:fontKey` gives back **the exact bytes** of the source TTF. This proves the key derivation.
    - Each embedded font's nameID 1 equals its `<w:font w:name>` and the run `w:rFonts` names.
    - Opening the file with `python-docx` still works (the package is not corrupt).
-8. **DOCX embedding manual check (required before this is called done):** on a **Windows PC where the chosen fonts are NOT installed** (uninstall them, or use a clean VM or another PC), open the downloaded .docx in Microsoft Word. There must be no repair prompt. The fonts must display correctly. File → Options → Save must show "Embed fonts in the file" as on. Editing and typing new text must keep the font. **Testing on the developer's own PC, where the fonts may be installed, proves nothing.** Record the Word version you tested.
+8. **DOCX embedding manual check (required before this is called done):** on a **Windows PC where the chosen fonts are NOT installed** (uninstall them, or use a clean VM or another PC), open the downloaded .docx in Microsoft Word. There must be no repair prompt. The fonts must display correctly. File → Options → Save must show "Embed fonts in the file" as on. Editing and typing new text must keep the font. **Testing on the developer's own PC, where the fonts may be installed, proves nothing.** Record the Word version you tested. A file that flows onto a second page is fine (see "Page flow" in §6.3); a heading alone at the bottom of a page, a job title parted from its line, or clipped text is not.
 9. **Regression:** existing CVs with no typography keys render pixel-identical (or visually identical) to before, for templates A, B and C.
 10. **Manual check:** the switch from Montserrat 900 to Almarai keeps 800; Anton shows a disabled `400 — only weight`; changing language resets invalid choices with a notice.
 

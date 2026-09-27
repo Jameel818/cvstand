@@ -24,10 +24,9 @@ COLOUR
 FONTS
     Word knows a face by FAMILY NAME plus a bold flag, not by weight, so every
     (family, weight) is written as build.json's `word_family_name` and
-    `word_bold` (spec §6.2) - never a name rebuilt here. A template face the
-    typography build does not have yet (Open Sans, Source Sans 3, ...) gets
-    the conventional name and is listed in PENDING_BUILD: step 6 builds and
-    embeds those, and a test keeps that list honest.
+    `word_bold` (spec §6.2) - never a name rebuilt here. Every face a
+    document can reach is built: the dropdowns' faces, plus the template
+    defaults no dropdown offers (registry.TEMPLATE_DEFAULT_FACES, step 6).
 
     Weights are never faked: a template weight snaps to the nearest weight the
     build has, and a chosen font with no chosen weight takes
@@ -70,21 +69,6 @@ THEMES_PATH = Path(__file__).resolve().parent.parent / "word_themes.json"
 #: fallback); Word gets Poppins, which DM Sans was derived from and which the
 #: build has (user decision 2026-09-27; follow-up: vendor DM Sans properly).
 WORD_SUBSTITUTES = {"DM Sans": "Poppins"}
-
-#: Template faces the typography build does not have yet. Step 6 builds them
-#: (to embed them); until then the Word file names them conventionally.
-PENDING_BUILD = frozenset({
-    ("Archivo Narrow", 400), ("Archivo Narrow", 700),
-    ("Fraunces", 700),
-    ("IBM Plex Mono", 600),
-    ("Merriweather", 700),
-    ("Open Sans", 400), ("Open Sans", 700), ("Open Sans", 800),
-    ("Source Sans 3", 400), ("Source Sans 3", 700), ("Source Sans 3", 900),
-})
-
-WEIGHT_NAMES = {100: "Thin", 200: "ExtraLight", 300: "Light", 400: "Regular",
-                500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold",
-                900: "Black"}
 
 # ECMA-376 CT_RPr child order (the same list tests/test_docx_validity.py checks).
 RPR_ORDER = ("rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps",
@@ -130,25 +114,23 @@ def _built_weights(family: str) -> list[int]:
 
 def snap_weight(family: str, weight: int) -> int:
     """The nearest weight the build has (heavier wins a tie), so Word never
-    fakes one; a family the build lacks keeps its weight (PENDING_BUILD)."""
+    fakes one."""
     built = _built_weights(family)
     if not built:
-        return weight
+        raise KeyError(f"{family!r} is not built - add it to "
+                       "registry.TEMPLATE_DEFAULT_FACES and run tools/build_fonts.py")
     return min(built, key=lambda w: (abs(w - weight), -w))
 
 
 def word_font(family: str, weight: int) -> tuple[str, bool]:
-    """(Word family name, bold flag) for one face - from build.json when the
-    face is built, the RIBBI convention otherwise (pending step 6)."""
+    """(Word family name, bold flag) for one face, exactly as build.json
+    measured it from the TTF (nameID 1 and the fsSelection bold bit) - the
+    names the embedded font will answer to."""
     from ..typography import face
     built = face(family, weight)
-    if built:
-        return built["word_family_name"], bool(built["word_bold"])
-    if weight == 400:
-        return family, False
-    if weight == 700:
-        return family, True
-    return f"{family} {WEIGHT_NAMES[weight]}", False
+    if not built:
+        raise KeyError(f"no built face {family} {weight}")
+    return built["word_family_name"], bool(built["word_bold"])
 
 
 @lru_cache(maxsize=1)
@@ -280,5 +262,29 @@ def apply(document, resolved: dict) -> None:
 
 
 def faces_used(resolved: dict) -> set[tuple[str, int]]:
-    """Every (family, weight) the themed document draws - what step 6 embeds."""
+    """Every (family, weight) the theme ASSIGNS to a role - whether or not
+    this particular document has text in that role."""
     return {(f["family"], f["weight"]) for f in resolved["faces"].values()}
+
+
+_STYLE_ROLE = {ST_NAME: "name", ST_HEADING: "heading", ST_ROLE: "role",
+               ST_BODY_BOLD: "body_bold", ST_ACCENT_TEXT: "body"}
+
+
+def faces_drawn(document, resolved: dict) -> set[tuple[str, int]]:
+    """Every (family, weight) the filled document's TEXT draws - what step 6
+    embeds (§6.3: "collect them while building the document", and nothing
+    unused). A role style no run references - the Modern layout never uses
+    CV Body Bold; a résumé with no experience never uses CV Role - adds
+    nothing. Text in no role style is Normal, the body face."""
+    by_id = {name.replace(" ", ""): role for name, role in _STYLE_ROLE.items()}
+    roles: set[str] = set()
+    for run in document.element.body.iter(qn("w:r")):
+        text = "".join(t.text or "" for t in run.iter(qn("w:t")))
+        if not text.strip():
+            continue
+        rpr = run.find(qn("w:rPr"))
+        rstyle = rpr.find(qn("w:rStyle")) if rpr is not None else None
+        roles.add(by_id.get(rstyle.get(qn("w:val")), "body") if rstyle is not None else "body")
+    faces = resolved["faces"]
+    return {(faces[r]["family"], faces[r]["weight"]) for r in roles}

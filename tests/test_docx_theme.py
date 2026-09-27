@@ -56,9 +56,8 @@ def _font_of(rpr) -> tuple[dict, bool, bool, str | None]:
 def _assert_face(styles, role, family, weight):
     slots, b, bcs, _ = _font_of(_style(styles, STYLE_IDS[role]))
     wname, bold = T.word_font(family, weight)
-    built = face(family, weight)
-    if built:  # the spec's rule: the build's names, not ours
-        assert (wname, bold) == (built["word_family_name"], bool(built["word_bold"]))
+    built = face(family, weight)  # the spec's rule: the build's names, not ours
+    assert (wname, bold) == (built["word_family_name"], bool(built["word_bold"]))
     assert set(slots.values()) == {wname}, (role, slots, wname)
     assert b == bold and bcs == bold, (role, "bold flag", b, bcs, bold)
 
@@ -89,23 +88,25 @@ def test_arabic_themes_follow_the_font_policy():
         assert th["body"] == "IBM Plex Sans Arabic"
 
 
-def test_the_faces_step_6_must_build_are_exactly_the_pending_list():
-    """A template face the typography build lacks is named conventionally
-    until step 6 builds (and embeds) it. This keeps that list exact: a new
-    template font cannot slip in unbuilt, and a built one drops out."""
+def test_every_face_a_word_file_uses_is_built():
+    """Step 6 embeds what a document uses, so all of it must exist as a TTF:
+    the dropdown faces AND the template defaults (TEMPLATE_DEFAULT_FACES),
+    exactly - a template default nothing reaches would be dead weight."""
+    from app.typography.registry import TEMPLATE_DEFAULT_FACES
     used = set()
     for key in KEYS:
         for data in (ENGLISH, ARABIC):
             used |= T.faces_used(T.resolve(data, key))
-    assert {f for f in used if f not in built_faces()} == T.PENDING_BUILD
+    assert used <= set(built_faces())
+    defaults = {(f, w) for f, ws in TEMPLATE_DEFAULT_FACES.items() for w in ws}
+    assert defaults <= used, f"unreached template defaults: {sorted(defaults - used)}"
 
 
 def test_template_weights_snap_to_built_weights():
     for key in KEYS:
         for data in (ENGLISH, ARABIC):
             for f in T.resolve(data, key)["faces"].values():
-                if not f["chosen"] and (f["family"], f["weight"]) not in T.PENDING_BUILD:
-                    assert (f["family"], f["weight"]) in built_faces(), (key, f)
+                assert (f["family"], f["weight"]) in built_faces(), (key, f)
 
 
 # ---- colour ----------------------------------------------------------------------

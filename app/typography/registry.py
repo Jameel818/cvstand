@@ -175,6 +175,36 @@ OFFERED: dict[tuple[str, str], tuple[str, ...]] = {
 OFFERED[("en", "name")] = OFFERED[("en", "heading")]
 OFFERED[("ar", "name")] = OFFERED[("ar", "heading")]
 
+# §6.3 "template-default" fonts: faces the 49 templates draw by DEFAULT that no
+# dropdown offers. A Word download with no font chosen names these (typography
+# step 5, app/word_themes.json) and must embed them (step 6), so the build
+# makes their TTFs - and only TTFs: the preview and the PDF already draw these
+# families from the templates' own files (fonts.css), so no woff2 and no
+# typography.css rule. Measured: exactly what docx_theme.faces_used() reaches
+# across the 49 templates in both languages that the offered set lacks.
+# Not in FONTS: FONTS is what the dropdowns list.
+TEMPLATE_DEFAULT_FONTS: dict[str, Font] = {f.family: f for f in (
+    Font("Open Sans", _span(300, 800), SANS),
+    Font("Source Sans 3", _span(200, 900), SANS),
+    Font("Archivo Narrow", _span(400, 700), SANS),
+    Font("Merriweather", _span(300, 900), SERIF, "serif"),
+    Font("Fraunces", _span(100, 900), SERIF, "serif"),
+    Font("IBM Plex Mono", _span(100, 700), SANS, "monospace"),
+)}
+TEMPLATE_DEFAULT_FACES: dict[str, tuple[int, ...]] = {
+    "Open Sans": (400, 700, 800),
+    "Source Sans 3": (400, 700, 900),
+    "Archivo Narrow": (400, 700),
+    "Merriweather": (700,),
+    "Fraunces": (700,),
+    "IBM Plex Mono": (600,),
+}
+
+
+def any_font(family: str) -> Font:
+    """A family from either list - the build and the Word export need both."""
+    return FONTS.get(family) or TEMPLATE_DEFAULT_FONTS[family]
+
 
 @dataclass(frozen=True)
 class SizeScale:

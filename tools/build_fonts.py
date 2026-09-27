@@ -44,6 +44,20 @@ WHY THE CSS FAMILIES ARE 'CVT <Family>'
     existing template renders. The prefix makes that impossible: nothing a
     template names can resolve to a file this script wrote.
 
+TEMPLATE-DEFAULT FACES (registry.TEMPLATE_DEFAULT_FACES, typography step 6)
+    Faces the templates draw by default that no dropdown offers. A Word
+    download names and embeds them, so they get a TTF - and only a TTF, marked
+    "use": "word": the preview and PDF already draw these families from the
+    templates' own files, so no woff2 and no typography.css rule.
+
+INCREMENTAL, AND PINNED
+    A run builds only the families with a face missing from build.json and
+    keeps every existing entry - and its file - exactly as it is, from the
+    google/fonts commit build.json already records. Re-downloading the lot
+    would pick up whatever upstream changed since, and move faces the PDF
+    goldens were captured with. `--rebuild-all` rebuilds everything (from the
+    recorded commit); `--update-source` moves to the latest commit.
+
 Downloads are pinned to one google/fonts commit, recorded in build.json.
 Helpers come from tools/fetch_fonts.py by import; that script is never re-run
 (re-running it rebuilds fonts.css from whatever Google serves today).
@@ -70,6 +84,7 @@ from fontTools import subset  # noqa: E402
 from fontTools.ttLib import TTFont  # noqa: E402
 from fontTools.varLib import instancer  # noqa: E402
 
+from app.typography.registry import TEMPLATE_DEFAULT_FACES, any_font  # noqa: E402
 from fetch_fonts import (  # noqa: E402  - path set above
     LICENCE_DIR_NAME,
     OUT_DIR,
@@ -167,11 +182,19 @@ def needed_faces() -> dict[str, list[int]]:
     for (lang, role), fams in OFFERED.items():
         for fam in fams:
             out.setdefault(fam, set()).update(built_weights(lang, role, fam))
+    for fam, ws in TEMPLATE_DEFAULT_FACES.items():
+        out.setdefault(fam, set()).update(ws)
     return {f: sorted(w) for f, w in sorted(out.items())}
 
 
+def word_only(family: str) -> bool:
+    """A template-default family: TTF for Word, nothing for the browser."""
+    return family in TEMPLATE_DEFAULT_FACES and not any(
+        family in fams for fams in OFFERED.values())
+
+
 def slug(family: str) -> str:
-    return FONTS[family].slug
+    return any_font(family).slug
 
 
 def licence_path(family: str) -> Path:
@@ -186,8 +209,17 @@ def reserved_names(ofl_text: str) -> list[str]:
     "RevReading Lexend" - names of the fonts they derive from, not their own."""
     names: list[str] = []
     for line in ofl_text.splitlines():
-        if re.search(r"Reserved\s+Font\s+Names?", line, re.I) and "refers to" not in line:
-            names += re.findall(r"[\"“”]([^\"“”]+)[\"“”]", line)
+        m = re.search(r"Reserved\s+Font\s+Names?", line, re.I)
+        if not m or "refers to" in line:
+            continue
+        tail = line[m.end():]
+        # Any quoting style: Source Sans 3 writes 'Source' in SINGLE quotes, and
+        # a double-quote-only pattern missed it - which would have shipped an
+        # instanced file under a reserved name (found in typography step 6).
+        found = re.findall(r"[\"“”']([^\"“”']+)[\"“”']", tail)
+        if not found:  # unquoted: Aref Ruqaa's "Reserved Font Name EURM10."
+            found = re.findall(r"^\s*([A-Z][\w-]*)", tail)
+        names += found
     return names
 
 
@@ -222,6 +254,10 @@ def _cached(url: str) -> bytes:
 
 
 def repo_commit() -> str:
+    """The commit build.json already records (see INCREMENTAL, AND PINNED);
+    the latest only with --update-source or when nothing was built yet."""
+    if "--update-source" not in sys.argv and BUILD_JSON.exists():
+        return json.loads(BUILD_JSON.read_text(encoding="utf-8"))["source"]["commit"]
     return json.loads(_fetch(f"{API}/commits/main", api=True))["sha"]
 
 
@@ -249,6 +285,24 @@ def gf_download_statics(family: str) -> dict[str, str]:
     return {r["filename"].rsplit("/", 1)[-1]: r["url"] for r in manifest["fileRefs"]
             if r["filename"].startswith("static/") and r["filename"].endswith(".ttf")
             and "Italic" not in r["filename"]}
+
+
+_WIDTH_VARIANT = re.compile(r"(Semi|Extra|Ultra)?(Condensed|Expanded)|Narrow|Wide")
+
+
+def _default_design(urls: dict[str, str]) -> tuple[dict[str, str], str | None]:
+    """One static per weight from an official download that ships several
+    designs of it. Merriweather's carries two widths and five optical sizes
+    (24-120pt) of every weight. Keep the normal width at the SMALLEST optical
+    size - the nearest to the variable font's default (18pt), the same
+    "default optical size" rule the user set for Fraunces (2026-09-27)."""
+    normal = {n: u for n, u in urls.items() if not _WIDTH_VARIANT.search(n)}
+    sizes = {int(m.group(1)) for n in normal if (m := re.search(r"_(\d+)pt", n))}
+    if not sizes:
+        return normal, ("normal width" if len(normal) < len(urls) else None)
+    keep = min(sizes)
+    return ({n: u for n, u in normal.items() if f"_{keep}pt" in n},
+            f"normal width, {keep}pt optical size (smallest official)")
 
 
 def _upright_statics(names: list[str]) -> list[str]:
@@ -354,7 +408,7 @@ def _check_weights_exist(family: str, *, var: TTFont | None = None,
                          statics: dict[int, str] | None = None) -> None:
     """§3: every weight the registry says the font HAS must really exist in
     the upstream files - not only the ones offered."""
-    claimed = FONTS[family].weights
+    claimed = any_font(family).weights
     if var is not None:
         a = next(x for x in var["fvar"].axes if x.axisTag == "wght")
         missing = [w for w in claimed if not a.minValue <= w <= a.maxValue]
@@ -407,7 +461,15 @@ def build() -> int:
     WEB_DIR.mkdir(parents=True, exist_ok=True)
 
     report, families_out, faces_out, errors = [], {}, [], []
+    kept = _kept(faces)
+    if kept:
+        families_out.update(kept["families"])
+        faces_out += kept["faces"]
+        print(f"keeping {len(kept['families'])} families as built "
+              f"({len(kept['faces'])} faces); building the rest")
     for family, weights in faces.items():
+        if family in families_out:
+            continue
         try:
             fam_info, fam_faces = _build_family(family, weights, sha)
         except BuildError as exc:
@@ -450,6 +512,29 @@ def build() -> int:
     return check()
 
 
+def _kept(faces: dict[str, list[int]]) -> dict | None:
+    """The build.json entries to keep unchanged: every family whose faces are
+    all already built, and whose files still match their recorded hashes."""
+    if "--rebuild-all" in sys.argv or not BUILD_JSON.exists():
+        return None
+    data = json.loads(BUILD_JSON.read_text(encoding="utf-8"))
+    have: dict[str, list[dict]] = {}
+    for f in data["faces"]:
+        have.setdefault(f["family"], []).append(f)
+    out = {"families": {}, "faces": []}
+    for family, weights in faces.items():
+        got = have.get(family, [])
+        if sorted(f["weight"] for f in got) != weights:
+            continue
+        for f in got:
+            actual = hashlib.sha256((OUT_DIR / f["ttf"]).read_bytes()).hexdigest()
+            if actual != f["ttf_sha256"]:
+                raise SystemExit(f"FAIL {f['ttf']} no longer matches build.json")
+        out["families"][family] = data["families"][family]
+        out["faces"] += got
+    return out
+
+
 def _build_family(family: str, weights: list[int], sha: str) -> tuple[dict, list[dict]]:
     d, names = repo_listing(family, sha)
     ofl = licence_path(family).read_text(encoding="utf-8", errors="replace")
@@ -478,7 +563,9 @@ def _build_family(family: str, weights: list[int], sha: str) -> tuple[dict, list
         # Variable-only in google/fonts and the name is reserved: an instance
         # would be a Modified Version. Google Fonts' family download carries
         # official statics; use those, unmodified.
-        urls = gf_download_statics(family)
+        urls, choice = _default_design(gf_download_statics(family))
+        if choice:
+            info["static_choice"] = choice
         if not urls:
             raise BuildError(f"{family}: Reserved Font Name {rfn} and no official "
                              "static TTF found - needs a human decision")
@@ -502,8 +589,10 @@ def _build_family(family: str, weights: list[int], sha: str) -> tuple[dict, list
         stem = f"{slug(family)}-{w}"
         ttf_rel, web_rel = f"ttf/{stem}.ttf", f"web/{stem}.woff2"
         face = {"family": family, "weight": w,
-                "css_family": CSS_FAMILY_PREFIX + family,
+                "css_family": None if word_only(family) else CSS_FAMILY_PREFIX + family,
                 "method": info["method"]}
+        if word_only(family):
+            face["use"] = "word"
         if info["method"] == "instanced":
             font, pinned = instance(var_bytes, family, w)
             src_path, src_bytes = info["variable_source"], var_bytes
@@ -522,7 +611,7 @@ def _build_family(family: str, weights: list[int], sha: str) -> tuple[dict, list
             before = cmap(font)
             subset_font(font, unicodes)
             ttf_bytes = _save(font)
-            web_bytes = _save(_load(ttf_bytes), "woff2")
+            web_bytes = None if word_only(family) else _save(_load(ttf_bytes), "woff2")
             lost = (before & unicodes) - cmap(_load(ttf_bytes))
             if lost:
                 raise BuildError(f"{family} {w}: subsetting dropped {len(lost)} "
@@ -589,6 +678,8 @@ def _cross_face_checks(faces: list[dict]) -> None:
 def write_css(faces: list[dict]) -> None:
     rules = []
     for f in faces:
+        if f.get("use") == "word":
+            continue  # template-default: Word only (see TEMPLATE-DEFAULT FACES)
         if f["woff2"]:
             src = f"url({WEB_PREFIX}/{f['woff2']}) format('woff2')"
         else:
@@ -598,7 +689,8 @@ def write_css(faces: list[dict]) -> None:
             f"font-weight: {f['weight']}; font-display: block; src: {src}; }}")
     header = ("/* GENERATED by tools/build_fonts.py from app/typography/build.json"
               " - do not edit.\n"
-              f"   {len(faces)} static faces for the typography controls. Families are\n"
+              f"   {sum(1 for f in faces if f.get('use') != 'word')} static faces for the "
+              "typography controls. Families are\n"
               f"   prefixed '{CSS_FAMILY_PREFIX.strip()}' so no template's own font can"
               " resolve to them.\n"
               "   Reserved-Font-Name families are served as their unmodified .ttf"
@@ -645,7 +737,10 @@ def check() -> int:
             if f[key] and not (OUT_DIR / f[key]).exists():
                 problems.append(f"missing {f[key]}")
         served = f["woff2"] or f["ttf"]
-        if f"{WEB_PREFIX}/{served}" not in css:
+        if f.get("use") == "word":
+            if f"{WEB_PREFIX}/{served}" in css:
+                problems.append(f"typography.css serves Word-only {served}")
+        elif f"{WEB_PREFIX}/{served}" not in css:
             problems.append(f"typography.css does not serve {served}")
     for fam in data["families"]:
         if not licence_path(fam).exists():

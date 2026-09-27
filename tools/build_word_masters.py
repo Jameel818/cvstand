@@ -126,6 +126,15 @@ def _doc(body_font: str, margin: float, *, head_font: str, role_font: str,
     rpr = normal.element.get_or_add_rPr().get_or_add_rFonts()
     for attr in ("w:ascii", "w:hAnsi", "w:eastAsia", "w:cs"):
         rpr.set(qn(attr), body_font)
+    # CONTENT FLOWS (user decision, typography step 6): with the fonts embedded,
+    # a Word file may run to a second page, and that is accepted. Line spacing
+    # stays Word's Auto default (Multiple 1.15 on each font's natural height),
+    # never "Exactly", so no glyph or Arabic mark is clipped. What must not
+    # happen at a page break: a heading alone at the bottom (every heading
+    # keeps with next), a job title parted from its company/date line (both
+    # keep with next), or a paragraph leaving one line alone - widow/orphan
+    # control, set here on Normal so every paragraph inherits it.
+    normal.paragraph_format.widow_control = True
     for section in doc.sections:
         section.top_margin = section.bottom_margin = Inches(margin)
         section.left_margin = section.right_margin = Inches(margin)

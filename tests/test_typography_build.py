@@ -18,6 +18,7 @@ import pytest
 from fontTools.ttLib import TTFont
 
 from app.typography import CSS_FAMILY_PREFIX, OFFERED, built_faces, built_weights
+from app.typography.registry import TEMPLATE_DEFAULT_FACES
 
 ROOT = Path(__file__).resolve().parent.parent
 FONT_DIR = ROOT / "app" / "static" / "fonts"
@@ -29,7 +30,10 @@ IDS = [f"{f['family']}-{f['weight']}" for f in FACES]
 #: The families whose OFL.txt reserves a name their own name contains. Typed
 #: out, so the build's licence parsing is checked against an independent list.
 RESERVED = {"Raleway", "Playfair Display", "Lora", "IBM Plex Sans Arabic",
-            "Scheherazade New", "Lateef"}
+            "Scheherazade New", "Lateef",
+            # step 6, template defaults: Source Sans 3 reserves 'Source' in
+            # SINGLE quotes, which the first parser (and this test) missed.
+            "IBM Plex Mono", "Merriweather", "Source Sans 3"}
 
 ARABIC_FAMILIES = {f for (lang, _r), fams in OFFERED.items() if lang == "ar" for f in fams}
 ASCII_PRINTABLE = set(range(0x20, 0x7F))
@@ -66,22 +70,27 @@ def _files(face: dict) -> list[str]:
 # ---- the build covers the registry, exactly ---------------------------------
 
 def test_every_requestable_face_is_built_and_nothing_else():
-    """Offered weights, plus the Details emphasis face (registry.EMPHASIS_WEIGHT)."""
+    """Offered weights, plus the Details emphasis face (registry.EMPHASIS_WEIGHT),
+    plus the template defaults Word embeds (registry.TEMPLATE_DEFAULT_FACES)."""
     wanted = {(fam, w) for (lang, role), fams in OFFERED.items() for fam in fams
               for w in built_weights(lang, role, fam)}
+    wanted |= {(fam, w) for fam, ws in TEMPLATE_DEFAULT_FACES.items() for w in ws}
     assert set(built_faces()) == wanted
 
 
 def test_the_build_is_not_vacuous():
-    """112 faces: the 106 offered (69 instanced, 20 official statics subset,
+    """123 faces: the 106 offered (69 instanced, 20 official statics subset,
     17 unmodified) plus 6 emphasis faces for the Details families that had no
     700 (Inter and Noto Sans Arabic instanced; Poppins and Amiri subset; Lora
-    and IBM Plex Sans Arabic unmodified)."""
+    and IBM Plex Sans Arabic unmodified), plus 11 template defaults for Word
+    (Open Sans x3, Archivo Narrow x2, Fraunces instanced; Source Sans 3 x3,
+    Merriweather, IBM Plex Mono unmodified)."""
     methods = {}
     for f in FACES:
         methods[f["method"]] = methods.get(f["method"], 0) + 1
-    assert len(FACES) == 112
-    assert methods == {"instanced": 71, "subset-static": 22, "unmodified": 19}
+    assert len(FACES) == 123
+    assert methods == {"instanced": 77, "subset-static": 22, "unmodified": 24}
+    assert sum(1 for f in FACES if f.get("use") == "word") == 11
 
 
 @pytest.mark.parametrize("family", sorted(BUILD["families"]))
@@ -200,11 +209,11 @@ def _declared_rfn(family: str) -> list[str]:
     out = []
     for line in text.splitlines():
         if re.search(r"Reserved\s+Font\s+Names?", line, re.I) and "refers to" not in line:
-            out += re.findall(r"[\"“”]([^\"“”]+)[\"“”]", line)
+            out += re.findall(r"[\"“”']([^\"“”']+)[\"“”']", line)
     return out
 
 
-def test_reserved_font_name_families_are_exactly_the_six():
+def test_reserved_font_name_families_are_exactly_these():
     applies = {fam for fam in BUILD["families"]
                if any(n.lower() in fam.lower() for n in _declared_rfn(fam))}
     assert applies == RESERVED
@@ -252,9 +261,16 @@ def _css_rules() -> dict[tuple[str, int], tuple[str, str]]:
 
 
 def test_css_serves_every_face_from_the_right_file():
+    """Every face but the Word-only template defaults, which the browser draws
+    from the templates' own files (fonts.css) and must NOT get here."""
     rules = _css_rules()
-    assert len(rules) == len(FACES)
+    web = [f for f in FACES if f.get("use") != "word"]
+    assert len(rules) == len(web)
     for f in FACES:
+        if f.get("use") == "word":
+            assert f["woff2"] is None and f["css_family"] is None
+            assert f["ttf"] not in CSS.read_text(encoding="utf-8")
+            continue
         url, fmt = rules[(f["css_family"], f["weight"])]
         if f["woff2"]:
             assert (url, fmt) == (f["woff2"], "woff2")

@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-27 (TYPOGRAPHY CONTROLS · steps 1–5 done; next: plan step 6, Word font embedding)
+# RESUME HERE — paused 2026-09-27 (TYPOGRAPHY CONTROLS · steps 1–6 done; waiting on the user's §7.8 manual Word check; then step 7)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -13,6 +13,50 @@ tests → commit → report verified / not verified → ask before the next step
 - **Word export ignores the chosen fonts** — expected; steps 5–6.
 - **Word export ALSO does not follow the selected template's design.** This
   is separate from typography; investigated 2026-09-26, see below.
+
+### ✅ STEP 6 DONE — Word embeds its fonts (2026-09-27)
+- **USER DECISION — WORD CONTENT FLOWS.** With the real fonts embedded, 78/98
+  sample exports ran to 2 pages (every Arabic face and Open Sans / Source
+  Sans 3 / Poppins are taller than the Arial the layouts were tuned in). The
+  user REJECTED squeezing line spacing to Arial's pitch ("cramped") and
+  decided: keep natural spacing ("Auto", Multiple 1.15, never "Exactly"), let
+  content flow to page 2 — **a 2-page Word file is accepted**. Failures are
+  only: exact spacing (clipping/overlap), an orphaned heading, a job title
+  parted from its company/date line. Recorded in the spec (§6.3 "Page flow",
+  §7.8). Normal now has widow/orphan control; headings and job lines already
+  kept with next. `tests/test_docx_flow.py` (200) checks it in the XML.
+- **Built 11 template-default faces** (`registry.TEMPLATE_DEFAULT_FACES`, TTF
+  only, `"use": "word"`): Open Sans 400/700/800, Archivo Narrow 400/700,
+  Fraunces 700 (default opsz) instanced; Source Sans 3 400/700/900,
+  Merriweather 700 (official 24pt normal-width static — smallest official
+  opsz), IBM Plex Mono 600 UNMODIFIED. `build_fonts.py` is now incremental and
+  pinned to build.json's commit: the 112 existing faces stayed byte-identical,
+  typography.css unchanged.
+- **Licence bug found + fixed:** `reserved_names()` only read double quotes;
+  Source Sans 3 reserves 'Source' in SINGLE quotes and would have been built
+  as a modified file. Fixed (any quotes, plus unquoted like Aref Ruqaa's
+  EURM10); re-audit: no already-built family changed status.
+- **`app/exporters/docx_font_embed.py`**: embeds exactly the faces the text
+  draws (`docx_theme.faces_drawn`), ECMA-376 obfuscation, fontTable + rels +
+  content type, `embedTrueTypeFonts` at its schema position, no
+  saveSubsetFonts; refuses fsType 2/4 and two faces under one (name, bold).
+  `tests/test_docx_font_embed.py` (42): key derivation, round trip = source
+  TTF bytes, names = nameID 1 (Windows record) = styles, schema order,
+  charset B2 for Arabic, refusals. Size 68–900 KB, median ~250 KB.
+- **Proved in real Word** (`tools/verify_word_embedding.py`, this PC has none
+  of the fonts installed): every non-cloud font in Word's PDF matched our TTF
+  widths EXACTLY. **Office cloud fonts:** M365 downloaded Anton, IBM Plex
+  Mono, Merriweather, Montserrat, Open Sans, Playfair Display, Poppins itself
+  and Word prefers those copies (Open Sans' comma differs slightly); the tool
+  reports them as "cloud". Calibri appears only for spaces beside Arial's
+  skill dots (nothing visible).
+- FONTS.md "Word masters are a deliberate exception" rewritten as "Word
+  downloads embed their fonts"; the unsupported "broke the masters" claim is
+  corrected there.
+- **Desktop folder `CVStand Word font check`** (6 .docx + Word-made PDFs +
+  CHECKLIST.txt) for the user's §7.8 check on another PC.
+- Rendering PDFs to images for review: pdf.js (npm, scratch only) in
+  Chromium. Word's EMF page export garbles embedded Arabic — don't use it.
 
 ### ✅ STEP 5 DONE — Word: template colours + fonts, and chosen fonts (2026-09-27)
 User decisions: option 1 of the Word investigation; readable-accent rule for
@@ -44,6 +88,8 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
   ~843 of 1056px, so the 2-page results look like a substitution artifact,
   but that is an approximation. **Step 6 must re-run the page count once the
   fonts are embedded** (Word then uses them) and fix any real overflow.
+  -> **Resolved in step 6:** the approximation was wrong (78/98 really flow
+  to 2 pages); the user accepted flowing content (see STEP 6).
 - Word COM trap: a new `Word.Application` can attach to an instance still
   quitting and hang forever. One fresh instance per file, started only after
   no WINWORD is left, is reliable.
@@ -80,11 +126,12 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
 3. ~~The user picks a Word option~~ **USER DECIDED 2026-09-27: option 1**
    (per-template colours and fonts on the existing 2 layouts), built as part
    of step 5 together with the chosen fonts. ~~Step 5~~ done above.
-4. **Plan step 6** (embed the fonts in .docx, spec §6.3 / §7.7 / §7.8): build
-   `PENDING_BUILD`, embed `docx_theme.faces_used()`, re-run the Word page
-   count with the fonts embedded, rewrite FONTS.md "Word masters are a
-   deliberate exception". §7.8 needs a PC WITHOUT the fonts (user's manual
-   check, Word version recorded).
+4. ~~Step 6~~ done above.
+5. **WAITING ON THE USER: §7.8 manual Word check** with the Desktop folder
+   `CVStand Word font check` on another PC without the fonts; record the Word
+   version here. It gates the merge (spec §9.3).
+6. Then **step 7** (calibration: `optical_scale` / `line_height`; reuse the
+   SIZE_ADJUST measurement in `tools/fetch_fonts_ar.py`).
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
