@@ -1,0 +1,1280 @@
+{
+ "generated_by": "tools/build_word_themes.py",
+ "note": "Measured from the rendered templates; do not edit by hand.",
+ "templates": {
+  "ats-t1": {
+   "ar": {
+    "accent": "#2563EB",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2563EB",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t10": {
+   "ar": {
+    "accent": "#FDE047",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#FDE047",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t11": {
+   "ar": {
+    "accent": "#0D9488",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#0D9488",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 800
+    }
+   }
+  },
+  "ats-t12": {
+   "ar": {
+    "accent": "#1A1A1A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#1A1A1A",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Merriweather",
+     "weight": 700
+    },
+    "name": {
+     "family": "Merriweather",
+     "weight": 700
+    }
+   }
+  },
+  "ats-t13": {
+   "ar": {
+    "accent": "#2563EB",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2563EB",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t14": {
+   "ar": {
+    "accent": "#B45309",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#B45309",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo Narrow",
+     "weight": 700
+    },
+    "name": {
+     "family": "Archivo Narrow",
+     "weight": 700
+    }
+   }
+  },
+  "ats-t15": {
+   "ar": {
+    "accent": "#7C3AED",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#7C3AED",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Poppins",
+     "weight": 700
+    },
+    "name": {
+     "family": "Poppins",
+     "weight": 700
+    }
+   }
+  },
+  "ats-t16": {
+   "ar": {
+    "accent": "#C2410C",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#C2410C",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Fraunces",
+     "weight": 700
+    },
+    "name": {
+     "family": "Fraunces",
+     "weight": 700
+    }
+   }
+  },
+  "ats-t17": {
+   "ar": {
+    "accent": "#166534",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 400
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#166534",
+    "body": "Inter",
+    "heading": {
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "family": "Anton",
+     "weight": 400
+    }
+   }
+  },
+  "ats-t18": {
+   "ar": {
+    "accent": "#4F46E5",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#4F46E5",
+    "body": "Montserrat",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 800
+    }
+   }
+  },
+  "ats-t19": {
+   "ar": {
+    "accent": "#B45309",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#B45309",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "family": "Source Sans 3",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t2": {
+   "ar": {
+    "accent": "#0D9488",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#0D9488",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t20": {
+   "ar": {
+    "accent": "#8B1E3F",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#8B1E3F",
+    "body": "Inter",
+    "heading": {
+     "family": "Inter",
+     "weight": 700
+    },
+    "name": {
+     "family": "Merriweather",
+     "weight": 700
+    }
+   }
+  },
+  "ats-t21": {
+   "ar": {
+    "accent": "#06B6D4",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#06B6D4",
+    "body": "Inter",
+    "heading": {
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "family": "IBM Plex Mono",
+     "weight": 600
+    }
+   }
+  },
+  "ats-t22": {
+   "ar": {
+    "accent": "#DC2626",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#DC2626",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t23": {
+   "ar": {
+    "accent": "#0F6E63",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#0F6E63",
+    "body": "Poppins",
+    "heading": {
+     "family": "Poppins",
+     "weight": 600
+    },
+    "name": {
+     "family": "Poppins",
+     "weight": 600
+    }
+   }
+  },
+  "ats-t24": {
+   "ar": {
+    "accent": "#4D7C0F",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#4D7C0F",
+    "body": "Inter",
+    "heading": {
+     "family": "Archivo Narrow",
+     "weight": 700
+    },
+    "name": {
+     "family": "Archivo Narrow",
+     "weight": 400
+    }
+   }
+  },
+  "ats-t25": {
+   "ar": {
+    "accent": "#3B6EA5",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#3B6EA5",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 700
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 800
+    }
+   }
+  },
+  "ats-t3": {
+   "ar": {
+    "accent": "#334155",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#334155",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t4": {
+   "ar": {
+    "accent": "#D8F035",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#D8F035",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t5": {
+   "ar": {
+    "accent": "#7C3AED",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#7C3AED",
+    "body": "Inter",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t6": {
+   "ar": {
+    "accent": "#475569",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#475569",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t7": {
+   "ar": {
+    "accent": "#1E3A5F",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#1E3A5F",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "ats-t8": {
+   "ar": {
+    "accent": "#C0392B",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 400
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#C0392B",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "family": "Anton",
+     "weight": 400
+    }
+   }
+  },
+  "ats-t9": {
+   "ar": {
+    "accent": "#1A1A1A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#1A1A1A",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Merriweather",
+     "weight": 700
+    },
+    "name": {
+     "family": "Merriweather",
+     "weight": 700
+    }
+   }
+  },
+  "modern-t1": {
+   "ar": {
+    "accent": "#D8F035",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#D8F035",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t10": {
+   "ar": {
+    "accent": "#A93005",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#A93005",
+    "body": "Poppins",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t11": {
+   "ar": {
+    "accent": "#2F855A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2F855A",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t12": {
+   "ar": {
+    "accent": "#111111",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 400
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#111111",
+    "body": "Inter",
+    "heading": {
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "family": "Anton",
+     "weight": 400
+    }
+   }
+  },
+  "modern-t13": {
+   "ar": {
+    "accent": "#2B6CB0",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2B6CB0",
+    "body": "Inter",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t14": {
+   "ar": {
+    "accent": "#B83280",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 400
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#B83280",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "family": "Anton",
+     "weight": 400
+    }
+   }
+  },
+  "modern-t15": {
+   "ar": {
+    "accent": "#2F855A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2F855A",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t16": {
+   "ar": {
+    "accent": "#A32638",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#A32638",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 800
+    }
+   }
+  },
+  "modern-t17": {
+   "ar": {
+    "accent": "#003366",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#003366",
+    "body": "Montserrat",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t18": {
+   "ar": {
+    "accent": "#002B66",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#002B66",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t19": {
+   "ar": {
+    "accent": "#6B2A5A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#6B2A5A",
+    "body": "Inter",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t2": {
+   "ar": {
+    "accent": "#C8A24A",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#C8A24A",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t20": {
+   "ar": {
+    "accent": "#810100",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 400
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#810100",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 400
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t21": {
+   "ar": {
+    "accent": "#013F32",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#013F32",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Montserrat",
+     "weight": 700
+    },
+    "name": {
+     "family": "Montserrat",
+     "weight": 800
+    }
+   }
+  },
+  "modern-t22": {
+   "ar": {
+    "accent": "#CB3500",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#CB3500",
+    "body": "Montserrat",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t23": {
+   "ar": {
+    "accent": "#3182CE",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#3182CE",
+    "body": "Inter",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t24": {
+   "ar": {
+    "accent": "#FFD633",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#FFD633",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Open Sans",
+     "weight": 800
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t3": {
+   "ar": {
+    "accent": "#F2C200",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#F2C200",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t4": {
+   "ar": {
+    "accent": "#3A6B5C",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#3A6B5C",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t5": {
+   "ar": {
+    "accent": "#FF6F5E",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 800
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#FF6F5E",
+    "body": "Open Sans",
+    "heading": {
+     "family": "Open Sans",
+     "weight": 800
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  },
+  "modern-t6": {
+   "ar": {
+    "accent": "#2B6CB0",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Cairo",
+     "weight": 700
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#2B6CB0",
+    "body": "Source Sans 3",
+    "heading": {
+     "family": "Poppins",
+     "weight": 700
+    },
+    "name": {
+     "family": "Poppins",
+     "weight": 700
+    }
+   }
+  },
+  "modern-t7": {
+   "ar": {
+    "accent": "#E4572E",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#E4572E",
+    "body": "Poppins",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Anton",
+     "weight": 400
+    }
+   }
+  },
+  "modern-t8": {
+   "ar": {
+    "accent": "#003366",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#003366",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 300
+    }
+   }
+  },
+  "modern-t9": {
+   "ar": {
+    "accent": "#F2C200",
+    "body": "IBM Plex Sans Arabic",
+    "heading": {
+     "family": "Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "family": "Tajawal",
+     "weight": 800
+    }
+   },
+   "en": {
+    "accent": "#F2C200",
+    "body": "Archivo",
+    "heading": {
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "family": "Archivo",
+     "weight": 900
+    }
+   }
+  }
+ }
+}

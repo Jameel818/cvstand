@@ -402,6 +402,13 @@ none of it. There is no link to `typography.css`, no rules, and no runtime.
 
 ## Word masters are a deliberate exception
 
+> **Changing (typography step 5, 2026-09-27).** The masters still hold these
+> system fonts, but only as PLACEHOLDERS: every export now names the
+> template's own faces or the user's chosen ones (`app/exporters/docx_theme.py`).
+> Until step 6 embeds them, a PC without those faces shows Word's substitutes.
+> Step 6 rewrites this section; the "broke the masters once before" sentence
+> below has no record behind it (see RESUME_HERE.md, Word investigation).
+
 `word_masters/*.docx` reference **Arial, Courier, Georgia and Times New Roman**
 — system fonts, none of them on the allowlist.
 

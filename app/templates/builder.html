@@ -24,6 +24,7 @@
       <div class="dl-menu" id="dl-menu">
         <a href="{{ url_for('main.export_pdf') }}" id="dl-pdf">{{ t('PDF') }}<small>{{ t('Pixel-accurate, for sending') }}</small></a>
         <a href="{{ url_for('main.export_docx') }}" id="dl-docx">{{ t('Word (.docx)') }}<small>{{ t('Editable, for job portals') }}</small></a>
+        <p class="dl-note" id="dl-note">{{ t('Word: editable version · PDF: exact design') }}</p>
       </div>
     </div>
   </div>

@@ -15,10 +15,13 @@ WHY A SCRIPT, NOT HAND-AUTHORED IN WORD
 
 DIVERGENCES FROM THE HTML FAMILY (Word has no CSS layout engine)
   1. One master per category, not per template — 49 HTML layouts collapse onto
-     2 Word documents, so each master carries ONE fixed palette, not the per
-     template accent.
-  2. Fonts substituted for ones present on any Word install: the Modern display
-     face -> Georgia, all body text -> Arial.
+     2 Word LAYOUTS. Since typography step 5 each download is still themed:
+     the template's accent and fonts (or the user's chosen fonts) are written
+     into the role styles at export (app/exporters/docx_theme.py). What does
+     not carry over is the layout itself.
+  2. The fonts written HERE (Georgia, Arial, Times New Roman) are only the
+     masters' placeholders; an export replaces them. Step 6 embeds the faces
+     an export names, so they render on a PC that lacks them.
   3. Ring / bar / slider skill graphics -> dot glyphs (●●●●○) plus the level
      word, both real selectable text.
   4. Modern is a single wide column: sidebar content (contact, skills, tools,
@@ -27,6 +30,21 @@ DIVERGENCES FROM THE HTML FAMILY (Word has no CSS layout engine)
      chip — docxtpl's {%tc %} horizontal loop emits an empty <w:tr/> here.
      schema.normalize() already drops blank-metric chips and caps the row at 4,
      so cells past the chip count render empty and, being borderless, invisible.
+
+ROLE STYLES (typography step 5)
+  Every run whose face, weight or accent colour depends on the TEMPLATE or on
+  the user's font choice carries a named character style instead of direct
+  formatting: CV Name, CV Heading (section titles and stat metrics), CV Role,
+  CV Body Bold, CV Accent Text; body text is the Normal style. At export,
+  app/exporters/docx_theme.py rewrites those styles for the chosen template
+  and fonts - one place per role, so no run can be missed. The fonts and
+  colours written here are only the master's own placeholders.
+
+  Such a run must NOT carry direct font, colour or bold: direct formatting
+  beats a style, so a leftover `<w:b w:val="0"/>` (what python-docx writes for
+  `run.bold = False`) would silently un-bold a heading. `_p` therefore leaves
+  bold and italic unset unless asked. The accent-coloured contact rule keeps
+  RULE_ACCENT as its colour so the export can find and recolour it.
 """
 from __future__ import annotations
 
@@ -34,6 +52,7 @@ import sys
 from pathlib import Path
 
 from docx import Document
+from docx.enum.style import WD_STYLE_TYPE
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
@@ -43,6 +62,9 @@ from docx.shared import Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from app.exporters.docx_theme import (  # noqa: E402
+    RULE_ACCENT, ST_ACCENT_TEXT, ST_BODY_BOLD, ST_HEADING, ST_NAME, ST_ROLE,
+)
 from app.labels import reset_lang, set_lang, t  # noqa: E402
 
 OUT_DIR = ROOT / "word_masters"
@@ -75,7 +97,25 @@ MODERN_ACCENT = RGBColor(0x1F, 0x3A, 0x5F)   # navy, stands in for 24 palettes
 
 # ---------------------------------------------------------------- primitives
 
-def _doc(body_font: str, margin: float) -> Document:
+def _char_style(doc, name: str, *, font: str, bold: bool, color):
+    """A role's character style, with the master's placeholder face and colour
+    (the export rewrites both). All four rFonts slots, so neither Latin nor
+    Arabic text falls through to another face; bCs so Arabic is bold too."""
+    style = doc.styles.add_style(name, WD_STYLE_TYPE.CHARACTER)
+    style.font.name = font
+    fonts = style.element.get_or_add_rPr().get_or_add_rFonts()
+    for attr in ("w:ascii", "w:hAnsi", "w:eastAsia", "w:cs"):
+        fonts.set(qn(attr), font)
+    if bold:
+        style.font.bold = True
+        style.element.rPr.insert_element_before(OxmlElement("w:bCs"), *_BCS_SUCCESSORS)
+    if color is not None:
+        style.font.color.rgb = color
+    return style
+
+
+def _doc(body_font: str, margin: float, *, head_font: str, role_font: str,
+         name_color, accent) -> Document:
     doc = Document()
     normal = doc.styles["Normal"]
     normal.font.name = body_font
@@ -89,16 +129,26 @@ def _doc(body_font: str, margin: float) -> Document:
     for section in doc.sections:
         section.top_margin = section.bottom_margin = Inches(margin)
         section.left_margin = section.right_margin = Inches(margin)
+    _char_style(doc, ST_NAME, font=head_font, bold=True, color=name_color)
+    _char_style(doc, ST_HEADING, font=head_font, bold=True, color=accent)
+    _char_style(doc, ST_ROLE, font=role_font, bold=True, color=None)
+    _char_style(doc, ST_BODY_BOLD, font=body_font, bold=True, color=None)
+    _char_style(doc, ST_ACCENT_TEXT, font=body_font, bold=False, color=accent)
     return doc
 
 
-def _p(doc, text="", *, size=10, bold=False, italic=False, color=None,
-       font=None, before=0, after=2, align=None, style=None):
-    """One paragraph, one run — so a docxtpl tag is never split across runs."""
+def _p(doc, text="", *, size=10, bold=None, italic=None, color=None,
+       font=None, before=0, after=2, align=None, style=None, rstyle=None):
+    """One paragraph, one run — so a docxtpl tag is never split across runs.
+
+    `rstyle` is the run's ROLE style (see ROLE STYLES). Bold and italic stay
+    unset unless given, so they cannot override the role style's."""
     para = doc.add_paragraph(style=style)
-    run = para.add_run(text)
-    run.bold = bold
-    run.italic = italic
+    run = para.add_run(text, style=rstyle)
+    if bold is not None:
+        run.bold = bold
+    if italic is not None:
+        run.italic = italic
     run.font.size = Pt(size)
     if color is not None:
         run.font.color.rgb = color
@@ -204,13 +254,13 @@ def _apply_rtl(doc, body_font: str):
             run.insert(0, rpr)
         if rpr.find(qn("w:rtl")) is None:
             rpr.insert_element_before(OxmlElement("w:rtl"), *_RTL_SUCCESSORS)
-        # complex-script face, size and weight must mirror the latin ones
+        # complex-script face, size and weight must mirror the latin ones. A
+        # run with no direct face takes it from its style - Normal or a role
+        # style, both of which carry w:cs (see _doc / _char_style); forcing
+        # one here would beat the style and pin every run to the body face.
         fonts = rpr.find(qn("w:rFonts"))
-        if fonts is None:
-            fonts = OxmlElement("w:rFonts")
-            rpr.insert(0, fonts)
-        ascii_face = fonts.get(qn("w:ascii")) or body_font
-        fonts.set(qn("w:cs"), ascii_face)
+        if fonts is not None and fonts.get(qn("w:ascii")):
+            fonts.set(qn("w:cs"), fonts.get(qn("w:ascii")))
         sz = rpr.find(qn("w:sz"))
         if sz is not None and rpr.find(qn("w:szCs")) is None:
             szcs = OxmlElement("w:szCs")
@@ -264,10 +314,10 @@ def _borderless(table):
     return table
 
 
-def _cell_p(cell, text, *, first, size=10, bold=False, color=None, font=None, after=0):
+def _cell_p(cell, text, *, first, size=10, color=None, font=None, after=0,
+            rstyle=None):
     para = cell.paragraphs[0] if first else cell.add_paragraph()
-    run = para.add_run(text)
-    run.bold = bold
+    run = para.add_run(text, style=rstyle)
     run.font.size = Pt(size)
     if color is not None:
         run.font.color.rgb = color
@@ -280,10 +330,8 @@ def _cell_p(cell, text, *, first, size=10, bold=False, color=None, font=None, af
 
 # ---------------------------------------------------------------- components
 
-def _heading(doc, label: str, accent: RGBColor, font: str, *, ruled=True,
-             before=7, after=3):
-    para = _p(doc, label, size=9, bold=True, color=accent, font=font,
-              before=before, after=after)
+def _heading(doc, label: str, *, ruled=True, before=7, after=3):
+    para = _p(doc, label, size=9, rstyle=ST_HEADING, before=before, after=after)
     # Word repaginates freely with variable-length user content, so a heading
     # must be bound to what follows it or it strands alone at a page break.
     para.paragraph_format.keep_with_next = True
@@ -294,7 +342,7 @@ def _heading(doc, label: str, accent: RGBColor, font: str, *, ruled=True,
     return para
 
 
-def _chip_row(doc, accent: RGBColor, font: str):
+def _chip_row(doc):
     """Fixed 4-cell borderless row. A slot past the chip count renders both its
     metric and its caption as "" — the whole chip disappears together, never a
     floating caption with no number."""
@@ -304,16 +352,15 @@ def _chip_row(doc, accent: RGBColor, font: str):
     for i, cell in enumerate(table.row_cells(0)):
         guard = f'r.achievements[{i}].{{}} if r.achievements|length > {i} else ""'
         _cell_p(cell, "{{ %s }}" % guard.format("metric"),
-                first=True, size=16, bold=True, color=accent, font=font)
+                first=True, size=16, rstyle=ST_HEADING)
         _cell_p(cell, "{{ %s }}" % guard.format("label"),
                 first=False, size=8.5, color=MUTED, after=4)
     return table
 
 
-def _experience(doc, accent: RGBColor, font: str):
+def _experience(doc, *, meta_style=None, meta_color=None):
     _tag(doc, "{%p for job in r.experience %}")
-    role = _p(doc, "{{ job.role }}", size=11, bold=True, font=font,
-              before=5, after=0)
+    role = _p(doc, "{{ job.role }}", size=11, rstyle=ST_ROLE, before=5, after=0)
     role.paragraph_format.keep_with_next = True  # never split a role from its dates
     # The whole meta line is guarded, not just its separators: "+ Add role" then
     # typing the job title leaves company/location/start/end all blank, and the
@@ -327,7 +374,7 @@ def _experience(doc, accent: RGBColor, font: str):
               "{{ job.location }}{% if (job.company or job.location) and "
               "(job.start or job.end) %}  ·  {% endif %}{{ job.start }}"
               "{% if job.start and job.end %} - {% endif %}{{ job.end }}",
-              size=9, color=accent, after=2)
+              size=9, rstyle=meta_style, color=meta_color, after=2)
     meta.paragraph_format.keep_with_next = True  # nor from its first bullet
     _tag(doc, "{%p endif %}")
     _tag(doc, "{%p for b in job.bullets %}")
@@ -354,11 +401,11 @@ def _education(doc):
     _tag(doc, "{%p endfor %}")
 
 
-def _tail_sections(doc, accent, head_font, *, head_before=7):
+def _tail_sections(doc, *, head_before=7):
     """Certifications / Tools / Languages — each guarded so an absent one leaves
     no orphan heading."""
     _tag(doc, "{%p if r.recognition %}")
-    _heading(doc, L("Certifications"), accent, head_font, before=head_before)
+    _heading(doc, L("Certifications"), before=head_before)
     _tag(doc, "{%p for rec in r.recognition %}")
     _p(doc, "{{ rec.title }}{% if rec.detail %} — {{ rec.detail }}{% endif %}",
        size=10, after=0)
@@ -366,12 +413,12 @@ def _tail_sections(doc, accent, head_font, *, head_before=7):
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.tools %}")
-    _heading(doc, L("Tools"), accent, head_font, before=head_before)
+    _heading(doc, L("Tools"), before=head_before)
     _p(doc, '{{ r.tools | join("  ·  ") }}', size=10)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.languages %}")
-    _heading(doc, L("Languages"), accent, head_font, before=head_before)
+    _heading(doc, L("Languages"), before=head_before)
     _tag(doc, "{%p for lang in r.languages %}")
     _p(doc, "{{ lang.name }}{% if lang.level %} — {{ lang.level }}{% endif %}"
             "{% if lang.dot_glyphs %}   {{ lang.dot_glyphs }}{% endif %}",
@@ -394,43 +441,43 @@ def build_ats(path: Path, lang: str = "en"):
 
 def _build_ats(path: Path, lang: str):
     font = AR_BODY_FONT if lang == "ar" else "Arial"
-    doc = _doc(font, 0.62)
-    accent = ATS_ACCENT
+    doc = _doc(font, 0.62, head_font=font, role_font=font, name_color=None,
+               accent=ATS_ACCENT)
 
-    _p(doc, "{{ r.name }}", size=22, bold=True, font=font, after=2)
+    _p(doc, "{{ r.name }}", size=22, rstyle=ST_NAME, after=2)
     _tag(doc, "{%p if r.title %}")
-    _p(doc, "{{ r.title }}", size=11, bold=True, color=MUTED, after=2)
+    _p(doc, "{{ r.title }}", size=11, rstyle=ST_BODY_BOLD, color=MUTED, after=2)
     _tag(doc, "{%p endif %}")
     _tag(doc, "{%p if r.contact_line %}")
     _p(doc, "{{ r.contact_line }}", size=9, color=MUTED, after=4)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.summary %}")
-    _heading(doc, L("Summary"), accent, font)
+    _heading(doc, L("Summary"))
     _p(doc, "{{ r.summary }}", size=10)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.achievements %}")
-    _heading(doc, L("Key Achievements"), accent, font)
-    _chip_row(doc, accent, font)
+    _heading(doc, L("Key Achievements"))
+    _chip_row(doc)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.experience %}")
-    _heading(doc, L("Experience"), accent, font)
-    _experience(doc, MUTED, font)
+    _heading(doc, L("Experience"))
+    _experience(doc, meta_color=MUTED)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.skills %}")
-    _heading(doc, L("Skills"), accent, font)
+    _heading(doc, L("Skills"))
     _skills(doc)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.education %}")
-    _heading(doc, L("Education"), accent, font)
+    _heading(doc, L("Education"))
     _education(doc)
     _tag(doc, "{%p endif %}")
 
-    _tail_sections(doc, accent, font)
+    _tail_sections(doc)
     if lang == "ar":
         _apply_rtl(doc, font)
     doc.save(str(path))
@@ -455,11 +502,11 @@ def _build_modern(path: Path, lang: str = "en"):
     photo-less resume simply carries more bottom margin. Sized once here rather
     than conditionally, since a static master cannot vary its own spacing."""
     body_font = AR_BODY_FONT if lang == "ar" else "Arial"
-    doc = _doc(body_font, 0.5)
     # Georgia carries no Arabic glyphs at all, so the Arabic Modern master
     # takes the serif Word guarantees instead. Same register, real coverage.
-    accent = MODERN_ACCENT
     head_font = AR_DISPLAY_FONT if lang == "ar" else "Georgia"
+    doc = _doc(body_font, 0.5, head_font=head_font, role_font=head_font,
+               name_color=MODERN_ACCENT, accent=MODERN_ACCENT)
     HEAD_BEFORE = 4
 
     # Photo slot — Modern only. 16 Modern templates have one; NO ATS template
@@ -470,41 +517,43 @@ def _build_modern(path: Path, lang: str = "en"):
     _p(doc, "{{ photo }}", after=3)
     _tag(doc, "{%p endif %}")
 
-    _p(doc, "{{ r.name }}", size=23, bold=True, color=accent, font=head_font, after=1)
+    _p(doc, "{{ r.name }}", size=23, rstyle=ST_NAME, after=1)
     _tag(doc, "{%p if r.title %}")
-    _p(doc, "{{ r.title }}", size=11, italic=True, color=MUTED, after=2)
+    # Upright, not italic: none of the built faces has an italic, so Word
+    # would slant the glyphs itself - a faked style (user, 2026-09-27).
+    _p(doc, "{{ r.title }}", size=11, color=MUTED, after=2)
     _tag(doc, "{%p endif %}")
     _tag(doc, "{%p if r.contact_line %}")
     _rule(_p(doc, "{{ r.contact_line }}", size=9, color=MUTED, after=4),
-          color="1F3A5F", size=8)
+          color=RULE_ACCENT, size=8)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.summary %}")
-    _heading(doc, L("Profile"), accent, head_font, before=HEAD_BEFORE)
+    _heading(doc, L("Profile"), before=HEAD_BEFORE)
     _p(doc, "{{ r.summary }}", size=10)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.achievements %}")
-    _heading(doc, L("Key Achievements"), accent, head_font, before=HEAD_BEFORE)
-    _chip_row(doc, accent, head_font)
+    _heading(doc, L("Key Achievements"), before=HEAD_BEFORE)
+    _chip_row(doc)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.experience %}")
-    _heading(doc, L("Experience"), accent, head_font, before=HEAD_BEFORE)
-    _experience(doc, accent, head_font)
+    _heading(doc, L("Experience"), before=HEAD_BEFORE)
+    _experience(doc, meta_style=ST_ACCENT_TEXT)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.skills %}")
-    _heading(doc, L("Skills"), accent, head_font, before=HEAD_BEFORE)
+    _heading(doc, L("Skills"), before=HEAD_BEFORE)
     _skills(doc)
     _tag(doc, "{%p endif %}")
 
     _tag(doc, "{%p if r.education %}")
-    _heading(doc, L("Education"), accent, head_font, before=HEAD_BEFORE)
+    _heading(doc, L("Education"), before=HEAD_BEFORE)
     _education(doc)
     _tag(doc, "{%p endif %}")
 
-    _tail_sections(doc, accent, head_font, head_before=HEAD_BEFORE)
+    _tail_sections(doc, head_before=HEAD_BEFORE)
     if lang == "ar":
         _apply_rtl(doc, body_font)
     doc.save(str(path))

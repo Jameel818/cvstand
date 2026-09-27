@@ -409,6 +409,10 @@ _UI_AR: dict[str, str] = {
     "Pixel-accurate, for sending": "بدقة تامة، للإرسال",
     "Word (.docx)": "‎Word (.docx)‎",
     "Editable, for job portals": "قابل للتحرير، لبوابات التوظيف",
+    # The two exports differ on purpose: Word has two layouts shared by all 49
+    # templates (themed per template), the PDF is the template itself.
+    "Word: editable version · PDF: exact design":
+        "Word: نسخة قابلة للتحرير · PDF: التصميم الدقيق",
     "Fill in what applies. Empty sections are hidden from the résumé automatically.":
         "املأ ما ينطبق عليك. الأقسام الفارغة تُخفى من السيرة تلقائياً.",
     "Fit": "ملاءمة",

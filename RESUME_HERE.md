@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-26 (TYPOGRAPHY CONTROLS · steps 1–4 done, Word export investigated; next: user picks a Word option, then plan step 5)
+# RESUME HERE — paused 2026-09-27 (TYPOGRAPHY CONTROLS · steps 1–5 done; next: plan step 6, Word font embedding)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -13,6 +13,40 @@ tests → commit → report verified / not verified → ask before the next step
 - **Word export ignores the chosen fonts** — expected; steps 5–6.
 - **Word export ALSO does not follow the selected template's design.** This
   is separate from typography; investigated 2026-09-26, see below.
+
+### ✅ STEP 5 DONE — Word: template colours + fonts, and chosen fonts (2026-09-27)
+User decisions: option 1 of the Word investigation; readable-accent rule for
+all 13 light accents, TEXT only (rules keep the original); Arabic menu
+caption "Word: نسخة قابلة للتحرير · PDF: التصميم الدقيق"; modern-t10 DM Sans
+-> Poppins in Word; Modern job title upright (no faked italic). Review page
+(Word before/after, EN + AR) approved.
+- **Masters carry ROLE STYLES** (`CV Name`, `CV Heading`, `CV Role`,
+  `CV Body Bold`, `CV Accent Text`, `Normal`); themed runs carry no direct
+  face/bold/colour. `_apply_rtl` no longer forces `w:cs` on unstyled runs.
+- **`app/word_themes.json`** measured by `tools/build_word_themes.py`
+  (Chromium computed style, both languages; `--check`; e2e test keeps it
+  current). Arabic follows the font policy exactly.
+- **`app/exporters/docx_theme.py`** rewrites the role styles at export: user
+  choice per group (via `effective()`) else template face, weights snapped to
+  built ones, Word names from build.json (`word_family_name` + `word_bold`),
+  all four rFonts slots + `bCs`, schema-ordered. Collision guard keyed on
+  (name, bold): Archivo 900 and Archivo Black share "Archivo Black".
+- **`PENDING_BUILD`** (step 6 must build): Open Sans 400/700/800, Source Sans 3
+  400/700/900, Archivo Narrow 400/700, Merriweather 700, Fraunces 700, IBM
+  Plex Mono 600 (Plex RFN: unmodified official file). A test keeps it exact.
+- Download menu note `#dl-note`, EN + AR.
+- `tests/test_docx_theme.py` (100); theme pass off -> 26 fail. 3 tests in
+  `test_docx_rtl.py` now read styles.xml too (fonts moved there).
+- **NOT VERIFIED: Word page-fit.** No theme font is installed on this PC, so
+  Word paginated all 98 exports in its own substitutes: 14 EN files came out
+  at 2 pages (ats-t7/8/11/12/15/17/18/23/25, modern-t5/7/10/16/24). With the
+  REAL fonts (Word's HTML export rendered in Chromium) modern-t10/-t16 EN use
+  ~843 of 1056px, so the 2-page results look like a substitution artifact,
+  but that is an approximation. **Step 6 must re-run the page count once the
+  fonts are embedded** (Word then uses them) and fix any real overflow.
+- Word COM trap: a new `Word.Application` can attach to an instance still
+  quitting and hang forever. One fresh instance per file, started only after
+  no WINWORD is left, is reliable.
 
 ### ✅ STEP 4 DONE — PDF (2026-09-26, committed + pushed)
 - Full suite before starting: 4462 passed / 24 skipped / 0 failed.
@@ -45,7 +79,12 @@ tests → commit → report verified / not verified → ask before the next step
 2. ~~Investigate the Word export~~ done below (2026-09-26, report only).
 3. ~~The user picks a Word option~~ **USER DECIDED 2026-09-27: option 1**
    (per-template colours and fonts on the existing 2 layouts), built as part
-   of step 5 together with the chosen fonts. Plan step 5 on that basis.
+   of step 5 together with the chosen fonts. ~~Step 5~~ done above.
+4. **Plan step 6** (embed the fonts in .docx, spec §6.3 / §7.7 / §7.8): build
+   `PENDING_BUILD`, embed `docx_theme.faces_used()`, re-run the Word page
+   count with the fonts embedded, rewrite FONTS.md "Word masters are a
+   deliberate exception". §7.8 needs a PC WITHOUT the fonts (user's manual
+   check, Word version recorded).
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
@@ -288,6 +327,14 @@ name pixel-identical to step 3; sections move <= 0.5pt (reflow below).
   variable-font trap, in the inline sheet.
 
 ### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
+- **Add DM Sans properly — preview, PDF and Word (user, 2026-09-27).**
+  `modern/t10.j2` names `'DM Sans'`, vendored nowhere: the preview and PDF
+  draw a system fallback (Arial on this PC, something else on Railway's
+  Linux), and step 5 sends Word Poppins instead (`WORD_SUBSTITUTES` in
+  `app/exporters/docx_theme.py`). Vendor DM Sans (OFL) through FONTS.md
+  "Adding a family", then drop the substitute. It MOVES modern-t10's English
+  pixels, so show before/after and get approval first (font policy);
+  `tests/test_template_fonts.py` has the named exemption to remove.
 - **Word layout archetypes, Modern only (option 2 of the Word investigation,
   2026-09-26).** A possible later step, user decision 2026-09-27: add ~4 Word
   layouts (shaded two-column sidebar via a table, full-width header band,

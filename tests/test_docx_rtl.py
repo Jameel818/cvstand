@@ -47,6 +47,18 @@ def _document_xml(blob: bytes) -> str:
         return z.read("word/document.xml").decode("utf-8")
 
 
+def _styles_xml(blob: bytes) -> str:
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        return z.read("word/styles.xml").decode("utf-8")
+
+
+def _faces_xml(blob: bytes) -> str:
+    """Where a document's FACES live. Since typography step 5 the themed runs
+    take face and weight from role styles (tools/build_word_masters.py "ROLE
+    STYLES"), so the fonts are in styles.xml, not on the runs."""
+    return _document_xml(blob) + _styles_xml(blob)
+
+
 def _master_bytes(name: str) -> bytes:
     return (MASTER_DIR / name).read_bytes()
 
@@ -88,7 +100,7 @@ def test_the_rtl_master_says_rtl_in_all_four_places(_, rtl):
     assert "<w:rtl/>" in xml, (
         "w:bidi without w:rtl: Word lays the glyphs out left-to-right inside a "
         "right-aligned paragraph")
-    assert 'w:cs="' in xml, (
+    assert 'w:cs="' in _faces_xml(_master_bytes(rtl)), (
         "no complex-script font: Arabic takes its face from w:rFonts/@w:cs, not "
         "@w:ascii, so Word substitutes one")
     assert "<w:bidiVisual/>" in xml, "the chip table does not mirror"
@@ -147,6 +159,6 @@ def test_the_arabic_master_avoids_a_font_with_no_arabic():
     """Georgia has no Arabic glyphs at all. Left in place, Word substitutes a
     face of its own choosing - the same silent substitution the HTML side
     solved by self-hosting fonts."""
-    xml = _document_xml(_master_bytes("modern_editorial_rtl.docx"))
+    xml = _faces_xml(_master_bytes("modern_editorial_rtl.docx"))
     assert "Georgia" not in xml
-    assert "Georgia" in _document_xml(_master_bytes("modern_editorial.docx"))
+    assert "Georgia" in _faces_xml(_master_bytes("modern_editorial.docx"))

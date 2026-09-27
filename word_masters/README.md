@@ -77,8 +77,14 @@ exist, so `/export/docx` returns a real `.docx`. If a master is ever deleted
 the route still degrades to **501** with a clear message rather than a 500.
 
 One master serves a whole category, so **49 HTML layouts collapse onto 2 Word
-documents**: a master carries one fixed palette (ATS monochrome, Modern navy
-`#1F3A5F`), not the per-template accent.
+layouts**. Since typography step 5 each download is still themed per template:
+`app/exporters/docx_theme.py` writes the template's accent and fonts (or the
+user's chosen fonts) into the masters' ROLE STYLES (`CV Name`, `CV Heading`,
+`CV Role`, `CV Body Bold`, `CV Accent Text`, plus `Normal`). The themes are
+measured from the rendered templates into `app/word_themes.json` by
+`tools/build_word_themes.py`. Text takes a readable variant of a light accent
+(4.5:1 on white); the accent rule keeps the original colour. A themed run must
+carry NO direct font, bold or colour, or it would override its style.
 
 ## Word-safe mapping (applies to every master)
 
@@ -102,9 +108,10 @@ documents**: a master carries one fixed palette (ATS monochrome, Modern navy
   The Modern master's spacing is tuned to fit **with** a photo, so a photo-less
   résumé simply carries more bottom margin; enlarging the 22 mm pushes the tail
   sections onto page 2.
-- **Fonts** → mapped to safe substitutes (Archivo→Arial, Fraunces→Georgia,
-  etc.) unless a licence to embed is confirmed. Record the substitution in the
-  master's own notes.
+- **Fonts** → the masters hold placeholders (Georgia, Arial, Times New Roman);
+  each export names the template's or the user's faces by their build.json
+  `word_family_name` + `word_bold`. Step 6 embeds them. No italic anywhere:
+  no built face has one, so Word would fake it.
 - **No hyphenation** anywhere (the table architecture assumes it off).
 - **Every section heading carries `keep_with_next`**, as does each job role and
   its company/date line. User content is variable-length, so Word *will*
