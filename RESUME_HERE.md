@@ -43,7 +43,9 @@ tests → commit → report verified / not verified → ask before the next step
 ### ⏭ NEXT SESSION, in this order
 1. ~~ECC `/e2e` check~~ passed (912 typography tests). ~~Step 4~~ done above.
 2. ~~Investigate the Word export~~ done below (2026-09-26, report only).
-3. **The user picks a Word option** (below). Then plan step 5 around it.
+3. ~~The user picks a Word option~~ **USER DECIDED 2026-09-27: option 1**
+   (per-template colours and fonts on the existing 2 layouts), built as part
+   of step 5 together with the chosen fonts. Plan step 5 on that basis.
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
@@ -286,6 +288,13 @@ name pixel-identical to step 3; sections move <= 0.5pt (reflow below).
   variable-font trap, in the inline sheet.
 
 ### ⏭ FOLLOW-UP — do AFTER the typography feature merges, not on this branch
+- **Word layout archetypes, Modern only (option 2 of the Word investigation,
+  2026-09-26).** A possible later step, user decision 2026-09-27: add ~4 Word
+  layouts (shaded two-column sidebar via a table, full-width header band,
+  centred, timeline) with RTL twins, and map each Modern template to an
+  archetype plus its option-1 theme. ATS stays single column. Estimated 3–5
+  sessions, medium risk (table sidebars repaginate badly; one-page tuning per
+  archetype with and without a photo). See the investigation section above.
 - **Arabic autofit first-pass compression (found in step 4, 2026-09-26).**
   Arabic sample on modern-t1 with Cairo headings / Amiri details / Tajawal
   name: the FIRST fit measures natural 1131px and compresses to d=0.94; an
