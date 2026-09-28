@@ -330,6 +330,7 @@ Commit after each step. Report what was verified at each step and what wasn't.
 1. **Branch.** All work happens on `feature/typography-controls`. Never commit this feature directly to `main`.
 2. **Ask before every push or merge.** Claude Code does not push, merge or deploy without an explicit go-ahead for that specific action. Approving one push does not approve the next.
 3. **Merge gate.** Merge into `main` only when every §7 test passes, the §7.9 regression shows existing CVs unchanged, and the §7.8 manual Word check has been done and its Word version recorded. A step marked "not verified" blocks the merge.
+   **Amended 2026-09-28 (user decision):** step 7 (calibration: `tools/calibrate_fonts.py`, `optical_scale` / `line_height`, §4.1) and the §7.4 calibration page follow **after** the merge, on a new branch, under these same §9 rules. Every other §7 item remained a merge-gate item and passed on 2026-09-28: full suite 4891 passed / 24 skipped / 0 failed, §7.9 98/98 previews pixel-identical to `main`, and the §7.8 check done in Word 2013.
 4. **Audit before pushing.** Run `git ls-files` and confirm nothing from `.env`, `*.db`, `venv/`, `data/resume.json` or a hardcoded key is tracked. Font files under the font build output are expected; check their licences against the §5 Reserved Font Name report first.
 5. **Push form.** Always use the non-interactive form, never a bare `git push`:
    `GIT_TERMINAL_PROMPT=0 git -c credential.interactive=never -c core.askPass= push origin <branch>`

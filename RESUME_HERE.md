@@ -1,4 +1,4 @@
-# RESUME HERE — 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; §7.8 Word check PASSED on Word 2013; merge prepared, NOT merged — awaiting the user)
+# RESUME HERE — 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; §7.8 Word check PASSED on Word 2013; MERGED into main by fast-forward (user-approved); NOT deployed; step 7 follows on a new branch)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -142,16 +142,18 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
    side: 98/98 pixel-identical (instrument self-test 0 vs 489,919 px). Audit:
    no .env/.db/venv/data/resume.json/key tracked; 123 font files = build.json
    exactly, every family has its OFL.txt, all 9 RFN families byte-identical
-   to upstream, fsType 0/8 throughout. **Blocker: §9.3 needs every §7 test,
-   and §7.4 (calibration page) is step 7, not built.** User decides: step 7
-   first, or amend the gate.
-6. **Step 7** (spec §8): calibration — `optical_scale` / `line_height`,
+   to upstream, fsType 0/8 throughout.
+   **USER DECISION 2026-09-28: option (b).** §9.3 amended: step 7 and the
+   §7.4 calibration page follow AFTER the merge (spec §9.3 records it).
+   Approved and run in order: push branch, `git merge --ff-only` into main,
+   push main. **Deploy NOT approved.**
+6. **Step 7 — AFTER the merge, on a new branch** (spec §8, §9.3 amended): calibration — `optical_scale` / `line_height`,
    `tools/calibrate_fonts.py` reusing the SIZE_ADJUST measurement in
    `tools/fetch_fonts_ar.py`, and the §7.4 calibration page. Plan → approval
-   first. The merge gate needs every §7 test, so this precedes the merge.
+   first. (Was a merge prerequisite; moved after the merge 2026-09-28.)
 7. **Optional: quality-council audit** (the `anthropic-skills:quality-council`
    skill) of the finished feature — the user's call whether to run it.
-8. **Merge + Railway deploy, each only on the user's explicit go-ahead**
+8. **Merge (approved 2026-09-28) + Railway deploy (NOT yet approved), each only on the user's explicit go-ahead**
    (spec §9.2). Merge gate §9.3: every §7 test passes, §7.9 regression shows
    existing CVs unchanged, §7.8 done with its Word version recorded. Then
    §9.4 audit, the non-interactive push form (§9.5, confirm with
