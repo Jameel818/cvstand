@@ -137,8 +137,16 @@ means moving that state out of memory, not adding workers.
 
 ### C5b. Deploying from the CLI — check WHERE before you push
 
-The GitHub App is not installed on the repo (see C1), so pushes do not
-auto-deploy and the CLI is the deploy path:
+**CORRECTED 2026-09-28: pushing `main` AUTO-DEPLOYS.** Railway builds
+`main` from `Jameel818/cvstand` on every push. Its deployment records show
+GitHub-built deploys since at least 2026-09-22, whatever C1 says. Found when
+a merge push went live about 20 seconds later (deployment `e3868c42`) with
+Word export broken (missing `fonttools`). So **a push of `main` is a deploy**:
+it needs the user's approval as one, and `verify_docker_context.py`,
+`tests/test_requirements_cover_imports.py` and the full suite must pass
+BEFORE the push. Feature-branch pushes do not deploy.
+
+The CLI remains a manual deploy path (not needed after a push of `main`):
 
 ```
 venv/Scripts/python tools/verify_deploy_target.py && railway up --detach

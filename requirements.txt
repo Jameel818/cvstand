@@ -22,6 +22,16 @@ docxtpl==0.20.2
 python-docx==1.2.0
 playwright==1.62.0
 
+# Word export embeds its fonts (app/exporters/docx_font_embed.py) and reads
+# each TTF's OS/2 table with fontTools: fsType (may it be embedded?), panose
+# and the Unicode/code-page ranges for fontTable.xml. It is a RUNTIME
+# dependency. It was missing from this file until 2026-09-28: this venv had
+# it for tools/build_fonts.py, so every test passed, while the container
+# answered every Word download with 500 (ModuleNotFoundError). Only TTF is
+# read at runtime, so the woff2 extra (brotli) is not needed.
+# tests/test_requirements_cover_imports.py keeps this file honest.
+fonttools==4.65.0
+
 # The AI writing assistant (app/assist.py). Optional at runtime: with no
 # ANTHROPIC_API_KEY set the feature answers 503 and the rest of the app is
 # unaffected, which is how it ships until Stage 3 turns payment on.

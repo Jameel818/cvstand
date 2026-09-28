@@ -157,12 +157,23 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
    (spec §9.2). Merge gate §9.3: every §7 test passes, §7.9 regression shows
    existing CVs unchanged, §7.8 done with its Word version recorded. Then
    §9.4 audit, the non-interactive push form (§9.5, confirm with
-   `git ls-remote`), and deploy ONLY via
-   `venv/Scripts/python tools/verify_deploy_target.py && railway up --detach`
-   from an up-to-date `main` (§9.6); `tools/verify_docker_context.py` first
-   (§9.7, fonts must ship); afterwards `tools/smoke_deploy.py` + one EN and
-   one AR PDF/DOCX export with a non-default font (§9.8). Don't touch
-   production settings (§9.9).
+   `git ls-remote`). **PUSHING `main` AUTO-DEPLOYS TO RAILWAY (found
+   2026-09-28, spec §9.6 corrected): a push of `main` IS a deploy and needs
+   the user's approval as one.** Before it: `tools/verify_docker_context.py`
+   (§9.7), `tests/test_requirements_cover_imports.py`, full suite. After:
+   `tools/smoke_deploy.py` + one EN and one AR PDF/DOCX export with a
+   non-default font (§9.8). Don't touch production settings (§9.9).
+
+### 🚨 2026-09-28 INCIDENT — Word export 500 on the live site
+The approved merge push of `ced0c95` auto-deployed (deployment `e3868c42`,
+~20 s after the push). `requirements.txt` lacked `fonttools`, which
+`docx_font_embed.py` imports at runtime, so every live Word download
+answered 500 (EN + AR; PDF was fine). The local suite passed because this venv has
+fontTools for `tools/build_fonts.py`. Fix (user-approved): pin
+`fonttools==4.65.0`; proved in a FRESH venv with only requirements.txt (Word
+tests 384 passed, EN + AR exports 200 with fonts embedded); new gate
+`tests/test_requirements_cover_imports.py` (mutation-tested). Last good
+deployment before this: `7afaf9d3` (`a4188a5`, 2026-09-22, now REMOVED).
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
