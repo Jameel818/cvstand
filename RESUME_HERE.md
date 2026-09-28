@@ -174,6 +174,14 @@ fontTools for `tools/build_fonts.py`. Fix (user-approved): pin
 tests 384 passed, EN + AR exports 200 with fonts embedded); new gate
 `tests/test_requirements_cover_imports.py` (mutation-tested). Last good
 deployment before this: `7afaf9d3` (`a4188a5`, 2026-09-22, now REMOVED).
+**FIXED + LIVE-VERIFIED 2026-09-28 21:53:** `e56240d` pushed (main, user-
+approved), auto-deployed as `78d1c5ed`. `smoke_deploy.py`: 25/25. Live EN
+(Montserrat 800 / Inter 300) and AR (Cairo 900 / Amiri 400), modern-t1: PDFs
+200 embedding exactly Montserrat-ExtraBold, Inter-Light/-Bold and
+Cairo-Black, Amiri-Regular/-Bold. Word files 200, `embedTrueTypeFonts` on,
+3 embedded faces each; de-obfuscated, each is byte-identical to our shipped
+TTF. The unembedded `Inter` (style CV Body Bold) and `Courier` (Word's
+MacroText) names draw no text (0 references).
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
