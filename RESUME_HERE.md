@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-27 (TYPOGRAPHY CONTROLS · steps 1–6 done; waiting on the user's §7.8 manual Word check; then step 7)
+# RESUME HERE — paused 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; waiting on the user's §7.8 manual Word check)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -14,7 +14,9 @@ tests → commit → report verified / not verified → ask before the next step
 - **Word export ALSO does not follow the selected template's design.** This
   is separate from typography; investigated 2026-09-26, see below.
 
-### ✅ STEP 6 DONE — Word embeds its fonts (2026-09-27)
+### ✅ STEP 6 DONE — Word embeds its fonts (2026-09-27, `6fc374f`, pushed)
+Full suite 4891 passed / 24 skipped / 0 failed; real Word check 98/98 clean
+page breaks (78 flow to 2 pages — ACCEPTED, see below).
 - **USER DECISION — WORD CONTENT FLOWS.** With the real fonts embedded, 78/98
   sample exports ran to 2 pages (every Arabic face and Open Sans / Source
   Sans 3 / Poppins are taller than the Arial the layouts were tuned in). The
@@ -127,11 +129,30 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
    (per-template colours and fonts on the existing 2 layouts), built as part
    of step 5 together with the chosen fonts. ~~Step 5~~ done above.
 4. ~~Step 6~~ done above.
-5. **WAITING ON THE USER: §7.8 manual Word check** with the Desktop folder
-   `CVStand Word font check` on another PC without the fonts; record the Word
-   version here. It gates the merge (spec §9.3).
-6. Then **step 7** (calibration: `optical_scale` / `line_height`; reuse the
-   SIZE_ADJUST measurement in `tools/fetch_fonts_ar.py`).
+### ⏭ REMAINING — in this order
+5. **WAITING ON THE USER: §7.8 manual Word check.** Folder on the user's
+   Desktop: `C:\Users\User\Desktop\CVStand Word font check` (6 .docx + the
+   Word-made PDF of each + CHECKLIST.txt). Copy it to a PC WITHOUT the fonts,
+   tick the checklist, and record here: pass/fail per file, Word version,
+   Windows version, Microsoft 365 yes/no. Files 2/4/5/6 are the real
+   embedding test (not M365 cloud fonts). A 2-page file is NOT a failure. It
+   gates the merge (spec §9.3).
+6. **Step 7** (spec §8): calibration — `optical_scale` / `line_height`,
+   `tools/calibrate_fonts.py` reusing the SIZE_ADJUST measurement in
+   `tools/fetch_fonts_ar.py`, and the §7.4 calibration page. Plan → approval
+   first. The merge gate needs every §7 test, so this precedes the merge.
+7. **Optional: quality-council audit** (the `anthropic-skills:quality-council`
+   skill) of the finished feature — the user's call whether to run it.
+8. **Merge + Railway deploy, each only on the user's explicit go-ahead**
+   (spec §9.2). Merge gate §9.3: every §7 test passes, §7.9 regression shows
+   existing CVs unchanged, §7.8 done with its Word version recorded. Then
+   §9.4 audit, the non-interactive push form (§9.5, confirm with
+   `git ls-remote`), and deploy ONLY via
+   `venv/Scripts/python tools/verify_deploy_target.py && railway up --detach`
+   from an up-to-date `main` (§9.6); `tools/verify_docker_context.py` first
+   (§9.7, fonts must ship); afterwards `tools/smoke_deploy.py` + one EN and
+   one AR PDF/DOCX export with a non-default font (§9.8). Don't touch
+   production settings (§9.9).
 
 ### 🔎 WORD EXPORT INVESTIGATION — 2026-09-26 (report only, no code)
 
