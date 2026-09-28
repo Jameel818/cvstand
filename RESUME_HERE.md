@@ -1,4 +1,4 @@
-# RESUME HERE — paused 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; waiting on the user's §7.8 manual Word check)
+# RESUME HERE — 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; §7.8 Word check PASSED on Word 2013; merge prepared, NOT merged — awaiting the user)
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
@@ -130,13 +130,21 @@ caption "Word: نسخة قابلة للتحرير · PDF: التصميم الد�
    of step 5 together with the chosen fonts. ~~Step 5~~ done above.
 4. ~~Step 6~~ done above.
 ### ⏭ REMAINING — in this order
-5. **WAITING ON THE USER: §7.8 manual Word check.** Folder on the user's
-   Desktop: `C:\Users\User\Desktop\CVStand Word font check` (6 .docx + the
-   Word-made PDF of each + CHECKLIST.txt). Copy it to a PC WITHOUT the fonts,
-   tick the checklist, and record here: pass/fail per file, Word version,
-   Windows version, Microsoft 365 yes/no. Files 2/4/5/6 are the real
-   embedding test (not M365 cloud fonts). A 2-page file is NOT a failure. It
-   gates the merge (spec §9.3).
+5. ~~§7.8 manual Word check~~ **PASSED 2026-09-28** (user's report):
+   another PC, **Windows 8, Word 2013**, none of the fonts installed. All 6
+   files in `CVStand Word font check` looked correct; re-saving in Word 2013
+   as .docx AND as .doc (Word 97-2003) kept the fonts. Microsoft 365: not
+   stated, and moot: Word 2013 has no cloud-font download, so files 1 and 3
+   were real embedding tests too. Recorded in spec §7.8.
+   **Merge prep 2026-09-28 (nothing merged/pushed):** full suite 4891 passed
+   / 24 skipped / 0 failed / 0 errors (25m20s). §7.9: live preview, no
+   typography keys, 49 templates × EN/AR, `main` vs branch served side by
+   side: 98/98 pixel-identical (instrument self-test 0 vs 489,919 px). Audit:
+   no .env/.db/venv/data/resume.json/key tracked; 123 font files = build.json
+   exactly, every family has its OFL.txt, all 9 RFN families byte-identical
+   to upstream, fsType 0/8 throughout. **Blocker: §9.3 needs every §7 test,
+   and §7.4 (calibration page) is step 7, not built.** User decides: step 7
+   first, or amend the gate.
 6. **Step 7** (spec §8): calibration — `optical_scale` / `line_height`,
    `tools/calibrate_fonts.py` reusing the SIZE_ADJUST measurement in
    `tools/fetch_fonts_ar.py`, and the §7.4 calibration page. Plan → approval
