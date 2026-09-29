@@ -147,8 +147,12 @@ def test_word_leaves_no_dangling_dash(app_ctx, key, lang, sample):
 
     from app.exporters import render_docx
 
-    paras = [p.text for p in Document(
-        io.BytesIO(render_docx(_with_unrated_skill(sample), key))).paragraphs]
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    doc = Document(io.BytesIO(render_docx(_with_unrated_skill(sample), key)))
+    # every paragraph, table cells included: a Modern template's Word LAYOUT
+    # puts its whole résumé in table cells (docs/WORD_LAYOUTS_PLAN.md)
+    paras = [Paragraph(p, doc).text for p in doc.element.body.iter(qn("w:p"))]
     assert "Ceramics" in paras, f"expected a bare name, got: {paras}"
     assert "Dutch" in paras
     assert not [p for p in paras if p.rstrip().endswith("—")], "dangling em-dash"

@@ -195,8 +195,11 @@ def test_two_faces_under_one_word_name_are_refused():
 
 
 def test_a_modern_file_does_not_embed_an_unused_role():
-    """Modern never uses CV Body Bold; its face must not ride along."""
-    data = dict(ENGLISH, font_body="Inter", font_body_weight=300)
+    """A role no text uses must not have its face ride along. On a Word
+    LAYOUT the degree and certification titles are bold body text; with
+    neither in the résumé, nothing is, so the bold body face stays out."""
+    data = dict(ENGLISH, font_body="Inter", font_body_weight=300, education=[],
+                recognition=[])
     drawn = _drawn(data, "modern-t1")
     assert ("Inter", 700) not in drawn and ("Inter", 300) in drawn
 

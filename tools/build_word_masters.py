@@ -756,7 +756,7 @@ def _cell_items(box, cell: str, source: str | None, *, headings: bool = True):
 
     _ctag(box, "{%p if it.k == 'contact' %}")
     _ctag(box, "{%p for c in r.contact_items %}")
-    _cp(box, "{{ c }}", size=9.5, rstyle=S("Text"), after=1)
+    _cp(box, "{{ c }}", size=9, rstyle=S("Text"), after=1)
     _ctag(box, "{%p endfor %}")
     _ctag(box, "{%p endif %}")
 

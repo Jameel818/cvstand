@@ -133,6 +133,18 @@ _MEASURE = r"""(arg) => {
     if (best) { sideR = best.r; sideBg = best.bg; }
   }
   const splitX = sideR ? (side === 'left' ? sideR.x + sideR.w : sideR.x) : split;
+  // a vertical rule AT the split (t1, t6 draw one; t22's line is its rail,
+  // far from the split, and does not count)
+  let splitRule = null;
+  if (side) for (const e of tpl.querySelectorAll('*')) {
+    const r = e.getBoundingClientRect(), c = getComputedStyle(e);
+    if (r.height < 0.3 * R.height) continue;
+    for (const s of ['Left', 'Right']) {
+      const x = ((s === 'Left' ? r.left : r.right) - R.left) / W;
+      if (parseFloat(c['border' + s + 'Width']) >= 0.5 && c['border' + s + 'Style'] !== 'none'
+          && Math.abs(x - splitX) < 0.04) splitRule = hex(c['border' + s + 'Color']);
+    }
+  }
 
   // --- band: the coloured block holding the name (not the side column)
   const name = document.querySelector('.cv-name');
@@ -302,6 +314,7 @@ _MEASURE = r"""(arg) => {
         const onMain = ov(bandR.x, bandR.x + bandR.w, mx0, mx1) / (mx1 - mx0);
         return onSide > 0.6 && onMain > 0.6 ? 'full' : onSide > 0.6 ? 'side' : 'main'; })(),
     side_top: sideR ? sideR.y : null,
+    split_rule: splitRule,
     items: items.map(i => ({kind: i.kind, zone: i.zone, y: +i.r.y.toFixed(3), label: i.label || null,
                             caps: !!i.caps, fill: i.fill || null, hcolor: i.hcolor || null, rule: !!i.rule,
                             color: i.color, bg: i.bg})),
@@ -414,6 +427,7 @@ def compile_lang(key: str, m: dict, lang: str, other: dict) -> dict:
         "cells": cells,
         "side_w": None if side is None else round(side["w"], 3),
         "side_bg": None if side is None else side["bg"],
+        "split_rule": m.get("split_rule"),
         "band": None if band is None else {"span": span, "bg": band["bg"]},
         "colours": colours,
         "name": {"color": m["name"]["color"], "pt": min(40.0, max(18.0, _px_pt(m["name"]["px"]))),

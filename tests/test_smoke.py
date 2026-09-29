@@ -148,18 +148,38 @@ def _docx(key, data=None):
     return Document(io.BytesIO(render_docx(data if data is not None else SAMPLE, key)))
 
 
-@pytest.mark.parametrize("key,profile_head", [("ats-t1", "Summary"), ("modern-t1", "Profile")])
-def test_docx_master_fills_every_section(key, profile_head):
-    paras = [p.text for p in _docx(key).paragraphs]
+def _all_paras(doc):
+    """Every paragraph, table cells included: a Modern template's Word LAYOUT
+    puts its whole résumé in table cells (docs/WORD_LAYOUTS_PLAN.md)."""
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    return [Paragraph(p, doc) for p in doc.element.body.iter(qn("w:p"))]
+
+
+def _expected_heads(key: str, lang: str = "en") -> tuple[str, ...]:
+    """ATS: its canonical headings. A Word LAYOUT: exactly the headings its
+    template's PDF shows, as measured (app/word_layouts.json)."""
+    from app.exporters import docx_layout
+    if docx_layout.spec_for(key):
+        cells = docx_layout.layouts()[key][lang]["cells"]
+        return tuple(docx_layout._item(i, lang)["text"] for c in cells.values()
+                     for i in c if i.get("label"))
+    return ("Summary", "Key Achievements", "Experience", "Skills", "Education",
+            "Certifications", "Tools", "Languages")
+
+
+@pytest.mark.parametrize("key", ["ats-t1", "modern-t1"])
+def test_docx_master_fills_every_section(key):
+    doc = _docx(key)
+    paras = [p.text for p in _all_paras(doc)]
     body = "\n".join(paras)
     # no unrendered docxtpl tags survived
     assert "{{" not in body and "{%" not in body
-    for head in (profile_head, "Key Achievements", "Experience", "Skills",
-                 "Education", "Certifications", "Tools", "Languages"):
+    for head in _expected_heads(key):
         assert head in paras, f"{key}: missing section {head!r}"
     # every experience entry and bullet made it through the loops
     assert sum(1 for p in paras if p.startswith("Halden & Row")) == 1, "'&' must survive"
-    assert len([p for p in _docx(key).paragraphs if p.style.name == "List Bullet"]) == 6
+    assert len([p for p in _all_paras(doc) if p.style.name == "List Bullet"]) == 6
     # skill level word AND dot glyphs are both real text
     assert any("Brand Systems — Expert" in p and "●" in p for p in paras)
 
@@ -175,11 +195,19 @@ def test_docx_unmapped_level_gets_no_dots():
 def test_docx_empty_sections_leave_no_orphan_headings(key):
     minimal = {"name": "Dana Ortiz", "contact": {"email": "d@example.com"}}
     doc = _docx(key, minimal)
-    paras = [p.text for p in doc.paragraphs if p.text.strip()]
-    for head in ("Summary", "Profile", "Key Achievements", "Experience",
-                 "Skills", "Education", "Certifications", "Tools", "Languages"):
+    paras = [p.text for p in _all_paras(doc) if p.text.strip()]
+    heads = set(_expected_heads(key)) | {"Summary", "Profile", "Key Achievements",
+                                         "Experience", "Skills", "Education",
+                                         "Certifications", "Tools", "Languages"}
+    heads -= {"Contact", "CONTACT"}   # the contact line IS there
+    for head in heads:
         assert head not in paras, f"{key}: orphan heading {head!r} with no content"
-    assert not doc.tables, "chip table must go when there are no achievements"
+    # the chip row (4 cells across) must go when there are no achievements;
+    # a Word LAYOUT keeps its own layout table
+    W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    chips = [t for t in doc.element.body.iter(f"{W}tbl")
+             if len(t.findall(f"{W}tblGrid/{W}gridCol")) == 4]
+    assert not chips, "chip table must go when there are no achievements"
 
 
 def _docx_images(key, data):
@@ -198,7 +226,9 @@ def uploaded_photo(client):
 
 
 def test_docx_modern_embeds_the_photo(uploaded_photo):
-    assert len(_docx_images("modern-t1", dict(SAMPLE, photo_url=uploaded_photo))) == 1
+    # a Modern template WITH a photo slot: a Word layout follows its PDF, and
+    # modern-t1's PDF has none (docs/WORD_LAYOUTS_PLAN.md)
+    assert len(_docx_images("modern-t16", dict(SAMPLE, photo_url=uploaded_photo))) == 1
 
 
 def test_docx_ats_never_embeds_a_photo(uploaded_photo):

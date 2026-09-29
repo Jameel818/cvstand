@@ -140,10 +140,18 @@ def test_the_english_masters_say_none_of_it(ltr, _):
 
 # --- headings and rendering ----------------------------------------------
 
+def _all_text(doc) -> str:
+    """Every paragraph's text, table cells included: a Word LAYOUT puts its
+    whole résumé in table cells (docs/WORD_LAYOUTS_PLAN.md)."""
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    return "\n".join(Paragraph(p, doc).text for p in doc.element.body.iter(qn("w:p")))
+
+
 @pytest.mark.parametrize("key", ["ats-t1", "modern-t1"])
 def test_the_rtl_export_carries_arabic_headings(key):
     doc = Document(io.BytesIO(render_docx({**AR, "lang": "ar"}, key)))
-    text = "\n".join(p.text for p in doc.paragraphs)
+    text = _all_text(doc)
     for label in ("Experience", "Skills", "Education", "Summary", "Profile"):
         assert label not in text, f"{key}: English heading {label!r} in an Arabic export"
     # and at least a few real Arabic headings are present
@@ -155,7 +163,7 @@ def test_the_rtl_export_carries_arabic_headings(key):
 def test_no_unrendered_tag_survives_in_either_language(key):
     for data in (EN, AR):
         doc = Document(io.BytesIO(render_docx(data, key)))
-        text = "\n".join(p.text for p in doc.paragraphs)
+        text = _all_text(doc)
         assert "{{" not in text and "{%" not in text
 
 

@@ -344,6 +344,12 @@ unclear, written down here.
     no heading (t1's summary, t2's contact grid, t22's labelled contact
     lines), Word has none. Per-line field labels ("Email", "Phone") are never
     taken as a section heading.
+14. **The open layouts' rule is measured too:** a vertical line between the
+    columns only where the PDF draws one at the split (t1, t6, in their own
+    light grey). t12 has none, and t22's line is its rail, not a split.
+15. **A side column is never narrower than 30% of the page.** t22's measured
+    24.7% (and t1's 27.8%) broke the email address mid-word in Word, where
+    the PDF's smaller type fits it. Stacked contact lines are 9 pt.
 13. **Skill bars are 5 segments,** one per level step, each with a hairline
     border in its own colour so the fills meet without a seam. They read as
     a stepped bar, the 5-point scale the level words map to.

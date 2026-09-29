@@ -92,7 +92,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.278
+    "side_w": 0.278,
+    "split_rule": "D6D6DA"
    },
    "archetype": "open",
    "en": {
@@ -184,7 +185,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.278
+    "side_w": 0.278,
+    "split_rule": "D6D6DA"
    },
    "side": "end",
    "skills": "dots",
@@ -288,7 +290,8 @@
      "round": true
     },
     "side_bg": "A93005",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -388,7 +391,8 @@
      "round": true
     },
     "side_bg": "A93005",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -494,7 +498,8 @@
      "round": false
     },
     "side_bg": "0F1B2B",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -596,7 +601,8 @@
      "round": false
     },
     "side_bg": "0F1B2B",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -679,7 +685,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.34
+    "side_w": 0.34,
+    "split_rule": null
    },
    "archetype": "open",
    "en": {
@@ -758,7 +765,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.34
+    "side_w": 0.34,
+    "split_rule": null
    },
    "side": "end",
    "skills": "dots",
@@ -844,7 +852,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": null
+    "side_w": null,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -926,7 +935,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": null
+    "side_w": null,
+    "split_rule": null
    },
    "side": null,
    "skills": "dots",
@@ -1038,7 +1048,8 @@
      "round": false
     },
     "side_bg": "F7F4EC",
-    "side_w": 0.431
+    "side_w": 0.431,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -1146,7 +1157,8 @@
      "round": false
     },
     "side_bg": "F7F4EC",
-    "side_w": 0.431
+    "side_w": 0.431,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -1254,7 +1266,8 @@
      "round": true
     },
     "side_bg": "1A3F22",
-    "side_w": 0.4
+    "side_w": 0.4,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -1358,7 +1371,8 @@
      "round": true
     },
     "side_bg": "1A3F22",
-    "side_w": 0.4
+    "side_w": 0.4,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -1462,7 +1476,8 @@
      "round": true
     },
     "side_bg": "1C1C20",
-    "side_w": 0.341
+    "side_w": 0.341,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -1562,7 +1577,8 @@
      "round": true
     },
     "side_bg": "1C1C20",
-    "side_w": 0.341
+    "side_w": 0.341,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -1679,7 +1695,8 @@
      "round": false
     },
     "side_bg": "E5E8F5",
-    "side_w": 0.424
+    "side_w": 0.424,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -1792,7 +1809,8 @@
      "round": false
     },
     "side_bg": "E5E8F5",
-    "side_w": 0.424
+    "side_w": 0.424,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -1883,7 +1901,8 @@
      "round": false
     },
     "side_bg": "002B66",
-    "side_w": 0.438
+    "side_w": 0.438,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -1970,7 +1989,8 @@
      "round": false
     },
     "side_bg": "002B66",
-    "side_w": 0.438
+    "side_w": 0.438,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -2067,7 +2087,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": null
+    "side_w": null,
+    "split_rule": null
    },
    "archetype": "gutter",
    "en": {
@@ -2160,7 +2181,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": null
+    "side_w": null,
+    "split_rule": null
    },
    "side": null,
    "skills": "bars",
@@ -2263,7 +2285,8 @@
      "round": true
     },
     "side_bg": "002366",
-    "side_w": 0.351
+    "side_w": 0.351,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -2362,7 +2385,8 @@
      "round": true
     },
     "side_bg": "002366",
-    "side_w": 0.351
+    "side_w": 0.351,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -2466,7 +2490,8 @@
      "round": false
     },
     "side_bg": "EDEBDD",
-    "side_w": 0.379
+    "side_w": 0.379,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -2566,7 +2591,8 @@
      "round": false
     },
     "side_bg": "EDEBDD",
-    "side_w": 0.379
+    "side_w": 0.379,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -2690,7 +2716,8 @@
      "round": true
     },
     "side_bg": "013F32",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -2810,7 +2837,8 @@
      "round": true
     },
     "side_bg": "013F32",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -2888,7 +2916,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.247
+    "side_w": 0.247,
+    "split_rule": null
    },
    "archetype": "open",
    "en": {
@@ -2962,7 +2991,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.247
+    "side_w": 0.247,
+    "split_rule": null
    },
    "side": "end",
    "skills": "dots",
@@ -3045,7 +3075,8 @@
     },
     "photo": null,
     "side_bg": "EFEFEF",
-    "side_w": 0.388
+    "side_w": 0.388,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -3124,7 +3155,8 @@
     },
     "photo": null,
     "side_bg": "EFEFEF",
-    "side_w": 0.388
+    "side_w": 0.388,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -3247,7 +3279,8 @@
      "round": true
     },
     "side_bg": "4A4C4A",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -3366,7 +3399,8 @@
      "round": true
     },
     "side_bg": "4A4C4A",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -3473,7 +3507,8 @@
      "round": false
     },
     "side_bg": "FFDE00",
-    "side_w": 0.341
+    "side_w": 0.341,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -3576,7 +3611,8 @@
      "round": false
     },
     "side_bg": "FFDE00",
-    "side_w": 0.341
+    "side_w": 0.341,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -3685,7 +3721,8 @@
      "round": true
     },
     "side_bg": "000034",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -3790,7 +3827,8 @@
      "round": true
     },
     "side_bg": "000034",
-    "side_w": 0.353
+    "side_w": 0.353,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -3913,7 +3951,8 @@
      "round": true
     },
     "side_bg": "003366",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -4032,7 +4071,8 @@
      "round": true
     },
     "side_bg": "003366",
-    "side_w": 0.329
+    "side_w": 0.329,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",
@@ -4128,7 +4168,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.435
+    "side_w": 0.435,
+    "split_rule": "D5D2CE"
    },
    "archetype": "open",
    "en": {
@@ -4220,7 +4261,8 @@
     },
     "photo": null,
     "side_bg": null,
-    "side_w": 0.435
+    "side_w": 0.435,
+    "split_rule": "D5D2CE"
    },
    "side": "end",
    "skills": "bars",
@@ -4332,7 +4374,8 @@
      "round": false
     },
     "side_bg": "001D3D",
-    "side_w": 0.388
+    "side_w": 0.388,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -4440,7 +4483,8 @@
      "round": false
     },
     "side_bg": "001D3D",
-    "side_w": 0.388
+    "side_w": 0.388,
+    "split_rule": null
    },
    "side": "end",
    "skills": "bars",
@@ -4560,7 +4604,8 @@
      "round": false
     },
     "side_bg": null,
-    "side_w": 0.461
+    "side_w": 0.461,
+    "split_rule": null
    },
    "archetype": "band",
    "en": {
@@ -4676,7 +4721,8 @@
      "round": false
     },
     "side_bg": null,
-    "side_w": 0.461
+    "side_w": 0.461,
+    "split_rule": null
    },
    "side": "start",
    "skills": "dots",
@@ -4777,7 +4823,8 @@
     },
     "photo": null,
     "side_bg": "FFDE00",
-    "side_w": 0.296
+    "side_w": 0.296,
+    "split_rule": null
    },
    "archetype": "sidebar",
    "en": {
@@ -4874,7 +4921,8 @@
     },
     "photo": null,
     "side_bg": "FFDE00",
-    "side_w": 0.296
+    "side_w": 0.296,
+    "split_rule": null
    },
    "side": "start",
    "skills": "bars",

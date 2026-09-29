@@ -199,8 +199,11 @@ def test_the_word_export_carries_both_scripts(key):
 
     from app.exporters import render_docx
 
-    paras = [p.text for p in
-             Document(io.BytesIO(render_docx(samples.MIXED, key))).paragraphs]
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    doc = Document(io.BytesIO(render_docx(samples.MIXED, key)))
+    # every paragraph, table cells included (a Word LAYOUT's cells hold it all)
+    paras = [Paragraph(p, doc).text for p in doc.element.body.iter(qn("w:p"))]
     body = "\n".join(paras)
     # Read from the fixture, never spelled again here. The city was hardcoded
     # as "بورتسايد" — itself a transliteration of "Portside" — so rewriting the

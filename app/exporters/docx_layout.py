@@ -50,7 +50,7 @@ LAYOUTS_PATH = Path(__file__).resolve().parent.parent / "word_layouts.json"
 
 #: Archetypes whose templates use the layout masters. The others keep the
 #: single-column Modern master until their milestone lands (plan §8).
-ARCHETYPES_ON = ("sidebar", "band")
+ARCHETYPES_ON = ("sidebar", "band", "open")
 
 PAGE_W = 12240                  # Letter, twips (8.5in); the canvas is 850 x 1100 px
 PAGE_H_PT = 792
@@ -60,6 +60,14 @@ PAD_SIDE = 432                  # 0.3in either side of a side column's text
 PAD_MAIN = 540                  # 0.375in either side of the main column's text
 PAD_TOP = 200                   # a cell's text starts 10pt below its top edge
 SEAM = 0.75                     # pt of overlap between two neighbouring fills
+MIN_SIDE = 0.30                 # of the page: narrower, an email address breaks mid-word
+
+
+def side_width(L: dict) -> int:
+    """The side column's width in twips: the template's, but never under
+    MIN_SIDE (modern-t22's is 24.7%, where Word broke the email address in
+    two - the PDF's smaller type fits it)."""
+    return round(max(L["side_w"], MIN_SIDE) * PAGE_W)
 
 
 @lru_cache(maxsize=1)
@@ -404,7 +412,7 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
                 tr.append(tcs[0])
 
     # ---- widths, fills, margins
-    side_w = round(L["side_w"] * PAGE_W) if has_side else 0
+    side_w = side_width(L) if has_side else 0
     main_w = PAGE_W - side_w
     order = ([side_w, main_w] if spec["side"] != "end" else [main_w, side_w])
     _grid(tbl, [w for w in order if w] if has_side else [PAGE_W])
@@ -424,6 +432,13 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
         bottom = 120 if (not body_row or tr is last_body) else 0
         _margins(tc, PAD_SIDE if z == "side" else PAD_MAIN, top, bottom)
         _fill(tc, None if bgs[z] == "FFFFFF" else bgs[z])
+
+    # ---- the rule between the columns, where the PDF draws one (t1, t6)
+    if has_side and L.get("split_rule"):
+        borders = tbl_pr.find(qn("w:tblBorders"))
+        inside = borders.find(qn("w:insideV"))
+        for k, v in (("val", "single"), ("sz", "4"), ("space", "0"), ("color", L["split_rule"])):
+            inside.set(qn(f"w:{k}"), v)
 
     # ---- the full-height side column and the band's strip, behind the text
     rects_all, rects_first = [], []

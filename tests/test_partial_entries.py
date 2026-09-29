@@ -120,10 +120,56 @@ def test_normalize_leaves_a_supplied_value_alone(app_ctx):
 
 # --------------------------------------------------------------- DOCX side
 
+def _visible_blank_lines(blob: bytes) -> list[int]:
+    """Empty paragraphs that show as a blank line. A Word LAYOUT needs a few
+    structural empty paragraphs - Word requires one to end every table cell
+    and to follow a table inside a cell - and sets their mark to 1-4 pt so
+    they take no visible room. Any other empty paragraph (no size, or a
+    larger one) is a stray blank line."""
+    import io
+    import zipfile
+
+    from lxml import etree
+    w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        root = etree.fromstring(z.read("word/document.xml"))
+    out = []
+    for p in root.iter(f"{w}p"):
+        if "".join(t.text or "" for t in p.iter(f"{w}t")).strip() or p.find(f".//{w}drawing") is not None:
+            continue
+        sz = p.find(f"{w}pPr/{w}rPr/{w}sz")
+        if sz is None or int(sz.get(f"{w}val")) > 8:
+            out.append(int(sz.get(f"{w}val")) if sz is not None else 0)
+    return out
+
+
+def _docx_paragraphs_marked(blob: bytes) -> list[tuple[str, bool]]:
+    """(text, is a 1-4pt structural empty paragraph) for every paragraph."""
+    import io
+    import zipfile
+
+    from lxml import etree
+    w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    with zipfile.ZipFile(io.BytesIO(blob)) as z:
+        root = etree.fromstring(z.read("word/document.xml"))
+    out = []
+    for p in root.iter(f"{w}p"):
+        text = "".join(t.text or "" for t in p.iter(f"{w}t"))
+        sz = p.find(f"{w}pPr/{w}rPr/{w}sz")
+        structural = not text.strip() and sz is not None and int(sz.get(f"{w}val")) <= 8
+        out.append((text, structural))
+    return out
+
+
 def _docx_paragraphs(blob: bytes) -> list[str]:
+    """Every paragraph, table cells included: a Modern template's Word LAYOUT
+    puts its whole résumé in table cells (docs/WORD_LAYOUTS_PLAN.md)."""
     import io
     from docx import Document
-    return [p.text for p in Document(io.BytesIO(blob)).paragraphs]
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    doc = Document(io.BytesIO(blob))
+    return [Paragraph(p, doc).text for p in doc.element.body.iter(qn("w:p"))]
 
 
 @pytest.mark.parametrize("lang,sample", samples.BOTH)
@@ -155,8 +201,11 @@ def test_a_role_with_no_dates_leaves_no_blank_line(app_ctx, key, lang, sample):
     Note the master is GENERATED: fix `tools/build_word_masters.py` and re-run
     it, never edit the .docx."""
     from app.exporters import render_docx
-    paras = _docx_paragraphs(render_docx(_partial(sample), key))
-    assert not [p for p in paras if not p.strip()], "stray blank paragraph(s)"
+    blob = render_docx(_partial(sample), key)
+    assert not _visible_blank_lines(blob), "stray blank paragraph(s)"
+    # what FOLLOWS the title, leaving out a layout's 1-4pt structural
+    # paragraphs (the cell's closing one: each job is its own row there)
+    paras = [t for t, structural in _docx_paragraphs_marked(blob) if not structural]
     i = paras.index("Studio Intern")
     assert paras[i + 1].strip(), "the role is followed by a blank line"
 

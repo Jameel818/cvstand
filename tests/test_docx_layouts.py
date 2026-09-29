@@ -116,8 +116,9 @@ def test_the_layout_table_has_its_own_grid_and_fills_the_page(exports, key, lang
                  for tc in tr.findall(f"{W}tc")]
         assert sum(spans) == len(cols), "a row does not fill the grid"
     if L["side_w"]:
-        side_w = round(L["side_w"] * DL.PAGE_W)
+        side_w = DL.side_width(L)
         assert side_w in cols
+        assert side_w >= round(L["side_w"] * DL.PAGE_W), "never narrower than the template's"
         first = cols[0] == side_w
         assert first == (DL.layouts()[key]["side"] == "start"), "side column on the wrong side"
 

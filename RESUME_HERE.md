@@ -43,7 +43,16 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    t11's white pseudo-pill (a sibling band is not an item's own ground). Export:
    t13 one-column grid, band strip z-order (t21), 0.75pt overlap between fills
    (t18 seam), hairline same-colour borders on bar segments.
-3. ⏳ Open (4). 4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
+3. ✅ **Open (4 templates: t1 6 12 22), EN + AR.** A vertical rule only
+   where the PDF draws one AT the split (t1, t6; measured colour). Side
+   column ≥ 30% of the page (t22's 24.7% broke the email mid-word); stacked
+   contact lines 9pt. Fast suite 3891 passed / 0 failed. Real Word 8/8 open,
+   0 flow failures. Seven older tests used modern-t1 as "the Modern master"
+   and read only top-level paragraphs: now they read table cells too, expect
+   the layout's measured headings, t16 for the photo (t1's PDF has no photo
+   slot), and a "visible blank line" = an empty paragraph > 4pt (a layout's
+   1-4pt structural paragraphs are required by Word).
+4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
    verification. 6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
