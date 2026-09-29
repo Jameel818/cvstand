@@ -69,7 +69,13 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    an allowed system face. 8 Arabic files flow to 2 pages (t3 5 8 13 14 17 18
    19; accepted). 5 files drew Open Sans from Microsoft 365's cloud copy (known,
    step 6). Report: scratchpad `verify48/report.json` (not kept).
-6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
+6. ✅ **Review page** `docs/review/word_layouts_review.html` (+ `img/`, 185
+   JPEGs, 6.7 MB): per template × EN/AR, PDF | Word today (main `e56240d`) |
+   Word new, the Word columns from Word's OWN PDFs (this PC). **Desktop:**
+   `C:\Users\User\Desktop\CVStand Word layouts review` = the page + img + the
+   48 new .docx (`docx/`) + README.txt. Built by scratch scripts
+   (review_stage_a/c.py; main's .docx made in a temp worktree `C:\cvmain`).
+7. ⏳ Full suite.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
 ## ⏭ NEXT, in this order (each needs the user's go-ahead)
