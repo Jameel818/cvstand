@@ -1,4 +1,54 @@
-# RESUME HERE — 2026-09-28 (TYPOGRAPHY CONTROLS · steps 1–6 done, pushed at `6fc374f`; §7.8 Word check PASSED on Word 2013; MERGED into main by fast-forward (user-approved); NOT deployed; step 7 follows on a new branch)
+# RESUME HERE — paused 2026-09-29 (typography steps 1–6 MERGED to main and LIVE at `e56240d` / deployment `78d1c5ed`; Word "looks plain" investigated = no defect; Word layouts plan written, AWAITING USER REVIEW)
+
+## ⏭ NEXT, in this order (each needs the user's go-ahead)
+1. **User reviews `docs/WORD_LAYOUTS_PLAN.md`** (option 2: 4 Word archetypes
+   for the 24 Modern templates) and answers its §9 decisions. No code yet.
+2. **Typography step 7** (calibration, §4.1 / §7.4) on a NEW branch from
+   `main`: plan → approval first. The order vs. the Word layouts work is
+   decision 6 in the plan.
+3. **Pushing `main` DEPLOYS** (Railway auto-deploy): it needs explicit deploy
+   approval, with `verify_docker_context.py`,
+   `tests/test_requirements_cover_imports.py` and the full suite first.
+4. Follow-ups still open (below): DM Sans, Arabic autofit first pass, IBM
+   Plex Sans Arabic RFN in `fonts_ar.css`.
+
+## 🔎 2026-09-29 — "Word download looks plain" (live, Incognito): NO DEFECT
+The user downloaded Word from the live builder in Incognito (a non-default
+template + fonts) and reported that it follows neither the fonts nor the
+template. Investigated read-only; the user accepted the findings:
+- **Their files ARE themed:** `hhh.docx` = modern-t8, Arabic RTL master,
+  Cairo ExtraBold / Markazi Text / Alexandria embedded, accent `#003366`. The
+  two earlier downloads were themed too (accents `#3A6B5C`, `#8E7335`).
+- **The live builder path works:** Playwright, fresh context, gallery "Use
+  this" → Fonts → the real `#dl-docx` / `#dl-pdf` clicks. The requests carry
+  `template_key` + every font key; the files come back themed and embedded
+  (AR modern-t8 204,491 B ≈ the user's 204,496 B; EN modern-t16 too). Local
+  `main` is identical. `builder.js` is served `no-cache`. There is no silent
+  fallback in the Word code.
+- **Word draws embedded fonts even in Protected View** (tested with real Word
+  COM: `ProtectedViewWindows.Open`, then after Enable Editing). The only
+  system-font text is the skill dots ●○ and the bullets (the chosen fonts lack
+  those glyphs).
+- **Why it looks plain:** by design, Word has ONE Modern layout (option 1).
+  modern-t8's blocks/sidebar become one column. → the Word layouts plan.
+- **Instrument notes:** a full-screen `CopyFromScreen` captured the user's
+  desktop (deleted at once); capture the Word window only (`PrintWindow` on
+  its handle). A DOM probe for photo slots / skill styles read "none" on all
+  24 → it was not used for those; the investigation table was.
+
+**Added:** `tests/e2e/test_word_follows_the_builder.py` (EN modern-t16, AR
+modern-t8; `deployed_server`, fresh context, real clicks). It asserts the
+request keys, the role-style fonts, the template accent (text-safe, not the
+master navy) and that the faces are embedded. Mutation-tested: a wrong
+template_key and dropped font keys each fail both cases. Fast suite 3407
+passed.
+
+**Written:** `docs/WORD_LAYOUTS_PLAN.md` (measured from a contact sheet of the
+24 + a column probe in EN and AR; in Arabic every sidebar mirrors). SIDEBAR 12
+/ BAND 7 / OPEN 4 / GUTTER 1, a timeline flag, risks (RTL `bidiVisual`,
+shading height, heading orphans across a broken row, editability, parsers),
+a test plan (144 real-Word files), about 4–5 sessions, and 6 decisions for the
+user.
 
 ## ⏸ TYPOGRAPHY CONTROLS — branch `feature/typography-controls`
 
