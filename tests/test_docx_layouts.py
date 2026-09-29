@@ -266,7 +266,8 @@ def test_skills_follow_the_template_bars_or_dots_with_real_text(exports, key, la
     if DL.layouts()[key]["skills"] == "bars":
         assert len(_bars(doc)) == len(rated), "one bar per rated skill"
         fills = {s.get(f"{W}fill") for b in _bars(doc) for s in b.iter(f"{W}shd")}
-        assert not fills & {"BA0001", "BA0002"}, "a bar kept its placeholder fill"
+        fills |= {e.get(f"{W}color") for b in _bars(doc) for e in b.iter(f"{W}left", f"{W}right")}
+        assert not fills & {"BA0001", "BA0002"}, "a bar kept its placeholder colour"
     else:
         assert not _bars(doc)
         assert "●" in text

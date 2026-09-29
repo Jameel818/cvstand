@@ -331,6 +331,22 @@ unclear, written down here.
 10. **Sizes:** the name at its measured size, clamped to 18–40 pt; section
     headings at theirs, clamped to 8.5–13 pt. Body text stays at 10 pt (9.5
     in the stacked contact lines).
+11. **Page breaks by rows, not by keep-with-next.** Real Word ignores
+    keep-with-next between paragraphs in a table cell that breaks across
+    pages (modern-t5 in Arabic stranded "الشهادات" at the foot of page 1). So
+    the main column is one cannot-split row per block: a section with its
+    heading, or one job (the first carries the Experience heading). The side
+    column is one cell merged down all rows. A block moves to the next page
+    whole. A block taller than a page still splits, since Word must split it.
+12. **Heading words the template does not give are not invented.** A default
+    catalogue heading is used only when the template gives that section a
+    heading in the OTHER language (t6's tools in Arabic). Where the PDF has
+    no heading (t1's summary, t2's contact grid, t22's labelled contact
+    lines), Word has none. Per-line field labels ("Email", "Phone") are never
+    taken as a section heading.
+13. **Skill bars are 5 segments,** one per level step, each with a hairline
+    border in its own colour so the fills meet without a seam. They read as
+    a stepped bar, the 5-point scale the level words map to.
 
 ## 11. Download-menu wording — DRAFT (decision 5: not in the UI yet)
 

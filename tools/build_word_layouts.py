@@ -163,7 +163,12 @@ _MEASURE = r"""(arg) => {
   const items = [];
   const blockW = el => { let e = el; while (e && e !== tpl && getComputedStyle(e).display.startsWith('inline')) e = e.parentElement;
     return rel(e.getBoundingClientRect()).w; };
-  const localBg = el => { for (let e = el; e && e !== tpl; e = e.parentElement) { const b = bgOf(e); if (b) return b; } return bgOf(tpl) || 'FFFFFF'; };
+  // an item's OWN ground: a small filled element around it (modern-t21's
+  // contact pill). None when the colour behind it is a separate block, as
+  // modern-t11's yellow band is: then the zone's colour is the ground.
+  const localBg = el => { for (let e = el; e && e !== tpl; e = e.parentElement) {
+      const r = rel(e.getBoundingClientRect()); if (r.w * r.h > 0.12) return null;
+      const b = bgOf(e); if (b) return b; } return null; };
   const push = (kind, el) => { if (!el) return;
     const r = rel(el.getBoundingClientRect());
     items.push({kind, el, r, zone: zoneOf(r, blockW(el)), color: hex(getComputedStyle(el).color), bg: localBg(el)}); };
@@ -216,9 +221,16 @@ _MEASURE = r"""(arg) => {
       const c = getComputedStyle(p); if (rel(p.getBoundingClientRect()).h > 0.08) break;
       if (parseFloat(c.borderBottomWidth) >= 0.5 && c.borderBottomStyle !== 'none') return true; }
       return false; };
+  // the heading's words as written, a <br> read as a space (modern-t15's
+  // "Personal<br>Information"); the capitals are the `caps` flag's job
+  const labelOf = e => { const c = e.cloneNode(true);
+      c.querySelectorAll('br').forEach(b => b.replaceWith(' '));
+      return c.textContent.replace(/\s+/g, ' ').trim(); };
   items.sort((a, b) => a.r.y - b.r.y || a.r.x - b.r.x);
   for (const it of items) {
-    if (['name', 'title', 'photo'].includes(it.kind)) continue;
+    // these never show a heading in Word; they must not claim one either (the
+    // chips beside t5's "Contact" pill took it from the contact lines)
+    if (['name', 'title', 'photo', 'achievements'].includes(it.kind)) continue;
     const cands = heads.filter(h => h.zone === it.zone && h.r.y + h.r.h <= it.r.y + 0.004
                                      && it.r.y - (h.r.y + h.r.h) < 0.16 && !used.has(h.e)
                                      && Math.abs(h.r.cx - it.r.cx) < 0.45)
@@ -227,16 +239,26 @@ _MEASURE = r"""(arg) => {
     // closer item between them
     const above = cands.find(c => !items.some(o => o !== it && o.zone === it.zone && o.kind !== 'name'
             && o.r.y > c.r.y + c.r.h - 0.002 && o.r.y < it.r.y - 0.002 && !['title', 'photo'].includes(o.kind)));
+    const starts = c => it.el.textContent.trim().startsWith(c.e.textContent.trim());
     // a label BESIDE its content: inline in the same line (t4's "Tools"), or
     // in a gutter (t19), level with the entry's first line
-    const beside = heads.filter(c => !used.has(c.e)
-            && (it.el.contains(c.e)
+    const beside = heads.filter(c => !used.has(c.e) && c.zone === it.zone
+            && ((c.e !== it.el && it.el.contains(c.e) && starts(c))
                 || ((arg.rtl ? c.r.cx > it.r.x + it.r.w - 0.01 : c.r.cx < it.r.x + 0.01)
                     && c.r.y <= it.r.y + 0.01
                     && it.r.y - c.r.y < (arg.gutter ? 0.07 : 0.012))))
         .sort((a, b) => b.r.y - a.r.y)[0];
-    const h = arg.gutter ? (beside || above) : (above || beside);
-    if (h) { used.add(h.e); it.label = h.e.textContent.replace(/\s+/g, ' ').trim(); it.caps = caps(h.e);
+    // a label INSIDE the item's own line wins: t8's "Also" block holds
+    // "<b>Tools</b> — Figma ..." under one "Also" heading
+    // (only at the START of the line: modern-t1's summary highlights a phrase
+    // mid-sentence in the heading style, and that is no label)
+    const inline = heads.find(c => !used.has(c.e) && c.e !== it.el && it.el.contains(c.e) && starts(c));
+    // contact lines take only a real heading above them: t22 labels each
+    // line ("Email", "Phone"), which is not the section's heading
+    const FIELD = /^(e-?mail|phone|mobile|tel|address|location|web(site)?|site|البريد|الهاتف|الجوال|العنوان|الموقع)/i;
+    const h = it.kind === 'contact' ? (above && !FIELD.test(labelOf(above.e)) ? above : null)
+            : inline || (arg.gutter ? (beside || above) : (above || beside));
+    if (h) { used.add(h.e); it.label = labelOf(h.e); it.caps = caps(h.e);
              it.fill = headFill(h.e); it.hcolor = hex(getComputedStyle(h.e).color); it.rule = ruleOf(h.e); }
   }
   // contact: one line, or stacked lines
@@ -342,7 +364,7 @@ def _default_label(kind: str, lang: str) -> str:
         reset_lang(token)
 
 
-def compile_lang(key: str, m: dict, lang: str) -> dict:
+def compile_lang(key: str, m: dict, lang: str, other: dict) -> dict:
     """One language's Word structure: which cell each item goes in, and the
     colours of each zone. See app/exporters/docx_layout.py for how it is drawn.
 
@@ -363,7 +385,11 @@ def compile_lang(key: str, m: dict, lang: str) -> dict:
         if kind == "contact" and not m["contact_stacked"] and it["zone"] != "side":
             kind = "contact_line"
         entry = {"k": kind}
-        if kind not in UNLABELLED:
+        # the other language's heading for this section, if the template
+        # gives it one there: then a missing one here is a measuring gap
+        # (t6's tools in Arabic), not the design (t1's summary has none)
+        twin = next((o for o in other["items"] if o["kind"] == it["kind"]), None)
+        if kind not in UNLABELLED and (it["label"] or (twin and twin["label"])):
             entry["label"] = it["label"] or _default_label(kind, lang)
             entry["caps"] = bool(it["caps"]) if it["label"] else lang == "en"
             if it["fill"]:
@@ -404,7 +430,7 @@ def compile_entry(key: str, en: dict, ar: dict) -> dict:
     tpl = registry.get(key)
     return {"archetype": arche, "side": _side_to_logical(en_side), "timeline": timeline,
             "skills": SKILLS[tpl.skill_pattern],
-            "en": compile_lang(key, en, "en"), "ar": compile_lang(key, ar, "ar")}
+            "en": compile_lang(key, en, "en", ar), "ar": compile_lang(key, ar, "ar", en)}
 
 
 def measure() -> dict:

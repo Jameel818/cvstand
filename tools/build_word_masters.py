@@ -682,10 +682,23 @@ def _bar(box):
     _pct_width(table, [5000 // BAR_SEGMENTS] * BAR_SEGMENTS)
     for i, cell in enumerate(table.rows[0].cells):
         tc_pr = cell._tc.get_or_add_tcPr()
+        colour = "{{ '%s' if sk.dots > %d else '%s' }}" % (BAR_ON, i, BAR_OFF)
+        # a hairline border in the segment's own colour: adjacent fills alone
+        # leave a light seam between the segments on screen
+        borders = OxmlElement("w:tcBorders")
+        for edge in ("left", "right"):
+            b = OxmlElement(f"w:{edge}")
+            b.set(qn("w:val"), "single")
+            b.set(qn("w:sz"), "4")
+            b.set(qn("w:space"), "0")
+            b.set(qn("w:color"), colour)
+            borders.append(b)
+        tc_pr.insert_element_before(borders, "w:shd", "w:noWrap", "w:tcMar", "w:textDirection",
+                                    "w:tcFitText", "w:vAlign", "w:hideMark")
         shd = OxmlElement("w:shd")
         shd.set(qn("w:val"), "clear")
         shd.set(qn("w:color"), "auto")
-        shd.set(qn("w:fill"), "{{ '%s' if sk.dots > %d else '%s' }}" % (BAR_ON, i, BAR_OFF))
+        shd.set(qn("w:fill"), colour)
         tc_pr.insert_element_before(shd, "w:noWrap", "w:tcMar", "w:textDirection",
                                     "w:tcFitText", "w:vAlign", "w:hideMark")
         para = cell.paragraphs[0]
@@ -916,6 +929,7 @@ def _build_layout(path: Path, lang: str):
     _cell_items(main, "Main", None)
     _ctag(main, "{%p endfor %}")
     _finish_cell(main)
+    _cant_split(table.rows[0])    # the band / header: never split either
     _cant_split(table.rows[2])
     table.cell(3, 0).paragraphs[0].add_run("{%tr endfor %}")
     end = doc.add_paragraph()

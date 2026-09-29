@@ -28,7 +28,9 @@ import pytest
 from lxml import etree
 
 from app import registry
+from app.exporters import docx_layout
 from app.exporters.docx import render_docx
+from app.schema import lang_of
 from tests.samples import ARABIC, ENGLISH
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -112,4 +114,11 @@ def test_headings_and_job_titles_keep_with_what_follows(key, data):
             nxt = paras[i + 1]
             if _style_of(nxt) != "CVRole":  # its company/date line, when there is one
                 assert _keeps_next(nxt), "the company/date line can part from its bullets"
-    assert headings >= 5 and roles >= 1, "the sample reaches headings and jobs"
+    spec = docx_layout.spec_for(key)
+    if spec and spec["archetype"] != "gutter":
+        # a Word LAYOUT shows exactly the headings its template's PDF shows
+        want = sum(1 for c in docx_layout.layouts()[key][lang_of(data)]["cells"].values()
+                   for i in c if i.get("label"))
+        assert headings == want and roles >= 1, f"{headings} headings, the layout has {want}"
+    else:
+        assert headings >= 5 and roles >= 1, "the sample reaches headings and jobs"

@@ -34,7 +34,16 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    Word tests 750 passed (test_docx_layouts.py 241); fast suite 3682 passed
    / 0 failed; `build_word_layouts.py --check` OK. Real Word (this PC): 24/24
    files open, 0 flow failures (t3/t5/t17 AR flow to 2 pages: accepted).
-2. ⏳ Band (7). 3. ⏳ Open (4). 4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
+2. ✅ **Band (7 templates: t7 8 11 13 14 18 21), EN + AR.** Word tests 912
+   passed; fast suite 3819 passed / 0 failed; `--check` OK. Real Word: 14/14
+   open, 0 flow failures. Fixed on the way (measurement): t8's inline labels
+   ("Also" block), t14's tools heading was a certification title, t15's
+   `<br>` in headings, t1's summary highlight read as a heading, t22's per-line
+   "Email" label, t5/t9/t18 "Contact" headings taken by the chips beside them,
+   t11's white pseudo-pill (a sibling band is not an item's own ground). Export:
+   t13 one-column grid, band strip z-order (t21), 0.75pt overlap between fills
+   (t18 seam), hairline same-colour borders on bar segments.
+3. ⏳ Open (4). 4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
    verification. 6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 

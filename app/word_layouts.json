@@ -60,12 +60,7 @@
        "k": "name"
       },
       {
-       "caps": false,
-       "fill": "D8F035",
-       "hcolor": "3A3A42",
-       "k": "summary",
-       "label": "الصمود بعد التسليم",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -157,12 +152,7 @@
        "k": "name"
       },
       {
-       "caps": false,
-       "fill": "D8F035",
-       "hcolor": "3A3A42",
-       "k": "summary",
-       "label": "survive handover",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -244,10 +234,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "contact",
-       "label": "التواصل",
-       "rule": false
+       "k": "contact"
       },
       {
        "caps": false,
@@ -347,10 +334,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "contact",
-       "label": "Contact",
-       "rule": false
+       "k": "contact"
       },
       {
        "caps": false,
@@ -439,10 +423,7 @@
      ],
      "side": [
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       },
       {
        "caps": true,
@@ -475,8 +456,6 @@
        "k": "achievements"
       },
       {
-       "bg": "FFFFFF",
-       "color": "08211C",
        "k": "contact_line"
       }
      ],
@@ -546,10 +525,7 @@
      ],
      "side": [
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       },
       {
        "caps": true,
@@ -582,8 +558,6 @@
        "k": "achievements"
       },
       {
-       "bg": "FFFFFF",
-       "color": "08211C",
        "k": "contact_line"
       }
      ],
@@ -799,10 +773,7 @@
     "cells": {
      "main": [
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       },
       {
        "caps": true,
@@ -832,8 +803,6 @@
      "side": [],
      "top_full": [
       {
-       "bg": "0E2D55",
-       "color": "C7D4E4",
        "k": "contact_line"
       },
       {
@@ -886,10 +855,7 @@
     "cells": {
      "main": [
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       },
       {
        "caps": true,
@@ -919,8 +885,6 @@
      "side": [],
      "top_full": [
       {
-       "bg": "0E2D55",
-       "color": "C7D4E4",
        "k": "contact_line"
       },
       {
@@ -1041,10 +1005,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       }
      ]
     },
@@ -1108,7 +1069,7 @@
       {
        "caps": false,
        "k": "tools",
-       "label": "Editorial Redesign, Gold",
+       "label": "Tools",
        "rule": false
       }
      ],
@@ -1152,10 +1113,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       }
      ]
     },
@@ -1203,10 +1161,7 @@
     "cells": {
      "main": [
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -1228,13 +1183,13 @@
       {
        "caps": false,
        "k": "contact",
-       "label": "المعلوماتالشخصية",
+       "label": "المعلومات الشخصية",
        "rule": false
       },
       {
        "caps": false,
        "k": "education",
-       "label": "التعليموالمؤهلات",
+       "label": "التعليم والمؤهلات",
        "rule": false
       },
       {
@@ -1310,10 +1265,7 @@
     "cells": {
      "main": [
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -1335,13 +1287,13 @@
       {
        "caps": true,
        "k": "contact",
-       "label": "PERSONALINFORMATION",
+       "label": "PERSONAL INFORMATION",
        "rule": false
       },
       {
        "caps": true,
        "k": "education",
-       "label": "EDUCATION &QUALIFICATIONS",
+       "label": "EDUCATION & QUALIFICATIONS",
        "rule": false
       },
       {
@@ -1424,10 +1376,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -1527,10 +1476,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -1655,6 +1601,8 @@
      "side": [
       {
        "caps": false,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
        "k": "contact",
        "label": "التواصل",
        "rule": false
@@ -1698,10 +1646,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       }
      ]
     },
@@ -1814,10 +1759,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       }
      ]
     },
@@ -1903,10 +1845,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_side": [
@@ -1972,7 +1911,7 @@
      ],
      "side": [
       {
-       "caps": true,
+       "caps": false,
        "k": "contact",
        "label": "Contact",
        "rule": false
@@ -1993,10 +1932,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_side": [
@@ -2052,8 +1988,6 @@
        "k": "title"
       },
       {
-       "bg": "FFFFFF",
-       "color": "54545E",
        "k": "contact_line"
       },
       {
@@ -2147,8 +2081,6 @@
        "k": "title"
       },
       {
-       "bg": "FFFFFF",
-       "color": "54545E",
        "k": "contact_line"
       },
       {
@@ -2243,10 +2175,7 @@
     "cells": {
      "main": [
       {
-       "caps": false,
-       "k": "contact",
-       "label": "التواصل",
-       "rule": false
+       "k": "contact"
       },
       {
        "k": "achievements"
@@ -2345,10 +2274,7 @@
     "cells": {
      "main": [
       {
-       "caps": true,
-       "k": "contact",
-       "label": "Contact",
-       "rule": false
+       "k": "contact"
       },
       {
        "k": "achievements"
@@ -2454,10 +2380,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -2557,10 +2480,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       },
       {
        "k": "achievements"
@@ -2585,7 +2505,7 @@
       {
        "caps": true,
        "k": "contact",
-       "label": "Contact",
+       "label": "CONTACT",
        "rule": false
       },
       {
@@ -2919,10 +2839,7 @@
      ],
      "side": [
       {
-       "caps": false,
-       "k": "contact",
-       "label": "التواصل",
-       "rule": false
+       "k": "contact"
       },
       {
        "caps": false,
@@ -2939,10 +2856,7 @@
        "k": "title"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -2999,10 +2913,7 @@
      ],
      "side": [
       {
-       "caps": false,
-       "k": "contact",
-       "label": "Email",
-       "rule": false
+       "k": "contact"
       },
       {
        "caps": false,
@@ -3019,10 +2930,7 @@
        "k": "title"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -3385,7 +3293,9 @@
        "k": "photo"
       },
       {
-       "caps": true,
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
        "k": "contact",
        "label": "Contact",
        "rule": false
@@ -3931,6 +3841,8 @@
       },
       {
        "caps": false,
+       "fill": "FFFFFF",
+       "hcolor": "1A1A1A",
        "k": "contact",
        "label": "التواصل",
        "rule": false
@@ -4047,7 +3959,9 @@
        "k": "photo"
       },
       {
-       "caps": true,
+       "caps": false,
+       "fill": "FFFFFF",
+       "hcolor": "1A1A1A",
        "k": "contact",
        "label": "Contact",
        "rule": false
@@ -4179,15 +4093,10 @@
        "k": "title"
       },
       {
-       "bg": "FFFFFF",
-       "color": "4A4A4A",
        "k": "contact_line"
       },
       {
-       "caps": false,
-       "k": "summary",
-       "label": "الملف الشخصي",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -4276,15 +4185,10 @@
        "k": "title"
       },
       {
-       "bg": "FFFFFF",
-       "color": "4A4A4A",
        "k": "contact_line"
       },
       {
-       "caps": true,
-       "k": "summary",
-       "label": "Profile",
-       "rule": false
+       "k": "summary"
       }
      ],
      "top_main": [],
@@ -4568,22 +4472,20 @@
       },
       {
        "caps": false,
-       "fill": "DCE6F2",
-       "hcolor": "003366",
        "k": "recognition",
-       "label": "أيضاً",
-       "rule": false
-      },
-      {
-       "caps": false,
-       "k": "tools",
        "label": "التقدير",
        "rule": false
       },
       {
        "caps": false,
-       "k": "languages",
+       "k": "tools",
        "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "اللغات",
        "rule": false
       }
      ],
@@ -4685,23 +4587,21 @@
        "rule": false
       },
       {
-       "caps": true,
-       "fill": "DCE6F2",
-       "hcolor": "003366",
-       "k": "recognition",
-       "label": "ALSO",
-       "rule": false
-      },
-      {
        "caps": false,
-       "k": "tools",
+       "k": "recognition",
        "label": "Recognition",
        "rule": false
       },
       {
        "caps": false,
-       "k": "languages",
+       "k": "tools",
        "label": "Tools",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "Languages",
        "rule": false
       }
      ],
@@ -4823,10 +4723,10 @@
        "k": "title"
       },
       {
-       "caps": false,
+       "caps": true,
        "k": "contact",
        "label": "التواصل",
-       "rule": false
+       "rule": true
       },
       {
        "caps": true,
@@ -4923,7 +4823,7 @@
        "caps": true,
        "k": "contact",
        "label": "Contact",
-       "rule": false
+       "rule": true
       },
       {
        "caps": true,

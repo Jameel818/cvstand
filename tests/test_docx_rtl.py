@@ -68,8 +68,12 @@ def _master_bytes(name: str) -> bytes:
 @pytest.mark.parametrize("key", ["ats-t1", "modern-t1", "ats-t20", "modern-t14"])
 def test_an_arabic_resume_gets_the_rtl_master(key):
     tpl = registry.get(key)
-    assert _master_for(tpl, EN) == tpl.docx_master
-    assert _master_for(tpl, {**EN, "lang": "ar"}).endswith("_rtl.docx")
+    # a Modern template on a Word LAYOUT uses the layout master, the rest their
+    # category's (docs/WORD_LAYOUTS_PLAN.md)
+    from app.exporters import docx_layout
+    english = docx_layout.master_for(key) or tpl.docx_master
+    assert _master_for(tpl, EN) == english
+    assert _master_for(tpl, {**EN, "lang": "ar"}) == english.replace(".docx", "_rtl.docx")
 
 
 def test_a_resume_with_no_lang_gets_the_english_master():

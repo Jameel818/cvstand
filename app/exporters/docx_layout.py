@@ -50,7 +50,7 @@ LAYOUTS_PATH = Path(__file__).resolve().parent.parent / "word_layouts.json"
 
 #: Archetypes whose templates use the layout masters. The others keep the
 #: single-column Modern master until their milestone lands (plan §8).
-ARCHETYPES_ON = ("sidebar",)
+ARCHETYPES_ON = ("sidebar", "band")
 
 PAGE_W = 12240                  # Letter, twips (8.5in); the canvas is 850 x 1100 px
 PAGE_H_PT = 792
@@ -59,6 +59,7 @@ TOP_MARGIN_PT = 28.8            # 0.4in: the layout master's top/bottom margin
 PAD_SIDE = 432                  # 0.3in either side of a side column's text
 PAD_MAIN = 540                  # 0.375in either side of the main column's text
 PAD_TOP = 200                   # a cell's text starts 10pt below its top edge
+SEAM = 0.75                     # pt of overlap between two neighbouring fills
 
 
 @lru_cache(maxsize=1)
@@ -296,7 +297,7 @@ def _rect(x_pt: float, w_pt: float, y_pt: float, h_pt: float, color: str, n: int
     return (f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
             f'{_VML_NS}><w:pict><v:rect id="cvstand_fill_{n}" o:allowincell="f" '
             f'style="position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
-            f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:-{251658240 + n};'
+            f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:{n - 251658240};'
             f'mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
             f'fillcolor="#{color}" stroked="f"/></w:pict></w:r>')
 
@@ -304,7 +305,8 @@ def _rect(x_pt: float, w_pt: float, y_pt: float, h_pt: float, color: str, n: int
 def _header_shapes(section, rects_all: list, rects_first: list) -> None:
     """Coloured rectangles behind the text, placed on the PAGE: `rects_all` on
     every page, `rects_first` on the first one only (the band's strip above
-    the table). Headers repeat on every page, so the side column is full
+    the table), drawn later = in front (a full-width band's strip covers the
+    side column's fill above the band, modern-t21). Headers repeat on every page, so the side column is full
     height on page 2 too."""
     def fill(header, rects):
         header.is_linked_to_previous = False
@@ -378,7 +380,8 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
         top = _tcs(rows[0])
         if lay["_full_top"] or not has_side:     # one cell across the page
             rows[0].remove(top[1])
-            _span(top[0], 2)
+            if has_side:
+                _span(top[0], 2)
             cell_of[top[0]] = "top_side"
             zone.pop("top_main")
         else:
@@ -388,9 +391,8 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
         body = _tcs(tr)
         if has_side:
             cell_of[body[0]], cell_of[body[1]] = "side", "main"
-        else:
+        else:                        # no side column: a one-column grid
             tr.remove(body[0])
-            _span(body[1], 2)
             cell_of[body[1]] = "main"
     if not has_side:
         zone.pop("side")
@@ -431,7 +433,11 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
         # logical start = left in English, right in Arabic
         return 0.0 if start != rtl else PAGE_W_PT - w_pt
     if has_side and L["side_bg"]:
-        rects_all.append((x_of(spec["side"] != "end", side_pt), side_pt, 0.0, float(PAGE_H_PT),
+        # 0.75pt wider than the column, reaching under its neighbour: two fills
+        # that only ABUT leave a light hairline between them on screen
+        wide = side_pt + SEAM
+        x = x_of(spec["side"] != "end", side_pt)
+        rects_all.append((x if x == 0.0 else x - SEAM, wide, 0.0, float(PAGE_H_PT),
                           L["side_bg"]))
     if band and top_items:
         if band["span"] == "full" or not has_side:
@@ -557,16 +563,17 @@ def _apply_styles(document, spec, lang, resolved, cell_zone: dict, bgs: dict, ce
             text = readable((colours.get(cell_zone[cell]) or colours["main"]).get("text"), bg, 4.5)
             on = accent if contrast(accent, bg) >= 1.6 else text
             off = blend(bg, text, 0.22)
-            for shd in tc.iter(qn("w:shd")):
-                fill = (shd.get(qn("w:fill")) or "").upper()
-                if fill == BAR_ON:
-                    shd.set(qn("w:fill"), on)
-                elif fill == BAR_OFF:
-                    shd.set(qn("w:fill"), off)
+            _recolour_bars(tc, on, off)
     else:
-        for shd in document.element.body.iter(qn("w:shd")):
-            fill = (shd.get(qn("w:fill")) or "").upper()
-            if fill == BAR_ON:
-                shd.set(qn("w:fill"), accent)
-            elif fill == BAR_OFF:
-                shd.set(qn("w:fill"), "E4E4E4")
+        _recolour_bars(document.element.body, accent, "E4E4E4")
+
+
+def _recolour_bars(root, on: str, off: str) -> None:
+    """The skill bars' placeholder colours - fills and their seam borders."""
+    for el in root.iter(qn("w:shd"), qn("w:left"), qn("w:right")):
+        attr = qn("w:fill") if el.tag == qn("w:shd") else qn("w:color")
+        val = (el.get(attr) or "").upper()
+        if val == BAR_ON:
+            el.set(attr, on)
+        elif val == BAR_OFF:
+            el.set(attr, off)
