@@ -16,8 +16,10 @@ WHAT IT CLAIMS, per language, on a server configured like the public one
     1. the request the button sends carries the chosen template_key and the
        chosen font keys;
     2. the file's name / heading / body styles use those fonts;
-    3. the name carries the TEMPLATE's accent (text-safe variant), not the
-       master's built-in navy;
+    3. the name carries the TEMPLATE's own colour, never the master's
+       placeholder navy: on a Word layout the colour measured from the PDF,
+       readable on the cell it sits on (docs/WORD_LAYOUTS_PLAN.md §10.4);
+       on the single-column master the readable accent;
     4. every face those styles draw is embedded in the file.
 """
 from __future__ import annotations
@@ -27,11 +29,14 @@ import re
 import zipfile
 
 import pytest
+from lxml import etree
 from playwright.sync_api import expect
 
+from app.exporters import docx_layout
 from app.exporters.docx_theme import RULE_ACCENT, text_safe, themes
 
 pytestmark = pytest.mark.e2e
+W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
 EXPORT_TIMEOUT = 120_000
 
@@ -114,22 +119,42 @@ def test_the_word_button_sends_and_gets_the_chosen_template_and_fonts(
     z = zipfile.ZipFile(io.BytesIO(blob))
     styles = z.read("word/styles.xml").decode("utf-8")
 
-    # 2. the fonts, in the role styles
-    for style_id, want in word_names.items():
+    # 2. the fonts, in the styles the text really uses. The name's style is
+    #    the one its RUN carries: on a Word LAYOUT (docs/WORD_LAYOUTS_PLAN.md)
+    #    a name in a band or a side column has that cell's own style.
+    doc = etree.fromstring(z.read("word/document.xml"))
+    name = body["data"]["name"]
+    name_run = next(r for r in doc.iter(f"{W}r")
+                    if "".join(t.text or "" for t in r.iter(f"{W}t")).strip() == name)
+    name_style = name_run.find(f"{W}rPr/{W}rStyle").get(f"{W}val")
+    used = dict(word_names, **{name_style: word_names["CVName"]})
+    if name_style != "CVName":
+        del used["CVName"]
+    for style_id, want in used.items():
         assert _family(_style(styles, style_id)) == want, (
             f"{style_id} draws {_family(_style(styles, style_id))!r}, expected {want!r}")
 
-    # 3. the template's accent, not the master's navy
-    accent = text_safe(themes()[key][lang]["accent"].lstrip("#")).upper()
-    got = _color(_style(styles, "CVName"))
-    assert got == accent, f"name colour {got}, template {key} accent is {accent}"
+    # 3. the template's OWN name colour, not the master's placeholder navy: a
+    #    layout takes it as measured from the PDF, readable on the cell it sits
+    #    on; the single-column master takes the readable accent
+    got = _color(_style(styles, name_style))
+    if docx_layout.spec_for(key):
+        cell = next(a for a in name_run.iterancestors() if a.tag == f"{W}tc")
+        shd = cell.find(f"{W}tcPr/{W}shd")
+        ground = shd.get(f"{W}fill") if shd is not None else "FFFFFF"
+        want = docx_layout.readable(docx_layout.layouts()[key][lang]["name"]["color"], ground)
+    else:
+        want = text_safe(themes()[key][lang]["accent"].lstrip("#")).upper()
+    assert got == want, f"name colour {got}, template {key} gives {want}"
     assert got != RULE_ACCENT.upper()
 
-    # 4. every face those styles draw is embedded
+    # 4. every face those styles draw is embedded: one font part per embedded
+    #    face (a Regular and its Bold share one name, so count the entries)
     table = z.read("word/fontTable.xml").decode("utf-8")
     embedded = set(re.findall(
         r'<w:font w:name="([^"]+)">(?:(?!</w:font>).)*?<w:embed', table, re.S))
     assert set(word_names.values()) <= embedded, (
         f"not embedded: {set(word_names.values()) - embedded}")
     assert "embedTrueTypeFonts" in z.read("word/settings.xml").decode("utf-8")
-    assert sum(n.endswith(".odttf") for n in z.namelist()) == len(embedded)
+    entries = len(re.findall(r"<w:embed(?:Regular|Bold|Italic|BoldItalic) ", table))
+    assert sum(n.endswith(".odttf") for n in z.namelist()) == entries

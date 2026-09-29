@@ -1,4 +1,4 @@
-# RESUME HERE — 2026-09-30 overnight (WORD LAYOUTS being built on `feature/word-layouts`; main = `e56240d`, live, untouched)
+# RESUME HERE — 2026-09-30 (WORD LAYOUTS BUILT on `feature/word-layouts`, all 24 Modern templates, 48/48 real Word, full suite green; NOT merged; main = `e56240d`, live, untouched)
 
 ## 🌙 OVERNIGHT RUN — Word layouts (user asleep; approved plan, decisions in plan §9–§10)
 Branch `feature/word-layouts` from `main` `e56240d` (+ cherry-picks of the
@@ -75,7 +75,24 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    `C:\Users\User\Desktop\CVStand Word layouts review` = the page + img + the
    48 new .docx (`docx/`) + README.txt. Built by scratch scripts
    (review_stage_a/c.py; main's .docx made in a temp worktree `C:\cvmain`).
-7. ⏳ Full suite.
+7. ✅ **Full suite (--e2e): 5419 passed / 24 skipped / 0 failed / 0 errors**
+   (28m). First run had 2 failures, both in test_word_follows_the_builder.py
+   asserting the pre-layout design (name = accent; one font part per NAME):
+   now it reads the style the name's RUN uses, expects the template's
+   measured name colour on its own cell's fill, and counts one part per
+   embed ENTRY (Regular + Bold share a name). No test weakened.
+8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` (plan only; found: Word applies the
+   chosen fonts but never the chosen SIZES - DECIDE (2) there).
+
+### ⏭ FOR THE USER (morning)
+1. Review `docs/review/word_layouts_review.html` (or the Desktop folder
+   "CVStand Word layouts review", which also has the 48 .docx) and plan §10
+   (17 decisions made overnight).
+2. Optional: the Word 2013 PC check with a few of the 48 .docx.
+3. Merge `feature/word-layouts` → main only on the user's go-ahead. **Pushing
+   main DEPLOYS** (Railway): full suite + `verify_docker_context.py` +
+   `test_requirements_cover_imports.py` first.
+4. Then typography step 7 (plan written).
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
 ## ⏭ NEXT, in this order (each needs the user's go-ahead)
