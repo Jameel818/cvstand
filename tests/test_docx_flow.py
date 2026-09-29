@@ -53,16 +53,27 @@ def _keeps_next(p) -> bool:
     return p.find(f"{W}pPr/{W}keepNext") is not None
 
 
+def _grid_cols(tbl) -> int:
+    return len(tbl.findall(f"{W}tblGrid/{W}gridCol"))
+
+
 def _body_paragraphs(doc):
-    """Paragraphs with text, in order, outside tables (the chip row's cells
-    use the heading style for their metrics, and a cell cannot break)."""
+    """Paragraphs with text, in order, that flow down the page: in the body,
+    or in a Word LAYOUT's cells (docs/WORD_LAYOUTS_PLAN.md: the side and
+    main columns are table cells, at most 2 across). Not in the chip row or a
+    skill bar (4-5 cells across): the chips use the heading style for their
+    metrics, and such a row cannot break."""
     out = []
     for p in doc.iter(f"{W}p"):
-        if any(a.tag == f"{W}tbl" for a in p.iterancestors()):
+        if any(a.tag == f"{W}tbl" and _grid_cols(a) > 2 for a in p.iterancestors()):
             continue
         if "".join(t.text or "" for t in p.iter(f"{W}t")).strip():
             out.append(p)
     return out
+
+
+#: A section heading's character style: the role style, or a layout cell's own.
+HEADING_STYLES = {"CVHeading", "CVTopSideHeading", "CVTopMainHeading", "CVSideHeading"}
 
 
 @pytest.mark.parametrize("master", MASTERS, ids=lambda p: p.name)
@@ -92,7 +103,7 @@ def test_headings_and_job_titles_keep_with_what_follows(key, data):
     headings = roles = 0
     for i, p in enumerate(paras):
         style = _style_of(p)
-        if style == "CVHeading":
+        if style in HEADING_STYLES:
             headings += 1
             assert _keeps_next(p), f"heading {''.join(p.itertext())!r} can be orphaned"
         elif style == "CVRole":

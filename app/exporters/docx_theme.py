@@ -60,6 +60,39 @@ ST_ACCENT_TEXT = "CV Accent Text"
 #: find it and recolour it with the template's own accent.
 RULE_ACCENT = "1F3A5F"
 
+# ---- the Word LAYOUTS (docs/WORD_LAYOUTS_PLAN.md) ------------------------------
+#: Cells of the layout master's table other than the main column. Each has its
+#: own set of role styles, because the same role is white on a navy sidebar and
+#: navy on a white page; app/exporters/docx_layout.py colours them per template.
+#: The MAIN column uses the role styles above, so docx_theme styles it as before.
+LAYOUT_CELLS = ("TopSide", "TopMain", "Side")
+CELL_ROLES = ("Name", "Heading", "Text", "Bold", "Accent", "Metric")
+#: The stat chips' numbers: the heading FACE, but their own colour - a heading
+#: may be white on a dark pill (modern-t5, t24) while the chips stand on the page.
+ST_METRIC = "CV Metric"
+#: Contact line: one character + one paragraph style, so a template whose
+#: contact sits on its own pill (modern-t21) can be filled and recoloured.
+ST_CONTACT = "CV Contact"
+PS_CONTACT = "CV Contact Para"
+#: Skill-bar segment fills, recoloured at export (accent / track).
+BAR_ON = "BA0001"
+BAR_OFF = "BA0002"
+
+
+def cell_style(cell: str, role: str) -> str | None:
+    """The character style for `role` text in `cell` ("Main" = the role styles;
+    None = plain Normal text)."""
+    if cell == "Main":
+        return {"Name": ST_NAME, "Heading": ST_HEADING, "Text": None, "Bold": ST_BODY_BOLD,
+                "Accent": ST_ACCENT_TEXT, "Role": ST_ROLE, "Metric": ST_METRIC}[role]
+    return f"CV {cell} {'Bold' if role == 'Role' else role}"
+
+
+def head_para_style(cell: str) -> str:
+    """Paragraph style of a section heading in `cell`: its fill (ribbon /
+    pill headings) and its rule are set per template at export."""
+    return f"CV Head {cell}"
+
 INK = "17181A"
 
 THEMES_PATH = Path(__file__).resolve().parent.parent / "word_themes.json"
@@ -268,7 +301,12 @@ def faces_used(resolved: dict) -> set[tuple[str, int]]:
 
 
 _STYLE_ROLE = {ST_NAME: "name", ST_HEADING: "heading", ST_ROLE: "role",
-               ST_BODY_BOLD: "body_bold", ST_ACCENT_TEXT: "body"}
+               ST_BODY_BOLD: "body_bold", ST_ACCENT_TEXT: "body", ST_CONTACT: "body"}
+_CELL_ROLE_FACE = {"Name": "name", "Heading": "heading", "Text": "body", "Bold": "body_bold",
+                   "Accent": "body", "Metric": "heading"}
+_STYLE_ROLE.update({cell_style(c, r): face for c in LAYOUT_CELLS
+                    for r, face in _CELL_ROLE_FACE.items()})
+_STYLE_ROLE[ST_METRIC] = "heading"
 
 
 def faces_drawn(document, resolved: dict) -> set[tuple[str, int]]:

@@ -1,11 +1,48 @@
-# RESUME HERE — paused 2026-09-29 (typography steps 1–6 MERGED to main and LIVE at `e56240d` / deployment `78d1c5ed`; Word "looks plain" investigated = no defect; Word layouts plan written, AWAITING USER REVIEW)
+# RESUME HERE — 2026-09-30 overnight (WORD LAYOUTS being built on `feature/word-layouts`; main = `e56240d`, live, untouched)
+
+## 🌙 OVERNIGHT RUN — Word layouts (user asleep; approved plan, decisions in plan §9–§10)
+Branch `feature/word-layouts` from `main` `e56240d` (+ cherry-picks of the
+test/plan commits). **Never push main / merge / deploy.** Work order and
+checkpoints: see the user's overnight message, mirrored in the plan §9.
+- **Measured, not hand-mapped:** `tools/build_word_layouts.py` →
+  `app/word_layouts.json` (24 templates × EN/AR: cells, order, template's
+  own headings, zone colours, side width, band, photo; `--check`; fails unless
+  it finds exactly the sections the template source uses).
+- **Masters:** `modern_layout(.docx/_rtl)` = 2x2 table [top side|top main] /
+  [side|main], each cell loops `lay.<cell>`; `modern_gutter` for t19. Built
+  by `tools/build_word_masters.py <names>` (names only: the ATS/editorial
+  masters stay byte-identical). Word 2013 mode (compat 15) on these only.
+- **Export:** `app/exporters/docx_layout.py` (`context()` + `apply()`),
+  gated by `ARCHETYPES_ON` (one archetype per milestone).
+- **Traps found:** docxtpl `fix_tables()` widens the OUTER grid to the
+  widest NESTED row (5-segment bars → 5 grid cols) → `_grid()` rewrites it.
+  Word 2010 compat mode shifts a table left by its first cell's padding →
+  compat 15. Word COM PDF → PNG: scratch `wordshots.py` + pdf.js.
+- **Shell classifier outage** mid-run: Bash/PowerShell calls got "no verdict"
+  ~8 times in a row; file tools kept working.
+- **Page breaks:** Word IGNORES keep-with-next between paragraphs inside a
+  table cell that breaks across pages (t5 AR orphaned "الشهادات"). Fix: main
+  column = one `cantSplit` row per block (a section + heading; each job its
+  own row, the first carrying the heading); the side column = ONE cell
+  vMerge'd down all rows. `docx_layout.blocks()`.
+- **Chip numbers** got their own "Metric" style: a heading can be white on a
+  dark pill (t5, t24) while the chips stand on the page (the contrast test
+  caught white-on-white).
+
+### Milestone status
+1. ✅ **Sidebar (12 templates: t2 3 4 5 9 10 15 16 17 20 23 24), EN + AR.**
+   Word tests 750 passed (test_docx_layouts.py 241); fast suite 3682 passed
+   / 0 failed; `build_word_layouts.py --check` OK. Real Word (this PC): 24/24
+   files open, 0 flow failures (t3/t5/t17 AR flow to 2 pages: accepted).
+2. ⏳ Band (7). 3. ⏳ Open (4). 4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
+   verification. 6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
+8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
 ## ⏭ NEXT, in this order (each needs the user's go-ahead)
-1. **User reviews `docs/WORD_LAYOUTS_PLAN.md`** (option 2: 4 Word archetypes
-   for the 24 Modern templates) and answers its §9 decisions. No code yet.
-2. **Typography step 7** (calibration, §4.1 / §7.4) on a NEW branch from
-   `main`: plan → approval first. The order vs. the Word layouts work is
-   decision 6 in the plan.
+1. ~~User reviews `docs/WORD_LAYOUTS_PLAN.md`~~ approved 2026-09-29 → being
+   built (above).
+2. **Typography step 7** (calibration, §4.1 / §7.4) AFTER the Word layouts
+   (decision 6), on a new branch from `main`: plan → approval first.
 3. **Pushing `main` DEPLOYS** (Railway auto-deploy): it needs explicit deploy
    approval, with `verify_docker_context.py`,
    `tests/test_requirements_cover_imports.py` and the full suite first.

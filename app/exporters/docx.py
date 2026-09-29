@@ -22,7 +22,7 @@ from pathlib import Path
 from .. import registry
 from ..config import UPLOADS_DIR, WORD_MASTERS_DIR
 from ..schema import DOT_TOTAL, dots_for, lang_of, normalize
-from . import docx_font_embed, docx_theme
+from . import docx_font_embed, docx_layout, docx_theme
 
 
 log = logging.getLogger(__name__)
@@ -45,12 +45,17 @@ class DocxExportError(RuntimeError):
 _RTL_MASTERS = {
     "ats_standard.docx": "ats_standard_rtl.docx",
     "modern_editorial.docx": "modern_editorial_rtl.docx",
+    "modern_layout.docx": "modern_layout_rtl.docx",
+    "modern_gutter.docx": "modern_gutter_rtl.docx",
 }
 
 
 def _master_for(tpl, data: dict) -> str:
-    """The master filename for this template AND this resume's language."""
-    name = tpl.docx_master
+    """The master filename for this template AND this resume's language.
+
+    A Modern template with a Word layout (docs/WORD_LAYOUTS_PLAN.md) uses the
+    layout masters; every other template its category's master."""
+    name = docx_layout.master_for(tpl.key) or tpl.docx_master
     if not name or lang_of(data) != "ar":
         return name
     rtl = _RTL_MASTERS.get(name)
@@ -73,6 +78,13 @@ def _dot_glyphs(level: str) -> str:
     if not filled:
         return ""
     return "●" * filled + "○" * (DOT_TOTAL - filled)  # ● / ○
+
+
+def _contact_items(contact: dict) -> list[str]:
+    """The contact details one per line, for a template that stacks them."""
+    bits = [contact.get(k, "") for k in ("email", "phone", "address", "site")]
+    bits += [s.get("label", "") for s in contact.get("social", [])]
+    return [b.strip() for b in bits if (b or "").strip()]
 
 
 def _contact_line(contact: dict) -> str:
@@ -110,15 +122,40 @@ def _photo(doc, photo_url: str):
         return ""
 
 
-def _context(data: dict, doc=None) -> dict:
+def _context(data: dict, doc=None, template_key: str | None = None) -> dict:
     r = normalize(data)
     for sk in r.get("skills", []):
         sk["dot_glyphs"] = _dot_glyphs(sk.get("level", ""))
+        sk["dots"] = dots_for(sk.get("level", ""))
     for lang in r.get("languages", []):
         lang["dot_glyphs"] = _dot_glyphs(lang.get("level", ""))
     r["contact_line"] = _contact_line(r.get("contact") or {})
-    photo = _photo(doc, r.get("photo_url", "")) if doc is not None else ""
-    return {"r": r, "photo": photo}
+    r["contact_items"] = _contact_items(r.get("contact") or {})
+    layout = template_key is not None and docx_layout.spec_for(template_key) is not None
+    if doc is None:
+        photo = ""
+    elif layout:
+        photo = _layout_photo(doc, r.get("photo_url", ""), template_key, lang_of(data))
+    else:
+        photo = _photo(doc, r.get("photo_url", ""))
+    ctx = {"r": r, "photo": photo}
+    if layout:
+        ctx["lay"] = docx_layout.context(r, template_key, lang_of(data), photo)
+    return ctx
+
+
+def _layout_photo(doc, photo_url: str, template_key: str, lang: str):
+    """The photo at its template's size and shape (round where the PDF's is),
+    or "" - the same guard as _photo."""
+    if not photo_url:
+        return ""
+    path = UPLOADS_DIR / Path(photo_url).name
+    if not path.exists():
+        return ""
+    try:
+        return docx_layout.photo_image(doc, path, template_key, lang)
+    except Exception:  # noqa: BLE001 - a bad image must not fail the export
+        return ""
 
 
 def render_docx(data: dict, template_key: str) -> bytes:
@@ -149,11 +186,15 @@ def render_docx(data: dict, template_key: str) -> bytes:
     # autoescape is REQUIRED: without it docxtpl writes user text straight into
     # the document XML, so an "&" in a company name ("Halden & Row") is dropped
     # and "<" can corrupt the package.
-    doc.render(_context(data, doc), autoescape=True)
+    ctx = _context(data, doc, template_key)
+    doc.render(ctx, autoescape=True)
     # The template's accent and fonts, or the user's chosen fonts (step 5):
     # rewrites the master's role styles, so it runs on the filled document.
     resolved = docx_theme.resolve(data, template_key)
     docx_theme.apply(doc.docx, resolved)
+    if "lay" in ctx:
+        # the template's SHAPE: columns, band, fills, zone colours (the plan)
+        docx_layout.apply(doc.docx, template_key, lang_of(data), resolved, ctx["lay"])
     faces = docx_theme.faces_drawn(doc.docx, resolved)
     buf = io.BytesIO()
     doc.save(buf)

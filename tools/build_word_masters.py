@@ -569,6 +569,398 @@ def _build_modern(path: Path, lang: str = "en"):
     return path
 
 
+# ------------------------------------------------------------ the Word LAYOUTS
+#
+# docs/WORD_LAYOUTS_PLAN.md. The Modern templates' SHAPE in Word: a side
+# column, a band, a plain header, a gutter. Two masters (+ RTL twins) serve all
+# 24, because what differs per template is DATA, measured into
+# app/word_layouts.json by tools/build_word_layouts.py:
+#
+#   modern_layout   one 2x2 table: [top side | top main] over [side | main].
+#                   Each cell loops over ITS ordered item list (lay.top_side,
+#                   lay.side, ...), so every template's sections land in the
+#                   same column and order as its PDF. At export
+#                   app/exporters/docx_layout.py merges the top row (a band
+#                   across both columns, an open layout's header), drops an
+#                   empty row or the side column, swaps the columns for a
+#                   right-hand side column, sets widths, fills and colours.
+#   modern_gutter   modern-t19: section titles in a narrow gutter beside
+#                   their content, one table row per section.
+#
+# Every cell is written from ONE dispatch (_cell_items), so a section looks
+# the same wherever a template puts it; only its cell's styles differ.
+
+from app.exporters.docx_theme import (  # noqa: E402
+    BAR_OFF, BAR_ON, LAYOUT_CELLS, PS_CONTACT, ST_CONTACT, cell_style, head_para_style,
+)
+
+BAR_SEGMENTS = 5          # one per dot: the level is dots_for(level) of 5
+
+
+def _cp(box, text="", *, size=10, rstyle=None, pstyle=None, before=0, after=2):
+    """One paragraph, one run, in a cell (or the body): `_p` for containers."""
+    para = box.add_paragraph(style=pstyle)
+    run = para.add_run(text, style=rstyle)
+    if size is not None:
+        run.font.size = Pt(size)
+    fmt = para.paragraph_format
+    fmt.space_before = Pt(before)
+    fmt.space_after = Pt(after)
+    return para
+
+
+def _cruns(box, parts, *, size=10, after=1, pstyle=None, keep=False):
+    """One paragraph of several runs, each (text, style) - a tag never spans runs."""
+    para = box.add_paragraph(style=pstyle)
+    for text, style in parts:
+        run = para.add_run(text, style=style)
+        run.font.size = Pt(size)
+    para.paragraph_format.space_before = Pt(0)
+    para.paragraph_format.space_after = Pt(after)
+    if keep:
+        para.paragraph_format.keep_with_next = True
+    return para
+
+
+def _ctag(box, tag: str):
+    return _cp(box, tag, size=1, after=0)
+
+
+def _mark_size(para, half_points: int):
+    """The paragraph MARK's size: an empty paragraph is as tall as its mark."""
+    ppr = para._p.get_or_add_pPr()
+    rpr = ppr.find(qn("w:rPr"))
+    if rpr is None:
+        rpr = OxmlElement("w:rPr")
+        ppr.append(rpr)          # w:rPr is last in CT_PPr but for sectPr/pPrChange
+    for tag in ("w:sz", "w:szCs"):
+        el = OxmlElement(tag)
+        el.set(qn("w:val"), str(half_points))
+        rpr.append(el)
+
+
+def _cell_margins(table, twips: int = 0):
+    tbl_pr = table._tbl.tblPr
+    mar = OxmlElement("w:tblCellMar")
+    for edge in ("top", "left", "bottom", "right"):
+        el = OxmlElement(f"w:{edge}")
+        el.set(qn("w:w"), str(twips))
+        el.set(qn("w:type"), "dxa")
+        mar.append(el)
+    tbl_pr.insert_element_before(mar, "w:tblLook", "w:tblCaption", "w:tblDescription")
+
+
+def _pct_width(table, cells_pct):
+    """Percent widths (fiftieths of a percent), fixed layout: the bar and chip
+    rows fill whatever column they are in."""
+    tbl_pr = table._tbl.tblPr
+    tblw = tbl_pr.find(qn("w:tblW"))
+    if tblw is None:
+        tblw = OxmlElement("w:tblW")
+        tbl_pr.insert_element_before(tblw, "w:jc", "w:tblCellSpacing", "w:tblInd",
+                                     "w:tblBorders", "w:shd", "w:tblLayout", "w:tblCellMar",
+                                     "w:tblLook", "w:tblCaption", "w:tblDescription")
+    tblw.set(qn("w:type"), "pct")
+    tblw.set(qn("w:w"), "5000")
+    layout = OxmlElement("w:tblLayout")
+    layout.set(qn("w:type"), "fixed")
+    tbl_pr.insert_element_before(layout, "w:tblCellMar", "w:tblLook", "w:tblCaption",
+                                 "w:tblDescription")
+    for cell, pct in zip(table.rows[0].cells, cells_pct):
+        tcw = cell._tc.get_or_add_tcPr().get_or_add_tcW()
+        tcw.set(qn("w:type"), "pct")
+        tcw.set(qn("w:w"), str(pct))
+
+
+def _bar(box):
+    """A skill bar: BAR_SEGMENTS borderless cells, filled BAR_ON up to the
+    level and BAR_OFF after it (the fill is a docxtpl expression). Row height
+    comes from a tiny paragraph mark - never an exact height."""
+    table = box.add_table(rows=1, cols=BAR_SEGMENTS)
+    _borderless(table)
+    _cell_margins(table, 0)
+    _pct_width(table, [5000 // BAR_SEGMENTS] * BAR_SEGMENTS)
+    for i, cell in enumerate(table.rows[0].cells):
+        tc_pr = cell._tc.get_or_add_tcPr()
+        shd = OxmlElement("w:shd")
+        shd.set(qn("w:val"), "clear")
+        shd.set(qn("w:color"), "auto")
+        shd.set(qn("w:fill"), "{{ '%s' if sk.dots > %d else '%s' }}" % (BAR_ON, i, BAR_OFF))
+        tc_pr.insert_element_before(shd, "w:noWrap", "w:tcMar", "w:textDirection",
+                                    "w:tcFitText", "w:vAlign", "w:hideMark")
+        para = cell.paragraphs[0]
+        para.paragraph_format.space_after = Pt(0)
+        _mark_size(para, 8)          # 4pt: the bar's thickness
+    trailing = box.paragraphs[-1]    # python-docx adds one after a nested table
+    trailing.paragraph_format.space_after = Pt(0)
+    _mark_size(trailing, 6)
+    return table
+
+
+def _chips(box, cell: str):
+    """The stat chips, as in the Modern master: a fixed 4-cell row whose empty
+    slots render nothing (never a caption without a number)."""
+    table = box.add_table(rows=1, cols=CHIP_SLOTS)
+    _borderless(table)
+    _pct_width(table, [5000 // CHIP_SLOTS] * CHIP_SLOTS)
+    for i, c in enumerate(table.row_cells(0)):
+        guard = f'r.achievements[{i}].{{}} if r.achievements|length > {i} else ""'
+        _cell_p(c, "{{ %s }}" % guard.format("metric"), first=True, size=15,
+                rstyle=cell_style(cell, "Metric"))
+        _cell_p(c, "{{ %s }}" % guard.format("label"), first=False, size=8.5,
+                rstyle=cell_style(cell, "Text"), after=2)
+    trailing = box.paragraphs[-1]
+    trailing.paragraph_format.space_after = Pt(0)
+    _mark_size(trailing, 8)
+
+
+def _cell_items(box, cell: str, source: str | None, *, headings: bool = True):
+    """Everything a cell can hold, dispatched on `it.k`, in the order of the
+    list `lay.<source>` (None: the caller's own loop defines `it`)."""
+    S = lambda role: cell_style(cell, role)   # noqa: E731
+    if source:
+        _ctag(box, "{%%p for it in lay.%s %%}" % source)
+
+    _ctag(box, "{%p if it.k == 'name' %}")
+    _cp(box, "{{ r.name }}", size=None, rstyle=S("Name"), after=2)
+    _ctag(box, "{%p endif %}")
+    _ctag(box, "{%p if it.k == 'title' %}")
+    _cp(box, "{{ r.title }}", size=11, rstyle=S("Text"), after=4)
+    _ctag(box, "{%p endif %}")
+    _ctag(box, "{%p if it.k == 'photo' %}")
+    _cp(box, "{{ photo }}", size=None, after=6)
+    _ctag(box, "{%p endif %}")
+    _ctag(box, "{%p if it.k == 'contact_line' %}")
+    _cp(box, "{{ r.contact_line }}", size=9, rstyle=ST_CONTACT, pstyle=PS_CONTACT, after=4)
+    _ctag(box, "{%p endif %}")
+
+    if headings:
+        _ctag(box, "{%p if it.label %}")
+        head = _cp(box, "{{ it.text }}", size=None, rstyle=S("Heading"),
+                   pstyle=head_para_style(cell), before=8, after=3)
+        head.paragraph_format.keep_with_next = True
+        _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'contact' %}")
+    _ctag(box, "{%p for c in r.contact_items %}")
+    _cp(box, "{{ c }}", size=9.5, rstyle=S("Text"), after=1)
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'summary' %}")
+    _cp(box, "{{ r.summary }}", size=10, rstyle=S("Text"), after=2)
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'achievements' %}")
+    _chips(box, cell)
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'experience' %}")
+    _ctag(box, "{%p for job in it.jobs %}")
+    role = _cp(box, "{{ job.role }}", size=11, rstyle=S("Role"), before=5, after=0)
+    role.paragraph_format.keep_with_next = True     # never split a role from its dates
+    _ctag(box, "{%p if job.company or job.location or job.start or job.end %}")
+    meta = _cp(box, "{{ job.company }}{% if job.company and job.location %}, {% endif %}"
+                    "{{ job.location }}{% if (job.company or job.location) and "
+                    "(job.start or job.end) %}  ·  {% endif %}{{ job.start }}"
+                    "{% if job.start and job.end %} - {% endif %}{{ job.end }}",
+               size=9, rstyle=S("Accent"), after=2)
+    meta.paragraph_format.keep_with_next = True     # nor from its first bullet
+    _ctag(box, "{%p endif %}")
+    _ctag(box, "{%p for b in job.bullets %}")
+    _cp(box, "{{ b }}", size=10, rstyle=S("Text"), pstyle="List Bullet", after=0)
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'education' %}")
+    _ctag(box, "{%p for ed in r.education %}")
+    _cruns(box, [("{{ ed.degree }}", S("Bold")),
+                 ("{% if ed.school %} — {{ ed.school }}{% endif %}"
+                  "{% if ed.start or ed.end %}, {{ ed.start }}"
+                  "{% if ed.start and ed.end %} - {% endif %}{{ ed.end }}{% endif %}"
+                  "{% if ed.gpa %} · GPA {{ ed.gpa }}{% endif %}", S("Text"))], after=2)
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'skills' %}")
+    _ctag(box, "{%p for sk in r.skills %}")
+    # name AND level as real text; the graphic beside it follows the template:
+    # bars where the PDF has bars, dots where it has dots or rings
+    _cruns(box, [("{{ sk.name }}", S("Text")),
+                 ("{% if sk.level %} — {{ sk.level }}{% endif %}", S("Text")),
+                 ("{% if not lay.bars and sk.dot_glyphs %}   {{ sk.dot_glyphs }}{% endif %}",
+                  S("Accent"))], after=1)
+    _ctag(box, "{%p if lay.bars and sk.dots %}")
+    _bar(box)
+    _ctag(box, "{%p endif %}")
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'recognition' %}")
+    _ctag(box, "{%p for rec in r.recognition %}")
+    _cruns(box, [("{{ rec.title }}", S("Bold")),
+                 ("{% if rec.detail %} — {{ rec.detail }}{% endif %}", S("Text"))], after=2)
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'tools' %}")
+    _cp(box, '{{ r.tools | join("  ·  ") }}', size=10, rstyle=S("Text"))
+    _ctag(box, "{%p endif %}")
+
+    _ctag(box, "{%p if it.k == 'languages' %}")
+    _ctag(box, "{%p for lang in r.languages %}")
+    _cruns(box, [("{{ lang.name }}", S("Text")),
+                 ("{% if lang.level %} — {{ lang.level }}{% endif %}", S("Text")),
+                 ("{% if lang.dot_glyphs %}   {{ lang.dot_glyphs }}{% endif %}", S("Accent"))],
+           after=1)
+    _ctag(box, "{%p endfor %}")
+    _ctag(box, "{%p endif %}")
+
+    if source:
+        _ctag(box, "{%p endfor %}")
+
+
+def _finish_cell(cell):
+    """Drop the empty paragraph a new cell starts with, and end with a tiny
+    one: a cell must END with a paragraph even when every loop renders
+    nothing (the trap that once emptied the chip row)."""
+    first = cell.paragraphs[0]
+    if not first.text and len(cell.paragraphs) > 1:
+        first._p.getparent().remove(first._p)
+    end = cell.add_paragraph()
+    end.paragraph_format.space_after = Pt(0)
+    _mark_size(end, 2)
+
+
+def _word2013(doc) -> None:
+    """Lay the document out as Word 2013+ does (compatibilityMode 15), not as
+    Word 2010. In the older mode Word shifts every table left by its first
+    cell's padding so the TEXT meets the margin; with the layout table running
+    edge to edge that pushed the side column's text onto the paper's edge and
+    every cell 21.6pt off its column. In mode 15 a table's edge sits at its
+    indent. Only the layout masters: the others keep their measured layout."""
+    for cs in doc.settings.element.iter(qn("w:compatSetting")):
+        if cs.get(qn("w:name")) == "compatibilityMode":
+            cs.set(qn("w:val"), "15")
+
+
+def _layout_doc(lang: str):
+    body_font = AR_BODY_FONT if lang == "ar" else "Arial"
+    head_font = AR_DISPLAY_FONT if lang == "ar" else "Georgia"
+    doc = _doc(body_font, 0.5, head_font=head_font, role_font=head_font,
+               name_color=MODERN_ACCENT, accent=MODERN_ACCENT)
+    for cell in LAYOUT_CELLS:
+        for role, font, bold in (("Name", head_font, True), ("Heading", head_font, True),
+                                 ("Text", body_font, False), ("Bold", body_font, True),
+                                 ("Accent", body_font, False), ("Metric", head_font, True)):
+            _char_style(doc, cell_style(cell, role), font=font, bold=bold, color=INK)
+    _char_style(doc, cell_style("Main", "Metric"), font=head_font, bold=True, color=INK)
+    _char_style(doc, ST_CONTACT, font=body_font, bold=False, color=MUTED)
+    doc.styles.add_style(PS_CONTACT, WD_STYLE_TYPE.PARAGRAPH).base_style = doc.styles["Normal"]
+    for cell in (*LAYOUT_CELLS, "Main"):
+        st = doc.styles.add_style(head_para_style(cell), WD_STYLE_TYPE.PARAGRAPH)
+        st.base_style = doc.styles["Normal"]
+        st.paragraph_format.keep_with_next = True
+    _word2013(doc)
+    return doc, body_font
+
+
+def build_layout(path: Path, lang: str = "en"):
+    token = set_lang(lang)
+    try:
+        return _build_layout(path, lang)
+    finally:
+        reset_lang(token)
+
+
+def _cant_split(row) -> None:
+    tr_pr = row._tr.get_or_add_trPr()
+    tr_pr.append(OxmlElement("w:cantSplit"))
+
+
+def _build_layout(path: Path, lang: str):
+    """The top row, then ONE ROW PER BLOCK of the main column.
+
+    Why rows: Word ignores keep-with-next between paragraphs inside a table
+    cell that breaks across pages (measured in real Word, 2026-09-30: modern-t5
+    in Arabic left "Certifications" alone at the foot of page 1). What Word
+    does honour is a row that cannot split. So each block - a section with
+    its heading, or one job of the experience (the first one carrying the
+    heading) - is its own `cantSplit` row, and the side column is ONE cell
+    merged down all of them (w:vMerge restart / continue)."""
+    doc, body_font = _layout_doc(lang)
+    # The table runs edge to edge: a side column's fill reaches the paper's
+    # edge as in the PDF, and each cell's own margins keep the text in.
+    for section in doc.sections:
+        section.left_margin = section.right_margin = Inches(0)
+        section.top_margin = section.bottom_margin = Inches(0.4)
+        section.header_distance = section.footer_distance = Inches(0)
+    table = doc.add_table(rows=4, cols=2)
+    _borderless(table)
+    for source, name, cell in (("top_side", "TopSide", table.cell(0, 0)),
+                               ("top_main", "TopMain", table.cell(0, 1))):
+        _cell_items(cell, name, source)
+        _finish_cell(cell)
+    table.cell(1, 0).paragraphs[0].add_run("{%tr for blk in lay.blocks %}")
+    side = table.cell(2, 0)
+    vmerge = OxmlElement("w:vMerge")
+    vmerge.set(qn("w:val"), "{{ 'restart' if loop.first else 'continue' }}")
+    side._tc.get_or_add_tcPr().append(vmerge)
+    _ctag(side, "{%p if loop.first %}")
+    _cell_items(side, "Side", "side")
+    _ctag(side, "{%p endif %}")
+    _finish_cell(side)
+    main = table.cell(2, 1)
+    _ctag(main, "{%p for it in blk %}")
+    _cell_items(main, "Main", None)
+    _ctag(main, "{%p endfor %}")
+    _finish_cell(main)
+    _cant_split(table.rows[2])
+    table.cell(3, 0).paragraphs[0].add_run("{%tr endfor %}")
+    end = doc.add_paragraph()
+    end.paragraph_format.space_after = Pt(0)
+    _mark_size(end, 2)
+    if lang == "ar":
+        _apply_rtl(doc, body_font)
+    doc.save(str(path))
+    return path
+
+
+def build_gutter(path: Path, lang: str = "en"):
+    token = set_lang(lang)
+    try:
+        return _build_gutter(path, lang)
+    finally:
+        reset_lang(token)
+
+
+def _build_gutter(path: Path, lang: str):
+    """modern-t19: the header items in the body, then one table row per
+    labelled section - its title in a narrow gutter, its content beside it."""
+    doc, body_font = _layout_doc(lang)
+    _cell_items(doc, "Main", "head", headings=False)
+    table = doc.add_table(rows=3, cols=2)
+    _borderless(table)
+    table.cell(0, 0).paragraphs[0].add_run("{%tr for it in lay.rows %}")
+    label = table.cell(1, 0)
+    head = label.paragraphs[0]
+    head.style = doc.styles[head_para_style("Main")]
+    run = head.add_run("{{ it.text }}", style=cell_style("Main", "Heading"))
+    head.paragraph_format.space_before = Pt(6)
+    head.paragraph_format.keep_with_next = True
+    _cell_items(table.cell(1, 1), "Main", None, headings=False)
+    _finish_cell(table.cell(1, 1))
+    table.cell(2, 0).paragraphs[0].add_run("{%tr endfor %}")
+    end = doc.add_paragraph()
+    end.paragraph_format.space_after = Pt(0)
+    _mark_size(end, 2)
+    if lang == "ar":
+        _apply_rtl(doc, body_font)
+    doc.save(str(path))
+    return path
+
+
 # One master per (category, direction). The RTL pair is a SEPARATE FILE rather
 # than a switch inside the LTR one: a .docx has no conditional layout, and the
 # English masters are tuned to fit exactly one page - re-tuning them to also
@@ -578,6 +970,10 @@ MASTERS = {
     "modern_editorial.docx": lambda p: build_modern(p, "en"),
     "ats_standard_rtl.docx": lambda p: build_ats(p, "ar"),
     "modern_editorial_rtl.docx": lambda p: build_modern(p, "ar"),
+    "modern_layout.docx": lambda p: build_layout(p, "en"),
+    "modern_layout_rtl.docx": lambda p: build_layout(p, "ar"),
+    "modern_gutter.docx": lambda p: build_gutter(p, "en"),
+    "modern_gutter_rtl.docx": lambda p: build_gutter(p, "ar"),
 }
 
 
@@ -641,7 +1037,10 @@ def verify_in_word(paths) -> int:
 def main():
     OUT_DIR.mkdir(exist_ok=True)
     written = []
-    for name, builder in MASTERS.items():
+    # Named masters only, if any are given: a rebuild re-saves the file (new
+    # timestamps in docProps), so masters nobody changed are left alone.
+    wanted = [a for a in sys.argv[1:] if a in MASTERS] or list(MASTERS)
+    for name, builder in ((n, MASTERS[n]) for n in wanted):
         path = builder(OUT_DIR / name)
         written.append(path)
         print(f"wrote {path.relative_to(ROOT)}  ({path.stat().st_size:,} bytes)")

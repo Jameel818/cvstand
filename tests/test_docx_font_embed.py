@@ -169,7 +169,10 @@ def test_font_table_follows_schema_order_and_scripts(_id, data, key):
 @pytest.mark.parametrize("_id,data,key", CASES, ids=IDS)
 def test_python_docx_still_opens_it(_id, data, key):
     d = docx.Document(io.BytesIO(render_docx(data, key)))
-    assert any(p.text.strip() for p in d.paragraphs)
+    # the body's text, table cells included: a Word LAYOUT puts every line in
+    # its table's cells (docs/WORD_LAYOUTS_PLAN.md)
+    from docx.oxml.ns import qn
+    assert "".join(t.text or "" for t in d.element.body.iter(qn("w:t"))).strip()
 
 
 # ---- refusals ---------------------------------------------------------------------

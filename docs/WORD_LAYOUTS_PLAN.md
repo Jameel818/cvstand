@@ -1,8 +1,9 @@
-# Word layout archetypes for the Modern templates — PLAN (not approved, no code)
+# Word layout archetypes for the Modern templates — PLAN (approved 2026-09-29, being built)
 
 Written 2026-09-29 for the user's review. This is option 2 of the Word export
-investigation (RESUME_HERE.md, 2026-09-26). Nothing here is built. Every
-decision marked **DECIDE** needs the user's answer before implementation.
+investigation (RESUME_HERE.md, 2026-09-26). The user approved it on
+2026-09-29 (decisions in §9) and it is being built on `feature/word-layouts`.
+What was decided while building, with nobody to ask, is in §10.
 
 ## 1. Why
 
@@ -254,14 +255,108 @@ one archetype.
 and orphaned headings in real Word), which is why real-Word verification has
 its own session.
 
-## 9. Decisions needed before implementation
+## 9. Decisions (user, 2026-09-29)
 
-1. Approve the four archetypes and the mapping in §3, or move templates
-   between them.
-2. Skill bars: keep dots + level word, or add bar mini-tables (§4)?
-3. Sidebar height: stop where the content stops, or an "at least" full-page
-   row (R2)?
-4. Drop the page background tints (t5, t14) and t22's rotated word: OK?
-5. Download-menu wording about tables and ATS (R5).
-6. Branch: new `feature/word-layouts` from `main` after typography step 7, or
-   before it?
+1. **Approved:** the four archetypes (Sidebar, Band, Open, Gutter) and the
+   mapping in §3.
+2. **Skills follow the template:** bars where the PDF has bars, dots where it
+   has dots.
+3. **Sidebar at full page height on page 1, as in the PDF.** If Word cannot do
+   it reliably, build both variants and show both on the review page.
+4. **Drop** the page tints (t5, t14) and t22's rotated word.
+5. **Clearer download-menu wording (EN + AR):** drafted in §11 only; the UI is
+   not changed yet.
+6. **Word layouts first**, typography step 7 after.
+
+Hard rules given with them: new branch `feature/word-layouts` from `main`
+(`e56240d`); never push `main`, merge or deploy; no change to the PDF/HTML
+templates or their goldens; keep everything already working (embedded fonts,
+the user's font choices, template colours, widow/orphan control, natural line
+spacing, keep-with-next, the ATS layout unchanged); Arabic mirrors every
+layout; a 2-page file is fine; only files that python-docx opens, that pass
+the validity test and that Word opens without a repair prompt.
+
+## 10. Decisions made overnight (2026-09-29/30)
+
+The user asked for the option closest to the PDF whenever something was
+unclear, written down here.
+
+1. **The layout is measured, not hand-mapped.** Beyond the archetype (§3,
+   approved), where each item sits, its order, its heading words and every
+   colour are read from the rendered template in Chromium
+   (`tools/build_word_layouts.py` → `app/word_layouts.json`, with `--check`).
+   The measurement fails loudly unless it finds exactly the sections the
+   template's source uses, in both languages.
+2. **A section the template does not show is not in its Word file either.**
+   Five templates leave sections out of their PDF (t4: no summary; t12, t18,
+   t22, t23: no certifications/tools/languages; t13: no tools/languages; t14:
+   no stat chips; t1: no title; t2: no tools). The PDF is the design, so the
+   Word file matches it. The old single-column Word file showed everything.
+3. **Headings use the template's own words** ("About me", "Core
+   Competencies", "Software", "الملف الشخصي"...), in capitals where the
+   template sets them in capitals (never in Arabic). If a template gives a
+   section no heading in one language, Word uses the catalogue's default
+   word for it in that language (only t6's tools in Arabic).
+4. **Colours follow the PDF zone by zone, not one accent.** Each cell (side
+   column, band, main) takes its measured text, heading and name colours.
+   The job company/date line keeps the step-5 readable accent. A contrast
+   guard swaps any text colour that would not read on its cell's fill for
+   black or white (4.5:1 body text, 3:1 headings and names), so nothing can
+   vanish (modern-t21's white contact text sits on its own dark pill, as in
+   the PDF).
+5. **Full-height sidebar, one variant.** Decision 3 is met with a coloured
+   rectangle in the page HEADER, behind the text, at the side column's width.
+   It is full height on every page, however long the content runs, and it
+   mirrors to the right in Arabic. The side cells are filled in the same
+   colour too, so a reader that ignores header shapes still shows the column
+   down to where its content ends. This proved reliable in real Word, so no
+   second variant was built.
+6. **The band reaches the top edge on page 1 only.** A band's cell starts at
+   the 0.4in top margin. A strip in the band's colour fills the margin above
+   it on the first page (a different first-page header), so page 2 has no
+   stray strip.
+7. **Word 2013 layout mode for the layout masters only**
+   (`compatibilityMode 15`). In the Word 2010 mode the masters used, Word
+   shifts a table left by its first cell's padding, which put the side
+   column's text on the paper's edge. ATS and the single-column master keep
+   their mode, and their files are byte-identical.
+8. **Rings become dots** (decision 2 names bars and dots only). A ring is a
+   circular gauge, and the dot row (●●●●○) is the closest circular form Word
+   can draw as text.
+9. **Photos:** at the template's measured width, clamped to 20–45 mm (a
+   template's large photo box would otherwise take half the page in Word),
+   and cut to a circle where the template's photo is round (8 of 16). With
+   no photo uploaded, Word shows nothing: never the PDF's "PORTRAIT
+   PLACEHOLDER" box.
+10. **Sizes:** the name at its measured size, clamped to 18–40 pt; section
+    headings at theirs, clamped to 8.5–13 pt. Body text stays at 10 pt (9.5
+    in the stacked contact lines).
+
+## 11. Download-menu wording — DRAFT (decision 5: not in the UI yet)
+
+Today (`app/templates/builder.html`, `app/labels.py`):
+
+| Where | English | Arabic |
+|---|---|---|
+| Word item caption | Editable, for job portals | (catalogue) |
+| Note under the menu | Word: editable version · PDF: exact design | Word: نسخة قابلة للتحرير · PDF: التصميم الدقيق |
+
+Why it has to change: with the layouts, a Modern Word file keeps its design,
+so "editable version" undersells it. And it is now built from tables, so
+"for job portals" oversells it. Some applicant-tracking systems read table
+columns out of order (R5). The ATS templates stay one column and remain the
+parser-safe choice.
+
+Proposed, chosen by the template's category (the builder knows it):
+
+| Where | Category | English | Arabic |
+|---|---|---|---|
+| Word item caption | Modern | Editable, same design | قابل للتحرير، بنفس التصميم |
+| Word item caption | ATS | Editable, for job portals (unchanged) | (unchanged) |
+| Note | Modern | Word keeps this design and you can edit it. Applying through a job portal? Choose an ATS template. | ملف Word يحتفظ بهذا التصميم ويمكنك تعديله. تتقدّم عبر بوابة توظيف؟ اختر قالباً من فئة ATS. |
+| Note | ATS | Word and PDF: one column, easy for job portals to read. | Word وPDF: عمود واحد تقرؤه بوابات التوظيف بسهولة. |
+
+To build it later: two new catalogue keys per language (`app/labels.py`),
+the note chosen by category in `builder.html` / `builder.js`, and the
+label-catalogue test for the Arabic keys. The Arabic needs a wording review
+by the user, like every new Arabic string.

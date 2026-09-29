@@ -1,0 +1,4984 @@
+{
+ "generated_by": "tools/build_word_layouts.py",
+ "note": "Measured from the rendered Modern templates; do not edit by hand. See docs/WORD_LAYOUTS_PLAN.md.",
+ "templates": {
+  "modern-t1": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "التقدير",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "القدرات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": false,
+       "fill": "D8F035",
+       "hcolor": "3A3A42",
+       "k": "summary",
+       "label": "الصمود بعد التسليم",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": "3A3A42",
+      "text": "3A3A42"
+     },
+     "main": {
+      "heading": "16161A",
+      "text": "2C2C34"
+     },
+     "side": {
+      "heading": "16161A",
+      "text": "3A3A42"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "16161A",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.278
+   },
+   "archetype": "open",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Capabilities",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": false,
+       "fill": "D8F035",
+       "hcolor": "3A3A42",
+       "k": "summary",
+       "label": "survive handover",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": "3A3A42",
+      "text": "3A3A42"
+     },
+     "main": {
+      "heading": "16161A",
+      "text": "2C2C34"
+     },
+     "side": {
+      "heading": "16161A",
+      "text": "3A3A42"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "16161A",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.278
+   },
+   "side": "end",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t10": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "نبذة",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "A93005",
+    "side_w": 0.329
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "SUMMARY",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "SKILLS",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "A93005",
+    "side_w": 0.329
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t11": {
+   "ar": {
+    "band": {
+     "bg": "FFD700",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "التقدير",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغة",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "08211C",
+       "k": "contact_line"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "08211C"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "22262E",
+      "text": "3A414B"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "C3CEDB"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "08211C",
+     "pt": 36.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "0F1B2B",
+    "side_w": 0.353
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "FFD700",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Language",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "08211C",
+       "k": "contact_line"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "08211C"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "22262E",
+      "text": "3A414B"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "C3CEDB"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "08211C",
+     "pt": 36.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "0F1B2B",
+    "side_w": 0.353
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t12": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "نبذة عني",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "المسيرة التعليمية",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "111111",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "111111",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.34
+   },
+   "archetype": "open",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "ABOUT ME",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "WORK EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATIONAL HISTORY",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "CONTACT",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "SKILLS",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "111111",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "111111",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.34
+   },
+   "side": "end",
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t13": {
+   "ar": {
+    "band": {
+     "bg": "0E2D55",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "side": [],
+     "top_full": [
+      {
+       "bg": "0E2D55",
+       "color": "C7D4E4",
+       "k": "contact_line"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "C7D4E4"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "0E2D55",
+      "text": "2E3646"
+     },
+     "side": {
+      "heading": null,
+      "text": null
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": null
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "0E2D55",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      }
+     ],
+     "side": [],
+     "top_full": [
+      {
+       "bg": "0E2D55",
+       "color": "C7D4E4",
+       "k": "contact_line"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "C7D4E4"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "0E2D55",
+      "text": "2E3646"
+     },
+     "side": {
+      "heading": null,
+      "text": null
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": null
+   },
+   "side": null,
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t14": {
+   "ar": {
+    "band": {
+     "bg": "B93E12",
+     "span": "side"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "photo"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FBE9E2"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "CFCFD5"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "2E2C28"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "F7F4EC",
+    "side_w": 0.431
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "B93E12",
+     "span": "side"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "Editorial Redesign, Gold",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "B93E12",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "photo"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FBE9E2"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "CFCFD5"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "2E2C28"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "F7F4EC",
+    "side_w": 0.431
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t15": {
+   "ar": {
+    "band": {
+     "bg": "D99201",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة المهنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "المعلوماتالشخصية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليموالمؤهلات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "3F2C02"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "58761B",
+      "text": "2B2B2B"
+     },
+     "side": {
+      "heading": "D99201",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "1A3F22",
+     "pt": 39.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": true
+    },
+    "side_bg": "1A3F22",
+    "side_w": 0.4
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": {
+     "bg": "D99201",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "PROFESSIONAL EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "TOOLS",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "PERSONALINFORMATION",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATION &QUALIFICATIONS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "SKILLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "LANGUAGES",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "CERTIFICATIONS",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "3F2C02"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "58761B",
+      "text": "2B2B2B"
+     },
+     "side": {
+      "heading": "D99201",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "1A3F22",
+     "pt": 39.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": true
+    },
+    "side_bg": "1A3F22",
+    "side_w": 0.4
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t16": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "1C1C20",
+      "text": "33333A"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "DDDDE2"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "1C1C20",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 42,
+     "round": true
+    },
+    "side_bg": "1C1C20",
+    "side_w": 0.341
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "1C1C20",
+      "text": "33333A"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "DDDDE2"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "1C1C20",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 42,
+     "round": true
+    },
+    "side_bg": "1C1C20",
+    "side_w": 0.341
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t17": {
+   "ar": {
+    "band": {
+     "bg": "003366",
+     "span": "side"
+    },
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "photo"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FFFFFF"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "444444"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "E5E8F5",
+    "side_w": 0.424
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": {
+     "bg": "003366",
+     "span": "side"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "contact",
+       "label": "CONTACT",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "LANGUAGES",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "tools",
+       "label": "TOOLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "003366",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "CERTIFICATIONS",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FFFFFF"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "111111",
+      "text": "444444"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "E5E8F5",
+    "side_w": 0.424
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t18": {
+   "ar": {
+    "band": {
+     "bg": "002B66",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "D2DCEA"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "002B66",
+      "text": "39424E"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "E3E9F2"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "002B66",
+    "side_w": 0.438
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "002B66",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "Work Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "D2DCEA"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "002B66",
+      "text": "39424E"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "E3E9F2"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "002B66",
+    "side_w": 0.438
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t19": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "54545E",
+       "k": "contact_line"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "side": [],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "6B2A5A",
+      "text": "2E2E38"
+     },
+     "side": {
+      "heading": null,
+      "text": null
+     }
+    },
+    "heading_pt": 8.5,
+    "name": {
+     "centred": false,
+     "color": "1B1B22",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": null
+   },
+   "archetype": "gutter",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "54545E",
+       "k": "contact_line"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tooling",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      }
+     ],
+     "side": [],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "6B2A5A",
+      "text": "2E2E38"
+     },
+     "side": {
+      "heading": null,
+      "text": null
+     }
+    },
+    "heading_pt": 8.5,
+    "name": {
+     "centred": false,
+     "color": "1B1B22",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": null
+   },
+   "side": null,
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t2": {
+   "ar": {
+    "band": {
+     "bg": "FFD700",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "نبذة عني",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "اللغة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "002366"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "002366",
+      "text": "333A47"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 12.5,
+    "name": {
+     "centred": false,
+     "color": "002366",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "002366",
+    "side_w": 0.351
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": {
+     "bg": "FFD700",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "EXPERIENCE",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "ABOUT ME",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "SKILLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "LANGUAGE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "CERTIFICATIONS",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "002366"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "002366",
+      "text": "333A47"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 12.5,
+    "name": {
+     "centred": false,
+     "color": "002366",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "002366",
+    "side_w": 0.351
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t20": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "مجالات الخبرة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "1B1717",
+      "text": "33302B"
+     },
+     "side": {
+      "heading": "1B1717",
+      "text": "1B1717"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "1B1717",
+     "pt": 31.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "EDEBDD",
+    "side_w": 0.379
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "WORK EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "EXPERTISE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "LANGUAGES",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "TOOLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "CERTIFICATIONS",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "1B1717",
+      "text": "33302B"
+     },
+     "side": {
+      "heading": "1B1717",
+      "text": "1B1717"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "1B1717",
+     "pt": 31.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "EDEBDD",
+    "side_w": 0.379
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t21": {
+   "ar": {
+    "band": {
+     "bg": "E1F04A",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "summary",
+       "label": "نبذة عني",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "013F32",
+       "color": "FDFDFD",
+       "k": "contact_line"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FDFDFD"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "013F32",
+      "text": "161616"
+     },
+     "side": {
+      "heading": "013F32",
+      "text": "E8EDEA"
+     }
+    },
+    "heading_pt": 10.5,
+    "name": {
+     "centred": false,
+     "color": "013F32",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 27,
+     "round": true
+    },
+    "side_bg": "013F32",
+    "side_w": 0.353
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "E1F04A",
+     "span": "full"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "experience",
+       "label": "Work Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "summary",
+       "label": "About Me",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "E1F04A",
+       "hcolor": "013F32",
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "013F32",
+       "color": "FDFDFD",
+       "k": "contact_line"
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "FDFDFD"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "013F32",
+      "text": "161616"
+     },
+     "side": {
+      "heading": "013F32",
+      "text": "E8EDEA"
+     }
+    },
+    "heading_pt": 10.5,
+    "name": {
+     "centred": false,
+     "color": "013F32",
+     "pt": 33.0
+    },
+    "photo": {
+     "mm": 27,
+     "round": true
+    },
+    "side_bg": "013F32",
+    "side_w": 0.353
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t22": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": "333333"
+     },
+     "main": {
+      "heading": "111111",
+      "text": "444444"
+     },
+     "side": {
+      "heading": "111111",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "111111",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.247
+   },
+   "archetype": "open",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "WORK EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "Email",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": "333333"
+     },
+     "main": {
+      "heading": "111111",
+      "text": "444444"
+     },
+     "side": {
+      "heading": "111111",
+      "text": "111111"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "111111",
+     "pt": 40.0
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.247
+   },
+   "side": "end",
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t23": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "نبذة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "151517",
+      "text": "3C3C40"
+     },
+     "side": {
+      "heading": "151517",
+      "text": "3C3C40"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "151517",
+     "pt": 30.0
+    },
+    "photo": null,
+    "side_bg": "EFEFEF",
+    "side_w": 0.388
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Work Experience",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "name"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Summary",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "151517",
+      "text": "3C3C40"
+     },
+     "side": {
+      "heading": "151517",
+      "text": "3C3C40"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "151517",
+     "pt": 30.0
+    },
+    "photo": null,
+    "side_bg": "EFEFEF",
+    "side_w": 0.388
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": true
+  },
+  "modern-t24": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "experience",
+       "label": "الخبرة المهنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "المهارات الإبداعية والتقنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "summary",
+       "label": "نبذة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "1A1A1A",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "1A1A1A",
+     "pt": 37.5
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "4A4C4A",
+    "side_w": 0.329
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "experience",
+       "label": "Professional Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "Creative & Technical Skills",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "Certifications",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "summary",
+       "label": "Summary",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFD633",
+       "hcolor": "1A1A1A",
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "1A1A1A",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "1A1A1A",
+     "pt": 37.5
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "4A4C4A",
+    "side_w": 0.329
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t3": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "نبذة مهنية",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات التقنية",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "التقدير",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": true
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": true
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "000000",
+      "text": "000000"
+     },
+     "side": {
+      "heading": "000000",
+      "text": "000000"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "000000",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "FFDE00",
+    "side_w": 0.341
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Professional Summary",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Technical Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Software",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": true
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "000000",
+      "text": "000000"
+     },
+     "side": {
+      "heading": "000000",
+      "text": "000000"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "000000",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "FFDE00",
+    "side_w": 0.341
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t4": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "الخبرة المهنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "التقدير",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "اللغة",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "14343B",
+      "text": "37474C"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "14343B",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "000034",
+    "side_w": 0.353
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "k": "experience",
+       "label": "Professional Experience",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "C4562F",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "Language",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "14343B",
+      "text": "37474C"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "14343B",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "000034",
+    "side_w": 0.353
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": true
+  },
+  "modern-t5": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "experience",
+       "label": "الخبرة المهنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "المهارات الإبداعية والتقنية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "الشهادات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "FFFFFF",
+       "hcolor": "1A1A1A",
+       "k": "summary",
+       "label": "نبذة",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "tools",
+       "label": "البرمجيات",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "1A1A1A",
+     "pt": 39.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "003366",
+    "side_w": 0.329
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "experience",
+       "label": "PROFESSIONAL EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "skills",
+       "label": "CREATIVE & TECHNICAL SKILLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "recognition",
+       "label": "CERTIFICATIONS",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "photo"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "FFFFFF",
+       "hcolor": "1A1A1A",
+       "k": "summary",
+       "label": "SUMMARY",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "tools",
+       "label": "SOFTWARE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "1A1A1A",
+       "hcolor": "FFFFFF",
+       "k": "languages",
+       "label": "LANGUAGES",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "FFFFFF",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "FFFFFF"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "1A1A1A",
+     "pt": 39.0
+    },
+    "photo": {
+     "mm": 38,
+     "round": true
+    },
+    "side_bg": "003366",
+    "side_w": 0.329
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": true
+  },
+  "modern-t6": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "التقدير",
+       "rule": true
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": true
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "4A4A4A",
+       "k": "contact_line"
+      },
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "الملف الشخصي",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": "2E2E2E"
+     },
+     "main": {
+      "heading": "1A1A1A",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "1A1A1A",
+      "text": "5A5A5A"
+     }
+    },
+    "heading_pt": 10.5,
+    "name": {
+     "centred": true,
+     "color": "1A1A1A",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.435
+   },
+   "archetype": "open",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Recognition",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Systems",
+       "rule": true
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": true
+      }
+     ],
+     "top_full": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "bg": "FFFFFF",
+       "color": "4A4A4A",
+       "k": "contact_line"
+      },
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Profile",
+       "rule": false
+      }
+     ],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": "2E2E2E"
+     },
+     "main": {
+      "heading": "1A1A1A",
+      "text": "333333"
+     },
+     "side": {
+      "heading": "1A1A1A",
+      "text": "1A1A1A"
+     }
+    },
+    "heading_pt": 10.5,
+    "name": {
+     "centred": true,
+     "color": "1A1A1A",
+     "pt": 34.5
+    },
+    "photo": null,
+    "side_bg": null,
+    "side_w": 0.435
+   },
+   "side": "end",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t7": {
+   "ar": {
+    "band": {
+     "bg": "FFD500",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "الهدف المهني",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "التدريب",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "4A4C4A"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "001D3D",
+      "text": "4A4C4A"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "DFDEDD"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "001D3D",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "001D3D",
+    "side_w": 0.388
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "FFD500",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Career Objective",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Training",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Skills",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tools",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "4A4C4A"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "001D3D",
+      "text": "4A4C4A"
+     },
+     "side": {
+      "heading": "FFFFFF",
+      "text": "DFDEDD"
+     }
+    },
+    "heading_pt": 13.0,
+    "name": {
+     "centred": false,
+     "color": "001D3D",
+     "pt": 40.0
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": "001D3D",
+    "side_w": 0.388
+   },
+   "side": "end",
+   "skills": "bars",
+   "timeline": false
+  },
+  "modern-t8": {
+   "ar": {
+    "band": {
+     "bg": "003366",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": false,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "experience",
+       "label": "الخبرة العملية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "recognition",
+       "label": "أيضاً",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "التقدير",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "الأدوات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": false,
+       "k": "summary",
+       "label": "نبذة عني",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "skills",
+       "label": "المهارات الشخصية",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "DCE6F2"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "003366",
+      "text": "3D4653"
+     },
+     "side": {
+      "heading": "003366",
+      "text": "E2E8F0"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": null,
+    "side_w": 0.461
+   },
+   "archetype": "band",
+   "en": {
+    "band": {
+     "bg": "003366",
+     "span": "main"
+    },
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "education",
+       "label": "EDUCATION",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "experience",
+       "label": "WORK EXPERIENCE",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "recognition",
+       "label": "ALSO",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "tools",
+       "label": "Recognition",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "languages",
+       "label": "Tools",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "ABOUT ME",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "skills",
+       "label": "PERSONAL SKILLS",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "fill": "DCE6F2",
+       "hcolor": "003366",
+       "k": "contact",
+       "label": "CONTACT",
+       "rule": false
+      }
+     ],
+     "top_full": [],
+     "top_main": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "k": "achievements"
+      }
+     ],
+     "top_side": [
+      {
+       "k": "photo"
+      }
+     ]
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": "DCE6F2"
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "003366",
+      "text": "3D4653"
+     },
+     "side": {
+      "heading": "003366",
+      "text": "20242E"
+     }
+    },
+    "heading_pt": 12.0,
+    "name": {
+     "centred": false,
+     "color": "FFFFFF",
+     "pt": 28.5
+    },
+    "photo": {
+     "mm": 45,
+     "round": false
+    },
+    "side_bg": null,
+    "side_w": 0.461
+   },
+   "side": "start",
+   "skills": "dots",
+   "timeline": false
+  },
+  "modern-t9": {
+   "ar": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "نبذة",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "الخبرة",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "التعليم",
+       "rule": false
+      },
+      {
+       "caps": false,
+       "k": "skills",
+       "label": "المهارات",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": false,
+       "k": "contact",
+       "label": "التواصل",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "الجوائز",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "الأدوات",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "اللغات",
+       "rule": true
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "000000",
+      "text": "000000"
+     },
+     "side": {
+      "heading": "000000",
+      "text": "000000"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "000000",
+     "pt": 30.0
+    },
+    "photo": null,
+    "side_bg": "FFDE00",
+    "side_w": 0.296
+   },
+   "archetype": "sidebar",
+   "en": {
+    "band": null,
+    "cells": {
+     "main": [
+      {
+       "caps": true,
+       "k": "summary",
+       "label": "Summary",
+       "rule": false
+      },
+      {
+       "k": "achievements"
+      },
+      {
+       "caps": true,
+       "k": "experience",
+       "label": "Experience",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "education",
+       "label": "Education",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "skills",
+       "label": "Technical",
+       "rule": false
+      }
+     ],
+     "side": [
+      {
+       "k": "name"
+      },
+      {
+       "k": "title"
+      },
+      {
+       "caps": true,
+       "k": "contact",
+       "label": "Contact",
+       "rule": false
+      },
+      {
+       "caps": true,
+       "k": "recognition",
+       "label": "Awards",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "tools",
+       "label": "Tools",
+       "rule": true
+      },
+      {
+       "caps": true,
+       "k": "languages",
+       "label": "Languages",
+       "rule": true
+      }
+     ],
+     "top_full": [],
+     "top_main": [],
+     "top_side": []
+    },
+    "colours": {
+     "band": {
+      "heading": null,
+      "text": null
+     },
+     "head": {
+      "heading": null,
+      "text": null
+     },
+     "main": {
+      "heading": "000000",
+      "text": "000000"
+     },
+     "side": {
+      "heading": "000000",
+      "text": "000000"
+     }
+    },
+    "heading_pt": 11.0,
+    "name": {
+     "centred": false,
+     "color": "000000",
+     "pt": 30.0
+    },
+    "photo": null,
+    "side_bg": "FFDE00",
+    "side_w": 0.296
+   },
+   "side": "start",
+   "skills": "bars",
+   "timeline": false
+  }
+ }
+}

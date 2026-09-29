@@ -43,6 +43,9 @@ SEQUENCES = {
               "tblStyleRowBandSize", "tblStyleColBandSize", "tblW", "jc",
               "tblCellSpacing", "tblInd", "tblBorders", "shd", "tblLayout",
               "tblCellMar", "tblLook", "tblCaption", "tblDescription"),
+    # Added with the Word LAYOUTS, whose cells carry widths, fills and margins.
+    "tcPr": ("cnfStyle", "tcW", "gridSpan", "hMerge", "vMerge", "tcBorders", "shd",
+             "noWrap", "tcMar", "textDirection", "tcFitText", "vAlign", "hideMark"),
     # Added when the RTL masters landed: `w:bidi` goes in the SECTION properties
     # too, and that element was not order-checked before.
     "sectPr": ("footnotePr", "endnotePr", "type", "pgSz", "pgMar", "paperSrc",
@@ -85,10 +88,10 @@ def test_property_children_follow_schema_order(master, prop):
             f"open this file."
         )
         checked += 1
-    assert checked or prop == "tblPr", f"no <w:{prop}> found to check"
+    assert checked or prop in ("tblPr", "tcPr"), f"no <w:{prop}> found to check"
 
 
-@pytest.mark.parametrize("key", ["ats-t1", "modern-t1"])
+@pytest.mark.parametrize("key", ["ats-t1", "modern-t1", "modern-t2", "modern-t16"])
 def test_rendered_export_is_valid_too(key):
     """The master is what we author; the RENDERED file is what a user opens.
     docxtpl re-serialises the package, so validate that end of the pipe too."""
@@ -112,7 +115,8 @@ def test_rendered_export_is_valid_too(key):
 
 
 def test_masters_exist():
-    """Four: one per (category, direction).
+    """One per (layout, direction): the two category masters, and the two
+    Word LAYOUT masters of docs/WORD_LAYOUTS_PLAN.md.
 
     The RTL pair is a separate FILE rather than a switch inside the LTR one - a
     .docx has no conditional layout - so a missing one is a missing export, not
@@ -121,4 +125,6 @@ def test_masters_exist():
     assert {m.name for m in MASTERS} == {
         "ats_standard.docx", "modern_editorial.docx",
         "ats_standard_rtl.docx", "modern_editorial_rtl.docx",
+        "modern_layout.docx", "modern_layout_rtl.docx",
+        "modern_gutter.docx", "modern_gutter_rtl.docx",
     }

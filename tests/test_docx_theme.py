@@ -21,8 +21,10 @@ import pytest
 from lxml import etree
 
 from app import registry
+from app.exporters import docx_layout
 from app.exporters import docx_theme as T
 from app.exporters.docx import render_docx
+from app.schema import lang_of
 from app.typography import built_faces, face
 from tests.samples import ARABIC, ENGLISH
 
@@ -129,10 +131,18 @@ def test_text_takes_the_readable_accent_and_rules_keep_the_original(key, data):
     doc, styles = _parts(render_docx(data, key))
     accent = registry.get(key).accent.lstrip("#").upper()
     text = T.text_safe(accent)
-    assert _font_of(_style(styles, "CVHeading"))[3] == text
     assert _font_of(_style(styles, "CVAccentText"))[3] == text
     rules = {b.get(f"{W}color") for b in doc.iter(f"{W}bottom")}
     assert T.RULE_ACCENT not in rules, "the master's placeholder rule colour survived"
+    if docx_layout.spec_for(key):
+        # A Word LAYOUT takes the template's OWN colours, measured from its
+        # PDF (app/word_layouts.json): here, the main column's headings.
+        # tests/test_docx_layouts.py checks every cell's colours in full.
+        main = docx_layout.layouts()[key][lang_of(data)]["colours"]["main"]
+        assert _font_of(_style(styles, "CVHeading"))[3] == docx_layout.readable(
+            main["heading"] or main["text"], "FFFFFF")
+        return
+    assert _font_of(_style(styles, "CVHeading"))[3] == text
     if key.startswith("modern-"):
         assert accent in rules, "the accent rule lost the template's own colour"
         assert _font_of(_style(styles, "CVName"))[3] == text
