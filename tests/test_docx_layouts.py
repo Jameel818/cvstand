@@ -202,6 +202,49 @@ def test_each_main_block_is_a_row_that_cannot_split(exports, key, lang):
                     f"heading {_text(texts[-1])!r} ends its row")
 
 
+GUTTER = [k for k in ON if DL.layouts()[k]["archetype"] == "gutter"]
+
+
+@pytest.mark.parametrize("key", GUTTER)
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_the_gutter_puts_each_label_beside_its_section_in_unbreakable_rows(exports, key, lang):
+    doc = _parts(exports[(key, lang)])["word/document.xml"]
+    tbl = doc.findall(f"{W}body/{W}tbl")[-1]
+    rows = tbl.findall(f"{W}tr")
+    labels = [DL._item(i, lang)["text"] for c in DL.layouts()[key][lang]["cells"].values()
+              for i in c if i.get("label")]
+    jobs = len(SAMPLES[lang]["experience"])
+    assert len(rows) == len(labels) + jobs - 1, "a row per section, and per job"
+    seen = []
+    for tr in rows:
+        assert tr.find(f"{W}trPr/{W}cantSplit") is not None
+        label_cell, content = tr.findall(f"{W}tc")
+        text = _text(label_cell).strip()
+        if text:
+            seen.append(text)
+            assert _text(content).strip(), f"label {text!r} beside an empty cell"
+    assert seen == labels
+    assert [len(c.findall(f"{W}gridCol")) for c in [tbl.find(f"{W}tblGrid")]] == [2]
+
+
+@pytest.mark.parametrize("key", ON)
+def test_a_timeline_template_marks_each_job_with_an_accent_bar(exports, key):
+    from app.exporters import docx_theme
+    spec = DL.layouts()[key]
+    for lang in ("en", "ar"):
+        doc = _parts(exports[(key, lang)])["word/document.xml"]
+        roles = [p for p in doc.iter(f"{W}p") if "CVRole" in _style_ids(p) and _text(p).strip()]
+        assert len(roles) == len(SAMPLES[lang]["experience"])
+        accent = docx_theme.resolve(SAMPLES[lang], key)["accent"]
+        edge = "right" if lang == "ar" else "left"   # the START edge, in Word's physical terms
+        for p in roles:
+            bar = p.find(f"{W}pPr/{W}pBdr/{W}{edge}")
+            if spec["timeline"]:
+                assert bar is not None and bar.get(f"{W}color") == accent, f"{lang}: no timeline bar"
+            else:
+                assert p.find(f"{W}pPr/{W}pBdr") is None, f"{lang}: a timeline bar on a template without one"
+
+
 # ---- content --------------------------------------------------------------------
 
 def _labels(key: str, lang: str) -> list[tuple[str, str]]:

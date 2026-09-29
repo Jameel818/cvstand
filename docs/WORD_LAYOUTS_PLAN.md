@@ -350,6 +350,16 @@ unclear, written down here.
 15. **A side column is never narrower than 30% of the page.** t22's measured
     24.7% (and t1's 27.8%) broke the email address mid-word in Word, where
     the PDF's smaller type fits it. Stacked contact lines are 9 pt.
+16. **The timeline is an accent bar per job,** down the start edge of the
+    job title and its company/date line. One continuous line through the
+    bullets is not possible, because a paragraph border sits at the
+    paragraph's own indent and the list bullets are indented. In Arabic the bar
+    is Word's `w:right`: Word reads a border's left/right physically even in
+    a right-to-left paragraph.
+17. **No keep-with-next in the layouts at all.** Inside a table Word chains
+    every row holding a keep-with-next paragraph to the next row. modern-t19
+    in Arabic then moved its whole table to page 2, leaving page 1 with only
+    the header. The cannot-split rows (decision 11) are the guarantee.
 13. **Skill bars are 5 segments,** one per level step, each with a hairline
     border in its own colour so the fills meet without a seam. They read as
     a stepped bar, the 5-point scale the level words map to.

@@ -749,9 +749,12 @@ def _cell_items(box, cell: str, source: str | None, *, headings: bool = True):
 
     if headings:
         _ctag(box, "{%p if it.label %}")
-        head = _cp(box, "{{ it.text }}", size=None, rstyle=S("Heading"),
-                   pstyle=head_para_style(cell), before=8, after=3)
-        head.paragraph_format.keep_with_next = True
+        # No keep-with-next anywhere in a layout: Word ignores it inside a
+        # cell that breaks, and ACROSS rows it chains each row to the next
+        # (modern-t19's whole table jumped to page 2). The cannot-split rows
+        # are what keep a heading with its content.
+        _cp(box, "{{ it.text }}", size=None, rstyle=S("Heading"),
+            pstyle=head_para_style(cell), before=8, after=3)
         _ctag(box, "{%p endif %}")
 
     _ctag(box, "{%p if it.k == 'contact' %}")
@@ -770,15 +773,13 @@ def _cell_items(box, cell: str, source: str | None, *, headings: bool = True):
 
     _ctag(box, "{%p if it.k == 'experience' %}")
     _ctag(box, "{%p for job in it.jobs %}")
-    role = _cp(box, "{{ job.role }}", size=11, rstyle=S("Role"), before=5, after=0)
-    role.paragraph_format.keep_with_next = True     # never split a role from its dates
+    _cp(box, "{{ job.role }}", size=11, rstyle=S("Role"), before=5, after=0)
     _ctag(box, "{%p if job.company or job.location or job.start or job.end %}")
     meta = _cp(box, "{{ job.company }}{% if job.company and job.location %}, {% endif %}"
                     "{{ job.location }}{% if (job.company or job.location) and "
                     "(job.start or job.end) %}  ·  {% endif %}{{ job.start }}"
                     "{% if job.start and job.end %} - {% endif %}{{ job.end }}",
                size=9, rstyle=S("Accent"), after=2)
-    meta.paragraph_format.keep_with_next = True     # nor from its first bullet
     _ctag(box, "{%p endif %}")
     _ctag(box, "{%p for b in job.bullets %}")
     _cp(box, "{{ b }}", size=10, rstyle=S("Text"), pstyle="List Bullet", after=0)
@@ -874,7 +875,6 @@ def _layout_doc(lang: str):
     for cell in (*LAYOUT_CELLS, "Main"):
         st = doc.styles.add_style(head_para_style(cell), WD_STYLE_TYPE.PARAGRAPH)
         st.base_style = doc.styles["Normal"]
-        st.paragraph_format.keep_with_next = True
     _word2013(doc)
     return doc, body_font
 
@@ -962,9 +962,14 @@ def _build_gutter(path: Path, lang: str):
     head.style = doc.styles[head_para_style("Main")]
     run = head.add_run("{{ it.text }}", style=cell_style("Main", "Heading"))
     head.paragraph_format.space_before = Pt(6)
-    head.paragraph_format.keep_with_next = True
+    # the label cell ends in the tiny closing paragraph like every cell (and,
+    # like the whole layout, keeps with nothing: see _cell_items)
+    end = label.add_paragraph()
+    end.paragraph_format.space_after = Pt(0)
+    _mark_size(end, 2)
     _cell_items(table.cell(1, 1), "Main", None, headings=False)
     _finish_cell(table.cell(1, 1))
+    _cant_split(table.rows[1])     # a section (or one job) never splits
     table.cell(2, 0).paragraphs[0].add_run("{%tr endfor %}")
     end = doc.add_paragraph()
     end.paragraph_format.space_after = Pt(0)

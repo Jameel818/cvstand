@@ -98,22 +98,54 @@ def test_no_exact_spacing_anywhere(key, data):
             assert h.get(f"{W}hRule") != "exact", "an exact row height can clip"
 
 
+def _row_of(p):
+    """The layout table row a paragraph sits in (outermost 1-2 column table)."""
+    rows = [a for a in p.iterancestors() if a.tag == f"{W}tr"
+            and _grid_cols(a.getparent()) <= 2]
+    return rows[-1] if rows else None
+
+
+def _in_side_column(p) -> bool:
+    return any(a.tag == f"{W}tc" and a.find(f"{W}tcPr/{W}vMerge") is not None
+               for a in p.iterancestors())
+
+
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("data", [ENGLISH, ARABIC], ids=["en", "ar"])
 def test_headings_and_job_titles_keep_with_what_follows(key, data):
-    paras = _body_paragraphs(_xml(render_docx(data, key), "word/document.xml"))
+    """The body masters (ATS, single-column Modern) keep a heading and a job
+    title with what follows by KEEP-WITH-NEXT. A Word LAYOUT cannot: inside a
+    table Word ignores it within a breaking cell and chains each row to the
+    next across rows (real Word, 2026-09-30). There the guarantee is the
+    ROW: every heading and job title shares a cannot-split row with what
+    follows it, and nothing in the table keeps with next."""
+    doc = _xml(render_docx(data, key), "word/document.xml")
+    paras = _body_paragraphs(doc)
+    layout = docx_layout.spec_for(key) is not None
+    if layout:
+        tables = [t for t in doc.iter(f"{W}tbl") if _grid_cols(t) <= 2]
+        chained = [p for t in tables for p in t.iter(f"{W}p") if _keeps_next(p)]
+        assert not chained, "keep-with-next in a layout table chains its rows"
     headings = roles = 0
     for i, p in enumerate(paras):
         style = _style_of(p)
-        if style in HEADING_STYLES:
-            headings += 1
-            assert _keeps_next(p), f"heading {''.join(p.itertext())!r} can be orphaned"
-        elif style == "CVRole":
-            roles += 1
-            assert _keeps_next(p), f"job title {''.join(p.itertext())!r} can split"
-            nxt = paras[i + 1]
-            if _style_of(nxt) != "CVRole":  # its company/date line, when there is one
-                assert _keeps_next(nxt), "the company/date line can part from its bullets"
+        if style in HEADING_STYLES or style == "CVRole":
+            headings += style in HEADING_STYLES
+            roles += style == "CVRole"
+            what = "heading" if style in HEADING_STYLES else "job title"
+            if not layout:
+                assert _keeps_next(p), f"{what} {''.join(p.itertext())!r} can be orphaned"
+                if style == "CVRole" and _style_of(paras[i + 1]) != "CVRole":
+                    assert _keeps_next(paras[i + 1]), "the company/date line can part from its bullets"
+                continue
+            if _in_side_column(p):
+                continue                 # one merged cell down the page; flows on
+            row = _row_of(p)
+            assert row is not None and row.find(f"{W}trPr/{W}cantSplit") is not None, (
+                f"{what} {''.join(p.itertext())!r} is not in a row that cannot split")
+            nxt = paras[i + 1] if i + 1 < len(paras) else None
+            assert nxt is not None and _row_of(nxt) is row, (
+                f"{what} {''.join(p.itertext())!r} ends its row")
     spec = docx_layout.spec_for(key)
     if spec and spec["archetype"] != "gutter":
         # a Word LAYOUT shows exactly the headings its template's PDF shows

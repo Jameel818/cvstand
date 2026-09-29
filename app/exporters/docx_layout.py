@@ -50,7 +50,7 @@ LAYOUTS_PATH = Path(__file__).resolve().parent.parent / "word_layouts.json"
 
 #: Archetypes whose templates use the layout masters. The others keep the
 #: single-column Modern master until their milestone lands (plan §8).
-ARCHETYPES_ON = ("sidebar", "band", "open")
+ARCHETYPES_ON = ("sidebar", "band", "open", "gutter")
 
 PAGE_W = 12240                  # Letter, twips (8.5in); the canvas is 850 x 1100 px
 PAGE_H_PT = 792
@@ -146,7 +146,9 @@ def context(r: dict, template_key: str, lang: str, photo) -> dict:
         everything = [i for n in ("top_full", "top_side", "top_main", "main", "side")
                       for i in cells[n]]
         lay["head"] = [i for i in everything if not i.get("label")]
-        lay["rows"] = [i for i in everything if i.get("label")]
+        # one row per section, and one per job (the first carries the label):
+        # a row that cannot split is Word's only reliable keep-together
+        lay["rows"] = [b[0] for b in blocks([i for i in everything if i.get("label")])]
     lay["_full_top"] = full
     return lay
 
@@ -361,6 +363,8 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
     if spec["archetype"] == "gutter":
         _apply_gutter(document)
         _apply_styles(document, spec, lang, resolved, {"Main": "main"}, {"main": "FFFFFF"})
+        if spec["timeline"]:
+            _timeline(document, resolved["accent"], lang == "ar")
         return
     L = spec[lang]
     tbl = _layout_table(document)
@@ -476,6 +480,34 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
     cell_zone = {{"top_side": "TopSide", "top_main": "TopMain", "side": "Side",
                   "main": "Main"}[n]: zone[n] for n in cell_of.values()}
     _apply_styles(document, spec, lang, resolved, cell_zone, bgs, cell_of=cell_of)
+    if spec["timeline"]:
+        _timeline(document, resolved["accent"], lang == "ar")
+
+
+def _timeline(document, accent: str, rtl: bool) -> None:
+    """The template's experience timeline, as Word can draw it: an accent bar
+    down the START edge of each job's title and company/date line. (One
+    continuous line through the bullets is not possible: a paragraph border
+    sits at the paragraph's own indent, and the list bullets are indented.)
+    Word reads a paragraph border's `w:left` as the PHYSICAL left even in a
+    right-to-left paragraph (seen in real Word: the Arabic bars sat at the
+    end of the line), so Arabic takes `w:right`, the start edge there."""
+    edge = "right" if rtl else "left"
+    for p in document.element.body.iter(qn("w:p")):
+        rs = p.find(qn("w:r") + "/" + qn("w:rPr") + "/" + qn("w:rStyle"))
+        if rs is None or rs.get(qn("w:val")) != "CVRole":
+            continue
+        group = [p]
+        nxt = p.getnext()
+        if nxt is not None and nxt.tag == qn("w:p"):
+            ns = nxt.find(qn("w:r") + "/" + qn("w:rPr") + "/" + qn("w:rStyle"))
+            if ns is not None and ns.get(qn("w:val")) == "CVAccentText":
+                group.append(nxt)
+        for q in group:
+            bdr = OxmlElement("w:pBdr")
+            bdr.append(_w(edge, val="single", sz=18, space=6, color=accent))
+            _put(_ppr(q), bdr, PPR_ORDER)
+            _put(_ppr(q), _w("ind", **{edge: 160}), PPR_ORDER)
 
 
 GUTTER_W = 0.22       # the label column of modern-t19, of the text width
@@ -483,7 +515,9 @@ TEXT_W = 12240 - 2 * 720                  # the gutter master keeps 0.5in margin
 
 
 def _apply_gutter(document) -> None:
-    tbl = _layout_table(document)
+    # the LAST table in the body: the header's stat chips (a table too) come
+    # before it in modern-t19
+    tbl = document.element.body.findall(qn("w:tbl"))[-1]
     label = round(TEXT_W * GUTTER_W)
     _grid(tbl, [label, TEXT_W - label])
     tbl_pr = tbl.find(qn("w:tblPr"))

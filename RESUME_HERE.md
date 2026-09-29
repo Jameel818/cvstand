@@ -52,7 +52,17 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    the layout's measured headings, t16 for the photo (t1's PDF has no photo
    slot), and a "visible blank line" = an empty paragraph > 4pt (a layout's
    1-4pt structural paragraphs are required by Word).
-4. ⏳ Gutter (1) + timeline. 5. ⏳ 48-file Word
+4. ✅ **Gutter (t19) + timeline (t4 5 12 13 14 22 23 24), EN + AR.** Gutter
+   = one cantSplit row per section / per job, label beside content. Timeline =
+   an accent bar on each job's title + company line, at the START edge (Word
+   reads a border's `w:left` PHYSICALLY even in RTL: Arabic takes `w:right`).
+   **Keep-with-next removed from the layout masters:** inside a table Word
+   chains every row that holds a keep-with-next paragraph to the next row, so
+   t19 AR's whole table jumped to page 2 (proved: stripping keepNext put 95
+   paragraphs back on page 1). The cannot-split rows are the guarantee; the
+   flow test now asserts it for layouts (heading/title shares a cantSplit row
+   with what follows; no keepNext in a layout table). Fast suite 3929 passed.
+5. ⏳ 48-file Word
    verification. 6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
