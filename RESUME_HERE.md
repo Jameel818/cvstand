@@ -62,8 +62,14 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
    paragraphs back on page 1). The cannot-split rows are the guarantee; the
    flow test now asserts it for layouts (heading/title shares a cantSplit row
    with what follows; no keepNext in a layout table). Fast suite 3929 passed.
-5. ⏳ 48-file Word
-   verification. 6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
+5. ✅ **Real-Word verification, 48 files** (24 Modern × EN/AR,
+   `tools/verify_word_embedding.py modern-t1..t24`, this PC, none of the fonts
+   installed): **48/48 pass** - open, clean page breaks (no orphan heading, no
+   split job, no exact spacing), every visible glyph from an embedded font or
+   an allowed system face. 8 Arabic files flow to 2 pages (t3 5 8 13 14 17 18
+   19; accepted). 5 files drew Open Sans from Microsoft 365's cloud copy (known,
+   step 6). Report: scratchpad `verify48/report.json` (not kept).
+6. ⏳ Review page + Desktop folder. 7. ⏳ Full suite.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` written early (during the outage).
 
 ## ⏭ NEXT, in this order (each needs the user's go-ahead)

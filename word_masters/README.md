@@ -33,11 +33,47 @@ Why the change:
   `{{ r.n` + `ame }}`, which it cannot parse. `python-docx` writes each tag as
   exactly one run, so that class of bug cannot occur.
 
+## The Word LAYOUTS (2026-09-30) — every Modern template keeps its shape
+
+Since `feature/word-layouts` (docs/WORD_LAYOUTS_PLAN.md), the 24 Modern
+templates no longer share one column. Two more masters (+ RTL twins) carry
+their shape, and what differs per template is DATA, measured from the
+rendered template into `app/word_layouts.json` by
+`tools/build_word_layouts.py` (`--check` in the e2e suite):
+
+| File | Feeds | Structure |
+|---|---|---|
+| `modern_layout(_rtl).docx` | 23 Modern templates (sidebar, band, open) | a table: a top row (a band / an open layout's header), then ONE cannot-split row per main-column block (a section with its heading; each job; the first job carries the heading), with the side column one cell merged down all of them. Each cell loops over its own item list (`lay.top_side`, `lay.side`, the blocks...). |
+| `modern_gutter(_rtl).docx` | modern-t19 | the header items in the body, then one cannot-split row per section / per job: its label in a narrow gutter, its content beside it. |
+
+`app/exporters/docx_layout.py` reshapes the filled table per template (merge,
+drop, swap the columns, widths, fills, zone colours, the full-height side
+fill as a shape in the page header, heading ribbons and rules, the timeline
+bar, the skill bars). Build ONLY what you change:
+`tools/build_word_masters.py modern_layout.docx modern_layout_rtl.docx ...`
+(named masters only), so the ATS and single-column masters stay
+byte-identical.
+
+Traps found building them, all fixed and tested:
+- **docxtpl's `fix_tables()` widens an OUTER table's grid to its widest
+  NESTED row.** A 5-segment skill bar made the 2-column layout table 5 grid
+  columns wide, and Word laid the cells out on the wrong grid. Fix:
+  `docx_layout._grid()` rewrites it after rendering.
+- **Word 2010 compatibility mode shifts a table left by its first cell's
+  padding.** The layout masters are Word 2013 mode (compat 15), so a table's
+  edge sits at its indent.
+- **Keep-with-next does not work in a table.** Within a cell that breaks
+  across pages Word ignores it (a heading was stranded), and across rows it
+  chains each row to the next (a whole table jumped to page 2). The layouts
+  use cannot-split rows and no keep-with-next at all.
+- **A paragraph border's `w:left` is PHYSICAL** in a right-to-left paragraph,
+  so the Arabic timeline bar is `w:right`.
+
 ## Families (one per template category)
 
 | File | Feeds | Structure |
 |---|---|---|
-| `modern_editorial.docx` | every `modern-*` template | single wide column in Word; sidebar content (contact, skills, tools, languages) folded into the main flow in reading order. Palette + type pairing + section order preserved. |
+| `modern_editorial.docx` | a `modern-*` template with no Word layout (none today: all 24 have one; kept as the fallback for a new template until it is measured) | single wide column in Word; sidebar content (contact, skills, tools, languages) folded into the main flow in reading order. Palette + type pairing + section order preserved. |
 | `ats_standard.docx` | every `ats-*` template | genuinely single column, canonical headings, plain hyphen date ranges. Mirrors the on-screen ATS layout closely. |
 | `modern_editorial_rtl.docx` | every `modern-*` template, Arabic résumé | the same layout, right-to-left. Georgia carries no Arabic glyphs, so the display face becomes Times New Roman. |
 | `ats_standard_rtl.docx` | every `ats-*` template, Arabic résumé | the same, right-to-left. |

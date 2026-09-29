@@ -344,6 +344,9 @@ unclear, written down here.
     no heading (t1's summary, t2's contact grid, t22's labelled contact
     lines), Word has none. Per-line field labels ("Email", "Phone") are never
     taken as a section heading.
+13. **Skill bars are 5 segments,** one per level step, each with a hairline
+    border in its own colour so the fills meet without a seam. They read as
+    a stepped bar, the 5-point scale the level words map to.
 14. **The open layouts' rule is measured too:** a vertical line between the
     columns only where the PDF draws one at the split (t1, t6, in their own
     light grey). t12 has none, and t22's line is its rail, not a split.
@@ -360,9 +363,6 @@ unclear, written down here.
     every row holding a keep-with-next paragraph to the next row. modern-t19
     in Arabic then moved its whole table to page 2, leaving page 1 with only
     the header. The cannot-split rows (decision 11) are the guarantee.
-13. **Skill bars are 5 segments,** one per level step, each with a hairline
-    border in its own colour so the fills meet without a seam. They read as
-    a stepped bar, the 5-point scale the level words map to.
 
 ## 11. Download-menu wording — DRAFT (decision 5: not in the UI yet)
 
