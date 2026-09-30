@@ -34,7 +34,7 @@ docx_design._load()
 KEYS = sorted(docx_design.DESIGNS)
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 #: designs whose skill graphic shows the percent as its text (bars), not the word
-PERCENT = {"modern-t2", "modern-t15", "modern-t23"}
+PERCENT = {"modern-t2", "modern-t10", "modern-t15", "modern-t23"}
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
@@ -47,6 +47,8 @@ HEADINGS = {
     "modern-t23": ["Contact", "Summary", "Skills", "Education", "Work Experience"],
     "modern-t15": ["PERSONAL<br>INFORMATION", "EDUCATION &amp;<br>QUALIFICATIONS", "SKILLS",
                    "LANGUAGES", "CERTIFICATIONS", "PROFESSIONAL EXPERIENCE", "TOOLS"],
+    "modern-t10": ["Tools", "Languages", "Certifications", "SUMMARY", "EXPERIENCE",
+                   "EDUCATION", "SKILLS"],
     "modern-t8": ["ABOUT ME", "PERSONAL SKILLS", "CONTACT", "EDUCATION", "WORK EXPERIENCE",
                   "ALSO"],
 }
@@ -176,7 +178,7 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
 
 
 #: designs whose template has a photo slot
-PHOTO = {"modern-t2", "modern-t4", "modern-t8", "modern-t15", "modern-t20"}
+PHOTO = {"modern-t2", "modern-t4", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
 
 
 @pytest.mark.parametrize("key", sorted(PHOTO))
