@@ -33,6 +33,7 @@ from lxml import etree
 from playwright.sync_api import expect
 
 from app.exporters import docx_layout
+from app.exporters.docx_design import has_design
 from app.exporters.docx_theme import RULE_ACCENT, text_safe, themes
 
 pytestmark = pytest.mark.e2e
@@ -124,8 +125,13 @@ def test_the_word_button_sends_and_gets_the_chosen_template_and_fonts(
     #    a name in a band or a side column has that cell's own style.
     doc = etree.fromstring(z.read("word/document.xml"))
     name = body["data"]["name"]
-    name_run = next(r for r in doc.iter(f"{W}r")
-                    if "".join(t.text or "" for t in r.iter(f"{W}t")).strip() == name)
+    # the paragraph that spells the name; its first run carries the name's
+    # style (a Word DESIGN may set the name in two runs, as its PDF does:
+    # modern-t8's light first name + heavy surname)
+    name_para = next(p for p in doc.iter(f"{W}p")
+                     if "".join(t.text or "" for t in p.iter(f"{W}t")).strip() == name)
+    name_run = next(r for r in name_para.iter(f"{W}r")
+                    if "".join(t.text or "" for t in r.iter(f"{W}t")).strip())
     name_style = name_run.find(f"{W}rPr/{W}rStyle").get(f"{W}val")
     used = dict(word_names, **{name_style: word_names["CVName"]})
     if name_style != "CVName":
@@ -138,7 +144,15 @@ def test_the_word_button_sends_and_gets_the_chosen_template_and_fonts(
     #    layout takes it as measured from the PDF, readable on the cell it sits
     #    on; the single-column master takes the readable accent
     got = _color(_style(styles, name_style))
-    if docx_layout.spec_for(key):
+    if has_design(key):
+        # a design colours the run itself, the template's own name colour;
+        # it must read on whatever fill the name stands on
+        got = name_run.find(f"{W}rPr/{W}color").get(f"{W}val").upper()
+        cell = next(a for a in name_run.iterancestors() if a.tag == f"{W}tc")
+        shd = cell.find(f"{W}tcPr/{W}shd")
+        ground = shd.get(f"{W}fill") if shd is not None else "FFFFFF"
+        want = got if docx_layout.contrast(got, ground) >= 3.0 else "readable on " + ground
+    elif docx_layout.spec_for(key):
         cell = next(a for a in name_run.iterancestors() if a.tag == f"{W}tc")
         shd = cell.find(f"{W}tcPr/{W}shd")
         ground = shd.get(f"{W}fill") if shd is not None else "FFFFFF"

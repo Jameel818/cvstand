@@ -29,7 +29,13 @@ Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templat
 - [ ] 5. font sizes: NOT reached
 - [x] 6. review — `docs/review/word_fidelity_review.html` (+ `fidelity_img/`) and
   Desktop `CVStand Word fidelity review` (page + images + 28 .docx + README).
-- [ ] 7. full suite (see the final commit message / below)
+- [x] 7. Tests: fast suite 3876 passed / 0 failed / 0 errors; browser tests for
+  what changed (`--e2e -k "word or seed or journey or export or download or
+  builder"`) 68 passed after one test was made design-aware (it looked for the
+  name as ONE run; t8 writes it as two, like its PDF). The complete `--e2e`
+  run was stopped at 10% after 35 min (too slow alongside Word) - NOT run in
+  full this time. Real Word (`tools/verify_word_embedding.py`, 7 designs x EN/AR,
+  the test sample): 14/14 pass.
 
 ### NEXT (for the user / the next run)
 1. Review the page; decide whether CLOSE is good enough to continue this way.

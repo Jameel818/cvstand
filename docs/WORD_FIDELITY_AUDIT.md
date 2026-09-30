@@ -131,6 +131,15 @@ eight templates already flow to 2 pages with the full sample.
 14. **Per-template checkpoints run the Word test subset** (`-k "docx or word or
     demo"`, ~3 min, ~1080 tests); the full fast suite runs at the item
     checkpoints and at the end.
+15. **Full `--e2e` run not completed:** at 10% after 35 minutes (it shared the
+    PC with Word's verification), it was stopped; instead the whole fast suite
+    ran (3876 passed) plus every browser test touching the builder seed, the
+    exports and Word (68 passed). The full `--e2e` run is left for the merge gate.
+16. **`tests/e2e/test_word_follows_the_builder.py`** finds the name by its
+    PARAGRAPH (a design may set it in two runs, like t8's PDF); for a designed
+    template the name colour is the run's own and must read on its fill.
+17. **Golden images:** none changed and none were updated (no HTML/PDF template
+    was touched; the pixel and HTML goldens pass in the fast suite).
 
 ## Pilot results (item 3): modern-t2 and modern-t8, rendered by Word on this PC
 
