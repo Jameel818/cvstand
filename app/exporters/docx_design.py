@@ -45,6 +45,7 @@ PX = 0.72                      # pt per template px (850px canvas on a 612pt pag
 PAGE_W_PX = 850
 PAGE_W = 12240                 # twips
 PAGE_H_PT = 792
+AR_GAP = 0.8                   # Arabic vertical gaps, of the template's
 CSS_LINE_AR = 1.75             # the Arabic faces' natural line
 CSS_LINE = 1.2                 # a face's "single" line, as a multiple of its size
 
@@ -196,7 +197,7 @@ def tiny(para, half_points: int = 2, before_px: float = 0) -> None:
 # ---- paragraphs and runs -----------------------------------------------------------
 
 def fmt_p(ctx: Ctx, para, *, align=None, before=0.0, after=0.0, line=None, ind_start=0,
-          ind_end=0, first=0, shade=None, border=None, tabs=None, keep=False):
+          ind_end=0, first=0, hanging=0, shade=None, border=None, tabs=None, keep=False):
     """`before`/`after`/`ind_*` in template px; `line` = the CSS line-height
     (a multiple of the font size), written as Word's AUTO multiple (never
     Exactly: nothing may clip). `border` = {logical edge: (px, colour, space_pt)}.
@@ -224,7 +225,10 @@ def fmt_p(ctx: Ctx, para, *, align=None, before=0.0, after=0.0, line=None, ind_s
                 attrs["leader"] = leader
             el.append(_w("tab", **attrs))
         _put(ppr, el, PPR_ORDER)
-    sp = {"before": int(round(pt(before) * 20)), "after": int(round(pt(after) * 20))}
+    # Arabic lines are taller (the faces' own metrics); the GAPS between them
+    # shrink so the page keeps the PDF's rhythm - the lines themselves never do
+    k = AR_GAP if ctx.rtl else 1.0
+    sp = {"before": int(round(pt(before) * 20 * k)), "after": int(round(pt(after) * 20 * k))}
     if line is not None:
         # Word's "single" is the face's own height: ~1.2x the size for the
         # Latin faces, ~1.7x for the Arabic ones - never below single (no clip)
@@ -233,7 +237,7 @@ def fmt_p(ctx: Ctx, para, *, align=None, before=0.0, after=0.0, line=None, ind_s
     else:
         sp.update(line=240, lineRule="auto")
     _put(ppr, _w("spacing", **sp), PPR_ORDER)
-    if ind_start or ind_end or first:
+    if ind_start or ind_end or first or hanging:
         # w:ind start/end are LOGICAL in Word (they follow w:bidi)
         # (seen in real Word: in a bidi paragraph w:left IS the start side)
         attrs = {}
@@ -243,6 +247,8 @@ def fmt_p(ctx: Ctx, para, *, align=None, before=0.0, after=0.0, line=None, ind_s
             attrs["right"] = tw(ind_end)
         if first:
             attrs["firstLine"] = tw(first)
+        if hanging:
+            attrs["hanging"] = tw(hanging)
         _put(ppr, _w("ind", **attrs), PPR_ORDER)
     if align:
         # in a bidi paragraph Word reads left/right LOGICALLY: "left" = start

@@ -38,6 +38,8 @@ SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 HEADINGS = {
     "modern-t2": ["ABOUT ME", "EDUCATION", "SKILLS", "LANGUAGE", "CERTIFICATIONS",
                   "EXPERIENCE"],
+    "modern-t4": ["Contact", "Education", "Skills", "Language", "Professional Experience",
+                  "Recognition"],
     "modern-t8": ["ABOUT ME", "PERSONAL SKILLS", "CONTACT", "EDUCATION", "WORK EXPERIENCE",
                   "ALSO"],
 }

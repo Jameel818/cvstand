@@ -4,7 +4,7 @@ helpers. Everything in template px (docx_design.PX)."""
 from __future__ import annotations
 
 from ..docx_design import (
-    Box, Ctx, PAGE_W_PX, cant_split, fmt_cell, fmt_table, page_rects, tw, vmerge,
+    Box, Ctx, PAGE_W_PX, cant_split, fmt_cell, fmt_table, page_rects, run, tw, vmerge,
 )
 
 
@@ -110,3 +110,24 @@ class Stack:
     def done(self):
         if self.boxes:
             self.boxes[-1].finish()
+
+
+def block(ctx: Ctx, box: Box, width_px: float, *, fill=None, pad=(0, 0, 0, 0), border=None,
+          valign=None) -> Box:
+    """A filled / bordered block (ribbon, pill, card, bar): a one-cell table.
+    `pad` (top, start, bottom, end) px - top/bottom as paragraph spacing."""
+    tbl = box.table([tw(width_px)])
+    cell = tbl.rows[0].cells[0]
+    fmt_cell(ctx, cell, fill=fill, pad=(0, pad[1], 0, pad[3]), borders=border, valign=valign)
+    return Box(ctx, cell, tw(width_px - pad[1] - pad[3]), pad_top=pad[0], pad_bottom=pad[2])
+
+
+def bullets(ctx: Ctx, box: Box, items, *, size, color, line=1.5, indent=16, bullet="•",
+            bullet_color=None, before=0, gap=0, ind_start=0):
+    """Real text bullets (a bullet, a tab, the text, a hanging indent), so the
+    bullet takes the template's colour and size."""
+    for i, b in enumerate(items):
+        p = box.p(before=before if i == 0 else gap, line=line, ind_start=ind_start + indent,
+                  hanging=indent, tabs=[(ind_start + indent, "start", None)])
+        run(ctx, p, bullet + "	", size=size, color=bullet_color or color)
+        run(ctx, p, b, size=size, color=color)

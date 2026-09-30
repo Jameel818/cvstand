@@ -180,8 +180,8 @@ def _design_rows_keep_headings(doc) -> None:
         rows = [a for a in p.iterancestors()
                 if a.tag == f"{W}tr" and a.find(f"{W}trPr/{W}cantSplit") is not None]
         assert rows, f"{text!r} is not in a row that cannot split"
-        if any(s is None for s in styles[1:]) and "—" in text:
-            continue                          # a run-in label: content is in the paragraph
+        if any(s is None for s in styles[1:]):
+            continue                          # a run-in label: its content is in the paragraph
         nxt = paras[i + 1] if i + 1 < len(paras) else None
         assert nxt is not None and rows[0] in list(nxt.iterancestors()), (
             f"{text!r} ends its unbreakable row")
