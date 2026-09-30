@@ -21,6 +21,7 @@ Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templat
   long CV flows. pdf2docx compared: not usable (see audit). Tests:
   `tests/test_docx_designs.py`, flow rule for designs. Fast suite 3921 passed.
 - [ ] 4. other templates
+  - t20 CLOSE EN/AR (demo 1 page; long flows)
   - t4 CLOSE EN/AR (demo 1 page; long flows)
 - [ ] 6. review   - [ ] 7. full suite
 

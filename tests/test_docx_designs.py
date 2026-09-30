@@ -40,6 +40,8 @@ HEADINGS = {
                   "EXPERIENCE"],
     "modern-t4": ["Contact", "Education", "Skills", "Language", "Professional Experience",
                   "Recognition"],
+    "modern-t20": ["CONTACT", "EXPERTISE", "LANGUAGES", "TOOLS", "CERTIFICATIONS",
+                   "WORK EXPERIENCE", "EDUCATION"],
     "modern-t8": ["ABOUT ME", "PERSONAL SKILLS", "CONTACT", "EDUCATION", "WORK EXPERIENCE",
                   "ALSO"],
 }

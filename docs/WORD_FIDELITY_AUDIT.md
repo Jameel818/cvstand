@@ -121,6 +121,16 @@ eight templates already flow to 2 pages with the full sample.
     mirroring + digits not RTL, embedded fonts) and the flow rule in
     `tests/test_docx_flow.py` (every heading/title in an unbreakable row shared
     with what follows). No assertion was loosened.
+11. **Arabic vertical gaps x0.8** (`docx_design.AR_GAP`): the Arabic faces'
+    lines are taller than the PDF's CSS lines; the gaps shrink, the lines never
+    do (t4 AR spilled one line).
+12. **Where Word's natural lines make a column longer than the PDF's, the gaps
+    are trimmed, never the text** (t20: dot glyph lines are taller than 9px CSS dots).
+13. **t20 Arabic portrait block is 70px tall**, as the Arabic PDF draws it (its
+    flex column shrinks the 214px block to fit the taller Arabic text).
+14. **Per-template checkpoints run the Word test subset** (`-k "docx or word or
+    demo"`, ~3 min, ~1080 tests); the full fast suite runs at the item
+    checkpoints and at the end.
 
 ## Pilot results (item 3): modern-t2 and modern-t8, rendered by Word on this PC
 

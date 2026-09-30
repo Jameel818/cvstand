@@ -131,3 +131,11 @@ def bullets(ctx: Ctx, box: Box, items, *, size, color, line=1.5, indent=16, bull
                   hanging=indent, tabs=[(ind_start + indent, "start", None)])
         run(ctx, p, bullet + "	", size=size, color=bullet_color or color)
         run(ctx, p, b, size=size, color=color)
+
+
+def node_x(ctx: Ctx, cell_px: float, at: str, d_px: float) -> float:
+    """x (pt, from the cell's physical left) that centres a `d_px` node on the
+    cell's LOGICAL `at` edge ("start"/"end") - a VML shape is placed physically."""
+    from ..docx_design import pt
+    left = (at == "start") != ctx.rtl
+    return (0.0 if left else pt(cell_px)) - pt(d_px) / 2
