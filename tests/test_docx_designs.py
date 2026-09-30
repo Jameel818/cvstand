@@ -34,7 +34,7 @@ docx_design._load()
 KEYS = sorted(docx_design.DESIGNS)
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 #: designs whose skill graphic shows the percent as its text (bars), not the word
-PERCENT = {"modern-t2", "modern-t23"}
+PERCENT = {"modern-t2", "modern-t15", "modern-t23"}
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
@@ -45,6 +45,8 @@ HEADINGS = {
     "modern-t20": ["CONTACT", "EXPERTISE", "LANGUAGES", "TOOLS", "CERTIFICATIONS",
                    "WORK EXPERIENCE", "EDUCATION"],
     "modern-t23": ["Contact", "Summary", "Skills", "Education", "Work Experience"],
+    "modern-t15": ["PERSONAL<br>INFORMATION", "EDUCATION &amp;<br>QUALIFICATIONS", "SKILLS",
+                   "LANGUAGES", "CERTIFICATIONS", "PROFESSIONAL EXPERIENCE", "TOOLS"],
     "modern-t8": ["ABOUT ME", "PERSONAL SKILLS", "CONTACT", "EDUCATION", "WORK EXPERIENCE",
                   "ALSO"],
 }
@@ -59,10 +61,25 @@ def _text(el) -> str:
     return "".join(x.text or "" for x in el.iter(f"{W}t"))
 
 
+def _lines(p):
+    """A paragraph's runs split at its line breaks (w:br), as run groups."""
+    out, cur = [], etree.Element("g")
+    for r in p.iter(f"{W}r"):
+        for ch in r:
+            if ch.tag == f"{W}br":
+                out.append(cur)
+                cur = etree.Element("g")
+            elif ch.tag == f"{W}t":
+                t_ = etree.SubElement(cur, f"{W}t")
+                t_.text = ch.text
+    out.append(cur)
+    return out
+
+
 def _label(key_text: str, lang: str) -> str:
     tok = set_lang(lang)
     try:
-        return str(t(key_text))
+        return str(t(key_text)).replace("<br>", "\n").replace("&amp;", "&")
     finally:
         reset_lang(tok)
 
@@ -81,7 +98,8 @@ def test_every_design_has_its_heading_list():
 def test_every_section_appears_under_the_templates_own_heading(exports, key, lang):
     doc, _ = _doc(exports[key, lang])
     # a ruled heading ends in spaces + a tab (the rule's leader)
-    paras = [_text(p).strip("  	") for p in doc.iter(f"{W}p")]
+    paras = ["\n".join(_text(x) for x in _lines(p)).strip(" \u00a0\t")
+             for p in doc.iter(f"{W}p")]
     for h in HEADINGS[key]:
         assert _label(h, lang) in paras, f"{key} {lang}: no {h!r} heading"
 
@@ -158,7 +176,7 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
 
 
 #: designs whose template has a photo slot
-PHOTO = {"modern-t2", "modern-t4", "modern-t8", "modern-t20"}
+PHOTO = {"modern-t2", "modern-t4", "modern-t8", "modern-t15", "modern-t20"}
 
 
 @pytest.mark.parametrize("key", sorted(PHOTO))

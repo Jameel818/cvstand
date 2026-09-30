@@ -616,7 +616,9 @@ def render(data: dict, template_key: str, photo: Path | None):
     token = set_lang(lang)
     try:
         ctx = Ctx(doc=doc, r=r, lang=lang, resolved=resolved, photo=photo,
-                  t=lambda s: str(t(s)).replace("<br>", " "))
+                  # a label's <br> is a line break in Word too (python-docx
+                  # writes "\n" as w:br), as the PDF breaks it
+                  t=lambda s: str(t(s)).replace("<br>", "\n").replace("&amp;", "&"))
         DESIGNS[template_key](ctx)
     finally:
         reset_lang(token)

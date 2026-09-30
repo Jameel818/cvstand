@@ -1,3 +1,3 @@
 """The per-template Word designs; importing a module registers its design
 (docx_design.DESIGNS). One module per template, named after it."""
-from . import t2, t4, t8, t20, t23  # noqa: F401
+from . import t2, t4, t8, t15, t20, t23  # noqa: F401
