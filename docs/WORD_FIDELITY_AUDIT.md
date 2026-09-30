@@ -158,3 +158,34 @@ Converted the same PDFs (demo CV with photo) and opened them in Word:
   labels merged; t2 AR spills a stray line to page 2.
 - **Editability:** static positioned text boxes/tables sized to the PDF; a longer
   CV cannot flow. **Not usable** as the export; the per-template design wins.
+
+## Results after item 4 (templates rebuilt this run)
+
+All graded from Word's own rendering on this PC, side by side with the PDF
+(`docs/review/word_fidelity_review.html`, Desktop "CVStand Word fidelity review").
+
+| Template | EN | AR | Demo CV (photo + refs) | Long CV |
+|---|---|---|---|---|
+| modern-t2 | CLOSE | CLOSE | 1 page / 1 page | 2 pages, clean |
+| modern-t4 | CLOSE | CLOSE | 1 / 1 | 2, clean |
+| modern-t8 | CLOSE | CLOSE | 1 / 1 | EN 1, AR 2, clean |
+| modern-t10 | CLOSE | CLOSE | 1 / 1 | 2, clean |
+| modern-t15 | CLOSE | CLOSE | 1 / 1 | 2, clean |
+| modern-t20 | CLOSE | CLOSE | 1 / 1 | 2, clean |
+| modern-t23 | CLOSE | CLOSE | 1 / 1 | 2, clean |
+
+Remaining differences common to all: rounded corners are square (bars, pills,
+cards); dot rows are Arial glyphs (slightly smaller than the CSS dots); the
+photo placeholder has no words. Per template: see the review page.
+
+**Not reached (still on the generic layout export):** Sidebar t3 t5 t9 t16 t17
+t24; Band t7 t11 t13 t14 t18 t21; Open t1 t6 t12 t22; Gutter t19. Item 5 (font
+sizes) not reached.
+
+**Estimate for the rest:** with the shared blocks now in place (SidebarPage,
+Stack, block, bullets, bars, dots, timeline nodes, page shapes, photo frames),
+a plain template takes ~20-30 min including two Word render rounds: ~6 h for
+the 17. Longer: the five RING templates (t12 t16 t17 t22 t24) need a ring
+drawn as a shape with the percent as text over it (~1 h to build once), t22's
+giant vertical "RESUME" (rotated text box) and t14/t21's overlapping blocks
+(~30 min extra each). Item 5 (sizes): ~1.5 h.

@@ -20,13 +20,26 @@ Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templat
   designed key there. Grades t2 EN/AR CLOSE, t8 EN/AR CLOSE; demo 1 page all 4;
   long CV flows. pdf2docx compared: not usable (see audit). Tests:
   `tests/test_docx_designs.py`, flow rule for designs. Fast suite 3921 passed.
-- [ ] 4. other templates
+- [x] 4. other templates (7 of 24 done: t2 t4 t8 t10 t15 t20 t23, all CLOSE EN/AR; 17 not reached)
   - t10 CLOSE EN/AR (demo 1 page; long flows)
   - t15 CLOSE EN/AR (demo 1 page; long flows)
   - t23 CLOSE EN/AR (demo 1 page; long flows)
   - t20 CLOSE EN/AR (demo 1 page; long flows)
   - t4 CLOSE EN/AR (demo 1 page; long flows)
-- [ ] 6. review   - [ ] 7. full suite
+- [ ] 5. font sizes: NOT reached
+- [x] 6. review — `docs/review/word_fidelity_review.html` (+ `fidelity_img/`) and
+  Desktop `CVStand Word fidelity review` (page + images + 28 .docx + README).
+- [ ] 7. full suite (see the final commit message / below)
+
+### NEXT (for the user / the next run)
+1. Review the page; decide whether CLOSE is good enough to continue this way.
+2. Remaining 17 templates in the same order (Sidebar t3 t5 t9 t16 t17 t24,
+   Band t7 t11 t13 t14 t18 t21, Open t1 t6 t12 t22, t19); rings need a shape.
+   Pattern: `app/exporters/word_designs/tN.py` + register in `__init__` + HEADINGS
+   (and PHOTO/PERCENT) in `tests/test_docx_designs.py`; render with scratch
+   `fid.py NAME modern-tN` (demo+photo+refs and long CV, EN/AR, real Word).
+3. Item 5: Word applies the user's chosen SIZES.
+4. Merge only on the user's go-ahead; pushing main deploys.
 
 Scratch tools (session scratchpad): `shots.py` (batch Word→PDF with ONE Word
 instance, pdf.js PNGs, side-by-side sheets), `audit_render.py`, `demo_fit.py`,
