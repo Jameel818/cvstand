@@ -1,4 +1,27 @@
-# RESUME HERE — 2026-09-30 (WORD LAYOUTS BUILT on `feature/word-layouts`, all 24 Modern templates, 48/48 real Word, full suite green; NOT merged; main = `e56240d`, live, untouched)
+# RESUME HERE — 2026-09-30 (WORD FIDELITY run on `feature/word-fidelity`, from `feature/word-layouts`; NOT merged; main untouched)
+
+## 🌙 AUTONOMOUS RUN — Word fidelity (user away ~7h)
+Branch `feature/word-fidelity` from `feature/word-layouts` `393f655`. Never push
+main / merge / deploy. Push this branch only (§9 form) + `git ls-remote`.
+Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templates
+(Sidebar, Band, Open, t19) → 5 font sizes → 6 review page + Desktop folder →
+7 full suite. Decisions: `docs/WORD_FIDELITY_AUDIT.md` "Decisions made during the run".
+
+- [x] 1. AUDIT — `docs/WORD_FIDELITY_AUDIT.md` (24 × EN/AR, PDF vs real-Word
+  render; 15 cross-cutting losses X1-X15 incl. Arabic phones/`$3.2M` reversed
+  and wrong accents in t6 t14 t15). Fast suite 3929 passed.
+- [ ] 2. DEMO CV
+- [ ] 3. PILOT t2 + t8
+- [ ] 4. other templates
+- [ ] 6. review   - [ ] 7. full suite
+
+Scratch tools (session scratchpad): `shots.py` (batch Word→PDF with ONE Word
+instance, pdf.js PNGs, side-by-side sheets), `audit_render.py`, `demo_fit.py`,
+`demo_word.py`.
+
+---
+
+# (previous) RESUME HERE — 2026-09-30 (WORD LAYOUTS BUILT on `feature/word-layouts`, all 24 Modern templates, 48/48 real Word, full suite green; NOT merged; main = `e56240d`, live, untouched)
 
 ## 🌙 OVERNIGHT RUN — Word layouts (user asleep; approved plan, decisions in plan §9–§10)
 Branch `feature/word-layouts` from `main` `e56240d` (+ cherry-picks of the
