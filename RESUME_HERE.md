@@ -84,6 +84,16 @@ checkpoints: see the user's overnight message, mirrored in the plan §9.
 8. ✅ `docs/STEP7_CALIBRATION_PLAN.md` (plan only; found: Word applies the
    chosen fonts but never the chosen SIZES - DECIDE (2) there).
 
+### ⏭ NEXT TASK (user, 2026-09-30) — on `feature/word-layouts`
+(a) **Word must apply the user's chosen SIZES** (Name, Headings, Details),
+    not only the fonts, in the layout masters AND the ATS masters, EN + AR,
+    with tests and a real-Word check.
+(b) **Test a PHOTO and a LONG CV** (5 jobs, 12 skills, 4 languages) on 6
+    templates — 2 Sidebar, 2 Band, 1 Open, and t19 — EN + AR, in real Word.
+(c) **Add those 12 cases** to the review page (`docs/review/`) and the Desktop
+    folder "CVStand Word layouts review".
+**Merge + deploy only after the user's review and approval.**
+
 ### ⏭ FOR THE USER (morning)
 1. Review `docs/review/word_layouts_review.html` (or the Desktop folder
    "CVStand Word layouts review", which also has the 48 .docx) and plan §10
