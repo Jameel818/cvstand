@@ -10,7 +10,10 @@ Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templat
 - [x] 1. AUDIT — `docs/WORD_FIDELITY_AUDIT.md` (24 × EN/AR, PDF vs real-Word
   render; 15 cross-cutting losses X1-X15 incl. Arabic phones/`$3.2M` reversed
   and wrong accents in t6 t14 t15). Fast suite 3929 passed.
-- [ ] 2. DEMO CV
+- [x] 2. DEMO CV — `data/demo_resume{,_ar}.json` (builder seed via
+  `config.DEMO_RESUME_PATHS` / `store.seed_resume`); samples unchanged. PDF: 48/48
+  one page, auto-fit a no-op. Word (layout exporter): 47/48 one page, t8-ar = 2
+  (rebuilt in the pilot). `tests/test_demo_resume.py`. Fast suite 3937 passed.
 - [ ] 3. PILOT t2 + t8
 - [ ] 4. other templates
 - [ ] 6. review   - [ ] 7. full suite

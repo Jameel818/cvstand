@@ -24,6 +24,16 @@ SAMPLE_RESUME_PATHS = {
     "ar": ROOT / "data" / "sample_resume_ar.json",
 }
 
+# The DEMO résumé a visitor's builder starts from, one per language: the
+# showcase content shortened so the example fits ONE page in every Modern
+# template, in the PDF and in Word (docs/WORD_FIDELITY_AUDIT.md, item 2). A
+# separate file on purpose: the tests, the goldens and the gallery keep
+# rendering the sample files above, unchanged.
+DEMO_RESUME_PATHS = {
+    "en": ROOT / "data" / "demo_resume.json",
+    "ar": ROOT / "data" / "demo_resume_ar.json",
+}
+
 # Template catalogue + which are live lives in app/registry.py.
 # DOCX master families (one per category) live under word_masters/.
 

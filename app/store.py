@@ -16,6 +16,7 @@ from functools import lru_cache
 from . import registry
 from .config import (
     RESUME_PATH,
+    DEMO_RESUME_PATHS,
     SAMPLE_RESUME_PATH,
     SAMPLE_RESUME_PATHS,
     SERVER_STORE,
@@ -46,8 +47,11 @@ def seed_resume(lang: str = "en") -> dict[str, Any]:
     An unknown language falls back to English rather than raising — the same
     degrade rule `load_showcase` follows, and for the same reason: the value
     comes from a user-editable cookie.
+
+    It is the DEMO file (config.DEMO_RESUME_PATHS), the showcase content cut
+    to fit one page in every Modern template in the PDF and in Word.
     """
-    return _read_json(SAMPLE_RESUME_PATHS.get(lang, SAMPLE_RESUME_PATH))
+    return _read_json(DEMO_RESUME_PATHS.get(lang, DEMO_RESUME_PATHS["en"]))
 
 
 def load_resume(seed_lang: str = "en") -> dict[str, Any]:
