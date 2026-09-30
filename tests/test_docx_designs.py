@@ -33,6 +33,8 @@ W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 docx_design._load()
 KEYS = sorted(docx_design.DESIGNS)
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
+#: designs whose skill graphic shows the percent as its text (bars), not the word
+PERCENT = {"modern-t2", "modern-t23"}
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
@@ -42,6 +44,7 @@ HEADINGS = {
                   "Recognition"],
     "modern-t20": ["CONTACT", "EXPERTISE", "LANGUAGES", "TOOLS", "CERTIFICATIONS",
                    "WORK EXPERIENCE", "EDUCATION"],
+    "modern-t23": ["Contact", "Summary", "Skills", "Education", "Work Experience"],
     "modern-t8": ["ABOUT ME", "PERSONAL SKILLS", "CONTACT", "EDUCATION", "WORK EXPERIENCE",
                   "ALSO"],
 }
@@ -100,7 +103,7 @@ def test_skills_keep_name_and_level_as_text(exports, key, lang):
     text = _text(doc)
     for sk in SAMPLES[lang]["skills"]:
         assert sk["name"] in text
-        level = f"{sk['percent']}%" if key == "modern-t2" else sk["level"]
+        level = f"{sk['percent']}%" if key in PERCENT else sk["level"]
         assert level in text, f"{key}: {sk['name']} has no level text"
 
 
@@ -154,7 +157,11 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
     assert not bad, bad
 
 
-@pytest.mark.parametrize("key", KEYS)
+#: designs whose template has a photo slot
+PHOTO = {"modern-t2", "modern-t4", "modern-t8", "modern-t20"}
+
+
+@pytest.mark.parametrize("key", sorted(PHOTO))
 def test_a_photo_lands_in_the_document(key, tmp_path, monkeypatch):
     from PIL import Image
     from app.exporters import docx as D

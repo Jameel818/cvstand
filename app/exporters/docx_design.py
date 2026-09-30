@@ -504,6 +504,24 @@ def page_rects(ctx: Ctx, rects_all: list, rects_first: list = ()) -> None:
                    [phys(r) for r in rects_first])
 
 
+def page_ovals(ctx: Ctx, ovals: list) -> None:
+    """Circles on every page, behind the text: (cx_px, cy_px, d_px, colour),
+    cx logical from the start edge. Call after page_rects."""
+    para = ctx.doc.sections[0].header.paragraphs[0]
+    for n, (cx, cy, d, colour) in enumerate(ovals):
+        if ctx.rtl:
+            cx = PAGE_W_PX - cx
+        para._p.append(parse_xml(
+            f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+            f'xmlns:v="urn:schemas-microsoft-com:vml" '
+            f'xmlns:o="urn:schemas-microsoft-com:office:office"><w:pict>'
+            f'<v:oval id="cvstand_dot_{n}" o:allowincell="f" style="position:absolute;'
+            f'margin-left:{pt(cx - d / 2):.2f}pt;margin-top:{pt(cy):.2f}pt;width:{pt(d):.2f}pt;'
+            f'height:{pt(d):.2f}pt;z-index:{n - 251650000};mso-position-horizontal-relative:page;'
+            f'mso-position-vertical-relative:page" fillcolor="#{colour}" stroked="f"/>'
+            f'</w:pict></w:r>'))
+
+
 def vml_oval(ctx: Ctx, para, *, x_pt: float, y_pt: float, d_pt: float, fill: str,
              stroke: str | None, weight_pt: float = 1.5, n: int = 1):
     """A small circle anchored in `para`, positioned from the start of its text
