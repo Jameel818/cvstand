@@ -97,3 +97,54 @@ eight templates already flow to 2 pages with the full sample.
 4. **Demo CV:** the builder's starting sample becomes `data/demo_resume*.json`
    (shorter content, same sections + References); `data/sample_resume*.json`
    stay unchanged for the tests and the gallery/landing showcase.
+5. **Vertical padding is paragraph spacing, never a cell margin** (measured in
+   Word: it applies the LARGEST top margin in a row to every cell of that row,
+   so the header's padding pushed t8's merged side column down 25pt).
+6. **Side-column sections are nested tables with unbreakable rows** (heading in
+   the first entry's row): a heading can no longer end a page alone in the
+   side column (t2's long CV left CERTIFICATIONS at the foot of page 1).
+7. **Arabic line height:** a template's CSS line-height is applied relative to
+   the face's own "single" line: 1.2x size for Latin faces, 1.75x for the Arabic
+   ones, never below single (the first cut doubled Arabic line gaps: t2 AR ran to
+   2 pages). Letter-spacing is never applied to runs holding Arabic letters
+   (Word pulls the joined letters apart; the PDF draws none there).
+8. **Bidi facts measured in Word:** in a bidi paragraph `w:ind` left/right and
+   `w:jc` left/right are LOGICAL (start/end); paragraph and cell borders are
+   PHYSICAL. Dot rows are marked RTL in Arabic so the filled dots start on the
+   right, as in the PDF.
+9. **Exact heights stay banned** (`tests/test_docx_flow.py`): bars and spacer
+   rows use "at least" heights around a 1pt empty paragraph instead.
+10. **Tests:** the layout-master tests (`tests/test_docx_layouts.py`) now cover
+    the templates still exported through the layout masters; designed
+    templates get the same promises in `tests/test_docx_designs.py` (headings,
+    skill text + graphics, unrated skill, contrast on fills, photo, Arabic
+    mirroring + digits not RTL, embedded fonts) and the flow rule in
+    `tests/test_docx_flow.py` (every heading/title in an unbreakable row shared
+    with what follows). No assertion was loosened.
+
+## Pilot results (item 3): modern-t2 and modern-t8, rendered by Word on this PC
+
+Test (a) = demo CV with photo + references; (b) = long CV (5 jobs, 12 skills,
+4 languages, references).
+
+| File | (a) pages | (b) pages | Grade | Remaining differences |
+|---|---|---|---|---|
+| t2 EN | 1 | 2 | **CLOSE** (near MATCHES) | bar ends square (PDF rounded); heading rule a hairline via tab leader, sits ~1pt lower; vertical rhythm ~5% looser; placeholder circle has no words |
+| t2 AR | 1 | 2 | **CLOSE** | as EN; the stat "2×" reads as typed (the PDF's bidi shows "×2") |
+| t8 EN | 1 | 1 | **CLOSE** | name's first word is the regular face (the PDF's 300 weight is not built); dot glyphs slightly smaller; bar text 1-2px lower |
+| t8 AR | 1 | 2 | **CLOSE** | as EN |
+
+Long CV page 2: sidebar colour continues (header shape), section bars and
+heading rules keep their style, no clipped text, every heading stays with its
+first entry (checked in the Word renders and by the flow test).
+
+### pdf2docx comparison (installed in the scratchpad only)
+Converted the same PDFs (demo CV with photo) and opened them in Word:
+- **English t2:** looks close at a glance, but the fonts are not embedded (Word
+  falls back to a serif), the photo is dropped (only the ring survives), and
+  every paragraph has an EXACT line height (~70 per file: text grows -> clips).
+- **English t8:** the header block breaks (title bar misplaced, stats labels lost).
+- **Arabic:** broken - names and words reordered ("خليلليلى"), "$3.2M" -> "3.2$ M4",
+  labels merged; t2 AR spills a stray line to page 2.
+- **Editability:** static positioned text boxes/tables sized to the PDF; a longer
+  CV cannot flow. **Not usable** as the export; the per-template design wins.

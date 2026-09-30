@@ -34,12 +34,16 @@ from lxml import etree
 from app import registry
 from app.exporters import docx_layout as DL
 from app.exporters.docx import _master_for, render_docx
+from app.exporters.docx_design import has_design
 from tests.samples import ARABIC, ENGLISH
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 V = "{urn:schemas-microsoft-com:vml}"
 MODERN = [k for k in registry.ported_keys() if k.startswith("modern-")]
-ON = [k for k in MODERN if DL.spec_for(k)]
+ON = [k for k in MODERN if DL.spec_for(k) and not has_design(k)]
+#: ON lists the templates EXPORTED through the layout masters. A template with
+#: its own Word design (app/exporters/docx_design.py) is checked for the same
+#: promises in its own terms by tests/test_docx_designs.py.
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 
 #: docs/WORD_LAYOUTS_PLAN.md §3, approved by the user 2026-09-29.

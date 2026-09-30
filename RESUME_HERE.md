@@ -14,7 +14,12 @@ Work order (user): 1 audit → 2 demo CV → 3 pilot t2 + t8 → 4 other templat
   `config.DEMO_RESUME_PATHS` / `store.seed_resume`); samples unchanged. PDF: 48/48
   one page, auto-fit a no-op. Word (layout exporter): 47/48 one page, t8-ar = 2
   (rebuilt in the pilot). `tests/test_demo_resume.py`. Fast suite 3937 passed.
-- [ ] 3. PILOT t2 + t8
+- [x] 3. PILOT t2 + t8 — per-template Word DESIGNS built in code:
+  `app/exporters/docx_design.py` (primitives, Box, bidi rules, render) +
+  `app/exporters/word_designs/{common,t2,t8}.py`; `docx.render_docx` routes a
+  designed key there. Grades t2 EN/AR CLOSE, t8 EN/AR CLOSE; demo 1 page all 4;
+  long CV flows. pdf2docx compared: not usable (see audit). Tests:
+  `tests/test_docx_designs.py`, flow rule for designs. Fast suite 3921 passed.
 - [ ] 4. other templates
 - [ ] 6. review   - [ ] 7. full suite
 

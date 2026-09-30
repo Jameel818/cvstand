@@ -22,7 +22,7 @@ from pathlib import Path
 from .. import registry
 from ..config import UPLOADS_DIR, WORD_MASTERS_DIR
 from ..schema import DOT_TOTAL, dots_for, lang_of, normalize
-from . import docx_font_embed, docx_layout, docx_theme
+from . import docx_design, docx_font_embed, docx_layout, docx_theme
 
 
 log = logging.getLogger(__name__)
@@ -173,6 +173,10 @@ def render_docx(data: dict, template_key: str) -> bytes:
             f"(expected at {master_path}). DOCX export for {template_key} is pending."
         )
 
+    if docx_design.has_design(template_key):
+        # the template's own Word DESIGN, built in code (docs/WORD_FIDELITY_AUDIT.md)
+        return _render_design(data, template_key)
+
     try:
         from docxtpl import DocxTemplate
     except ImportError as exc:  # pragma: no cover
@@ -203,4 +207,25 @@ def render_docx(data: dict, template_key: str) -> bytes:
     out = docx_font_embed.embed_fonts(buf.getvalue(), faces)
     log.info("docx %s: %d KB, %d embedded face(s) %s", template_key, len(out) // 1024,
              len(faces), sorted(faces))
+    return out
+
+
+def _photo_path(photo_url: str) -> Path | None:
+    if not photo_url:
+        return None
+    path = UPLOADS_DIR / Path(photo_url).name
+    return path if path.exists() else None
+
+
+def _render_design(data: dict, template_key: str) -> bytes:
+    import io
+
+    doc, resolved = docx_design.render(data, template_key,
+                                       _photo_path(normalize(data).get("photo_url", "")))
+    faces = docx_theme.faces_drawn(doc, resolved)
+    buf = io.BytesIO()
+    doc.save(buf)
+    out = docx_font_embed.embed_fonts(buf.getvalue(), faces)
+    log.info("docx %s (design): %d KB, %d embedded face(s)", template_key, len(out) // 1024,
+             len(faces))
     return out

@@ -30,6 +30,7 @@ from lxml import etree
 from app import registry
 from app.exporters import docx_layout
 from app.exporters.docx import render_docx
+from app.exporters.docx_design import has_design
 from app.schema import lang_of
 from tests.samples import ARABIC, ENGLISH
 
@@ -120,6 +121,9 @@ def test_headings_and_job_titles_keep_with_what_follows(key, data):
     ROW: every heading and job title shares a cannot-split row with what
     follows it, and nothing in the table keeps with next."""
     doc = _xml(render_docx(data, key), "word/document.xml")
+    if has_design(key):
+        _design_rows_keep_headings(doc)
+        return
     paras = _body_paragraphs(doc)
     layout = docx_layout.spec_for(key) is not None
     if layout:
@@ -154,3 +158,31 @@ def test_headings_and_job_titles_keep_with_what_follows(key, data):
         assert headings == want and roles >= 1, f"{headings} headings, the layout has {want}"
     else:
         assert headings >= 5 and roles >= 1, "the sample reaches headings and jobs"
+
+
+def _design_rows_keep_headings(doc) -> None:
+    """A per-template Word DESIGN (docs/WORD_FIDELITY_AUDIT.md) is tables all
+    the way down - the side column's sections included - so the same rule
+    holds everywhere in it: a heading or job title starts a paragraph inside
+    a row that cannot split (its innermost one), and the paragraph after it
+    is in that same row - unless the title is a run-in label whose content
+    follows in its own paragraph ("Tools — Figma · ...")."""
+    paras = [p for p in doc.iter(f"{W}p") if "".join(t.text or "" for t in p.iter(f"{W}t")).strip()]
+    n = 0
+    for i, p in enumerate(paras):
+        runs = [r for r in p.iter(f"{W}r") if "".join(t.text or "" for t in r.iter(f"{W}t")).strip()]
+        styles = [(r.find(f"{W}rPr/{W}rStyle").get(f"{W}val")
+                   if r.find(f"{W}rPr/{W}rStyle") is not None else None) for r in runs]
+        if styles[0] not in ("CVHeading", "CVRole"):
+            continue
+        n += 1
+        text = "".join(p.itertext())
+        rows = [a for a in p.iterancestors()
+                if a.tag == f"{W}tr" and a.find(f"{W}trPr/{W}cantSplit") is not None]
+        assert rows, f"{text!r} is not in a row that cannot split"
+        if any(s is None for s in styles[1:]) and "—" in text:
+            continue                          # a run-in label: content is in the paragraph
+        nxt = paras[i + 1] if i + 1 < len(paras) else None
+        assert nxt is not None and rows[0] in list(nxt.iterancestors()), (
+            f"{text!r} ends its unbreakable row")
+    assert n >= 5, "the sample reaches headings and jobs"
