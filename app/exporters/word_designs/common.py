@@ -156,13 +156,25 @@ class SidebarPage:
             for b in self.rows:
                 if b is box:
                     break
-                above += m.block(b.c._tc, b.w / 20)
+                above += self._row_h(m, b)
             first = next(box.c._tc.iter(qn("w:p")), None)
             if first is not None:
                 _set_before(first, max(pt(min_gap_px), pt(y_px) - sec.top_margin.pt - above))
         self.ctx.after_lines.append(go)
 
-    def push_to_bottom(self, box: Box, *, bottom_px: float = 0, reserve_pt: float = 12.0) -> None:
+    @staticmethod
+    def _row_h(m, b) -> float:
+        """A main row's height: its content, or its AT-LEAST height if taller
+        (a band row: t7/t11/t18)."""
+        from docx.oxml.ns import qn
+        h = m.block(b.c._tc, b.w / 20)
+        tr = b.c._tc.getparent()
+        th = tr.find(qn("w:trPr") + "/" + qn("w:trHeight")) if tr is not None else None
+        if th is not None:
+            h = max(h, int(th.get(qn("w:val"))) / 20)
+        return h
+
+    def push_to_bottom(self, box: Box, *, bottom_px: float = 0, reserve_pt: float = 24.0) -> None:
         """The PDF's `margin-top:auto` on a main-column block: the page's slack
         (one page, measured once the line heights are final) goes above
         `box`, so it sits at the foot of the column, `bottom_px` above the
@@ -175,7 +187,7 @@ class SidebarPage:
 
         def go():
             m = Measure(self.ctx.resolved)
-            used = sum(m.block(b.c._tc, b.w / 20) for b in self.rows)
+            used = sum(self._row_h(m, b) for b in self.rows)
             slack = avail - reserve_pt - used
             first = next(box.c._tc.iter(qn("w:p")), None)
             if slack > 0 and first is not None:
@@ -204,7 +216,7 @@ class SidebarPage:
 
         def go():
             m = Measure(self.ctx.resolved)
-            used = sum(m.block(b.c._tc, b.w / 20) for b in self.rows)
+            used = sum(self._row_h(m, b) for b in self.rows)
             over = used - avail
             if over <= 0 or over > max_over_pt:
                 return
