@@ -380,3 +380,48 @@ def pill(ctx: Ctx, box: Box, label: str, width_px: float, *, fill: str, color: s
         box.pad_top += after
     p.spacer = spacer
     return p
+
+
+class ColumnPage(SidebarPage):
+    """One full-width column (a band template with no side column): one
+    unbreakable row per block, the same measured helpers (pin_top,
+    push_to_bottom, the near-one-page fit) as SidebarPage."""
+
+    def __init__(self, ctx: Ctx, *, pad_x=(48, 48)):
+        self.ctx = ctx
+        self.side = None
+        self.side_end = False
+        self.main_pad_x = pad_x
+        self.side_fill = None
+        self.side_px, self.main_px = 0, PAGE_W_PX
+        self.side_w, self.main_w = 0, tw(PAGE_W_PX)
+        self.tbl = ctx.doc.add_table(rows=1, cols=1)
+        fmt_table(self.tbl, [self.main_w])
+        self.rows = []
+        self._first = True
+
+    def _main_cell(self, row):
+        return row.cells[0]
+
+    def main_row(self, *, pad_top=0, pad_bottom=0, fill=None, pad_x=None, split=False) -> Box:
+        if self._first:
+            row = self.tbl.rows[0]
+            self._first = False
+        else:
+            row = self.tbl.add_row()
+        if not split:
+            cant_split(row)
+        cell = row.cells[0]
+        px = pad_x or self.main_pad_x
+        fmt_cell(self.ctx, cell, fill=fill, pad=(0, px[0], 0, px[1]))
+        box = Box(self.ctx, cell, self.main_w - tw(px[0] + px[1]), pad_top=pad_top,
+                  pad_bottom=pad_bottom)
+        self.rows.append(box)
+        return box
+
+    def finish(self):
+        self._fit_main()
+        tail = self.main_row(split=True)
+        for b in self.rows:
+            b.finish()
+        return tail

@@ -38,6 +38,7 @@ PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t7", "modern-t9", "mod
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
+    "modern-t13": ["Experience", "Skills", "Education", "Certifications"],
     "modern-t11": ["Skills", "Education", "Language", "Experience", "Recognition", "Tools"],
     "modern-t7": ["Career Objective", "Experience", "Training", "Skills", "Education", "Tools",
                   "Languages", "Contact"],

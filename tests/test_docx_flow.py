@@ -185,4 +185,6 @@ def _design_rows_keep_headings(doc) -> None:
         nxt = paras[i + 1] if i + 1 < len(paras) else None
         assert nxt is not None and rows[0] in list(nxt.iterancestors()), (
             f"{text!r} ends its unbreakable row")
-    assert n >= 5, "the sample reaches headings and jobs"
+    # >= 4: a design whose job titles are in the BODY face (modern-t13's
+    # Inter 700, as its PDF) counts only its four section headings
+    assert n >= 4, "the sample reaches headings and jobs"
