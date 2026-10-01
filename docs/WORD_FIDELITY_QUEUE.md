@@ -41,7 +41,7 @@ Band:
 - [x] modern-t7 - CLOSE (near MATCHES), EN 8.3 % (tol 3.0) / AR 8.2 % (5.5), demo 1/1, long 2 clean
 - [x] modern-t11 - MATCHES, EN 6.5 % (tol 1.8) / AR 6.0 % (4.2), demo 1/1, long 2 clean
 - [x] modern-t13 - CLOSE, EN 8.9 % (tol 6.8) / AR 11.1 % (10.3), demo 1/1, long 2 clean
-- [ ] modern-t14
+- [x] modern-t14 - CLOSE, EN 14.0 % (tol 11.5) / AR 17.0 % (15.5); overlapping panel/photo simplified (photo shows its uncovered 483-761px), demo 1/1, long 2 clean
 - [ ] modern-t18
 - [ ] modern-t21
 Open:
