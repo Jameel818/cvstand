@@ -50,7 +50,7 @@ Open:
 - [x] modern-t12 - CLOSE, EN 9.1 % (tol 5.2) / AR 9.4 % (8.1), demo 1/1, long 2 clean; empty SKILLS/EDUCATION heads hidden
 - [x] modern-t22 - CLOSE, EN 21.0 % (tol 17.2; the giant rail letters sit ~20px off) / AR 10.8 % (8.8), demo 1/1; RESUME rail = page-anchored vertical text box; long CV: the two-column block starts on page 2 (AR 3 pages)
 Gutter:
-- [ ] modern-t19
+- [x] modern-t19 - CLOSE, EN 9.9 % (tol 8.1) / AR 6.2 % (3.8), demo 1/1, long 2 clean
 
 ## 4. Font sizes
 - [ ] 4. Word applies the chosen SIZES (Name, Headings, Details), EN + AR, tests + real-Word check
