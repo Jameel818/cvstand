@@ -16,17 +16,20 @@ class SidebarPage:
     to the next page instead of being cut."""
 
     def __init__(self, ctx: Ctx, side_px: float, *, side_fill=None, side_pad=(34, 28, 30, 28),
-                 main_pad_x=(40, 40), full_height_fill=True, side_end=False, top_px=0.0):
+                 main_pad_x=(40, 40), full_height_fill=True, side_end=False, top_px=0.0,
+                 ind_px: float = 0.0):
         self.ctx = ctx
+        # `ind_px`: the table starts that far in (an inset side column on a
+        # framed page, modern-t5); the main column still ends at the page edge
         self.side_w = tw(side_px)
-        self.main_w = tw(PAGE_W_PX) - self.side_w
-        self.side_px, self.main_px = side_px, PAGE_W_PX - side_px
+        self.main_w = tw(PAGE_W_PX - ind_px) - self.side_w
+        self.side_px, self.main_px = side_px, PAGE_W_PX - ind_px - side_px
         self.side_end = side_end
         self.main_pad_x = main_pad_x
         self.side_fill = side_fill
         widths = [self.main_w, self.side_w] if side_end else [self.side_w, self.main_w]
         self.tbl = ctx.doc.add_table(rows=1, cols=2)
-        fmt_table(self.tbl, widths)
+        fmt_table(self.tbl, widths, ind=tw(ind_px))
         self.rows = []
         side = self._side_cell(self.tbl.rows[0])
         vmerge(side, "restart")
@@ -234,3 +237,91 @@ def node_x(ctx: Ctx, cell_px: float, at: str, d_px: float) -> float:
     from ..docx_design import pt
     left = (at == "start") != ctx.rtl
     return (0.0 if left else pt(cell_px)) - pt(d_px) / 2
+
+
+_ROLE_FACE = {"heading": "heading", "name": "name", "bold": "body_bold", "role": "role",
+              "body": "body", "metric": "heading", "accent": "body"}
+
+
+def single_px(ctx: Ctx, role: str, size_px: float) -> float:
+    """Word's single line (px) for `role`'s face at `size_px` (measured rule,
+    docx_measure)."""
+    from ..docx_measure import _face_file, _font
+    key = _ROLE_FACE[role]
+    if key == "heading" and role == "metric" and ctx.rtl:
+        key = "role"
+    f = ctx.resolved["faces"][key]
+    rel = _face_file(f["family"], f["weight"])
+    return size_px * (_font(rel)["line"] if rel else 1.2)
+
+
+_CORNER = {  # VML paths of a corner MASK (square minus a quarter circle), r x r
+    "tl": "m0,0 l{r},0 qx0,{r} x e",
+    "tr": "m0,0 qx{r},{r} l{r},0 x e",
+    "bl": "m0,0 qy{r},{r} l0,{r} x e",
+    "br": "m{r},0 qy0,{r} l{r},{r} x e",
+}
+
+
+def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: str,
+                  pad_left_px: float) -> None:
+    """Round a filled block's corners: four tiny in-front shapes in the colour
+    BEHIND the block mask its square corners (Word shading has none, and a
+    shape behind text vanishes under a cell's shading). Call after
+    inner.finish(): the top masks hang on the cell's first paragraph, the
+    bottom ones on its last (the padding paragraph). `pad_left_px`: the
+    cell's physical left margin (masks are placed from the text column)."""
+    from docx.oxml.ns import qn
+    from ..docx_design import pt, vml_anchored
+    ps = inner.c._tc.findall(qn("w:p"))
+    if not ps:
+        return
+    k = 100
+    r = radius_px
+    from docx.text.paragraph import Paragraph
+    first, last = Paragraph(ps[0], inner.c), Paragraph(ps[-1], inner.c)
+    sp = ps[-1].find(qn("w:pPr")).find(qn("w:spacing"))
+    last_h = (int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0) + 0.3
+    x_l, x_r = pt(-pad_left_px), pt(width_px - pad_left_px - r)
+    for key, para, x, y in (("tl", first, x_l, 0.0), ("tr", first, x_r, 0.0),
+                            ("bl", last, x_l, last_h - pt(r)), ("br", last, x_r, last_h - pt(r))):
+        vml_anchored(para, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
+                     path=_CORNER[key].format(r=k), coords=f"{k},{k}", z=20)
+
+
+def rounded_block(ctx: Ctx, box: Box, width_px: float, *, fill: str, bg: str, radius: float,
+                  pad=(0, 0, 0, 0)) -> Box:
+    """A filled block (one-cell table, as `block`) whose corners are rounded
+    by round_corners() when its Box is finished through `.finish_round()`."""
+    inner = block(ctx, box, width_px, fill=fill, pad=pad)
+    pad_left = pad[3] if ctx.rtl else pad[1]
+
+    def finish_round():
+        inner.finish()
+        round_corners(ctx, inner, width_px, radius, bg, pad_left)
+    inner.finish_round = finish_round
+    return inner
+
+
+def pill(ctx: Ctx, box: Box, label: str, width_px: float, *, fill: str, color: str, size,
+         pad_y=10, pad_x=22, radius=14, spacing=0, before=0, role="heading", after=0,
+         align="start", bg="FFFFFF"):
+    """A rounded pill heading: a filled one-cell block (the label live text in
+    its role style) with its corners rounded against `bg`; `before`/`after`
+    px around it."""
+    spacer = None
+    if before:
+        # its own spacer paragraph: a column too full can shrink it (fit_side)
+        from ..docx_design import tiny
+        spacer = box.p()
+        tiny(spacer, before_px=before + box.pad_top)
+        box.pad_top = 0
+    inner = rounded_block(ctx, box, width_px, fill=fill, bg=bg, radius=radius,
+                          pad=(pad_y, pad_x, pad_y, pad_x))
+    p = inner.p(align=align)
+    run(ctx, p, label, role, size=size, color=color, spacing=spacing)
+    inner.finish_round()
+    if after:
+        box.pad_top += after
+    p.spacer = spacer
+    return p

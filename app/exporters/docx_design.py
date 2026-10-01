@@ -542,6 +542,33 @@ def dots_shape(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, d=
                   parts, pt(lift))
 
 
+def slider_shape(ctx: Ctx, para, pct: float, width_px: float, *, on: str, off: str,
+                 track=4, knob=18, ring=3, lift=0.0):
+    """The PDF's slider as ONE inline drawing: a rounded track, the filled part
+    from the START edge, and a white knob with a coloured ring centred on the
+    fill's end (kept inside the track). The value stays real text beside it."""
+    pct = max(0.0, min(100.0, pct))
+    k = 10
+    W, H = round(width_px * k), knob * k
+    ty, th = (knob - track) / 2 * k, track * k
+    f = round(W * pct / 100)
+    arc = 1.0
+    x0 = W - f if ctx.rtl else 0
+    cx = (W - f) if ctx.rtl else f
+    kx = min(max(cx - knob * k / 2, 0), W - knob * k)
+    rw = ring * k
+    parts = [f'<v:roundrect style="position:absolute;left:0;top:{ty:.0f};width:{W};height:{th:.0f}" '
+             f'arcsize="{arc}" fillcolor="#{off}" stroked="f"/>']
+    if f > 0:
+        parts.append(f'<v:roundrect style="position:absolute;left:{x0};top:{ty:.0f};width:{f};'
+                     f'height:{th:.0f}" arcsize="{arc}" fillcolor="#{on}" stroked="f"/>')
+    parts.append(f'<v:oval style="position:absolute;left:{kx + rw / 2:.0f};top:{rw / 2:.0f};'
+                 f'width:{knob * k - rw:.0f};height:{knob * k - rw:.0f}" fillcolor="#FFFFFF" '
+                 f'strokecolor="#{on}" strokeweight="{pt(ring):.2f}pt"/>')
+    _SHAPE_N[0] += 1
+    _inline_group(para, f"cvstand_bar_{_SHAPE_N[0]}", width_px, knob, W, H, parts, pt(lift))
+
+
 def dots(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, size=12, gap=5):
     """●●●○○ - the dot row as glyphs (Arial has them; the CV faces may not)."""
     if not filled:
@@ -669,25 +696,36 @@ def page_ovals(ctx: Ctx, ovals: list) -> None:
 
 
 def vml_anchored(para, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float, fill: str,
-                 path: str | None = None, coords: str | None = None, z: int = 5) -> None:
+                 path: str | None = None, coords: str | None = None, z: int = 5,
+                 arc: float | None = None, behind: bool = False, stroke: str | None = None,
+                 weight_pt: float = 1.0) -> None:
     """A filled shape anchored in `para`, positioned PHYSICALLY from the left
-    of its text column (x) and the top of its line (y): it moves with the
-    text. A rectangle, or a VML `path` in `coords` units (e.g. a fold
+    of its text column (x) and from the paragraph's top INCLUDING its space
+    before (y; measured in Word - "relative to line" is not the text line):
+    it moves with the text. A rectangle, or a VML `path` in `coords` units (e.g. a fold
     triangle). Behind nothing, in front of the cell fill."""
     _SHAPE_N[0] += 1
     n = _SHAPE_N[0]
+    if behind:
+        z = -251650000 + n            # behind the text (Word's behindDoc range)
     style = (f'position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
              f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:{z};'
              f'mso-position-horizontal-relative:text;mso-position-vertical-relative:line')
+    stroke_attr = (f'strokecolor="#{stroke}" strokeweight="{weight_pt:.2f}pt"' if stroke
+                   else 'stroked="f"')
     ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
           'xmlns:v="urn:schemas-microsoft-com:vml" '
           'xmlns:o="urn:schemas-microsoft-com:office:office"')
+    fill_attr = f'fillcolor="#{fill}"' if fill else 'filled="f"'
     if path:
         shape = (f'<v:shape id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
-                 f'coordsize="{coords}" path="{path}" fillcolor="#{fill}" stroked="f"/>')
+                 f'coordsize="{coords}" path="{path}" {fill_attr} {stroke_attr}/>')
+    elif arc is not None:
+        shape = (f'<v:roundrect id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
+                 f'arcsize="{arc:.3f}" {fill_attr} {stroke_attr}/>')
     else:
         shape = (f'<v:rect id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
-                 f'fillcolor="#{fill}" stroked="f"/>')
+                 f'{fill_attr} {stroke_attr}/>')
     para._p.append(parse_xml(f'<w:r {ns}><w:pict>{shape}</w:pict></w:r>'))
 
 

@@ -27,8 +27,10 @@ def _ribbon(ctx, box, label):
     # x from the text column's physical left: it starts 34px in (LTR) or at
     # the cell's left edge (RTL: the 34px padding is on the right)
     x = (SIDE_PX - 34) if not ctx.rtl else -14
-    vml_anchored(p, x_pt=pt(x), y_pt=pt(-10), w_pt=pt(14), h_pt=pt(line_px + 20), fill=CLAY)
-    vml_anchored(p, x_pt=pt(x), y_pt=pt(line_px + 10), w_pt=pt(14), h_pt=pt(8), fill=FOLD,
+    # y is measured from the paragraph's top INCLUDING its space before
+    # (measured in Word): the ribbon's 10px top padding is that space
+    vml_anchored(p, x_pt=pt(x), y_pt=0, w_pt=pt(14), h_pt=pt(line_px + 20), fill=CLAY)
+    vml_anchored(p, x_pt=pt(x), y_pt=pt(line_px + 20), w_pt=pt(14), h_pt=pt(8), fill=FOLD,
                  path="m0,0 l14,0 l0,8 x e", coords="14,8")
     b.finish()
 

@@ -32,7 +32,7 @@ Already built last run - re-measure with the overlay, polish if > 10 %:
 - [x] modern-t23 (Sidebar) - CLOSE, EN 7.3 % (4.2) / AR 6.4 % (5.3), demo 1/1
 Sidebar:
 - [x] modern-t3 - CLOSE, EN 13.5 % (tol 6.5) / AR 10.7 % (7.9), demo 1/1, long 2 clean
-- [ ] modern-t5
+- [x] modern-t5 - CLOSE, EN 11.2 % (tol 7.1) / AR 22.7 % (21.1; Arabic column ~50px longer: Word's Arabic faces vs the PDF's fallback), demo 1/1, long 2 clean
 - [ ] modern-t9
 - [ ] modern-t16
 - [ ] modern-t17

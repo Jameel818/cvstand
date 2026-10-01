@@ -12,7 +12,7 @@ lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
 (estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
 
 Status: items 0, 1, 2 DONE; item 3: the 5 designs from run 1 re-measured and polished (all CLOSE, demo 1 page). Next: new designs, Sidebar t3 first.
-Designs built this run: t3 (CLOSE);
+Designs built this run: t3 (CLOSE); t5 (CLOSE);
 
 ---
 

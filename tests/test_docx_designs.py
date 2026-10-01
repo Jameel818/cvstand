@@ -34,10 +34,12 @@ docx_design._load()
 KEYS = sorted(docx_design.DESIGNS)
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 #: designs whose skill graphic shows the percent as its text (bars), not the word
-PERCENT = {"modern-t2", "modern-t3", "modern-t10", "modern-t15", "modern-t23"}
+PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t10", "modern-t15", "modern-t23"}
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
+    "modern-t5": ["Contact", "SUMMARY", "EDUCATION", "SOFTWARE", "LANGUAGES",
+                  "PROFESSIONAL EXPERIENCE", "CREATIVE & TECHNICAL SKILLS", "CERTIFICATIONS"],
     "modern-t3": ["Contact", "Core Competencies", "Software", "Languages", "Professional Summary",
                   "Experience", "Technical Skills", "Education", "Recognition"],
     "modern-t2": ["ABOUT ME", "EDUCATION", "SKILLS", "LANGUAGE", "CERTIFICATIONS",
@@ -150,12 +152,20 @@ def test_an_unrated_skill_has_no_graphic(key):
     assert "0%" not in re.sub(r"\d0%", "", _text(doc))
 
 
+V = "{urn:schemas-microsoft-com:vml}"
+
+
 def _fill_behind(run, side_fill: str | None) -> str:
     for a in run.iterancestors():
         if a.tag == f"{W}p":
             shd = a.find(f"{W}pPr/{W}shd")
             if shd is not None and shd.get(f"{W}fill") not in (None, "auto"):
                 return shd.get(f"{W}fill")
+            # a filled shape anchored BEHIND this paragraph's text is what the
+            # text is drawn on (a rounded pill: docx_design.vml_anchored)
+            for sh in list(a.iter(f"{V}roundrect")) + list(a.iter(f"{V}rect")):
+                if "z-index:-" in (sh.get("style") or "") and sh.get("fillcolor"):
+                    return sh.get("fillcolor").lstrip("#").upper()
         if a.tag == f"{W}tc":
             shd = a.find(f"{W}tcPr/{W}shd")
             if shd is not None and shd.get(f"{W}fill") not in (None, "auto"):
@@ -163,6 +173,12 @@ def _fill_behind(run, side_fill: str | None) -> str:
             if a.find(f"{W}tcPr/{W}vMerge") is not None and side_fill:
                 return side_fill
     return "FFFFFF"
+
+
+#: Colours a template's own PDF draws below 3:1, kept for fidelity: only for
+#: LARGE display numbers (>= 18pt), never body text. modern-t5's locked coral
+#: stat numerals (#F26A5F, 26px) sit at 2.9:1 on its light frame in the PDF too.
+PDF_OWN_LOW_CONTRAST = {"modern-t5": {"F26A5F"}}
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -176,13 +192,17 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
         if not txt or col is None or set(txt) <= set("●○"):
             continue                 # the dots are the graphic, drawn as in the PDF
         bg = _fill_behind(r, None)
+        sz = r.find(f"{W}rPr/{W}sz")
+        if (col.get(f"{W}val") in PDF_OWN_LOW_CONTRAST.get(key, ()) and sz is not None
+                and int(sz.get(f"{W}val")) >= 36 and contrast(col.get(f"{W}val"), bg) >= 2.8):
+            continue
         if contrast(col.get(f"{W}val"), bg) < 3.0:
             bad.append((txt[:20], col.get(f"{W}val"), bg))
     assert not bad, bad
 
 
 #: designs whose template has a photo slot
-PHOTO = {"modern-t2", "modern-t3", "modern-t4", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
+PHOTO = {"modern-t2", "modern-t3", "modern-t4", "modern-t5", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
 
 
 @pytest.mark.parametrize("key", sorted(PHOTO))
