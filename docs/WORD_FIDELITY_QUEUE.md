@@ -46,7 +46,7 @@ Band:
 - [x] modern-t21 - CLOSE, EN 14.1 % (tol 10.5) / AR 15.8 % (13.8); rounded cards via corner masks (side card's foot square), demo 1/1, long 2 clean
 Open:
 - [x] modern-t1 - MATCHES, EN 6.4 % (tol 2.5) / AR 6.5 % (5.7), demo 1/1, long 2 clean
-- [ ] modern-t6
+- [x] modern-t6 - CLOSE (near MATCHES), EN 7.7 % (tol 3.3) / AR 8.6 % (7.0), demo 1/1, long 2 clean
 - [ ] modern-t12
 - [ ] modern-t22
 Gutter:
