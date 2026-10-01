@@ -6,17 +6,30 @@ from __future__ import annotations
 
 from docx.shared import Pt
 
-from ..docx_design import Box, Ctx, design, dots, fmt_cell, photo_run, pt, run, tw
+from ..docx_design import (
+    Box, Ctx, design, dots_shape, fmt_cell, photo_run, pt, run, tw, vml_anchored,
+)
 from .common import SidebarPage, Stack, block, bullets, date_range, joined
 
-RAIL, CLAY, INK, BODY = "000034", "C4562F", "14343B", "37474C"
+RAIL, CLAY, INK, BODY, FOLD = "000034", "C4562F", "14343B", "37474C", "8E3A1E"
 RAIL_TEXT, RAIL_MUTED, DOT_OFF, RULE, MUTED = "E3E5EF", "AEB4D2", "565C8A", "D8D2C7", "6E7C80"
 SIDE_PX = 300
 
 
-def _ribbon(ctx, box, label, before=13):
-    b = block(ctx, box, SIDE_PX, fill=CLAY, pad=(8, 34, 8, 0))
-    run(ctx, b.p(), label, "heading", size=19, color="FFFFFF", spacing=0.5)
+def _ribbon(ctx, box, label):
+    """Clay ribbon, 314px: it overhangs the 300px rail by 14px, with a dark
+    fold triangle under the overhang (CSS clip-path polygon(0 0,100% 0,0 100%),
+    physical, so the same shape in Arabic, at the rail's other edge)."""
+    b = block(ctx, box, SIDE_PX, fill=CLAY, pad=(10, 34, 10, 0))
+    p = b.p()
+    run(ctx, p, label, "heading", size=19, color="FFFFFF", spacing=0.5)
+    line_px = 19 * 1.088                 # the label's line (Archivo, CSS normal)
+    # x from the text column's physical left: it starts 34px in (LTR) or at
+    # the cell's left edge (RTL: the 34px padding is on the right)
+    x = (SIDE_PX - 34) if not ctx.rtl else -14
+    vml_anchored(p, x_pt=pt(x), y_pt=pt(-10), w_pt=pt(14), h_pt=pt(line_px + 20), fill=CLAY)
+    vml_anchored(p, x_pt=pt(x), y_pt=pt(line_px + 10), w_pt=pt(14), h_pt=pt(8), fill=FOLD,
+                 path="m0,0 l14,0 l0,8 x e", coords="14,8")
     b.finish()
 
 
@@ -42,7 +55,7 @@ def build(ctx: Ctx) -> None:
             return
         st = Stack(ctx, side, SIDE_PX)
         for i, it in enumerate(items):
-            b = st.row(pad_top=11 if i == 0 else 0)
+            b = st.row(pad_top=13 if i == 0 else 0)
             if i == 0:
                 _ribbon(ctx, b, label)
             write(b, i, it, gap)
@@ -50,12 +63,12 @@ def build(ctx: Ctx) -> None:
 
     def contact(b, i, item, gap):
         label, value = item
-        run(ctx, b.p(before=11 if i == 0 else gap, ind_start=34, ind_end=34), label, "bold",
+        run(ctx, b.p(before=13 if i == 0 else gap, ind_start=34, ind_end=34), label, "bold",
             size=13, color="FFFFFF")
         run(ctx, b.p(line=1.45, ind_start=34, ind_end=34), value, size=12.5, color=RAIL_TEXT)
 
     def education(b, i, ed, gap):
-        run(ctx, b.p(before=11 if i == 0 else gap, ind_start=34, ind_end=34), ed["degree"],
+        run(ctx, b.p(before=13 if i == 0 else gap, ind_start=34, ind_end=34), ed["degree"],
             "bold", size=13.5, color="FFFFFF")
         if ed["school"]:
             run(ctx, b.p(line=1.45, ind_start=34, ind_end=34), ed["school"], size=12.5,
@@ -68,16 +81,16 @@ def build(ctx: Ctx) -> None:
                 color=RAIL_MUTED)
 
     def skill(b, i, sk, gap):
-        p = b.p(before=11 if i == 0 else gap, ind_start=34, tabs=[(SIDE_PX - 34, "end", None)])
+        p = b.p(before=13 if i == 0 else gap, ind_start=34, tabs=[(SIDE_PX - 34, "end", None)])
         run(ctx, p, sk["name"], "bold", size=12.5, color="FFFFFF")
         if sk["level"]:
             run(ctx, p, "\t", size=11)
             run(ctx, p, sk["level"], size=11, color=RAIL_MUTED)
-            dp = b.p(before=1, ind_start=34)
-            dots(ctx, dp, sk["dots"], sk["dot_total"], on=CLAY, off=DOT_OFF, size=15, gap=1)
+            dp = b.p(before=5, ind_start=34)
+            dots_shape(ctx, dp, sk["dots"], sk["dot_total"], on=CLAY, off=DOT_OFF, d=9, gap=5)
 
     def language(b, i, lg, gap):
-        p = b.p(before=11 if i == 0 else gap, ind_start=34, tabs=[(SIDE_PX - 34, "end", None)])
+        p = b.p(before=13 if i == 0 else gap, ind_start=34, tabs=[(SIDE_PX - 34, "end", None)])
         run(ctx, p, lg["name"], "bold", size=12.5, color="FFFFFF")
         if lg["level"]:
             run(ctx, p, "\t", size=12.5)
@@ -147,6 +160,8 @@ def build(ctx: Ctx) -> None:
             run(ctx, p, "  " + " · ".join(r["tools"]), size=12.5, color=BODY)
     if r["references"]:
         box = page.main_row(pad_top=20)
+        # margin-top:auto in the PDF: References close the page
+        page.push_to_bottom(box, bottom_px=34 - 22)
         _head(ctx, box, t("References"), after=14)
         refs = r["references"]
         col = (T - 26) / 2

@@ -198,3 +198,110 @@ the 17. Longer: the five RING templates (t12 t16 t17 t22 t24) need a ring
 drawn as a shape with the percent as text over it (~1 h to build once), t22's
 giant vertical "RESUME" (rotated text box) and t14/t21's overlapping blocks
 (~30 min extra each). Item 5 (sizes): ~1.5 h.
+
+---
+
+# Run of 2026-10-01 (15 h, user away) — queue in `docs/WORD_FIDELITY_QUEUE.md`
+
+## How fidelity is measured now
+Scratchpad `ovl.py`: the app's PDF and the .docx as **Microsoft Word on this PC**
+saves it as PDF, both rasterised by pdf.js at the same size (797×1031 px).
+- **strict %** = pixels whose colour differs by more than 40/255 (the number asked for);
+- **tolerant %** = pixels with no matching pixel within 2 px in the other page
+  (forgives the 1-2 px glyph drift between Word's and Chromium's rasterisers;
+  what remains are elements in different places);
+- `dy.py`: every text line matched between the two PDFs, vertical offset per line
+  (section-by-section positions).
+
+Word and Chromium never rasterise the same text identically (kerning, hinting,
+sub-pixel x positions), so a text-dense page keeps several % strict difference
+even when every line is in place. **Strict < 5 % is out of reach on text pages;
+the realistic bar is strict < 10 % with tolerant < 5 %.** Arabic strict % is
+further inflated by the PDF finding below (different faces).
+
+## Decisions made during the run (continued)
+18. **Word's single line is measured per face**, in Word on this PC, for all 41
+    built families (scratch `calib.py`): the typo line when the font sets
+    USE_TYPO_METRICS, else the win line. A CSS line-height (a multiple of the
+    SIZE) becomes Word's multiple = CSS / that face's single
+    (`docx_design.true_lines`). The old flat 1.2 made Archivo body lines 9 % too
+    tight (the "Word packs higher" the user saw) and display names too tall.
+19. **Below single** only down to 0.75 (Latin) / 0.78 (Arabic): measured in Word,
+    Latin caps at 0.72 do not clip; Arabic marks touch the next line below ~0.75.
+    Never "Exactly" (the flow test bans it). Cost: Arabic two-line names run
+    ~15 px taller than the PDF's `line-height:0.98`.
+20. **Half-leading** (measured): for multiples ≥ 1 Word keeps the first baseline
+    at the ascent and puts all extra leading BELOW the line; CSS splits it. Each
+    paragraph with a CSS line-height gets the half-leading as space before and
+    loses it from space after (`docx_design.half_leading`): same height, the
+    PDF's baselines.
+21. **Flexbox in Word**: `justify-content:space-between` columns and
+    `margin-top:auto` blocks are reproduced by MEASURING what was written
+    (`app/exporters/docx_measure.py`: font advance widths incl. joined Arabic
+    forms, word wrap, the measured line heights, tables, inline shapes) and
+    handing the slack out as ordinary paragraph spacing
+    (`SidebarPage.spread_side`, `SidebarPage.push_to_bottom`). A 4 pt reserve
+    keeps an estimate error from spilling a column to page 2. Checked against
+    Word's own PDF: section tops within ~1-4 pt (t2 sidebar).
+22. **Header paragraph flattened** (`flat_headers`): the paragraph holding the
+    page shapes was ~14 pt tall at header distance 0 and pushed the body down
+    when a template's top margin is smaller (t4's name sat 14 pt low).
+23. **Skill bars and dot rows are inline VML drawings** (`bar_shape`,
+    `dots_shape`): rounded ends as in the PDF, exact 9 px dots, the line no
+    taller than the graphic (glyph dots made every t4 skill row 4 px too tall).
+    Editable shapes; name and level stay real text. The graphics test counts
+    these drawings too.
+24. **Folded ribbon tab (t4)**: the 14 px overhang past the rail and the fold
+    triangle are shapes anchored to the ribbon's own line (`vml_anchored`), so
+    they move with the text; the same physical shape in Arabic, as the PDF's
+    clip-path draws it.
+25. **Arabic bidi of neutrals**: a date range "2013 – 2015" is written as start,
+    " – " (its own RTL run), end; a stat "2×" as "2" + "×" (RTL run). Word then
+    shows "2015 – 2013" and "×2" as the PDF does. Digits, Latin, "$", "@" and "%"
+    are still never in an RTL run (the test now checks exactly that).
+26. **Arabic faces by role follow the PDF's CSS policy** (`rendering.RTL_TYPOGRAPHY`):
+    only the name (Tajawal 800) and the section titles (Tajawal or Cairo, per
+    template) take display faces; job titles, reference names, dates and stat
+    numbers are IBM Plex Sans Arabic bold (`docx_theme.resolve`, Arabic, no user
+    choice). Before, Word drew them in the heading face (Tajawal).
+27. **Tiny structural paragraphs** (cell ends, spacers) use an AUTO multiple of
+    0.25 (~0.3 pt) instead of single: Word needs them, they should add nothing
+    (each added ~1 pt per job/skill row).
+28. **AR_GAP 0.8 removed** (now 1.0): it compensated the wrong line heights;
+    with true lines the Arabic gaps are the template's.
+
+## FINDING for the user (not changed: PDF/HTML are out of scope this run)
+**The Arabic PDF does not use the Arabic faces its CSS names.** The RTL policy
+CSS asks for "IBM Plex Sans Arabic", "Tajawal" and "Cairo" by family name, but
+`document_html(for_pdf=True)` inlines only `fonts_inline.css` +
+`fonts_ar_inline.css`, which declare Arabic glyphs under the LATIN family names.
+The three policy families are declared only in the app shell's
+`fonts_ar_shell.css`. So Chromium draws Arabic CVs with system fallbacks: on
+this PC Segoe UI (body), Times New Roman Bold (names, some headings), Tahoma,
+Segoe UI Black (numbers), as read from the PDFs' font tables. On the Linux
+server it will be whatever fallback is installed there; the preview iframe
+likely has the same gap. Word keeps the faces the CSS INTENDS (table below).
+
+## Arabic font table (t2, t4): role by role
+| Role | PDF CSS intends | PDF actually embeds (this PC) | Word before | Word after |
+|---|---|---|---|---|
+| Name | Tajawal 800 | Times New Roman Bold (fallback) | Tajawal 800 | Tajawal 800 |
+| Section titles | Tajawal (t2 700, t4 900) | Segoe UI Bold (t2) / Times New Roman Bold (t4) | Tajawal 700 / 900 | Tajawal 700 / 900 |
+| Body | IBM Plex Sans Arabic 400 | Segoe UI | IBM Plex Sans Arabic 400 | IBM Plex Sans Arabic 400 |
+| Bold labels, degrees | IBM Plex Sans Arabic 700 | Segoe UI Bold / Semibold | IBM Plex Sans Arabic 700 | IBM Plex Sans Arabic 700 |
+| Job titles, reference names | IBM Plex Sans Arabic 700 | Segoe UI Bold (t2) / Times New Roman Bold (t4) | **Tajawal 700** | IBM Plex Sans Arabic 700 |
+| Stat numbers | IBM Plex Sans Arabic (900 -> 700 built) | Segoe UI Black | **Tajawal 700 / 900** | IBM Plex Sans Arabic 700 |
+| t4 date column | IBM Plex Sans Arabic 700 | Segoe UI Bold | **Tajawal 700** | IBM Plex Sans Arabic 700 |
+
+Also found: 7 offered faces (Lora, Raleway, Work Sans, Playfair Display,
+Lalezar, Aref Ruqaa, Bebas Neue) are embedded, but Word on this PC draws Calibri
+for them: their names are in Microsoft 365's cloud-font catalogue (same class
+as the known Open Sans case). Only matters when a user CHOOSES one of them.
+
+## Item 1 results (t2, t4 polished), demo CV with photo + References
+| File | strict % | tolerant % | pages (demo / long) | Grade |
+|---|---|---|---|---|
+| t2 EN | 10.5 -> 7.8 | 3.0 | 1 / 2 | CLOSE (near MATCHES) |
+| t2 AR | 9.8 -> 9.1 | 7.1 | 1 / 2 | CLOSE (PDF draws fallback faces) |
+| t4 EN | 18.9 -> 8.4 | 3.9 | 1 / 2 | CLOSE (near MATCHES) |
+| t4 AR | 11.5 -> 11.2 | 8.7 | 1 / 2 | CLOSE (fallback faces; Arabic name ~15 px taller) |

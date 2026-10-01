@@ -45,7 +45,7 @@ PX = 0.72                      # pt per template px (850px canvas on a 612pt pag
 PAGE_W_PX = 850
 PAGE_W = 12240                 # twips
 PAGE_H_PT = 792
-AR_GAP = 0.8                   # Arabic vertical gaps, of the template's
+AR_GAP = 1.0                   # Arabic vertical gaps, of the template's
 CSS_LINE_AR = 1.75             # the Arabic faces' natural line
 CSS_LINE = 1.2                 # a face's "single" line, as a multiple of its size
 
@@ -60,6 +60,8 @@ def tw(px: float) -> int:
 
 _ARABIC = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]")
 RPR_ORDER = docx_theme.RPR_ORDER
+_MULT = re.compile(r"([0-9][0-9.,]*)([×+])")   # a stat like "2×"
+_RANGE = re.compile(r"(\S+)(\s+[–—]\s+)(\S+)")   # a date range: start – end
 
 ROLE_STYLE = {"body": None, "bold": "CVBodyBold", "name": "CVName", "heading": "CVHeading",
               "role": "CVRole", "metric": "CVMetric", "accent": "CVAccentText"}
@@ -109,9 +111,12 @@ class Ctx:
     photo: Path | None
     t: Callable[[str], str]
     rtl: bool = field(init=False)
+    css_lines: dict = field(init=False)
 
     def __post_init__(self):
         self.rtl = self.lang == "ar"
+        self.css_lines = {}     # paragraph element -> the template's CSS line-height
+        self.after_lines = []   # callables run once the true line heights are set
 
     # physical edge of a LOGICAL side, for the properties Word reads physically
     # (paragraph borders; shape positions)
@@ -190,7 +195,10 @@ def tiny(para, half_points: int = 2, before_px: float = 0) -> None:
         ppr.append(rpr)
     _rpr_put(rpr, "sz", val=half_points)
     _rpr_put(rpr, "szCs", val=half_points)
-    _put(ppr, _w("spacing", before=int(round(pt(before_px) * 20)), after=0, line=240,
+    # a quarter of a 1pt line (~0.3pt): Word must have this paragraph (a cell
+    # ends with one, even after a nested table) but it should add nothing;
+    # still an AUTO multiple, never Exactly
+    _put(ppr, _w("spacing", before=int(round(pt(before_px) * 20)), after=0, line=60,
                   lineRule="auto"), PPR_ORDER)
 
 
@@ -230,10 +238,10 @@ def fmt_p(ctx: Ctx, para, *, align=None, before=0.0, after=0.0, line=None, ind_s
     k = AR_GAP if ctx.rtl else 1.0
     sp = {"before": int(round(pt(before) * 20 * k)), "after": int(round(pt(after) * 20 * k))}
     if line is not None:
-        # Word's "single" is the face's own height: ~1.2x the size for the
-        # Latin faces, ~1.7x for the Arabic ones - never below single (no clip)
+        # provisional; true_lines() rewrites it from the face the runs draw
         mult = max(1.0, line / (CSS_LINE_AR if ctx.rtl else CSS_LINE))
         sp.update(line=int(round(240 * mult)), lineRule="auto")
+        ctx.css_lines[p] = line
     else:
         sp.update(line=240, lineRule="auto")
     _put(ppr, _w("spacing", **sp), PPR_ORDER)
@@ -262,6 +270,22 @@ def run(ctx: Ctx, para, text: str, role: str = "body", *, size=None, color=None,
         underline=None, rtl=False):
     """One run. `size`/`spacing`/`position` in template px. `role` picks the
     role style (the face); colour and size are the template's, set directly."""
+    kw = dict(size=size, color=color, caps=caps, spacing=spacing, italic=italic, bold=bold,
+              font=font, position=position, underline=underline)
+    m = _RANGE.fullmatch(text or "") if ctx.rtl and not rtl else None
+    if m and not _ARABIC.search(text):
+        # "2013 – 2015" in an Arabic paragraph: the PDF's bidi draws it right
+        # to left (2015 – 2013). Word does the same only when the dash is its
+        # own right-to-left run between the two left-to-right numbers.
+        run(ctx, para, m.group(1), role, **kw)
+        run(ctx, para, m.group(2), role, rtl=True, **kw)
+        return run(ctx, para, m.group(3), role, **kw)
+    m = _MULT.fullmatch(text or "") if ctx.rtl and not rtl else None
+    if m:
+        # "2×" in an Arabic paragraph: the PDF's bidi shows "×2"; Word does
+        # when the neutral sign is its own right-to-left run
+        run(ctx, para, m.group(1), role, **kw)
+        return run(ctx, para, m.group(2), role, rtl=True, **kw)
     r = para.add_run(text)
     rpr = r._r.get_or_add_rPr()
     sid = ROLE_STYLE[role]
@@ -423,6 +447,96 @@ def inline_bar_cells(ctx: Ctx, fill_cell, track_cell, *, on, off, height=7):
         tiny(para, max(2, int(round(pt(height) * 2 / 1.15))))
 
 
+_SHAPE_N = [0]
+
+
+def bar_shape(ctx: Ctx, para, pct: float, width_px: float, *, on: str, off: str, height=7,
+              radius=4, fill_round=False, lift=None):
+    """A skill bar as ONE inline drawing in the text line - a group of rounded
+    VML shapes (the track, the fill), so the ends are round as in the PDF and
+    the bar stays an editable shape (no picture). The fill starts at the
+    START edge (the right in Arabic). `fill_round`: the fill's far end is round
+    too (stacked bars); otherwise it is cut square, like the PDF's fill
+    clipped by its track. `lift` (px) raises it off the baseline (default:
+    centred on a lower-case line)."""
+    pct = max(0.0, min(100.0, pct))
+    W, H = 1000, max(1, round(1000 * height / width_px))
+    # VML arcsize: the corner radius as a fraction of HALF the smaller side
+    arc = min(1.0, 2 * radius / max(0.1, height))
+    f = round(W * pct / 100)
+    x0 = W - f if ctx.rtl else 0
+    _SHAPE_N[0] += 1
+    n = _SHAPE_N[0]
+    parts = [f'<v:roundrect style="position:absolute;left:0;top:0;width:{W};height:{H}" '
+             f'arcsize="{arc:.3f}" fillcolor="#{off}" stroked="f"/>']
+    if f > 0:
+        parts.append(f'<v:roundrect style="position:absolute;left:{x0};top:0;width:{f};'
+                     f'height:{H}" arcsize="{arc:.3f}" '
+                     f'fillcolor="#{on}" stroked="f"/>')
+        if not fill_round and f < W:
+            # square off the fill's far end
+            half = max(1, min(f // 2, H))
+            sx = x0 if ctx.rtl else f - half
+            parts.append(f'<v:rect style="position:absolute;left:{sx};top:0;width:{half};'
+                         f'height:{H}" fillcolor="#{on}" stroked="f"/>')
+    lift_pt = pt(lift) if lift is not None else max(0.0, pt(height) * 0.15)
+    _inline_group(para, f"cvstand_bar_{n}", width_px, height, W, H, parts, lift_pt)
+
+
+def _inline_group(para, gid: str, width_px: float, height_px: float, cw: int, ch: int,
+                  parts: list[str], lift_pt: float) -> None:
+    """Append ONE inline VML group (an editable drawing in the text line) to
+    `para`. Its run's font is 1pt and so is the paragraph mark, so the line is
+    as tall as the drawing, no taller."""
+    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+          'xmlns:v="urn:schemas-microsoft-com:vml" '
+          'xmlns:o="urn:schemas-microsoft-com:office:office"')
+    xml = (f'<w:r {ns}><w:rPr><w:position w:val="{int(round(lift_pt * 2))}"/>'
+           f'<w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr><w:pict>'
+           f'<v:group id="{gid}" style="width:{pt(width_px):.2f}pt;'
+           f'height:{pt(height_px):.2f}pt" coordsize="{cw},{ch}" coordorigin="0,0">'
+           + "".join(parts) + '</v:group></w:pict></w:r>')
+    para._p.append(parse_xml(xml))
+    ppr = _ppr(para._p)
+    rpr = ppr.find(qn("w:rPr"))
+    if rpr is None:
+        rpr = OxmlElement("w:rPr")
+        ppr.append(rpr)
+    _rpr_put(rpr, "sz", val=2)
+    _rpr_put(rpr, "szCs", val=2)
+
+
+def dots_shape(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, d=9, gap=5,
+               hollow=True, stroke=1.0, lift=0.0):
+    """The PDF's dot row as ONE inline drawing: `total` circles `d` px wide,
+    `gap` px apart, the first `filled` solid in `on`, the rest hollow rings in
+    `off` (`hollow`) or solid `off`. Filled dots start at the START edge (the
+    right in Arabic). Nothing is drawn for an unrated skill (filled == 0)."""
+    if not filled:
+        return
+    total = max(total, filled)
+    width = total * d + (total - 1) * gap
+    k = 10                                  # coordinate units per px
+    parts = []
+    for i in range(total):
+        slot = (total - 1 - i) if ctx.rtl else i
+        x = slot * (d + gap) * k
+        if i < filled:
+            parts.append(f'<v:oval style="position:absolute;left:{x};top:0;width:{d * k};'
+                         f'height:{d * k}" fillcolor="#{on}" stroked="f"/>')
+        elif hollow:
+            sw = stroke * k
+            parts.append(f'<v:oval style="position:absolute;left:{x + sw / 2:.0f};'
+                         f'top:{sw / 2:.0f};width:{d * k - sw:.0f};height:{d * k - sw:.0f}" '
+                         f'filled="f" strokecolor="#{off}" strokeweight="{pt(stroke):.2f}pt"/>')
+        else:
+            parts.append(f'<v:oval style="position:absolute;left:{x};top:0;width:{d * k};'
+                         f'height:{d * k}" fillcolor="#{off}" stroked="f"/>')
+    _SHAPE_N[0] += 1
+    _inline_group(para, f"cvstand_dots_{_SHAPE_N[0]}", width, d, round(width * k), d * k,
+                  parts, pt(lift))
+
+
 def dots(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, size=12, gap=5):
     """●●●○○ - the dot row as glyphs (Arial has them; the CV faces may not)."""
     if not filled:
@@ -522,6 +636,29 @@ def page_ovals(ctx: Ctx, ovals: list) -> None:
             f'</w:pict></w:r>'))
 
 
+def vml_anchored(para, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float, fill: str,
+                 path: str | None = None, coords: str | None = None, z: int = 5) -> None:
+    """A filled shape anchored in `para`, positioned PHYSICALLY from the left
+    of its text column (x) and the top of its line (y): it moves with the
+    text. A rectangle, or a VML `path` in `coords` units (e.g. a fold
+    triangle). Behind nothing, in front of the cell fill."""
+    _SHAPE_N[0] += 1
+    n = _SHAPE_N[0]
+    style = (f'position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
+             f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:{z};'
+             f'mso-position-horizontal-relative:text;mso-position-vertical-relative:line')
+    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+          'xmlns:v="urn:schemas-microsoft-com:vml" '
+          'xmlns:o="urn:schemas-microsoft-com:office:office"')
+    if path:
+        shape = (f'<v:shape id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
+                 f'coordsize="{coords}" path="{path}" fillcolor="#{fill}" stroked="f"/>')
+    else:
+        shape = (f'<v:rect id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
+                 f'fillcolor="#{fill}" stroked="f"/>')
+    para._p.append(parse_xml(f'<w:r {ns}><w:pict>{shape}</w:pict></w:r>'))
+
+
 def vml_oval(ctx: Ctx, para, *, x_pt: float, y_pt: float, d_pt: float, fill: str,
              stroke: str | None, weight_pt: float = 1.5, n: int = 1):
     """A small circle anchored in `para`, positioned from the start of its text
@@ -573,6 +710,103 @@ def finish_rtl(doc) -> None:
             _put(tbl.find(qn("w:tblPr")), _w("bidiVisual"), TBLPR_ORDER)
 
 
+def faces_drawn(doc, resolved: dict) -> set[tuple[str, int]]:
+    """docx_theme.faces_drawn, with the stat numbers' face as THIS module
+    sets it (the role face in Arabic, see render)."""
+    faces = docx_theme.faces_drawn(doc, resolved)
+    if resolved["lang"] == "ar":
+        for r in doc.element.body.iter(qn("w:rStyle")):
+            if r.get(qn("w:val")) == "CVMetric":
+                f = resolved["faces"]["role"]
+                faces.add((f["family"], f["weight"]))
+                break
+    return faces
+
+
+MIN_MULT, MIN_MULT_AR = 0.75, 0.78
+
+
+def true_lines(ctx: Ctx) -> None:
+    """A CSS line-height is a multiple of the font SIZE; Word's "multiple" is a
+    multiple of the face's own single line, which differs per face (measured
+    in Word, see docx_measure: Archivo 1.088x, Archivo Black 1.347x, IBM Plex
+    Sans Arabic 1.5x). So each paragraph's multiple = CSS line / the single of
+    the face its largest run draws. Below single only as far as no glyph
+    collides (MIN_MULT; Arabic marks need MIN_MULT_AR) - never Exactly."""
+    from .docx_measure import Measure
+    m = Measure(ctx.resolved)
+    for p, css in ctx.css_lines.items():
+        best, size = _largest_run(m, p)
+        if size == 0:
+            continue
+        single = m._metrics(best)["line"]
+        text = "".join(t.text or "" for t in p.iter(qn("w:t")))
+        floor = MIN_MULT_AR if _ARABIC.search(text) else MIN_MULT
+        mult = max(floor, css / single)
+        sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
+        sp.set(qn("w:line"), str(int(round(240 * mult))))
+
+
+def flat_headers(doc) -> None:
+    """The page shapes live in the header; its paragraph must take no room.
+    Measured in Word: a default header paragraph (~14pt tall at distance 0)
+    pushed the body down whenever the template's top margin is smaller
+    (modern-t4's name sat 14pt low)."""
+    for s in doc.sections:
+        s.header_distance = 0
+        s.footer_distance = 0
+        for hdr in (s.header, s.first_page_header):
+            if hdr.is_linked_to_previous:
+                continue
+            for para in hdr.paragraphs:
+                tiny(para)
+
+
+def half_leading(ctx: Ctx) -> None:
+    """CSS puts half of a line's leading ABOVE the text; Word (measured,
+    multiples >= 1) keeps the first baseline at the face's ascent and puts all
+    the extra space BELOW. So every paragraph with a CSS line-height gets the
+    half-leading as space before and loses it from space after (or from the
+    next paragraph's space before): same height, the PDF's baselines."""
+    from .docx_measure import Measure
+    m = Measure(ctx.resolved)
+    carry_to = {}
+    for p, css in ctx.css_lines.items():
+        best, size = _largest_run(m, p)
+        if not size:
+            continue
+        single = m._metrics(best)["line"]
+        hl = (css - single) * size / 2           # pt
+        if hl <= 0.2:
+            continue
+        sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
+        tw_hl = int(round(hl * 20))
+        sp.set(qn("w:before"), str(int(sp.get(qn("w:before"), 0)) + tw_hl))
+        after = int(sp.get(qn("w:after"), 0)) - tw_hl
+        sp.set(qn("w:after"), str(max(0, after)))
+        if after < 0:
+            nxt = p.getnext()
+            if nxt is not None and nxt.tag == qn("w:p"):
+                carry_to[nxt] = carry_to.get(nxt, 0) - after
+    for p, debt in carry_to.items():
+        ppr = p.find(qn("w:pPr"))
+        sp = ppr.find(qn("w:spacing")) if ppr is not None else None
+        if sp is not None:
+            sp.set(qn("w:before"), str(max(0, int(sp.get(qn("w:before"), 0)) - debt)))
+
+
+def _largest_run(m, p):
+    best, size = None, 0.0
+    for r in p.iter(qn("w:r")):
+        if not "".join(t.text or "" for t in r.iter(qn("w:t"))).strip():
+            continue
+        rpr = r.find(qn("w:rPr"))
+        sz = m._size(rpr)
+        if sz > size:
+            best, size = rpr, sz
+    return best, size
+
+
 def end_paragraph(doc) -> None:
     """The body ends with a (tiny) paragraph after the last table."""
     tiny(doc.add_paragraph())
@@ -608,11 +842,12 @@ def render(data: dict, template_key: str, photo: Path | None):
     r = normalize(data)
     lang = lang_of(data)
     resolved = docx_theme.resolve(data, template_key)
+    faces = resolved["faces"]      # Arabic: "role" is the bold body face (docx_theme.resolve)
     doc = new_document(lang == "ar")
     docx_theme.apply(doc, resolved)
-    heading = resolved["faces"]["heading"]
-    docx_theme._face(docx_theme._style_rpr(doc, "CVMetric"), heading["family"],
-                     heading["weight"], None)
+    metric = faces["role"] if lang == "ar" else faces["heading"]
+    docx_theme._face(docx_theme._style_rpr(doc, "CVMetric"), metric["family"],
+                     metric["weight"], None)
     token = set_lang(lang)
     try:
         ctx = Ctx(doc=doc, r=r, lang=lang, resolved=resolved, photo=photo,
@@ -620,6 +855,11 @@ def render(data: dict, template_key: str, photo: Path | None):
                   # writes "\n" as w:br), as the PDF breaks it
                   t=lambda s: str(t(s)).replace("<br>", "\n").replace("&amp;", "&"))
         DESIGNS[template_key](ctx)
+        true_lines(ctx)
+        half_leading(ctx)
+        flat_headers(doc)
+        for fn in ctx.after_lines:
+            fn()
     finally:
         reset_lang(token)
     end_paragraph(doc)

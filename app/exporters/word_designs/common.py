@@ -62,6 +62,46 @@ class SidebarPage:
         self.rows.append(box)
         return box
 
+    def spread_side(self, heads, *, reserve_pt: float = 4.0) -> None:
+        """The side column as the PDF's `justify-content: space-between`:
+        the page's slack shared out before each of `heads` (python-docx
+        paragraphs). The page's bottom margin stands in for the column's
+        bottom padding, so the side box's own is dropped. Call before
+        finish()."""
+        from ..docx_design import PAGE_H_PT
+        from ..docx_measure import Measure, spread
+        from ..docx_design import tiny
+        sec = self.ctx.doc.sections[0]
+        self.side.pad_bottom = 0
+        if self.side.pending is not None:
+            tiny(self.side.pending)      # what finish() will make of it
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+        heads = [h._p if hasattr(h, "_p") else h for h in heads]
+        tc, width = self.side.c._tc, self.side.w / 20
+        # measured once the line heights are final (docx_design.true_lines)
+        self.ctx.after_lines.append(lambda: spread(Measure(self.ctx.resolved), tc, width,
+                                                   heads, avail, reserve_pt))
+
+    def push_to_bottom(self, box: Box, *, bottom_px: float = 0, reserve_pt: float = 4.0) -> None:
+        """The PDF's `margin-top:auto` on a main-column block: the page's slack
+        (one page, measured once the line heights are final) goes above
+        `box`, so it sits at the foot of the column, `bottom_px` above the
+        bottom margin. Nothing moves when the column already fills the page."""
+        from docx.oxml.ns import qn
+        from ..docx_design import PAGE_H_PT, pt
+        from ..docx_measure import Measure, bump_before
+        sec = self.ctx.doc.sections[0]
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - pt(bottom_px)
+
+        def go():
+            m = Measure(self.ctx.resolved)
+            used = sum(m.block(b.c._tc, b.w / 20) for b in self.rows)
+            slack = avail - reserve_pt - used
+            first = next(box.c._tc.iter(qn("w:p")), None)
+            if slack > 0 and first is not None:
+                bump_before(first, slack)
+        self.ctx.after_lines.append(go)
+
     @property
     def main_text_px(self) -> float:
         return self.main_px - sum(self.main_pad_x)

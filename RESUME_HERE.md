@@ -1,3 +1,20 @@
+# RESUME HERE — 2026-10-01 (WORD FIDELITY run 2 on `feature/word-fidelity`; NOT merged; main untouched)
+
+## AUTONOMOUS RUN 2 (user away ~15 h)
+Queue: `docs/WORD_FIDELITY_QUEUE.md` (take the next unticked item). Decisions,
+measurement method, Arabic font table and the PDF FINDING:
+`docs/WORD_FIDELITY_AUDIT.md` from "Run of 2026-10-01". Never push main /
+merge / deploy; push this branch only (§9 form) + `git ls-remote`.
+
+Scratch tools (session scratchpad a1d5eef3...): `ovl.py RUN keys` (demo+photo+refs
+and long CV, EN/AR, real Word, strict + tolerant % and overlays), `dy.py RUN key
+lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
+(estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
+
+Status: item 0 + item 1 (t2/t4 polish) DONE - see the queue.
+
+---
+
 # RESUME HERE — 2026-09-30 (WORD FIDELITY run on `feature/word-fidelity`, from `feature/word-layouts`; NOT merged; main untouched)
 
 ## 🌙 AUTONOMOUS RUN — Word fidelity (user away ~7h)

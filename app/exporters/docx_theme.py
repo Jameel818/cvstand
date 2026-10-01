@@ -201,6 +201,11 @@ def resolve(data: dict, template_key: str) -> dict:
     role = ({"family": heading["family"], "weight": snap_weight(heading["family"], 700),
              "chosen": heading["chosen"]}
             if template_key.startswith("modern-") else dict(body_bold))
+    if lang == "ar" and not heading["chosen"]:
+        # The Arabic PDF's font policy (rendering.RTL_TYPOGRAPHY) gives only the
+        # name and the section titles display faces; job titles, reference
+        # names and stat numbers are the body face, bold where the template is.
+        role = dict(body_bold)
     faces = {"name": name, "heading": heading, "role": role, "body": body,
              "body_bold": body_bold}
     _one_face_per_word_name(faces)

@@ -5,7 +5,7 @@ References. Measured from app/templates/resumes/modern/t2.j2."""
 from __future__ import annotations
 
 from ..docx_design import (
-    Box, Ctx, design, fmt_cell, fmt_p, inline_bar_cells, photo_run, pt, rated, rule_heading, run,
+    Box, Ctx, bar_shape, design, fmt_cell, fmt_p, photo_run, pt, rated, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
 from .common import SidebarPage, Stack, date_range, joined
@@ -17,7 +17,7 @@ SIDE_PX = 298
 
 
 def _side_head(ctx, box, label, before):
-    rule_heading(ctx, box, label, width_px=SIDE_PX - 56, size=16.5, color="FFFFFF", rule=GOLD,
+    return rule_heading(ctx, box, label, width_px=SIDE_PX - 56, size=16.5, color="FFFFFF", rule=GOLD,
                  spacing=3, before=before, after=10)
 
 
@@ -40,6 +40,7 @@ def build(ctx: Ctx) -> None:
     p = side.p(align="center", after=0)
     photo_run(ctx, p, size_px=150, ring_px=5, ring=GOLD, placeholder=TRACK)
     gap, W = 26, SIDE_PX - 56
+    heads = []
 
     def section(label, items, write):
         if not items:
@@ -48,7 +49,7 @@ def build(ctx: Ctx) -> None:
         for i, it in enumerate(items):
             b = st.row()
             if i == 0:
-                _side_head(ctx, b, label, gap)
+                heads.append(_side_head(ctx, b, label, gap))
             write(b, i, it)
         st.done()
 
@@ -69,22 +70,16 @@ def build(ctx: Ctx) -> None:
             run(ctx, b.p(before=top), sk["name"], size=12, color="FFFFFF")
             return
         pct, label = skill_pct(sk)
-        bar_w, lab_w, gapw = 74, 34, 8
+        bar_w, lab_w, gapw = 74, 26, 8
         name_w = W - bar_w - lab_w - 2 * gapw
-        fill = round(bar_w * pct / 100)
-        widths = [tw(name_w + gapw), tw(fill), tw(bar_w - fill), tw(gapw + lab_w)]
-        tbl = b.table([w if w > 0 else 1 for w in widths])
+        tbl = b.table([tw(name_w + gapw), tw(bar_w), tw(gapw + lab_w)])
         c = tbl.rows[0].cells
-        fmt_cell(ctx, c[0], valign="center", pad=(top, 0, 0, 0))
-        fmt_p(ctx, c[0].paragraphs[0])
-        run(ctx, c[0].paragraphs[0], sk["name"], size=12, color="FFFFFF")
-        inline_bar_cells(ctx, c[1], c[2], on=GOLD, off=TRACK, height=7)
-        for cell in (c[1], c[2]):
-            fmt_cell(ctx, cell, pad=(top, 0, 0, 0))
-        fmt_cell(ctx, c[3], valign="center", pad=(top, 0, 0, 0))
-        lp = c[3].paragraphs[0]
-        fmt_p(ctx, lp, align="end")
-        run(ctx, lp, label, size=10, color=GOLD)
+        for cell in c:
+            fmt_cell(ctx, cell, valign="center", pad=(top, 0, 0, 0))
+        run(ctx, fmt_p(ctx, c[0].paragraphs[0]), sk["name"], size=12, color="FFFFFF")
+        bar_shape(ctx, fmt_p(ctx, c[1].paragraphs[0], line=1.0), pct, bar_w, on=GOLD,
+                  off=TRACK, height=7, radius=4)
+        run(ctx, fmt_p(ctx, c[2].paragraphs[0], align="end"), label, size=10, color=GOLD)
 
     def language(b, i, lg):
         p = b.p(before=6 if i else 0, tabs=[(W, "end", None)])
@@ -104,7 +99,9 @@ def build(ctx: Ctx) -> None:
     section(t("SKILLS"), r["skills"], skill)
     section(t("LANGUAGE"), r["languages"], language)
     section(t("CERTIFICATIONS"), r["recognition"], cert)
-
+    # the PDF's side column is justify-content:space-between: the page's
+    # slack goes between the photo and the sections
+    page.spread_side(heads)
 
     # ---- main column
     text_px = page.main_text_px

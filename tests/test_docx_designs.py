@@ -128,10 +128,12 @@ def test_skills_keep_name_and_level_as_text(exports, key, lang):
 
 
 def _graphics(doc) -> int:
-    """Skill graphics: dot runs (●) and bar fills (shaded cells/paragraphs
-    with no text beside a skill)."""
+    """Skill graphics: dot runs (●) and the inline drawings a design builds a
+    bar or a dot row from (docx_design.bar_shape / dots_shape)."""
     dots = sum(1 for r in doc.iter(f"{W}r") if "●" in _text(r))
-    return dots
+    shapes = sum(1 for g in doc.iter("{urn:schemas-microsoft-com:vml}group")
+                 if (g.get("id") or "").startswith(("cvstand_bar_", "cvstand_dots_")))
+    return dots + shapes
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -204,7 +206,9 @@ def test_arabic_mirrors_and_keeps_digits_left_to_right(exports, key):
     for r in doc.iter(f"{W}r"):
         txt = _text(r)
         if txt.strip() and not arabic.search(txt) and r.find(f"{W}rPr/{W}rtl") is not None:
-            assert set(txt) <= set("●○"), f"{txt!r} is marked RTL: Word reorders it"
+            # digits, Latin, "$" and "@" are what Word reorders when marked RTL;
+            # dot glyphs and a date range's lone " – " are RTL on purpose
+            assert not re.search(r"[0-9A-Za-z$@%]", txt), f"{txt!r} is marked RTL: Word reorders it"
     en, _ = _doc(exports[key, "en"])
     assert en.find(f".//{W}bidiVisual") is None and en.find(f".//{W}rtl") is None
 

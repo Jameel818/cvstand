@@ -222,7 +222,7 @@ def _render_design(data: dict, template_key: str) -> bytes:
 
     doc, resolved = docx_design.render(data, template_key,
                                        _photo_path(normalize(data).get("photo_url", "")))
-    faces = docx_theme.faces_drawn(doc, resolved)
+    faces = docx_design.faces_drawn(doc, resolved)
     buf = io.BytesIO()
     doc.save(buf)
     out = docx_font_embed.embed_fonts(buf.getvalue(), faces)
