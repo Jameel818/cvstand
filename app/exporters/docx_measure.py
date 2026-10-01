@@ -220,6 +220,12 @@ class Measure:
                         else:
                             cur[0] += pending_space + w
                             cur[1] = max(cur[1], h)
+                        # a single word wider than the line (an e-mail, a URL):
+                        # Word breaks it between characters onto more lines
+                        while lines[-1][0] > avail:
+                            rest = lines[-1][0] - avail
+                            lines[-1][0] = avail
+                            lines.append([rest, h])
                         pending_space = 0.0
             max_h_para = max(max_h_para, h)
         if not runs:
@@ -262,7 +268,16 @@ class Measure:
             if mar is not None:
                 dl, dr, dt, db = (self._mar(mar, e) for e in ("left", "right", "top", "bottom"))
         total = 0.0
-        for tr in tbl.findall(qn("w:tr")):
+        # the table's own horizontal rules take room too (t9's 2px boxes)
+        rows = tbl.findall(qn("w:tr"))
+        if pr is not None:
+            bd = pr.find(qn("w:tblBorders"))
+            if bd is not None:
+                for edge, n in (("top", 1), ("bottom", 1), ("insideH", max(0, len(rows) - 1))):
+                    e = bd.find(qn(f"w:{edge}"))
+                    if e is not None and e.get(qn("w:val")) not in ("nil", "none"):
+                        total += n * int(e.get(qn("w:sz"), 0)) / 8
+        for tr in rows:
             row_h = 0.0
             trpr = tr.find(qn("w:trPr"))
             at_least = 0.0

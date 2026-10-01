@@ -34,10 +34,12 @@ docx_design._load()
 KEYS = sorted(docx_design.DESIGNS)
 SAMPLES = {"en": ENGLISH, "ar": ARABIC}
 #: designs whose skill graphic shows the percent as its text (bars), not the word
-PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t10", "modern-t15", "modern-t23"}
+PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t9", "modern-t10", "modern-t15", "modern-t23"}
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
+    "modern-t9": ["Contact", "Skills", "Awards", "Tools", "Languages", "Summary", "Experience",
+                  "Education", "Technical"],
     "modern-t5": ["Contact", "SUMMARY", "EDUCATION", "SOFTWARE", "LANGUAGES",
                   "PROFESSIONAL EXPERIENCE", "CREATIVE & TECHNICAL SKILLS", "CERTIFICATIONS"],
     "modern-t3": ["Contact", "Core Competencies", "Software", "Languages", "Professional Summary",

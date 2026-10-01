@@ -90,6 +90,28 @@ class SidebarPage:
             crop_picture_height(photo, max(pt(min_px), h - over))
         self.ctx.after_lines.append(go)
 
+    def center_side(self, *, reserve_pt: float | None = None) -> None:
+        """The PDF's side column is `justify-content:center`: half the page's
+        slack goes above its first paragraph (measured once the line heights
+        are final); nothing moves when the column is full."""
+        from docx.oxml.ns import qn
+        from ..docx_design import PAGE_H_PT, pt, tiny
+        from ..docx_measure import Measure, bump_before
+        sec = self.ctx.doc.sections[0]
+        if self.side.pending is not None:
+            tiny(self.side.pending)
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+        tc, width = self.side.c._tc, self.side.w / 20
+        if reserve_pt is None:
+            reserve_pt = 30.0 if self.ctx.rtl else 6.0   # the Arabic estimate runs short
+
+        def go():
+            slack = avail - reserve_pt - Measure(self.ctx.resolved).block(tc, width)
+            first = next(tc.iter(qn("w:p")), None)
+            if slack > 0 and first is not None:
+                bump_before(first, slack / 2)
+        self.ctx.after_lines.append(go)
+
     def fit_side(self, heads, *, reserve_pt: float = 4.0) -> None:
         """Only the safety half of spread_side: a side column too tall for
         the page gives up space before `heads` instead of spilling."""
@@ -164,7 +186,40 @@ class SidebarPage:
     def main_text_px(self) -> float:
         return self.main_px - sum(self.main_pad_x)
 
+    def _fit_main(self, max_over_pt: float = 60.0, reserve_pt: float | None = None) -> None:
+        """Shrink-only safety for a CV that ALMOST fits one page (the demo):
+        when the main column's estimate exceeds the page by at most
+        `max_over_pt`, the space before each row's first paragraph (the gaps)
+        shrinks proportionally - never the text. A long CV (far over) flows to
+        page 2 untouched. Word's Arabic faces run taller than the PDF's."""
+        from docx.oxml.ns import qn
+        from ..docx_design import PAGE_H_PT
+        from ..docx_measure import Measure, _before, _set_before
+        sec = self.ctx.doc.sections[0]
+        if reserve_pt is None:
+            # measured: the Arabic estimate runs ~20pt short on a full page
+            # (joined-form widths under-count Arabic line lengths a little)
+            reserve_pt = 30.0 if self.ctx.rtl else 6.0
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - reserve_pt
+
+        def go():
+            m = Measure(self.ctx.resolved)
+            used = sum(m.block(b.c._tc, b.w / 20) for b in self.rows)
+            over = used - avail
+            if over <= 0 or over > max_over_pt:
+                return
+            firsts = [next(b.c._tc.iter(qn("w:p")), None) for b in self.rows]
+            firsts = [f for f in firsts if f is not None]
+            have = sum(_before(f) for f in firsts)
+            if have <= 0:
+                return
+            k = max(0.0, 1 - over / have)
+            for f in firsts:
+                _set_before(f, _before(f) * k)
+        self.ctx.after_lines.append(go)
+
     def finish(self):
+        self._fit_main()
         tail = self.main_row(split=True)
         self.side.finish()
         for b in self.rows:
