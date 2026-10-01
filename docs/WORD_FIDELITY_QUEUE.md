@@ -45,7 +45,7 @@ Band:
 - [x] modern-t18 - CLOSE, EN 8.7 % (tol 5.1) / AR 8.3 % (6.4), demo 1/1, long 2 clean; rail navy begins under the photo frame
 - [x] modern-t21 - CLOSE, EN 14.1 % (tol 10.5) / AR 15.8 % (13.8); rounded cards via corner masks (side card's foot square), demo 1/1, long 2 clean
 Open:
-- [ ] modern-t1
+- [x] modern-t1 - MATCHES, EN 6.4 % (tol 2.5) / AR 6.5 % (5.7), demo 1/1, long 2 clean
 - [ ] modern-t6
 - [ ] modern-t12
 - [ ] modern-t22

@@ -57,8 +57,13 @@ class SidebarPage:
             self._first = False
         else:
             row = self.tbl.add_row()
-            vmerge(self._side_cell(row), "continue")
-            fmt_cell(self.ctx, self._side_cell(row), fill=self.side_fill)
+            # hold the cell first: once marked "continue", python-docx's
+            # row.cells hands back the merge's TOP cell instead
+            cont = self._side_cell(row)
+            vmerge(cont, "continue")
+            fmt_cell(self.ctx, cont, fill=self.side_fill)
+            from ..docx_design import tiny
+            tiny(cont.paragraphs[0])                   # structural, merged away
         if not split:
             cant_split(row)
         cell = self._main_cell(row)

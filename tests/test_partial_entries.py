@@ -215,6 +215,13 @@ def test_complete_entries_keep_their_meta_line(app_ctx, key):
     """The guard must not swallow the line it is guarding."""
     from app.exporters import render_docx
     paras = _docx_paragraphs(render_docx(SAMPLE, key))
+    from app.exporters.docx_design import has_design
+    if has_design(key):
+        # a per-template Word DESIGN writes the line as its PDF does
+        # ("Halden & Row · Portside", the dates on the role line)
+        for company in ("Halden & Row", "Bellrock Studio", "Kiln Press"):
+            assert any(p.startswith(company + " · ") for p in paras), company
+        return
     # matched by company, not by the "  ·  " separator — the Tools line uses
     # that too, which is what made the first cut of this assertion wrong.
     for company in ("Halden & Row", "Bellrock Studio", "Kiln Press"):
