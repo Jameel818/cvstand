@@ -38,7 +38,7 @@ Sidebar:
 - [x] modern-t17 - CLOSE, EN 8.1 % (tol 4.0) / AR 17.2 % (16.1; name block taller with Word's Arabic face), demo 1/1, long 2 clean
 - [x] modern-t24 - CLOSE, EN 14.7 % (tol 11.1) / AR 23.7 % (21.9; Arabic faces vs the PDF's fallback), demo 1/1, long 2 clean
 Band:
-- [ ] modern-t7
+- [x] modern-t7 - CLOSE (near MATCHES), EN 8.3 % (tol 3.0) / AR 8.2 % (5.5), demo 1/1, long 2 clean
 - [ ] modern-t11
 - [ ] modern-t13
 - [ ] modern-t14
