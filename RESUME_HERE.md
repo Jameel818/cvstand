@@ -12,6 +12,16 @@ lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
 (estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
 
 Status: items 0, 1, 2 DONE; item 3: the 5 designs from run 1 re-measured and polished (all CLOSE, demo 1 page). Next: new designs, Sidebar t3 first.
+
+STOPPED 2026-10-02 at the usage limit. NEXT (in order): modern-t22 (Open: giant
+vertical "RESUME" rail = rotated text box; read t22.j2), modern-t19 (Gutter), then
+re-render ALL designs with `ovl.py` (the shared fit/push/spread guards changed
+late: fit reserves 50/10pt, spacing compression), item 4 (Word applies chosen
+SIZES), item 5 (review page + Desktop folder), item 6 (close Word, full suite
+incl. --e2e). Audit decisions 18-33 are written; add: t12 hides empty heads;
+python-docx row.cells returns the merge's TOP cell for vMerge continue cells;
+pushes/fits measure content above the page table and at-least row heights.
+
 Designs built this run: t3 (CLOSE); t5 (CLOSE); t9 (CLOSE); t16 (CLOSE (near MATCHES)); t17 (CLOSE); t24 (CLOSE); t7 (CLOSE (near MATCHES)); t11 (MATCHES); t13 (CLOSE); t14 (CLOSE); t18 (CLOSE); t21 (CLOSE); t1 (MATCHES); t6 (CLOSE (near MATCHES)); t12 (CLOSE);
 
 ---
