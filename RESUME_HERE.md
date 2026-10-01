@@ -12,6 +12,7 @@ lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
 (estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
 
 Status: items 0, 1, 2 DONE; item 3: the 5 designs from run 1 re-measured and polished (all CLOSE, demo 1 page). Next: new designs, Sidebar t3 first.
+Designs built this run: t22 (CLOSE);
 
 STOPPED 2026-10-02 at the usage limit. NEXT (in order): modern-t22 (Open: giant
 vertical "RESUME" rail = rotated text box; read t22.j2), modern-t19 (Gutter), then
