@@ -38,6 +38,8 @@ PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t7", "modern-t9", "mod
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
+    "modern-t21": ["About Me", "Skills", "Tools", "Languages", "Education", "Work Experience",
+                   "Certifications"],
     "modern-t18": ["Contact", "Education", "Work Experience", "Skills"],
     "modern-t14": ["Contact", "Skills", "Languages", "Education", "Experience", "Recognition"],
     "modern-t13": ["Experience", "Skills", "Education", "Certifications"],
@@ -219,7 +221,7 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
 
 #: designs whose template has a photo slot
 PHOTO = {"modern-t2", "modern-t3", "modern-t4", "modern-t5", "modern-t16", "modern-t17",
-         "modern-t24", "modern-t7", "modern-t11", "modern-t14", "modern-t18", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
+         "modern-t24", "modern-t7", "modern-t11", "modern-t14", "modern-t18", "modern-t21", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
 
 
 @pytest.mark.parametrize("key", sorted(PHOTO))

@@ -82,7 +82,8 @@ class SidebarPage:
 
         def go():
             from docx.oxml.ns import qn
-            over = Measure(self.ctx.resolved).block(tc, width) + reserve_pt - avail
+            m = Measure(self.ctx.resolved)
+            over = m.block(tc, width) + reserve_pt - (avail - self._above(m))
             if over <= 0:
                 return
             ext = photo._r.find(".//" + qn("wp:extent"))
@@ -106,13 +107,14 @@ class SidebarPage:
             reserve_pt = 30.0 if self.ctx.rtl else 6.0   # the Arabic estimate runs short
 
         def go():
-            slack = avail - reserve_pt - Measure(self.ctx.resolved).block(tc, width)
+            m = Measure(self.ctx.resolved)
+            slack = avail - self._above(m) - reserve_pt - m.block(tc, width)
             first = next(tc.iter(qn("w:p")), None)
             if slack > 0 and first is not None:
                 bump_before(first, slack / 2)
         self.ctx.after_lines.append(go)
 
-    def fit_side(self, heads, *, reserve_pt: float = 4.0) -> None:
+    def fit_side(self, heads, *, reserve_pt: float = 12.0) -> None:
         """Only the safety half of spread_side: a side column too tall for
         the page gives up space before `heads` instead of spilling."""
         self.spread_side(heads, reserve_pt=reserve_pt, grow=False)
@@ -137,8 +139,10 @@ class SidebarPage:
         heads = [h._p if hasattr(h, "_p") else h for h in heads]
         tc, width = self.side.c._tc, self.side.w / 20
         # measured once the line heights are final (docx_design.true_lines)
-        self.ctx.after_lines.append(lambda: spread(Measure(self.ctx.resolved), tc, width,
-                                                   heads, avail, reserve_pt, grow=grow))
+        def go():
+            m = Measure(self.ctx.resolved)
+            spread(m, tc, width, heads, avail - self._above(m), reserve_pt, grow=grow)
+        self.ctx.after_lines.append(go)
 
     def pin_top(self, box: Box, y_px: float, *, min_gap_px: float = 0) -> None:
         """Start main-column row `box` at `y_px` from the top of the page (an
@@ -161,6 +165,22 @@ class SidebarPage:
             if first is not None:
                 _set_before(first, max(pt(min_gap_px), pt(y_px) - sec.top_margin.pt - above))
         self.ctx.after_lines.append(go)
+
+    def _above(self, m) -> float:
+        """Height of what the body holds BEFORE this page's table (a header
+        card or band table, modern-t14/t21): the measured helpers' page starts
+        below it."""
+        from docx.oxml.ns import qn
+        h = 0.0
+        width = 612.0
+        for el in self.ctx.doc.element.body:
+            if el is self.tbl._tbl:
+                break
+            if el.tag == qn("w:p"):
+                h += m.paragraph(el, width)
+            elif el.tag == qn("w:tbl"):
+                h += m.table(el)
+        return h
 
     @staticmethod
     def _row_h(m, b) -> float:
@@ -187,7 +207,7 @@ class SidebarPage:
 
         def go():
             m = Measure(self.ctx.resolved)
-            used = sum(self._row_h(m, b) for b in self.rows)
+            used = sum(self._row_h(m, b) for b in self.rows) + self._above(m)
             slack = avail - reserve_pt - used
             first = next(box.c._tc.iter(qn("w:p")), None)
             if slack > 0 and first is not None:
@@ -216,7 +236,7 @@ class SidebarPage:
 
         def go():
             m = Measure(self.ctx.resolved)
-            used = sum(self._row_h(m, b) for b in self.rows)
+            used = sum(self._row_h(m, b) for b in self.rows) + self._above(m)
             over = used - avail
             if over <= 0 or over > max_over_pt:
                 return
@@ -334,26 +354,33 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
                   pad_left_px: float) -> None:
     """Round a filled block's corners: four tiny in-front shapes in the colour
     BEHIND the block mask its square corners (Word shading has none, and a
-    shape behind text vanishes under a cell's shading). Call after
-    inner.finish(): the top masks hang on the cell's first paragraph, the
-    bottom ones on its last (the padding paragraph). `pad_left_px`: the
-    cell's physical left margin (masks are placed from the text column)."""
+    shape behind text vanishes under a cell's shading). All four hang on the
+    cell's FIRST paragraph; the block's height is measured once the line
+    heights are final, and the radius never exceeds half the height or width
+    (a pill). `pad_left_px`: the cell's physical left margin (masks are
+    placed from the text column)."""
     from docx.oxml.ns import qn
-    from ..docx_design import pt, vml_anchored
-    ps = inner.c._tc.findall(qn("w:p"))
-    if not ps:
-        return
-    k = 100
-    r = radius_px
     from docx.text.paragraph import Paragraph
-    first, last = Paragraph(ps[0], inner.c), Paragraph(ps[-1], inner.c)
-    sp = ps[-1].find(qn("w:pPr")).find(qn("w:spacing"))
-    last_h = (int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0) + 0.3
-    x_l, x_r = pt(-pad_left_px), pt(width_px - pad_left_px - r)
-    for key, para, x, y in (("tl", first, x_l, 0.0), ("tr", first, x_r, 0.0),
-                            ("bl", last, x_l, last_h - pt(r)), ("br", last, x_r, last_h - pt(r))):
-        vml_anchored(para, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
-                     path=_CORNER[key].format(r=k), coords=f"{k},{k}", z=20)
+    from ..docx_design import pt, vml_anchored
+    from ..docx_measure import Measure
+    tc = inner.c._tc
+    first_el = tc.find(qn("w:p"))
+    if first_el is None:
+        first_el = next(tc.iter(qn("w:p")), None)
+    if first_el is None:
+        return
+    first = Paragraph(first_el, inner.c)
+
+    def go():
+        h_px = Measure(ctx.resolved).block(tc, pt(width_px)) / 0.72
+        r = max(1.0, min(radius_px, h_px / 2, width_px / 2))
+        k = 100
+        x_l, x_r = pt(-pad_left_px), pt(width_px - pad_left_px - r)
+        for key, x, y in (("tl", x_l, 0.0), ("tr", x_r, 0.0), ("bl", x_l, pt(h_px - r)),
+                          ("br", x_r, pt(h_px - r))):
+            vml_anchored(first, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
+                         path=_CORNER[key].format(r=k), coords=f"{k},{k}", z=20)
+    ctx.after_lines.append(go)
 
 
 def rounded_block(ctx: Ctx, box: Box, width_px: float, *, fill: str, bg: str, radius: float,
@@ -361,6 +388,11 @@ def rounded_block(ctx: Ctx, box: Box, width_px: float, *, fill: str, bg: str, ra
     """A filled block (one-cell table, as `block`) whose corners are rounded
     by round_corners() when its Box is finished through `.finish_round()`."""
     inner = block(ctx, box, width_px, fill=fill, pad=pad)
+    if not inner.pad_top:
+        # the corner masks hang on the cell's first paragraph: make sure there
+        # is one ABOVE any table (a cell-end paragraph after a table is not
+        # laid out by Word)
+        inner.pad_top = 0.01
     pad_left = pad[3] if ctx.rtl else pad[1]
 
     def finish_round():
@@ -437,3 +469,16 @@ class ColumnPage(SidebarPage):
         for b in self.rows:
             b.finish()
         return tail
+
+
+def text_px(ctx: Ctx, role: str, text: str, size_px: float, spacing_px: float = 0.0) -> float:
+    """Width (px) of `text` in `role`'s face (font advance widths, joined
+    Arabic forms) - for shrink-wrapped boxes (an inline-block pill)."""
+    from ..docx_measure import _face_file, _font, _w
+    key = _ROLE_FACE[role]
+    f = ctx.resolved["faces"][key]
+    rel = _face_file(f["family"], f["weight"])
+    if not rel:
+        return len(text) * size_px * 0.55
+    m = _font(rel)
+    return sum(_w(m, ch) for ch in text) * size_px + spacing_px * len(text)

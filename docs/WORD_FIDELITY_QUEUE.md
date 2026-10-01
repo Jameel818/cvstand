@@ -43,7 +43,7 @@ Band:
 - [x] modern-t13 - CLOSE, EN 8.9 % (tol 6.8) / AR 11.1 % (10.3), demo 1/1, long 2 clean
 - [x] modern-t14 - CLOSE, EN 14.0 % (tol 11.5) / AR 17.0 % (15.5); overlapping panel/photo simplified (photo shows its uncovered 483-761px), demo 1/1, long 2 clean
 - [x] modern-t18 - CLOSE, EN 8.7 % (tol 5.1) / AR 8.3 % (6.4), demo 1/1, long 2 clean; rail navy begins under the photo frame
-- [ ] modern-t21
+- [x] modern-t21 - CLOSE, EN 14.1 % (tol 10.5) / AR 15.8 % (13.8); rounded cards via corner masks (side card's foot square), demo 1/1, long 2 clean
 Open:
 - [ ] modern-t1
 - [ ] modern-t6

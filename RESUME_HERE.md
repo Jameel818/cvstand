@@ -12,7 +12,7 @@ lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
 (estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
 
 Status: items 0, 1, 2 DONE; item 3: the 5 designs from run 1 re-measured and polished (all CLOSE, demo 1 page). Next: new designs, Sidebar t3 first.
-Designs built this run: t3 (CLOSE); t5 (CLOSE); t9 (CLOSE); t16 (CLOSE (near MATCHES)); t17 (CLOSE); t24 (CLOSE); t7 (CLOSE (near MATCHES)); t11 (MATCHES); t13 (CLOSE); t14 (CLOSE); t18 (CLOSE);
+Designs built this run: t3 (CLOSE); t5 (CLOSE); t9 (CLOSE); t16 (CLOSE (near MATCHES)); t17 (CLOSE); t24 (CLOSE); t7 (CLOSE (near MATCHES)); t11 (MATCHES); t13 (CLOSE); t14 (CLOSE); t18 (CLOSE); t21 (CLOSE);
 
 ---
 
