@@ -47,7 +47,7 @@ Band:
 Open:
 - [x] modern-t1 - MATCHES, EN 6.4 % (tol 2.5) / AR 6.5 % (5.7), demo 1/1, long 2 clean
 - [x] modern-t6 - CLOSE (near MATCHES), EN 7.7 % (tol 3.3) / AR 8.6 % (7.0), demo 1/1, long 2 clean
-- [ ] modern-t12
+- [x] modern-t12 - CLOSE, EN 9.1 % (tol 5.2) / AR 9.4 % (8.1), demo 1/1, long 2 clean; empty SKILLS/EDUCATION heads hidden
 - [ ] modern-t22
 Gutter:
 - [ ] modern-t19

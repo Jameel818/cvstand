@@ -223,20 +223,21 @@ class SidebarPage:
     def main_text_px(self) -> float:
         return self.main_px - sum(self.main_pad_x)
 
-    def _fit_main(self, max_over_pt: float = 60.0, reserve_pt: float | None = None) -> None:
-        """Shrink-only safety for a CV that ALMOST fits one page (the demo):
-        when the main column's estimate exceeds the page by at most
-        `max_over_pt`, the space before each row's first paragraph (the gaps)
-        shrinks proportionally - never the text. A long CV (far over) flows to
-        page 2 untouched. Word's Arabic faces run taller than the PDF's."""
+    def _fit_main(self, max_over_pt: float = 160.0, reserve_pt: float | None = None) -> None:
+        """Shrink-only safety for a CV that ALMOST fits one page (the demo), as
+        the app's own auto-fit compresses the PDF's vertical rhythm: when the
+        main column's estimate exceeds the page by at most `max_over_pt`, the
+        space before each row's first paragraph shrinks first; if that is not
+        enough, ALL paragraph spacing in the main column scales down (never
+        below 40 %, never the text). A long CV flows to page 2 untouched."""
         from docx.oxml.ns import qn
         from ..docx_design import PAGE_H_PT
         from ..docx_measure import Measure, _before, _set_before
         sec = self.ctx.doc.sections[0]
         if reserve_pt is None:
-            # measured: the Arabic estimate runs ~20pt short on a full page
+            # measured: the Arabic estimate runs 20-50pt short on a full page
             # (joined-form widths under-count Arabic line lengths a little)
-            reserve_pt = 30.0 if self.ctx.rtl else 6.0
+            reserve_pt = 50.0 if self.ctx.rtl else 10.0
         avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - reserve_pt
 
         def go():
@@ -248,11 +249,28 @@ class SidebarPage:
             firsts = [next(b.c._tc.iter(qn("w:p")), None) for b in self.rows]
             firsts = [f for f in firsts if f is not None]
             have = sum(_before(f) for f in firsts)
-            if have <= 0:
+            if have >= over:
+                k = 1 - over / have
+                for f in firsts:
+                    _set_before(f, _before(f) * k)
                 return
-            k = max(0.0, 1 - over / have)
-            for f in firsts:
-                _set_before(f, _before(f) * k)
+            # every paragraph's spacing in the main column, proportionally
+            sps = []
+            for b in self.rows:
+                for p_ in b.c._tc.iter(qn("w:p")):
+                    sp = p_.find(qn("w:pPr") + "/" + qn("w:spacing"))
+                    if sp is not None:
+                        sps.append(sp)
+            total = sum((int(sp.get(qn("w:before"), 0)) + int(sp.get(qn("w:after"), 0))) / 20
+                        for sp in sps)
+            if total <= 0:
+                return
+            k = max(0.4, 1 - over / total)
+            for sp in sps:
+                for a in ("before", "after"):
+                    v = int(sp.get(qn(f"w:{a}"), 0))
+                    if v:
+                        sp.set(qn(f"w:{a}"), str(int(v * k)))
         self.ctx.after_lines.append(go)
 
     def finish(self):
