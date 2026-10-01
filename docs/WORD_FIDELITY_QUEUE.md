@@ -59,11 +59,11 @@ Gutter:
 - [x] 5. docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity review" (pdf / word-demo / word-long-p1 / word-long-p2 / overlay, grade, %, differences, .docx)
 
 ## 6. Full suite
-- [ ] 6. Close Word; full suite incl. browser tests; fix without weakening
+- [x] 6. Close Word; full suite incl. browser tests; fix without weakening - 5232 passed / 47 skipped / 0 failed (25 min); one e2e test made design-aware (name on two lines)
 
 ## Follow-ups (NOT this run: the PDF/HTML templates stay unchanged)
 - [ ] Arabic PDF shows reference phone numbers reversed; fix later in the HTML/PDF templates.
 - [ ] Arabic PDF/preview draw system fallback faces (the policy families are never declared in the document); see the audit FINDING.
 
 ## Final
-- [ ] Final report, RESUME_HERE, commit, push, ls-remote, clean status
+- [x] Final report, RESUME_HERE, commit, push, ls-remote, clean status

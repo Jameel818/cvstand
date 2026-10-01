@@ -68,7 +68,13 @@ def test_docx_download_opens_as_a_package_containing_the_edit(page, live_server,
     with zipfile.ZipFile(dest) as z:
         assert "word/document.xml" in z.namelist()
         xml = z.read("word/document.xml").decode("utf-8")
-    assert "Peta Vale" in xml
+    # the edit reached the file; a per-template Word DESIGN may set the name on
+    # two lines as its PDF does ("Peta" / "Vale"), so the words are matched
+    import re
+    texts = re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", xml)
+    words = " ".join(texts).split()
+    assert "Peta Vale" in xml or ("Peta" in words and "Vale" in words)
+    assert "Wren" not in words, "the old name survived the edit"
     assert "{{" not in xml and "{%" not in xml, "an unrendered docxtpl tag shipped"
 
 

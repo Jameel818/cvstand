@@ -11,19 +11,16 @@ and long CV, EN/AR, real Word, strict + tolerant % and overlays), `dy.py RUN key
 lang` (per-line vertical offsets), `hbox.py` (HTML element rects), `mval2.py`
 (estimator vs Word), `calib.py` (per-face single lines), `ckpt2.sh "msg"`.
 
-Status: items 0, 1, 2 DONE; item 3: the 5 designs from run 1 re-measured and polished (all CLOSE, demo 1 page). Next: new designs, Sidebar t3 first.
-Designs built this run: t22 (CLOSE); t19 (CLOSE);
-
-STOPPED 2026-10-02 at the usage limit. NEXT (in order): modern-t22 (Open: giant
-vertical "RESUME" rail = rotated text box; read t22.j2), modern-t19 (Gutter), then
-re-render ALL designs with `ovl.py` (the shared fit/push/spread guards changed
-late: fit reserves 50/10pt, spacing compression), item 4 (Word applies chosen
-SIZES), item 5 (review page + Desktop folder), item 6 (close Word, full suite
-incl. --e2e). Audit decisions 18-33 are written; add: t12 hides empty heads;
-python-docx row.cells returns the merge's TOP cell for vMerge continue cells;
-pushes/fits measure content above the page table and at-least row heights.
-
-Designs built this run: t3 (CLOSE); t5 (CLOSE); t9 (CLOSE); t16 (CLOSE (near MATCHES)); t17 (CLOSE); t24 (CLOSE); t7 (CLOSE (near MATCHES)); t11 (MATCHES); t13 (CLOSE); t14 (CLOSE); t18 (CLOSE); t21 (CLOSE); t1 (MATCHES); t6 (CLOSE (near MATCHES)); t12 (CLOSE);
+Status (2026-10-02): QUEUE COMPLETE. All 24 Modern templates have Word designs
+(grades + % in docs/WORD_FIDELITY_QUEUE.md; 48/48 demo files 1 page in real
+Word); item 4 chosen sizes in Word (tests/test_docx_sizes.py); item 5 review
+page docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity
+review" (236 images, 96 .docx); item 6 full suite --e2e 5232 passed / 47
+skipped / 0 failed. No golden image changed.
+Open for the user: (1) the Arabic PDF draws fallback faces (audit FINDING);
+(2) Arabic PDF reference phones reversed (queue follow-up); (3) 7 cloud-named
+fonts draw Calibri in Word here; (4) t22 long CV: two-column block starts on
+page 2. Merge only on the user's go-ahead (pushing main deploys).
 
 ---
 
