@@ -35,7 +35,7 @@ Sidebar:
 - [x] modern-t5 - CLOSE, EN 11.2 % (tol 7.1) / AR 22.7 % (21.1; Arabic column ~50px longer: Word's Arabic faces vs the PDF's fallback), demo 1/1, long 2 clean
 - [x] modern-t9 - CLOSE, EN 14.8 % (tol 8.1) / AR 13.4 % (9.3), demo 1/1, long 2 clean
 - [x] modern-t16 - CLOSE (near MATCHES), EN 7.1 % (tol 2.4) / AR 7.9 % (6.6), demo 1/1, long 2 clean; rings = editable stroke shapes, % as text
-- [ ] modern-t17
+- [x] modern-t17 - CLOSE, EN 8.1 % (tol 4.0) / AR 17.2 % (16.1; name block taller with Word's Arabic face), demo 1/1, long 2 clean
 - [ ] modern-t24
 Band:
 - [ ] modern-t7
