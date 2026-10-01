@@ -31,8 +31,12 @@ class SidebarPage:
         side = self._side_cell(self.tbl.rows[0])
         vmerge(side, "restart")
         fmt_cell(ctx, side, fill=side_fill, pad=(0, side_pad[1], 0, side_pad[3]))
+        # the column's bottom padding is the PAGE's bottom margin (every design
+        # sets it equal): written again in the cell it counted twice once Word
+        # stopped hiding the cell-end paragraph (Box.finish), and the side
+        # column spilled an empty page 2 (t4 Arabic)
         self.side = Box(ctx, side, self.side_w - tw(side_pad[1] + side_pad[3]),
-                        pad_top=side_pad[0], pad_bottom=side_pad[2])
+                        pad_top=side_pad[0], pad_bottom=0)
         self._first = True
         if full_height_fill and side_fill:
             x = PAGE_W_PX - side_px if side_end else 0
@@ -62,27 +66,78 @@ class SidebarPage:
         self.rows.append(box)
         return box
 
-    def spread_side(self, heads, *, reserve_pt: float = 4.0) -> None:
+    def shrink_side_photo(self, photo, *, min_px: float = 40, reserve_pt: float = 4.0) -> None:
+        """The PDF's side column is a flex column whose photo block may SHRINK
+        (flex-shrink) when the column is full: the photo gives up height,
+        cropped (object-fit: cover), before anything else moves. Same here,
+        measured once the line heights are final."""
+        from ..docx_design import PAGE_H_PT, crop_picture_height, pt
+        from ..docx_measure import Measure
+        sec = self.ctx.doc.sections[0]
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - pt(self.side.pad_bottom) - 1
+        tc, width = self.side.c._tc, self.side.w / 20
+
+        def go():
+            from docx.oxml.ns import qn
+            over = Measure(self.ctx.resolved).block(tc, width) + reserve_pt - avail
+            if over <= 0:
+                return
+            ext = photo._r.find(".//" + qn("wp:extent"))
+            h = int(ext.get("cy")) / 12700
+            crop_picture_height(photo, max(pt(min_px), h - over))
+        self.ctx.after_lines.append(go)
+
+    def fit_side(self, heads, *, reserve_pt: float = 4.0) -> None:
+        """Only the safety half of spread_side: a side column too tall for
+        the page gives up space before `heads` instead of spilling."""
+        self.spread_side(heads, reserve_pt=reserve_pt, grow=False)
+
+    def spread_side(self, heads, *, reserve_pt: float = 4.0, grow: bool = True) -> None:
         """The side column as the PDF's `justify-content: space-between`:
         the page's slack shared out before each of `heads` (python-docx
         paragraphs). The page's bottom margin stands in for the column's
         bottom padding, so the side box's own is dropped. Call before
         finish()."""
-        from ..docx_design import PAGE_H_PT
+        from ..docx_design import PAGE_H_PT, pt, tiny
         from ..docx_measure import Measure, spread
-        from ..docx_design import tiny
         sec = self.ctx.doc.sections[0]
-        self.side.pad_bottom = 0
+        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+        if grow:
+            self.side.pad_bottom = 0
+        else:
+            # fit only: the column keeps its bottom padding, inside the page
+            avail -= pt(self.side.pad_bottom) + 1
         if self.side.pending is not None:
             tiny(self.side.pending)      # what finish() will make of it
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
         heads = [h._p if hasattr(h, "_p") else h for h in heads]
         tc, width = self.side.c._tc, self.side.w / 20
         # measured once the line heights are final (docx_design.true_lines)
         self.ctx.after_lines.append(lambda: spread(Measure(self.ctx.resolved), tc, width,
-                                                   heads, avail, reserve_pt))
+                                                   heads, avail, reserve_pt, grow=grow))
 
-    def push_to_bottom(self, box: Box, *, bottom_px: float = 0, reserve_pt: float = 4.0) -> None:
+    def pin_top(self, box: Box, y_px: float, *, min_gap_px: float = 0) -> None:
+        """Start main-column row `box` at `y_px` from the top of the page (an
+        absolutely placed flow in the PDF, e.g. below a band): the rows above
+        are measured once the line heights are final and the gap made up as
+        space before `box`'s first paragraph (at least `min_gap_px`)."""
+        from docx.oxml.ns import qn
+        from ..docx_design import pt
+        from ..docx_measure import Measure, _set_before
+        sec = self.ctx.doc.sections[0]
+
+        def go():
+            m = Measure(self.ctx.resolved)
+            above = 0.0
+            for b in self.rows:
+                if b is box:
+                    break
+                above += m.block(b.c._tc, b.w / 20)
+            first = next(box.c._tc.iter(qn("w:p")), None)
+            if first is not None:
+                _set_before(first, max(pt(min_gap_px), pt(y_px) - sec.top_margin.pt - above))
+        self.ctx.after_lines.append(go)
+
+    def push_to_bottom(self, box: Box, *, bottom_px: float = 0, reserve_pt: float = 12.0) -> None:
         """The PDF's `margin-top:auto` on a main-column block: the page's slack
         (one page, measured once the line heights are final) goes above
         `box`, so it sits at the foot of the column, `bottom_px` above the

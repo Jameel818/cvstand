@@ -7,7 +7,7 @@ paragraph, and the "ALSO" block. Measured from modern/t8.j2."""
 from __future__ import annotations
 
 from ..docx_design import (
-    Box, Ctx, design, dots, fmt_cell, fmt_p, page_rects, photo_run, pt, run, tw,
+    Box, Ctx, design, dots_shape, fmt_cell, fmt_p, page_rects, photo_run, pt, run, tw,
 )
 from .common import SidebarPage, Stack, date_range, joined
 
@@ -88,7 +88,7 @@ def build(ctx: Ctx) -> None:
         rule = b.p(before=10, ind_end=L - 56 - 52, border={"bottom": (2, "FFFFFF", 0)})
         run(ctx, rule, "", size=2)
         from ..docx_design import tiny
-        tiny(rule)
+        tiny(rule, before_px=10)        # tiny() rewrites the spacing: keep the 10px
         run(ctx, b.p(before=14, line=1.65), r["summary"], size=11, color="E2E8F0")
         b.finish()
 
@@ -113,8 +113,8 @@ def build(ctx: Ctx) -> None:
             db = Box(ctx, c1, 0)
             dp = db.p(align="end")
             if sk["level"]:
-                dots(ctx, dp, sk["dots"], sk["dot_total"], on=NAVY, off=MUTED_DOT, size=21,
-                     gap=1)
+                dots_shape(ctx, dp, sk["dots"], sk["dot_total"], on=NAVY, off=MUTED_DOT, d=12,
+                           gap=7, stroke=1.5)
             db.finish()
         st.done()
 
@@ -154,7 +154,7 @@ def build(ctx: Ctx) -> None:
             color="FFFFFF", spacing=4, caps=True)
     rule = head.p(before=13, border={"bottom": (2, "FFFFFF", 0)})
     from ..docx_design import tiny
-    tiny(rule)
+    tiny(rule, before_px=13)            # tiny() rewrites the spacing: keep the 13px
     if r["achievements"]:
         n = len(r["achievements"])
         each = tw(R - 72) // n

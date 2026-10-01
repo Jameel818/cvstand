@@ -181,6 +181,16 @@ class Box:
             self.pending = self.c.add_paragraph()
         if self.pending is not None:
             tiny(self.pending, before_px=extra)
+            prev = self.pending._p.getprevious()
+            if extra and prev is not None and prev.tag == qn("w:tbl"):
+                # measured in Word: an EMPTY paragraph closing a cell after a
+                # nested table is not laid out at all - its spacing (this
+                # padding) vanished (t8's header lost 26px). A 1pt space makes
+                # it a real line again; it shows nothing.
+                r = self.pending.add_run(" ")
+                rpr = r._r.get_or_add_rPr()
+                _rpr_put(rpr, "sz", val=2)
+                _rpr_put(rpr, "szCs", val=2)
             self.pending = None
         self.pad_top = self.pad_bottom = 0
 
@@ -604,6 +614,33 @@ def photo_run(ctx: Ctx, para, *, size_px: float, shape: str = "circle", ring_px:
     r = para.add_run()
     r.add_picture(buf, width=Pt(pt(w_px)))
     return r
+
+
+def crop_picture_height(r, new_h_pt: float) -> None:
+    """Make an inline picture (python-docx run `r`) `new_h_pt` tall by
+    cropping its top and bottom equally - the CSS `object-fit:cover` of a
+    flex item that shrank - never squashing it."""
+    from docx.oxml.ns import nsdecls  # noqa: F401
+    el = r._r
+    ext = el.find(".//" + qn("wp:extent"))
+    old = int(ext.get("cy"))
+    new = max(1, int(round(new_h_pt * 12700)))
+    if new >= old:
+        return
+    ext.set("cy", str(new))
+    for a_ext in el.iter("{http://schemas.openxmlformats.org/drawingml/2006/main}ext"):
+        if a_ext.get("cy") == str(old):
+            a_ext.set("cy", str(new))
+    fill = next(el.iter("{http://schemas.openxmlformats.org/drawingml/2006/picture}blipFill"))
+    A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+    src = fill.find(A + "srcRect")
+    if src is None:
+        src = parse_xml('<a:srcRect xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"/>')
+        blip = fill.find(A + "blip")
+        blip.addnext(src)
+    cut = int(round((1 - new / old) * 100000 / 2))    # 1/1000 of a percent, each edge
+    src.set("t", str(cut))
+    src.set("b", str(cut))
 
 
 def page_rects(ctx: Ctx, rects_all: list, rects_first: list = ()) -> None:

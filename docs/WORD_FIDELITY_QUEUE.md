@@ -21,15 +21,15 @@ scratchpad `ovl.py`.
 - [x] 1d. Details: bar ends, Arabic name size, gap before References, date dash style
 
 ## 2. Demo CV
-- [ ] 2. Demo CV one page in PDF + Word, EN + AR, every template (re-checked per template in 3)
+- [x] 2. Demo CV one page in PDF + Word, EN + AR, every template (re-checked per template in 3)
 
 ## 3. Per-template Word designs (EN + AR: audit, demo + photo + refs 1 page, long CV, overlay, grade)
 Already built last run - re-measure with the overlay, polish if > 10 %:
-- [ ] modern-t8 (Band)
-- [ ] modern-t10 (Sidebar)
-- [ ] modern-t15 (Sidebar)
-- [ ] modern-t20 (Sidebar)
-- [ ] modern-t23 (Sidebar)
+- [x] modern-t8 (Band) - CLOSE, EN 7.0 % (tol 3.7) / AR 6.8 % (4.9), demo 1/1 page
+- [x] modern-t10 (Sidebar) - CLOSE, EN 9.3 % (5.2) / AR 7.5 % (5.1), demo 1/1
+- [x] modern-t15 (Sidebar) - CLOSE, EN 10.5 % (5.7) / AR 12.3 % (10.4, fallback faces), demo 1/1
+- [x] modern-t20 (Sidebar) - CLOSE, EN 9.3 % (6.0) / AR 7.9 % (6.5), demo 1/1
+- [x] modern-t23 (Sidebar) - CLOSE, EN 7.3 % (4.2) / AR 6.4 % (5.3), demo 1/1
 Sidebar:
 - [ ] modern-t3
 - [ ] modern-t5

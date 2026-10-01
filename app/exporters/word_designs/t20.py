@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from docx.shared import Pt
 
-from ..docx_design import Box, Ctx, design, dots, fmt_cell, photo_run, pt, run, tiny, tw, vml_oval
+from ..docx_design import (
+    Box, Ctx, design, dots_shape, fmt_cell, photo_run, pt, run, tiny, tw, vml_oval,
+)
 from .common import SidebarPage, Stack, bullets, date_range, joined, node_x
 
 BEIGE, INK, MAROON, DARK, MUTED, BODY, RULE = ("EDEBDD", "1B1717", "810100", "630000",
@@ -20,23 +22,29 @@ def build(ctx: Ctx) -> None:
     r, t = ctx.r, ctx.t
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(0.1)
-    sec.bottom_margin = Pt(pt(30))
-    page = SidebarPage(ctx, SIDE_PX, side_fill=BEIGE, side_pad=(32, 30, 32, 30),
+    sec.bottom_margin = Pt(pt(32))      # = the side column's bottom padding (the PDF has no page margin)
+    page = SidebarPage(ctx, SIDE_PX, side_fill=BEIGE, side_pad=(32, 30, 0, 30),
                        main_pad_x=(38, 38))
     side = page.side
     W = SIDE_PX - 60
     p = side.p()
-    photo_run(ctx, p, size_px=W, height_px=70 if ctx.rtl else 214, shape="rect", placeholder="DCD9C8",
-              ring_px=1, ring="CFCBB6")
+    photo = photo_run(ctx, p, size_px=W, height_px=214, shape="rect", placeholder="DCD9C8",
+                      ring_px=1, ring="CFCBB6")
+    # flex-shrink in the PDF: a full column takes height from the photo block
+    page.shrink_side_photo(photo)
+
+    heads = []
 
     def section(label, items, write):
         if not items:
             return
         st = Stack(ctx, side, W)
         for i, it in enumerate(items):
-            b = st.row(pad_top=13 if i == 0 else 0)
+            b = st.row()
             if i == 0:
-                run(ctx, b.p(after=8), label, "heading", size=21, color=INK, spacing=3)  # after 12px in the PDF
+                hp = b.p(before=18, after=12)
+                heads.append(hp)
+                run(ctx, hp, label, "heading", size=21, color=INK, spacing=3)
             write(b, i, it)
         st.done()
 
@@ -46,13 +54,13 @@ def build(ctx: Ctx) -> None:
         run(ctx, b.p(), item[1], size=12, color=INK)
 
     def skill(b, i, sk):
-        p = b.p(before=7 if i else 0, tabs=[(W, "end", None)])
+        p = b.p(before=10 if i else 0, tabs=[(W, "end", None)])
         run(ctx, p, sk["name"], "bold", size=12.5, color=INK)
         if sk["level"]:
             run(ctx, p, "\t", size=10.5)
             run(ctx, p, sk["level"], size=10.5, color="5C5C66")
-            dots(ctx, b.p(before=2), sk["dots"], sk["dot_total"], on=MAROON, off="B3AE99",
-                 size=12, gap=1.5)
+            dots_shape(ctx, b.p(before=5), sk["dots"], sk["dot_total"], on=MAROON,
+                       off="B3AE99", d=9, gap=5)
 
     def language(b, i, lg):
         p = b.p(before=6 if i else 0)
@@ -85,6 +93,7 @@ def build(ctx: Ctx) -> None:
     section(t("TOOLS"), [" · ".join(r["tools"])] if r["tools"] else [], tools)
     section(t("CERTIFICATIONS"), r["recognition"], cert)
     section(t("REFERENCES"), r["references"], ref)
+    page.fit_side(heads)       # a full side column gives up gaps, never spills
 
     # ---- main column
     T = page.main_text_px
@@ -112,13 +121,15 @@ def build(ctx: Ctx) -> None:
 
     def timeline(label, entries, write, rule_above):
         for j, e in enumerate(entries):
-            box = page.main_row(pad_top=26 if j == 0 else 0)
+            box = page.main_row(pad_top=0 if (j == 0 and rule_above) else (26 if j == 0 else 0))
             if j == 0:
                 if rule_above:
+                    # gap 26 - the 1px rule - gap 26 (tiny() would reset the
+                    # space before, so the mark is shrunk first)
                     rp = box.p()
                     tiny(rp)
                     from ..docx_design import fmt_p
-                    fmt_p(ctx, rp, after=26, border={"bottom": (1, RULE, 0)})
+                    fmt_p(ctx, rp, before=26, after=26, border={"bottom": (1, RULE, 0)})
                 run(ctx, box.p(align="center", after=22), label, "heading", size=23,
                     color=INK, spacing=4)
             last = j == len(entries) - 1

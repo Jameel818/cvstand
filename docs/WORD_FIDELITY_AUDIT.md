@@ -269,6 +269,22 @@ further inflated by the PDF finding below (different faces).
     (each added ~1 pt per job/skill row).
 28. **AR_GAP 0.8 removed** (now 1.0): it compensated the wrong line heights;
     with true lines the Arabic gaps are the template's.
+29. **A cell-end paragraph after a nested table** (measured): when EMPTY, Word
+    does not lay it out at all, so padding written on it vanished (t8's header
+    lost 26 px; every side column's bottom padding was silently dropped).
+    `Box.finish` now puts a 1 pt space in it when it carries padding.
+30. **Side column bottom padding = the page's bottom margin**, never both
+    (every design set them equal; once item 29 made the cell padding real the
+    side column counted it twice and spilled an empty page 2 - t4 Arabic).
+31. **flex-shrink photo (t20)**: the PDF's side photo block shrinks when the
+    column is full (214 px -> 175 px EN, ~70 px AR). Word measures the column
+    and crops the photo's height by the overflow (`crop_picture_height`,
+    object-fit: cover), replacing last run's hard-coded 70 px.
+32. **Absolutely placed flows (t15)** start where the PDF puts them:
+    `SidebarPage.pin_top` measures the rows above and makes up the gap
+    (replaces a formula guessed from the name length).
+33. **Reserves**: spread/fit 4 pt, push-to-bottom 12 pt (a 2-page demo is
+    worse than References sitting a few pt high).
 
 ## FINDING for the user (not changed: PDF/HTML are out of scope this run)
 **The Arabic PDF does not use the Arabic faces its CSS names.** The RTL policy

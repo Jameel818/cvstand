@@ -93,12 +93,12 @@ def build(ctx: Ctx) -> None:
 
     # ---- main column: the name on the band, then the flow from 300px down
     T = page.main_text_px
-    top = page.main_row(pad_top=96)
+    top = page.main_row(pad_top=112)
     run(ctx, top.p(line=1.0), r["name"], "name", size=52, color=GREEN, spacing=0.5, caps=True)
     if r["title"]:
         run(ctx, top.p(before=12), r["title"], "bold", size=16, color="3F2C02")
-    gap_to_flow = 300 - 112 - (52 * 1.25 * (1 if len(r["name"]) < 16 else 2)) - 34
-    box = page.main_row(pad_top=max(24, gap_to_flow))
+    box = page.main_row()
+    page.pin_top(box, 300, min_gap_px=24)       # the PDF's flow starts at 300px
     if r["summary"]:
         run(ctx, box.p(line=1.55), r["summary"], size=12, color="2B2B2B")
     if r["achievements"]:

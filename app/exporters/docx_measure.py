@@ -26,7 +26,7 @@ from docx.oxml.ns import qn
 
 _STYLE_FACE = {"CVName": "name", "CVHeading": "heading", "CVRole": "role",
                "CVBodyBold": "body_bold", "CVMetric": "heading", "CVAccentText": "body"}
-_ARIAL = {"line": 1.149, "avg": 0.55}
+_ARIAL = {"line": 1.149, "avg": 0.55, "widths": {}}
 
 
 @lru_cache(maxsize=None)
@@ -311,18 +311,42 @@ def bump_before(p, extra_pt: float) -> None:
 
 
 def spread(measure: Measure, container, width_pt: float, heads, avail_pt: float,
-           reserve_pt: float = 8.0) -> float:
+           reserve_pt: float = 8.0, *, grow: bool = True, shrink: bool = True) -> float:
     """`justify-content: space-between` for a column already written: the
     slack (`avail_pt` - what the column holds - a reserve) is shared equally
     as space before each of `heads` (the first paragraph of every block after
-    the first). Returns the space each got (0 when the column is full)."""
+    the first). With `shrink`, a column too tall for the page instead gives
+    up the space before those heads (never below 0, never the text), so it
+    does not spill one line onto a new page. Returns the change per head."""
     heads = [h for h in heads if h is not None]
     if not heads:
         return 0.0
     slack = avail_pt - reserve_pt - measure.block(container, width_pt)
-    if slack <= 0:
-        return 0.0
-    each = slack / len(heads)
-    for p in heads:
-        bump_before(p, each)
-    return each
+    if slack > 0 and grow:
+        each = slack / len(heads)
+        for p in heads:
+            bump_before(p, each)
+        return each
+    if slack < 0 and shrink:
+        have = [_before(p) for p in heads]
+        total = sum(have)
+        if total <= 0:
+            return 0.0
+        k = max(0.0, 1 - (-slack) / total)
+        for p, b in zip(heads, have):
+            _set_before(p, b * k)
+        return -(-slack) / len(heads)
+    return 0.0
+
+
+def _before(p) -> float:
+    ppr = p.find(qn("w:pPr"))
+    sp = ppr.find(qn("w:spacing")) if ppr is not None else None
+    return int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0.0
+
+
+def _set_before(p, v_pt: float) -> None:
+    ppr = p.find(qn("w:pPr"))
+    sp = ppr.find(qn("w:spacing")) if ppr is not None else None
+    if sp is not None:
+        sp.set(qn("w:before"), str(max(0, int(round(v_pt * 20)))))
