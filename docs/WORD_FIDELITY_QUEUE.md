@@ -56,7 +56,7 @@ Gutter:
 - [x] 4. Word applies the chosen SIZES (Name, Headings, Details), EN + AR, tests + real-Word check - DONE: factor per role as typography.js (designs + ATS/editorial masters), tests/test_docx_sizes.py, real Word t2/t11/ats-t1 EN+AR (all 1 page except ats-t1 AR = 2 at the larger sizes)
 
 ## 5. Review
-- [ ] 5. docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity review" (pdf / word-demo / word-long-p1 / word-long-p2 / overlay, grade, %, differences, .docx)
+- [x] 5. docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity review" (pdf / word-demo / word-long-p1 / word-long-p2 / overlay, grade, %, differences, .docx)
 
 ## 6. Full suite
 - [ ] 6. Close Word; full suite incl. browser tests; fix without weakening

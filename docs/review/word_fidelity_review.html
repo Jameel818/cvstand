@@ -1,33 +1,427 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Word Fidelity Review</title>
-<style>
-:root { --bg:#f4f3ef; --fg:#1b1b1f; --muted:#5d5d66; --card:#ffffff; --line:#d9d7cf; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#17171a; --fg:#ececf0; --muted:#a3a3ad; --card:#222226; --line:#3a3a40; } }
-:root[data-theme="dark"] { --bg:#17171a; --fg:#ececf0; --muted:#a3a3ad; --card:#222226; --line:#3a3a40; }
-body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, sans-serif; }
-main { max-width:1400px; margin:0 auto; padding:24px 16px 64px; }
-h1 { font-size:26px; margin:0 0 6px; } .sub { color:var(--muted); margin:0 0 18px; }
-nav a { margin-right:10px; } section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin:18px 0; }
-h2 { font-size:18px; margin:0 0 6px; } .lang { color:var(--muted); font-weight:500; }
-.grade { font-size:12px; padding:2px 8px; border-radius:99px; margin-left:8px; vertical-align:middle; }
-.g-close { background:#e3efd9; color:#2f5a14; } .g-matches { background:#d5e9f7; color:#12476e; } .g-wrong { background:#f7d9d5; color:#7a1d12; }
-.diff { margin:0 0 10px; color:var(--muted); }
-.strip { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:10px; }
-figure { margin:0; } figure img { width:100%; height:auto; border:1px solid var(--line); background:#fff; }
-figure.none div { aspect-ratio:8.5/11; border:1px dashed var(--line); display:grid; place-items:center; color:var(--muted); }
-figcaption { font-size:12px; color:var(--muted); margin-top:4px; } figure.wide img { max-width:100%; }
-table { border-collapse:collapse; width:100%; } td, th { border-bottom:1px solid var(--line); padding:6px; text-align:left; font-size:14px; }
-@media (max-width:800px) { .strip { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Word Fidelity Review</title><style>
+:root{--bg:#f6f6f4;--fg:#1a1a1a;--muted:#666;--card:#fff;--line:#ddd;--ok:#1b7a3e;--mid:#9a6a00}
+@media (prefers-color-scheme: dark){:root{--bg:#161616;--fg:#eee;--muted:#aaa;--card:#222;--line:#333}}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 system-ui,Segoe UI,sans-serif}
+main{max-width:1500px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0} h2{font-size:17px;margin:28px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin:12px 0}
+.imgs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.imgs figure{margin:0} .imgs img{width:100%;border:1px solid var(--line);display:block}
+figcaption{font-size:12px;color:var(--muted);text-align:center;margin-top:3px}
+.g{font-weight:700} .g.MATCHES{color:var(--ok)} .g.CLOSE{color:var(--mid)}
+table{border-collapse:collapse;width:100%;font-size:13px} td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+@media (max-width:900px){.imgs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body><main>
-<h1>Word fidelity review</h1>
-<p class="sub">Branch <code>feature/word-fidelity</code>. Every picture of a Word file is Word's own rendering on this PC (Word saved the PDF; pdf.js drew it). The PDF column is the app's PDF export of the same demo CV. Demo CV = the new builder sample with a photo and References; long CV = 5 jobs, 12 skills, 4 languages.</p>
-<nav>Templates: <a href="#modern-t2-en">t2</a> <a href="#modern-t4-en">t4</a> <a href="#modern-t8-en">t8</a> <a href="#modern-t10-en">t10</a> <a href="#modern-t15-en">t15</a> <a href="#modern-t20-en">t20</a> <a href="#modern-t23-en">t23</a></nav>
-<h2 style="margin-top:18px">Summary</h2>
-<table><tr><th>Template</th><th>EN</th><th>AR</th><th>Demo CV pages (EN / AR)</th></tr>
-<tr><td>modern-t2</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t4</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t8</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t10</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t15</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t20</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr><tr><td>modern-t23</td><td>CLOSE</td><td>CLOSE</td><td>1 / 1</td></tr>
+<h1>CVStand - Word fidelity review (all 24 Modern templates, EN + AR)</h1>
+<p>Every Word column is <b>Microsoft Word's own PDF</b> of the exported .docx (this PC), next to the app's PDF. Demo CV = the builder's sample with a photo and References; long CV = 5 jobs, 12 skills, 4 languages. <b>Strict %</b> = pixels whose colour differs; <b>tolerant %</b> forgives a 1-2px text drift (elements in the same places). Overlay: both pages blended, differing pixels tinted magenta. Arabic % is inflated: the app's Arabic PDF draws system fallback fonts (see the audit FINDING), Word the intended faces.</p>
+<table><tr><th>Template</th><th>Group</th><th>Grade</th><th>EN strict / tol</th><th>AR strict / tol</th><th>Pages demo (EN/AR)</th><th>Long (EN/AR)</th></tr>
+<tr><td><a href='#modern-t1'>modern-t1</a></td><td>Open</td><td class='g MATCHES'>MATCHES</td><td>6.42 / 2.46</td><td>6.48 / 5.41</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t2'>modern-t2</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>8.19 / 3.31</td><td>8.93 / 6.85</td><td>1 / 1</td><td>1 / 1</td></tr>
+<tr><td><a href='#modern-t3'>modern-t3</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>13.46 / 6.51</td><td>10.68 / 7.74</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t4'>modern-t4</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>8.29 / 3.9</td><td>11.17 / 8.95</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t5'>modern-t5</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>10.79 / 6.74</td><td>21.76 / 20.04</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t6'>modern-t6</a></td><td>Open</td><td class='g CLOSE'>CLOSE (near MATCHES)</td><td>7.65 / 3.28</td><td>8.59 / 7.02</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t7'>modern-t7</a></td><td>Band</td><td class='g CLOSE'>CLOSE (near MATCHES)</td><td>10.22 / 5.6</td><td>8.73 / 6.37</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t8'>modern-t8</a></td><td>Band</td><td class='g CLOSE'>CLOSE</td><td>5.55 / 0.86</td><td>6.76 / 5.01</td><td>1 / 1</td><td>1 / 2</td></tr>
+<tr><td><a href='#modern-t9'>modern-t9</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>14.79 / 8.05</td><td>12.28 / 7.46</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t10'>modern-t10</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>9.26 / 5.12</td><td>7.55 / 5.18</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t11'>modern-t11</a></td><td>Band</td><td class='g MATCHES'>MATCHES</td><td>6.5 / 1.8</td><td>5.98 / 4.22</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t12'>modern-t12</a></td><td>Open</td><td class='g CLOSE'>CLOSE</td><td>9.09 / 5.2</td><td>9.36 / 8.05</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t13'>modern-t13</a></td><td>Band</td><td class='g CLOSE'>CLOSE</td><td>8.91 / 6.81</td><td>11.15 / 10.37</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t14'>modern-t14</a></td><td>Band</td><td class='g CLOSE'>CLOSE</td><td>14.19 / 11.74</td><td>16.84 / 14.94</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t15'>modern-t15</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>11.21 / 6.83</td><td>12.12 / 10.2</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t16'>modern-t16</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE (near MATCHES)</td><td>7.14 / 2.37</td><td>7.94 / 6.58</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t17'>modern-t17</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>8.11 / 4.03</td><td>17.0 / 15.28</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t18'>modern-t18</a></td><td>Band</td><td class='g CLOSE'>CLOSE</td><td>8.74 / 5.05</td><td>8.68 / 6.99</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t19'>modern-t19</a></td><td>Gutter</td><td class='g CLOSE'>CLOSE</td><td>9.92 / 8.08</td><td>6.16 / 3.75</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t20'>modern-t20</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>8.39 / 4.16</td><td>7.78 / 6.24</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t21'>modern-t21</a></td><td>Band</td><td class='g CLOSE'>CLOSE</td><td>14.05 / 10.54</td><td>18.11 / 16.31</td><td>1 / 1</td><td>2 / 2</td></tr>
+<tr><td><a href='#modern-t22'>modern-t22</a></td><td>Open</td><td class='g CLOSE'>CLOSE</td><td>20.98 / 17.21</td><td>10.79 / 8.74</td><td>1 / 1</td><td>2 / 3</td></tr>
+<tr><td><a href='#modern-t23'>modern-t23</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>5.92 / 2.25</td><td>6.67 / 5.56</td><td>1 / 1</td><td>1 / 2</td></tr>
+<tr><td><a href='#modern-t24'>modern-t24</a></td><td>Sidebar</td><td class='g CLOSE'>CLOSE</td><td>14.72 / 11.09</td><td>23.67 / 21.84</td><td>1 / 1</td><td>2 / 2</td></tr>
 </table>
-<p class="sub">Not reached this run (still exported with the generic Word layout): modern-t3, modern-t5, modern-t9, modern-t16, modern-t17, modern-t24, modern-t7, modern-t11, modern-t13, modern-t14, modern-t18, modern-t21, modern-t1, modern-t6, modern-t12, modern-t22, modern-t19.</p>
-<section id="modern-t2-en"><h2>modern-t2 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Bar ends square (PDF rounded); heading rules are a tab leader, ~1pt lower; rhythm ~5% looser; photo placeholder circle without words.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t2-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t2-ar"><h2>modern-t2 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> As EN; the stat &quot;2×&quot; reads as typed (the PDF&#x27;s bidi shows &quot;×2&quot;).</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t2-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t2-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t4-en"><h2>modern-t4 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Ribbons stop at the rail edge (PDF overhangs 14px with a folded corner); dots slightly smaller.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t4-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t4-ar"><h2>modern-t4 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> As EN.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t4-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t4-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t8-en"><h2>modern-t8 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> First name in the regular face (the PDF&#x27;s 300 weight is not built); dot glyphs a little smaller.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t8-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t8-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t8-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure class="none"><div>(one page only)</div><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t8-ar"><h2>modern-t8 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> As EN.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t8-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t8-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t8-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t8-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t10-en"><h2>modern-t10 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Sliders have no knob; skills card corners square; Word uses Poppins for DM Sans (earlier decision), so the rail text is a touch wider.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t10-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t10-ar"><h2>modern-t10 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> As EN.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t10-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t10-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t15-en"><h2>modern-t15 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Near MATCHES: square bar ends; the band is a page shape behind the photo (same look).</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t15-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t15-ar"><h2>modern-t15 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Portrait 200px (EN 268px) so the Arabic rail fits one page.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t15-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t15-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t20-en"><h2>modern-t20 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Heading gaps trimmed a little so Word&#x27;s taller dot lines fit; dots are glyphs.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t20-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t20-ar"><h2>modern-t20 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Portrait block 70px tall, as the Arabic PDF draws it.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t20-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t20-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t23-en"><h2>modern-t23 <span class="lang">EN</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> Title pill has square ends; Education follows Skills (the PDF pins it to the rail&#x27;s foot).</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t23-en-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-en-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-en-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-en-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section><section id="modern-t23-ar"><h2>modern-t23 <span class="lang">AR</span> <span class="grade g-close">CLOSE</span></h2><p class="diff"><b>Remaining differences:</b> As EN.</p><div class="strip"><figure><img loading="lazy" src="fidelity_img/modern-t23-ar-pdf.jpg" alt="PDF (demo CV, photo, references)"><figcaption>PDF (demo CV, photo, references)</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-ar-demo.jpg" alt="Word, demo CV"><figcaption>Word, demo CV</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-ar-long1.jpg" alt="Word, long CV p1"><figcaption>Word, long CV p1</figcaption></figure><figure><img loading="lazy" src="fidelity_img/modern-t23-ar-long2.jpg" alt="Word, long CV p2"><figcaption>Word, long CV p2</figcaption></figure></div></section>
-<section><h2>pdf2docx comparison</h2><p class="diff">Same PDFs converted with pdf2docx (installed in the scratchpad only) and opened in Word: fonts not embedded, photo lost, ~70 exact line heights per file, the t8 header breaks, Arabic text is reordered. Not usable as the export.</p><figure class="wide"><img loading="lazy" src="fidelity_img/pdf2docx-modern-t2.jpg" alt="pdf2docx modern-t2"><figcaption>modern-t2: PDF vs pdf2docx output opened in Word (EN left, AR right)</figcaption></figure><figure class="wide"><img loading="lazy" src="fidelity_img/pdf2docx-modern-t8.jpg" alt="pdf2docx modern-t8"><figcaption>modern-t8: PDF vs pdf2docx output opened in Word (EN left, AR right)</figcaption></figure></section>
+<h2 id='modern-t1'>modern-t1 - Open - <span class='g MATCHES'>MATCHES</span></h2>
+<p> MATCHES, EN 6.4 % (tol 2.5) / AR 6.5 % (5.7), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 6.42 %, tolerant 2.46 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t1-en-demo.docx</code>, <code>docx/modern-t1-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t1-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 6.48 %, tolerant 5.41 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t1-ar-demo.docx</code>, <code>docx/modern-t1-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t1-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t1-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t2'>modern-t2 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p>Polished this run: spacing per face, rounded bars, Arabic dates/×2, faces by role. </p>
+<div class='card'><b>EN</b> - strict 8.19 %, tolerant 3.31 %, demo 1 page(s), long 1 page(s) - .docx: <code>docx/modern-t2-en-demo.docx</code>, <code>docx/modern-t2-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t2-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><div>-</div><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 8.93 %, tolerant 6.85 %, demo 1 page(s), long 1 page(s) - .docx: <code>docx/modern-t2-ar-demo.docx</code>, <code>docx/modern-t2-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t2-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><div>-</div><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t2-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t3'>modern-t3 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 13.5 % (tol 6.5) / AR 10.7 % (7.9), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 13.46 %, tolerant 6.51 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t3-en-demo.docx</code>, <code>docx/modern-t3-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t3-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 10.68 %, tolerant 7.74 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t3-ar-demo.docx</code>, <code>docx/modern-t3-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t3-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t3-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t4'>modern-t4 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p>Polished this run: folded ribbon tab, dot shapes, References at the foot. </p>
+<div class='card'><b>EN</b> - strict 8.29 %, tolerant 3.9 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t4-en-demo.docx</code>, <code>docx/modern-t4-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t4-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 11.17 %, tolerant 8.95 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t4-ar-demo.docx</code>, <code>docx/modern-t4-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t4-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t4-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t5'>modern-t5 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 11.2 % (tol 7.1) / AR 22.7 % (21.1; Arabic column ~50px longer: Word&#x27;s Arabic faces vs the PDF&#x27;s fallback), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 10.79 %, tolerant 6.74 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t5-en-demo.docx</code>, <code>docx/modern-t5-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t5-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 21.76 %, tolerant 20.04 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t5-ar-demo.docx</code>, <code>docx/modern-t5-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t5-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t5-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t6'>modern-t6 - Open - <span class='g CLOSE'>CLOSE (near MATCHES)</span></h2>
+<p> CLOSE (near MATCHES), EN 7.7 % (tol 3.3) / AR 8.6 % (7.0), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 7.65 %, tolerant 3.28 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t6-en-demo.docx</code>, <code>docx/modern-t6-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t6-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 8.59 %, tolerant 7.02 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t6-ar-demo.docx</code>, <code>docx/modern-t6-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t6-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t6-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t7'>modern-t7 - Band - <span class='g CLOSE'>CLOSE (near MATCHES)</span></h2>
+<p> CLOSE (near MATCHES), EN 8.3 % (tol 3.0) / AR 8.2 % (5.5), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 10.22 %, tolerant 5.6 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t7-en-demo.docx</code>, <code>docx/modern-t7-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t7-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 8.73 %, tolerant 6.37 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t7-ar-demo.docx</code>, <code>docx/modern-t7-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t7-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t7-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t8'>modern-t8 - Band - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 7.0 % (tol 3.7) / AR 6.8 % (4.9), demo 1/1 page</p>
+<div class='card'><b>EN</b> - strict 5.55 %, tolerant 0.86 %, demo 1 page(s), long 1 page(s) - .docx: <code>docx/modern-t8-en-demo.docx</code>, <code>docx/modern-t8-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t8-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><div>-</div><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 6.76 %, tolerant 5.01 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t8-ar-demo.docx</code>, <code>docx/modern-t8-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t8-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t8-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t9'>modern-t9 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 14.8 % (tol 8.1) / AR 13.4 % (9.3), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 14.79 %, tolerant 8.05 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t9-en-demo.docx</code>, <code>docx/modern-t9-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t9-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 12.28 %, tolerant 7.46 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t9-ar-demo.docx</code>, <code>docx/modern-t9-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t9-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t9-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t10'>modern-t10 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 9.3 % (5.2) / AR 7.5 % (5.1), demo 1/1</p>
+<div class='card'><b>EN</b> - strict 9.26 %, tolerant 5.12 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t10-en-demo.docx</code>, <code>docx/modern-t10-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t10-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 7.55 %, tolerant 5.18 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t10-ar-demo.docx</code>, <code>docx/modern-t10-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t10-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t10-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t11'>modern-t11 - Band - <span class='g MATCHES'>MATCHES</span></h2>
+<p> MATCHES, EN 6.5 % (tol 1.8) / AR 6.0 % (4.2), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 6.5 %, tolerant 1.8 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t11-en-demo.docx</code>, <code>docx/modern-t11-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t11-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 5.98 %, tolerant 4.22 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t11-ar-demo.docx</code>, <code>docx/modern-t11-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t11-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t11-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t12'>modern-t12 - Open - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 9.1 % (tol 5.2) / AR 9.4 % (8.1), demo 1/1, long 2 clean; empty SKILLS/EDUCATION heads hidden</p>
+<div class='card'><b>EN</b> - strict 9.09 %, tolerant 5.2 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t12-en-demo.docx</code>, <code>docx/modern-t12-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t12-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 9.36 %, tolerant 8.05 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t12-ar-demo.docx</code>, <code>docx/modern-t12-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t12-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t12-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t13'>modern-t13 - Band - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 8.9 % (tol 6.8) / AR 11.1 % (10.3), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 8.91 %, tolerant 6.81 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t13-en-demo.docx</code>, <code>docx/modern-t13-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t13-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 11.15 %, tolerant 10.37 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t13-ar-demo.docx</code>, <code>docx/modern-t13-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t13-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t13-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t14'>modern-t14 - Band - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 14.0 % (tol 11.5) / AR 17.0 % (15.5); overlapping panel/photo simplified (photo shows its uncovered 483-761px), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 14.19 %, tolerant 11.74 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t14-en-demo.docx</code>, <code>docx/modern-t14-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t14-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 16.84 %, tolerant 14.94 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t14-ar-demo.docx</code>, <code>docx/modern-t14-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t14-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t14-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t15'>modern-t15 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 10.5 % (5.7) / AR 12.3 % (10.4, fallback faces), demo 1/1</p>
+<div class='card'><b>EN</b> - strict 11.21 %, tolerant 6.83 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t15-en-demo.docx</code>, <code>docx/modern-t15-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t15-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 12.12 %, tolerant 10.2 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t15-ar-demo.docx</code>, <code>docx/modern-t15-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t15-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t15-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t16'>modern-t16 - Sidebar - <span class='g CLOSE'>CLOSE (near MATCHES)</span></h2>
+<p> CLOSE (near MATCHES), EN 7.1 % (tol 2.4) / AR 7.9 % (6.6), demo 1/1, long 2 clean; rings = editable stroke shapes, % as text</p>
+<div class='card'><b>EN</b> - strict 7.14 %, tolerant 2.37 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t16-en-demo.docx</code>, <code>docx/modern-t16-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t16-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 7.94 %, tolerant 6.58 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t16-ar-demo.docx</code>, <code>docx/modern-t16-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t16-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t16-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t17'>modern-t17 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 8.1 % (tol 4.0) / AR 17.2 % (16.1; name block taller with Word&#x27;s Arabic face), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 8.11 %, tolerant 4.03 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t17-en-demo.docx</code>, <code>docx/modern-t17-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t17-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 17.0 %, tolerant 15.28 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t17-ar-demo.docx</code>, <code>docx/modern-t17-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t17-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t17-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t18'>modern-t18 - Band - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 8.7 % (tol 5.1) / AR 8.3 % (6.4), demo 1/1, long 2 clean; rail navy begins under the photo frame</p>
+<div class='card'><b>EN</b> - strict 8.74 %, tolerant 5.05 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t18-en-demo.docx</code>, <code>docx/modern-t18-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t18-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 8.68 %, tolerant 6.99 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t18-ar-demo.docx</code>, <code>docx/modern-t18-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t18-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t18-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t19'>modern-t19 - Gutter - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 9.9 % (tol 8.1) / AR 6.2 % (3.8), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 9.92 %, tolerant 8.08 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t19-en-demo.docx</code>, <code>docx/modern-t19-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t19-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 6.16 %, tolerant 3.75 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t19-ar-demo.docx</code>, <code>docx/modern-t19-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t19-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t19-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t20'>modern-t20 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 9.3 % (6.0) / AR 7.9 % (6.5), demo 1/1</p>
+<div class='card'><b>EN</b> - strict 8.39 %, tolerant 4.16 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t20-en-demo.docx</code>, <code>docx/modern-t20-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t20-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 7.78 %, tolerant 6.24 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t20-ar-demo.docx</code>, <code>docx/modern-t20-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t20-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t20-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t21'>modern-t21 - Band - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 14.1 % (tol 10.5) / AR 15.8 % (13.8); rounded cards via corner masks (side card&#x27;s foot square), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 14.05 %, tolerant 10.54 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t21-en-demo.docx</code>, <code>docx/modern-t21-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t21-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 18.11 %, tolerant 16.31 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t21-ar-demo.docx</code>, <code>docx/modern-t21-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t21-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t21-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t22'>modern-t22 - Open - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 21.0 % (tol 17.2; the giant rail letters sit ~20px off) / AR 10.8 % (8.8), demo 1/1; RESUME rail = page-anchored vertical text box; long CV: the two-column block starts on page 2 (AR 3 pages)</p>
+<div class='card'><b>EN</b> - strict 20.98 %, tolerant 17.21 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t22-en-demo.docx</code>, <code>docx/modern-t22-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t22-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 10.79 %, tolerant 8.74 %, demo 1 page(s), long 3 page(s) - .docx: <code>docx/modern-t22-ar-demo.docx</code>, <code>docx/modern-t22-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t22-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t22-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t23'>modern-t23 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 7.3 % (4.2) / AR 6.4 % (5.3), demo 1/1</p>
+<div class='card'><b>EN</b> - strict 5.92 %, tolerant 2.25 %, demo 1 page(s), long 1 page(s) - .docx: <code>docx/modern-t23-en-demo.docx</code>, <code>docx/modern-t23-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t23-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><div>-</div><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 6.67 %, tolerant 5.56 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t23-ar-demo.docx</code>, <code>docx/modern-t23-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t23-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t23-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<h2 id='modern-t24'>modern-t24 - Sidebar - <span class='g CLOSE'>CLOSE</span></h2>
+<p> CLOSE, EN 14.7 % (tol 11.1) / AR 23.7 % (21.9; Arabic faces vs the PDF&#x27;s fallback), demo 1/1, long 2 clean</p>
+<div class='card'><b>EN</b> - strict 14.72 %, tolerant 11.09 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t24-en-demo.docx</code>, <code>docx/modern-t24-en-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t24-en-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-en-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-en-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-en-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-en-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
+<div class='card'><b>AR</b> - strict 23.67 %, tolerant 21.84 %, demo 1 page(s), long 2 page(s) - .docx: <code>docx/modern-t24-ar-demo.docx</code>, <code>docx/modern-t24-ar-long.docx</code><div class='imgs'>
+<figure><img loading=lazy src='fidelity_img/modern-t24-ar-pdf.jpg' alt='pdf'><figcaption>pdf</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-ar-word-demo.jpg' alt='word-demo'><figcaption>word-demo</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-ar-word-long-p1.jpg' alt='word-long-p1'><figcaption>word-long-p1</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-ar-word-long-p2.jpg' alt='word-long-p2'><figcaption>word-long-p2</figcaption></figure>
+<figure><img loading=lazy src='fidelity_img/modern-t24-ar-overlay.jpg' alt='overlay'><figcaption>overlay</figcaption></figure>
+</div></div>
 </main></body></html>
