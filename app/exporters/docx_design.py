@@ -117,6 +117,7 @@ class Ctx:
         self.rtl = self.lang == "ar"
         self.css_lines = {}     # paragraph element -> the template's CSS line-height
         self.after_lines = []   # callables run once the true line heights are set
+        self.labels = set()     # every catalogue label this design printed (ctx.t)
 
     # physical edge of a LOGICAL side, for the properties Word reads physically
     # (paragraph borders; shape positions)
@@ -825,6 +826,80 @@ def faces_drawn(doc, resolved: dict) -> set[tuple[str, int]]:
     return faces
 
 
+def chosen_sizes(ctx: Ctx, data: dict) -> None:
+    """The user's chosen SIZES on a per-template design: a section heading is
+    a heading-style run whose paragraph is one of the labels it printed."""
+    apply_chosen_sizes(ctx.doc, data,
+                       lambda ptext, style: style == "CVHeading" and ptext in ctx.labels)
+
+
+def apply_chosen_sizes(document, data: dict, is_section, base_hp: int = 20) -> None:
+    """The user's chosen SIZES (Name, Headings, Details; docs/CVSTAND_FONT_CONTROLS.md),
+    applied as the PDF applies them (static/js/typography.js): a FACTOR per
+    role - the name: chosen / its largest size; each section heading:
+    chosen / its own largest size; details: chosen / the body's dominant size
+    (by characters), applied to every other text run (job titles, labels and
+    stat numbers are details in the PDF too). A chosen size is CSS pt on the
+    850px page (chosen * 4/3 px; 1px = 0.72pt on paper). Graphics (bars, dots,
+    rings) keep their size. A run with no size of its own is `base_hp`
+    (Normal)."""
+    from ..schema import typography_of
+    from ..typography.render import effective
+    eff = effective(typography_of(data)[0])
+    want = {"name": eff["name"]["size"], "section": eff["section"]["size"],
+            "body": eff["body"]["size"]}
+    if all(v is None for v in want.values()):
+        return
+
+    def hp_of(rpr):
+        el = rpr.find(qn("w:sz"))
+        return int(el.get(qn("w:val"))) if el is not None else base_hp
+
+    groups = {"name": [], "section": {}, "body": []}
+    for p in document.element.body.iter(qn("w:p")):
+        ptext = "".join(x.text or "" for x in p.iter(qn("w:t"))).strip()
+        for r in p.findall(qn("w:r")):
+            text = "".join(x.text or "" for x in r.iter(qn("w:t")))
+            if not text.strip():
+                continue
+            rpr = r.get_or_add_rPr() if hasattr(r, "get_or_add_rPr") else r.find(qn("w:rPr"))
+            if rpr is None:
+                rpr = OxmlElement("w:rPr")
+                r.insert(0, rpr)
+            fonts = rpr.find(qn("w:rFonts"))
+            if fonts is not None and (fonts.get(qn("w:ascii")) or "") == "Arial":
+                continue                          # dot glyphs: a graphic
+            st = rpr.find(qn("w:rStyle"))
+            style = st.get(qn("w:val")) if st is not None else None
+            if style == "CVName":
+                groups["name"].append(rpr)
+            elif is_section(ptext, style):
+                groups["section"].setdefault(id(p), []).append(rpr)
+            else:
+                groups["body"].append((rpr, len(text)))
+
+    def scale(rprs, k):
+        for rpr in rprs:
+            hp = max(2, int(round(hp_of(rpr) * k)))
+            _rpr_put(rpr, "sz", val=hp)
+            _rpr_put(rpr, "szCs", val=hp)
+
+    def target_hp(pt_css):
+        return pt_css * 4 / 3 * PX * 2
+
+    if want["name"] and groups["name"]:
+        scale(groups["name"], target_hp(want["name"]) / max(hp_of(x) for x in groups["name"]))
+    if want["section"]:
+        for rprs in groups["section"].values():
+            scale(rprs, target_hp(want["section"]) / max(hp_of(x) for x in rprs))
+    if want["body"] and groups["body"]:
+        chars: dict = {}
+        for rpr, n in groups["body"]:
+            chars[hp_of(rpr)] = chars.get(hp_of(rpr), 0) + n
+        dominant = max(chars, key=chars.get)
+        scale([x for x, _ in groups["body"]], target_hp(want["body"]) / dominant)
+
+
 MIN_MULT, MIN_MULT_AR = 0.75, 0.78
 
 
@@ -978,11 +1053,18 @@ def render(data: dict, template_key: str, photo: Path | None):
                      metric["weight"], None)
     token = set_lang(lang)
     try:
-        ctx = Ctx(doc=doc, r=r, lang=lang, resolved=resolved, photo=photo,
-                  # a label's <br> is a line break in Word too (python-docx
-                  # writes "\n" as w:br), as the PDF breaks it
-                  t=lambda s: str(t(s)).replace("<br>", "\n").replace("&amp;", "&"))
+        labels: set = set()
+
+        def tr(s):
+            # a label's <br> is a line break in Word too (python-docx writes
+            # "\n" as w:br), as the PDF breaks it
+            out = str(t(s)).replace("<br>", "\n").replace("&amp;", "&")
+            labels.add(out.strip())
+            return out
+        ctx = Ctx(doc=doc, r=r, lang=lang, resolved=resolved, photo=photo, t=tr)
+        ctx.labels = labels
         DESIGNS[template_key](ctx)
+        chosen_sizes(ctx, data)
         true_lines(ctx)
         half_leading(ctx)
         flat_headers(doc)

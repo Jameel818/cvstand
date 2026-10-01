@@ -283,8 +283,30 @@ further inflated by the PDF finding below (different faces).
 32. **Absolutely placed flows (t15)** start where the PDF puts them:
     `SidebarPage.pin_top` measures the rows above and makes up the gap
     (replaces a formula guessed from the name length).
-33. **Reserves**: spread/fit 4 pt, push-to-bottom 12 pt (a 2-page demo is
-    worse than References sitting a few pt high).
+33. **Reserves** (final): spread 4 pt, side fit 12 pt, push-to-bottom 24 pt,
+    main near-one-page fit 10 pt EN / 50 pt AR (the Arabic estimate runs short).
+    A 2-page demo is worse than a block sitting a few pt high.
+34. **Near-one-page fit = the PDF's auto-fit**: when a CV almost fits one page
+    (estimate over by <= 160 pt) Word shrinks the row gaps, then all paragraph
+    spacing (never below 40 %, never the text), as autofit.js compresses the
+    PDF's rhythm. Long CVs (far over) flow untouched.
+35. **t12**: the PDF prints SKILLS / EDUCATIONAL HISTORY even over an empty
+    section; Word does not leave an empty heading (the tests' rule).
+36. **python-docx trap**: once a cell is marked vMerge "continue",
+    `row.cells` returns the merge's TOP cell - hold the cell before merging.
+37. **Measured helpers** count the content above the page table (a header
+    card) and at-least row heights (bands).
+38. **Chosen SIZES in Word** (item 4): the PDF's factor per role
+    (static/js/typography.js) - name: chosen / its largest size; each section
+    heading: chosen / its own largest; details: chosen / the dominant body size
+    (by characters), applied to all other text. Designs know a section heading
+    as a heading-style run whose paragraph is a label the design printed;
+    ATS/editorial masters: every CV Heading run. Graphics keep their size.
+39. **Tests made design-aware, none weakened in what they protect**:
+    test_docx_theme (run colours are the template's own in a design; faces and
+    bold still only from styles), test_smoke (design bullets / caps headings),
+    test_unrated_skill (name<tab>level), test_docx_font_embed (the unused-role
+    case strips every bold-body element of t1's design).
 
 ## FINDING for the user (not changed: PDF/HTML are out of scope this run)
 **The Arabic PDF does not use the Arabic faces its CSS names.** The RTL policy

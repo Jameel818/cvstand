@@ -196,6 +196,8 @@ def render_docx(data: dict, template_key: str) -> bytes:
     # rewrites the master's role styles, so it runs on the filled document.
     resolved = docx_theme.resolve(data, template_key)
     docx_theme.apply(doc.docx, resolved)
+    # the user's chosen SIZES, as the PDF applies them (factor per role)
+    docx_design.apply_chosen_sizes(doc.docx, data, lambda ptext, style: style == "CVHeading")
     if "lay" in ctx:
         # the template's SHAPE: columns, band, fills, zone colours (the plan)
         docx_layout.apply(doc.docx, template_key, lang_of(data), resolved, ctx["lay"])

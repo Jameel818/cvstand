@@ -158,4 +158,9 @@ def test_word_leaves_no_dangling_dash(app_ctx, key, lang, sample):
     assert not [p for p in paras if p.rstrip().endswith("—")], "dangling em-dash"
     # rated rows keep their separator and glyphs
     rated = sample["skills"][0]
+    from app.exporters.docx_design import has_design
+    if has_design(key):
+        # a design writes "name<tab>level", as its PDF sets them apart
+        assert any(p.startswith(rated["name"]) and rated["level"] in p for p in paras)
+        return
     assert any(p.startswith(f"{rated['name']} — {rated['level']}") for p in paras)

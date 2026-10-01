@@ -198,8 +198,10 @@ def test_a_modern_file_does_not_embed_an_unused_role():
     """A role no text uses must not have its face ride along. On a Word
     LAYOUT the degree and certification titles are bold body text; with
     neither in the résumé, nothing is, so the bold body face stays out."""
+    # every element that is bold body text in modern-t1's design removed
+    # (degrees, award titles, skill names, stat labels): nothing is
     data = dict(ENGLISH, font_body="Inter", font_body_weight=300, education=[],
-                recognition=[])
+                recognition=[], skills=[], achievements=[])
     drawn = _drawn(data, "modern-t1")
     assert ("Inter", 700) not in drawn and ("Inter", 300) in drawn
 

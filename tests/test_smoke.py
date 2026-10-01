@@ -175,10 +175,22 @@ def test_docx_master_fills_every_section(key):
     body = "\n".join(paras)
     # no unrendered docxtpl tags survived
     assert "{{" not in body and "{%" not in body
+    from app.exporters.docx_design import has_design
+    # a design types the template's words and shows them in caps (w:caps), as
+    # the PDF does with text-transform
+    seen = {p.upper() for p in paras} if has_design(key) else set(paras)
     for head in _expected_heads(key):
-        assert head in paras, f"{key}: missing section {head!r}"
+        assert (head.upper() if has_design(key) else head) in seen, f"{key}: missing section {head!r}"
     # every experience entry and bullet made it through the loops
     assert sum(1 for p in paras if p.startswith("Halden & Row")) == 1, "'&' must survive"
+    if has_design(key):
+        # a per-template Word DESIGN: text bullets ("•" + tab), the skill's
+        # level word as text beside it, its dot row an inline drawing
+        assert len([p for p in paras if p.startswith("•	")]) == 6
+        assert any(p.startswith("Brand Systems") and "Expert" in p for p in paras)
+        xml = doc.element.body.xml
+        assert "cvstand_dots_" in xml or "●" in xml
+        return
     assert len([p for p in _all_paras(doc) if p.style.name == "List Bullet"]) == 6
     # skill level word AND dot glyphs are both real text
     assert any("Brand Systems — Expert" in p and "●" in p for p in paras)

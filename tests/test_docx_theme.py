@@ -134,6 +134,11 @@ def test_text_takes_the_readable_accent_and_rules_keep_the_original(key, data):
     assert _font_of(_style(styles, "CVAccentText"))[3] == text
     rules = {b.get(f"{W}color") for b in doc.iter(f"{W}bottom")}
     assert T.RULE_ACCENT not in rules, "the master's placeholder rule colour survived"
+    from app.exporters.docx_design import has_design
+    if has_design(key):
+        # a per-template Word DESIGN draws headings and rules in its template's
+        # own measured colours, run by run (contrast: tests/test_docx_designs.py)
+        return
     if docx_layout.spec_for(key):
         # A Word LAYOUT takes the template's OWN colours, measured from its
         # PDF (app/word_layouts.json): here, the main column's headings.
@@ -249,6 +254,8 @@ def test_themed_styles_follow_schema_order(base, key, keys, _):
 def test_no_themed_run_overrides_its_style(key, data):
     """Direct formatting beats a style: a styled run with its own face, bold
     or colour would silently ignore the theme."""
+    from app.exporters.docx_design import has_design
+    designed = has_design(key)
     doc, _ = _parts(render_docx(data, key))
     styled = 0
     for r in doc.iter(f"{W}r"):
@@ -259,7 +266,10 @@ def test_no_themed_run_overrides_its_style(key, data):
         fonts = rpr.find(f"{W}rFonts")
         assert fonts is None or not fonts.get(f"{W}ascii"), "direct face on a styled run"
         assert rpr.find(f"{W}b") is None, "direct bold on a styled run"
-        if rpr.find(f"{W}rStyle").get(f"{W}val") != "CVBodyBold":  # title keeps MUTED
+        # a per-template Word DESIGN paints every run in its template's own
+        # measured colour (docs/WORD_FIDELITY_AUDIT.md); faces and bold still
+        # come from the theme's styles only
+        if not designed and rpr.find(f"{W}rStyle").get(f"{W}val") != "CVBodyBold":
             assert rpr.find(f"{W}color") is None, "direct colour on a styled run"
     assert styled >= 5
 

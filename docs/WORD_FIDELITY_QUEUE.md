@@ -53,7 +53,7 @@ Gutter:
 - [x] modern-t19 - CLOSE, EN 9.9 % (tol 8.1) / AR 6.2 % (3.8), demo 1/1, long 2 clean
 
 ## 4. Font sizes
-- [ ] 4. Word applies the chosen SIZES (Name, Headings, Details), EN + AR, tests + real-Word check
+- [x] 4. Word applies the chosen SIZES (Name, Headings, Details), EN + AR, tests + real-Word check - DONE: factor per role as typography.js (designs + ATS/editorial masters), tests/test_docx_sizes.py, real Word t2/t11/ats-t1 EN+AR (all 1 page except ats-t1 AR = 2 at the larger sizes)
 
 ## 5. Review
 - [ ] 5. docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity review" (pdf / word-demo / word-long-p1 / word-long-p2 / overlay, grade, %, differences, .docx)
