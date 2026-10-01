@@ -729,6 +729,38 @@ def vml_anchored(para, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float, fi
     para._p.append(parse_xml(f'<w:r {ns}><w:pict>{shape}</w:pict></w:r>'))
 
 
+def ring_anchored(para, *, x_pt: float, y_pt: float, d_px: float, width_px: float, pct: float,
+                  on: str, off: str) -> None:
+    """A skill RING anchored in `para` (the percent's own paragraph): the
+    track circle and the filled arc, STROKES only, in front of the text - the
+    hole stays empty, so the percent (real text, centred in that paragraph)
+    shows through, and a filled cell behind (a dark rail) does not hide it.
+    The arc starts at 12 o'clock and runs clockwise, as CSS conic-gradient
+    does in both directions. (x, y) = the ring box's top-left, from the text
+    column's left and the paragraph's top."""
+    pct = max(0.0, min(100.0, pct))
+    sw = pt(width_px)
+    inset = sw / 2
+    d = pt(d_px) - sw
+    _SHAPE_N[0] += 1
+    n = _SHAPE_N[0]
+    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
+          'xmlns:v="urn:schemas-microsoft-com:vml" '
+          'xmlns:o="urn:schemas-microsoft-com:office:office"')
+    base = (f'position:absolute;margin-left:{x_pt + inset:.2f}pt;margin-top:{y_pt + inset:.2f}pt;'
+            f'width:{d:.2f}pt;height:{d:.2f}pt;mso-position-horizontal-relative:text;'
+            f'mso-position-vertical-relative:line')
+    shapes = [f'<v:oval id="cvstand_ring_{n}" o:allowincell="t" style="{base};z-index:{30 + n}" '
+              f'filled="f" strokecolor="#{off}" strokeweight="{sw:.2f}pt"/>']
+    if pct > 0:
+        end = 359.9 if pct >= 100 else pct * 3.6
+        shapes.append(f'<v:arc id="cvstand_ringfill_{n}" o:allowincell="t" '
+                      f'style="{base};z-index:{31 + n}" startangle="0" endangle="{end:.1f}" '
+                      f'filled="f" strokecolor="#{on}" strokeweight="{sw:.2f}pt"/>')
+    for sh in shapes:
+        para._p.append(parse_xml(f'<w:r {ns}><w:pict>{sh}</w:pict></w:r>'))
+
+
 def vml_oval(ctx: Ctx, para, *, x_pt: float, y_pt: float, d_pt: float, fill: str,
              stroke: str | None, weight_pt: float = 1.5, n: int = 1):
     """A small circle anchored in `para`, positioned from the start of its text

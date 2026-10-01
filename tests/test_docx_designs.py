@@ -38,6 +38,8 @@ PERCENT = {"modern-t2", "modern-t3", "modern-t5", "modern-t9", "modern-t10", "mo
 
 #: The heading words each design draws (its template's own, from the catalogue).
 HEADINGS = {
+    "modern-t16": ["Contact", "Skills", "Certifications", "Languages", "Experience",
+                   "Education", "Tools"],
     "modern-t9": ["Contact", "Skills", "Awards", "Tools", "Languages", "Summary", "Experience",
                   "Education", "Technical"],
     "modern-t5": ["Contact", "SUMMARY", "EDUCATION", "SOFTWARE", "LANGUAGES",
@@ -139,6 +141,8 @@ def _graphics(doc) -> int:
     dots = sum(1 for r in doc.iter(f"{W}r") if "●" in _text(r))
     shapes = sum(1 for g in doc.iter("{urn:schemas-microsoft-com:vml}group")
                  if (g.get("id") or "").startswith(("cvstand_bar_", "cvstand_dots_")))
+    shapes += sum(1 for g in doc.iter("{urn:schemas-microsoft-com:vml}oval")
+                  if (g.get("id") or "").startswith("cvstand_ring_"))
     return dots + shapes
 
 
@@ -204,7 +208,7 @@ def test_every_run_reads_on_its_fill(exports, key, lang):
 
 
 #: designs whose template has a photo slot
-PHOTO = {"modern-t2", "modern-t3", "modern-t4", "modern-t5", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
+PHOTO = {"modern-t2", "modern-t3", "modern-t4", "modern-t5", "modern-t16", "modern-t8", "modern-t10", "modern-t15", "modern-t20"}
 
 
 @pytest.mark.parametrize("key", sorted(PHOTO))
