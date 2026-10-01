@@ -432,19 +432,14 @@ def rule_heading(ctx: Ctx, box: Box, label: str, *, width_px: float, size, color
     return p
 
 
-def bar(ctx: Ctx, box: Box, pct: float, width_px: float, *, on: str, off: str, height=7):
-    """A stacked skill bar: a one-row table, the filled part and the track."""
-    pct = max(0.0, min(100.0, pct))
-    full = tw(width_px)
-    a = int(round(full * pct / 100))
-    widths = [w for w in (a, full - a) if w > 0]
-    tbl = box.table(widths)
-    row = tbl.rows[0]
-    row_height(row, height, "atLeast")
-    for cell, colour in zip(row.cells, [on, off] if a and full - a else ([on] if a else [off])):
-        fmt_cell(ctx, cell, fill=colour)
-        tiny(cell.paragraphs[0])
-    return tbl
+def bar(ctx: Ctx, box: Box, pct: float, width_px: float, *, on: str, off: str, height=7,
+        radius=None, before=0.0):
+    """A stacked skill bar on its own line: one rounded inline drawing (track +
+    fill, both ends round, as the PDF's border-radius:999px bars)."""
+    p = box.p(before=before, line=1.0)
+    bar_shape(ctx, p, pct, width_px, on=on, off=off, height=height,
+              radius=height / 2 if radius is None else radius, fill_round=True, lift=0)
+    return p
 
 
 def inline_bar_cells(ctx: Ctx, fill_cell, track_cell, *, on, off, height=7):
@@ -818,18 +813,44 @@ def half_leading(ctx: Ctx) -> None:
             continue
         sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
         tw_hl = int(round(hl * 20))
+        after0 = int(sp.get(qn("w:after"), 0))
+        nxt = _next_below(p) if after0 < tw_hl else None
+        if after0 < tw_hl and nxt is None:
+            tw_hl = after0         # nothing below to take it back from: shift less
+        if tw_hl <= 0:
+            continue
         sp.set(qn("w:before"), str(int(sp.get(qn("w:before"), 0)) + tw_hl))
-        after = int(sp.get(qn("w:after"), 0)) - tw_hl
+        after = after0 - tw_hl
         sp.set(qn("w:after"), str(max(0, after)))
         if after < 0:
-            nxt = p.getnext()
-            if nxt is not None and nxt.tag == qn("w:p"):
-                carry_to[nxt] = carry_to.get(nxt, 0) - after
+            carry_to[nxt] = carry_to.get(nxt, 0) - after
     for p, debt in carry_to.items():
         ppr = p.find(qn("w:pPr"))
         sp = ppr.find(qn("w:spacing")) if ppr is not None else None
         if sp is not None:
             sp.set(qn("w:before"), str(max(0, int(sp.get(qn("w:before"), 0)) - debt)))
+
+
+def _next_below(p):
+    """The paragraph drawn directly BELOW `p`: its next sibling, or - when `p`
+    ends a cell of a one-column table (a Stack row) - the first paragraph of
+    the next row. None when unknown (a multi-column row, the end of a cell)."""
+    nxt = p.getnext()
+    if nxt is not None:
+        return nxt if nxt.tag == qn("w:p") else None
+    tc = p.getparent()
+    if tc is None or tc.tag != qn("w:tc"):
+        return None
+    tr = tc.getparent()
+    tbl = tr.getparent()
+    if len(tbl.find(qn("w:tblGrid"))) != 1:
+        return None
+    nrow = tr.getnext()
+    while nrow is not None and nrow.tag != qn("w:tr"):
+        nrow = nrow.getnext()
+    if nrow is None:
+        return None
+    return next(nrow.iter(qn("w:p")), None)
 
 
 def _largest_run(m, p):
