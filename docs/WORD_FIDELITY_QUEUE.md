@@ -39,7 +39,7 @@ Sidebar:
 - [x] modern-t24 - CLOSE, EN 14.7 % (tol 11.1) / AR 23.7 % (21.9; Arabic faces vs the PDF's fallback), demo 1/1, long 2 clean
 Band:
 - [x] modern-t7 - CLOSE (near MATCHES), EN 8.3 % (tol 3.0) / AR 8.2 % (5.5), demo 1/1, long 2 clean
-- [ ] modern-t11
+- [x] modern-t11 - MATCHES, EN 6.5 % (tol 1.8) / AR 6.0 % (4.2), demo 1/1, long 2 clean
 - [ ] modern-t13
 - [ ] modern-t14
 - [ ] modern-t18
