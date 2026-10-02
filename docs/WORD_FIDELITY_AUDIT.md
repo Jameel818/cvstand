@@ -367,3 +367,15 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     Fonts panel (heading font + body size) -> Download Word; fails unless the
     file carries the template's design drawings, its own headings, the chosen
     font and size, RTL in Arabic. Arabic e2e runs on the live-configured server.
+44. **Arabic PDF/preview fonts fixed on the branch** (not only "prepared"):
+    every golden is rendered from the ENGLISH sample, and the change touches
+    only right-to-left documents, so no golden changes (English before/after:
+    0.00 % of pixels changed in all five templates checked). The policy CSS now
+    names 'CVT IBM Plex Sans Arabic' / 'CVT Tajawal' / 'CVT Cairo' first;
+    Arabic previews link typography.css, Arabic PDFs inline those ten faces
+    (+~3 MB of HTML per Arabic PDF render, not in the PDF: only the glyphs used
+    are embedded). A chosen font still wins. The LIVE site keeps the fallback
+    fonts until this is merged and deployed (your decision).
+45. test_typography_render's `_own()` now also removes the RTL policy block:
+    those tests prove the typography FEATURE emits nothing without a choice;
+    the policy is a separate layer that now reuses its 'CVT ' faces.

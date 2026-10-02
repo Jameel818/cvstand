@@ -42,7 +42,14 @@ def _own(doc: str) -> str:
     comment). What is left is what THIS feature added, or did not."""
     af = autofit_script()
     assert doc.count(af) == 1
-    return doc.replace(af, "")
+    doc = doc.replace(af, "")
+    # The Arabic font POLICY (rendering.RTL_TYPOGRAPHY + policy_faces) is not
+    # this feature: it ships in every RTL document and, since run 4, names and
+    # loads its faces under the same 'CVT ' families typography.css declares.
+    from app.rendering import RTL_TYPOGRAPHY, policy_faces
+    for pdf in (False, True):
+        doc = doc.replace(RTL_TYPOGRAPHY + policy_faces(pdf), "")
+    return doc
 
 
 def _config(doc: str) -> dict:

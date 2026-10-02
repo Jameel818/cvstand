@@ -290,7 +290,7 @@ RTL_TYPOGRAPHY = """<style>
      assigns faces, not a type scale. The one exception is leading, below. */
   [dir="rtl"] .tpl,
   [dir="rtl"] .tpl * {
-    font-family: "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
+    font-family: "CVT IBM Plex Sans Arabic", "CVT Tajawal", "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
   }
   /* SECTION TITLES ARE SPLIT ACROSS THE CATALOGUE, 27 Tajawal / 22 Cairo.
      The written policy says both things and they cannot both be true of the
@@ -317,23 +317,48 @@ RTL_TYPOGRAPHY = """<style>
      Cairo rule is the default and the .cv-sections-taj rule is the override. */
   [dir="rtl"] .tpl .cv-section,
   [dir="rtl"] .tpl .cv-section * {
-    font-family: "Cairo", "Tajawal", sans-serif !important;
+    font-family: "CVT Cairo", "CVT Tajawal", "Cairo", "Tajawal", sans-serif !important;
   }
   /* Same specificity as the rule above (0,2,0), so SOURCE ORDER decides and
      this must stay after it. */
   [dir="rtl"] .cv-sections-taj .cv-section,
   [dir="rtl"] .cv-sections-taj .cv-section * {
-    font-family: "Tajawal", "Cairo", sans-serif !important;
+    font-family: "CVT Tajawal", "CVT Cairo", "Tajawal", "Cairo", sans-serif !important;
   }
   [dir="rtl"] .tpl .cv-name,
   [dir="rtl"] .tpl .cv-name * {
-    font-family: "Tajawal", "Cairo", sans-serif !important;
+    font-family: "CVT Tajawal", "CVT Cairo", "Tajawal", "Cairo", sans-serif !important;
     /* ExtraBold per the policy. Only raised where the template already set a
        bold-or-heavier name, so a deliberately light masthead is not shouted
        at; Tajawal has a real 800 and does not need synthesising. */
     font-weight: 800 !important;
   }
 </style>"""
+
+
+# THE POLICY'S FACES, LOADED (run 4, item 3). The rules above name IBM Plex
+# Sans Arabic, Tajawal and Cairo, but no document ever DECLARED those families:
+# the Arabic sheet (fonts_ar*.css) declares Arabic glyphs under the LATIN family
+# names, and typography.css declares every offered family under its 'CVT '
+# name only for a CHOSEN font. So with no font chosen every Arabic CV - preview
+# and PDF, locally and live - was drawn in whatever the machine had: Segoe UI /
+# Times New Roman on Windows, Liberation Sans / FreeSerif on the server
+# (measured with CSS.getPlatformFontsForNode and the PDFs' font tables). The
+# rules now name the 'CVT ' families first and the document carries them: the
+# preview links typography.css (the browser fetches only the faces it uses),
+# the PDF inlines them (no base URL there - see font_head).
+POLICY_FACES = (("IBM Plex Sans Arabic", (400, 700)), ("Tajawal", (400, 700, 800, 900)),
+                ("Cairo", (400, 700, 800, 900)))
+
+
+def policy_faces(for_pdf: bool) -> str:
+    from .typography import built_faces
+    from .typography.render import TYPOGRAPHY_CSS_URL, _inline_faces
+    if not for_pdf:
+        return f'<link rel="stylesheet" href="{TYPOGRAPHY_CSS_URL}">'
+    built = set(built_faces())
+    faces = {(f, w) for f, ws in POLICY_FACES for w in ws if (f, w) in built}
+    return _inline_faces(faces).replace('id="cv-typography-faces"', 'id="cv-policy-faces"')
 
 
 _DOC_TMPL = """<!DOCTYPE html>
@@ -395,7 +420,7 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
         lang=lang_of(data),
         dir=dir_of(data),
         fonts=font_head(for_pdf=for_pdf, lang=lang_of(data)),
-        rtl_css=RTL_TYPOGRAPHY if dir_of(data) == "rtl" else "",
+        rtl_css=(RTL_TYPOGRAPHY + policy_faces(for_pdf)) if dir_of(data) == "rtl" else "",
         typography_head=ty_head,
         canvas=canvas,
         typography_body=ty_body,

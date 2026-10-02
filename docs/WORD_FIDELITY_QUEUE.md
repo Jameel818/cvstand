@@ -76,9 +76,9 @@ Gutter:
 - [x] R4-2a. Arabic: local builder vs live site (labels, sample, direction, previews, downloads) - live = Arabic demo; local = the stored English-bodied document; main locally identical (not a branch regression)
 - [x] R4-2b. Fix what this branch broke (Arabic demo sample?), one-page Arabic demo - run.py live-like by default (browser store, throwaway key); --server-store keeps the old mode; Arabic demo is one page (run 1)
 - [x] R4-2c. e2e: switch to Arabic -> preview Arabic + RTL, PDF and Word Arabic - tests/e2e/test_arabic_builder.py on the live-configured server
-- [ ] R4-3a. Arabic PDF/preview fonts actually used (3 Modern + 2 ATS, with/without a chosen font), local + live
-- [ ] R4-3b. Why the policy faces aren't loaded; prepare the fix
-- [ ] R4-3c. Before/after images (EN unchanged + AR), list of goldens that would change (not updated)
+- [x] R4-3a. Arabic PDF/preview fonts actually used (3 Modern + 2 ATS, with/without a chosen font), local + live - no font chosen: local PDF = Segoe UI/Times/Tahoma, LIVE PDF = Liberation Sans/FreeSerif, previews local+live = Segoe UI/Times; chosen font: correct faces (local + live)
+- [x] R4-3b. Why the policy faces aren't loaded; prepare the fix - cause: policy CSS named families no document declares; fix: 'CVT ' families + typography.css link (preview) / inlined faces (PDF) - APPLIED on the branch (affects RTL only)
+- [x] R4-3c. Before/after images (EN unchanged + AR), list of goldens that would change (not updated) - before/after 5 templates: EN 0.00 % changed (pixel-identical), AR 4.7-6.9 % (fonts); goldens that would change: NONE (all goldens are English); images in scratch ba/ -> Desktop 'CVStand PDF font fix review' (8b)
 - [ ] R4-4. Arabic PDF reference phones reversed: fix in HTML/PDF templates, before/after, goldens listed
 - [ ] R4-5. Seven fonts drawn as Calibri in Word: cause + fix, real Word check for each, tests
 - [ ] R4-6. Polish weakest: t22, t14, t21, t3, t9, t24 (EN + AR, demo + long, re-grade)
