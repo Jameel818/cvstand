@@ -9,7 +9,8 @@ live, and export **PDF** and **Word (.docx)**.
 ```
 venv/Scripts/python -m pip install -r requirements.txt   # add --trusted-host flags if pip SSL-errors
 venv/Scripts/python -m playwright install chromium        # for PDF export
-venv/Scripts/python run.py                                # http://127.0.0.1:5000
+venv/Scripts/python run.py                                # http://127.0.0.1:5000, live-like (browser store)
+venv/Scripts/python run.py --server-store                 # old single-user mode: data/resume.json
 venv/Scripts/python -m pytest -q                          # unit + contract, ~8s
 venv/Scripts/python -m pytest --e2e -q                    # + the browser suite, ~158s
 venv/Scripts/python -m pytest --e2e -q -m "e2e and not slow"   # browser, minus the 49-template gate (~85s)
