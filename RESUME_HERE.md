@@ -2,13 +2,21 @@
 
 ## AUTONOMOUS RUN 4 (user away ~7 h)
 Queue: `docs/WORD_FIDELITY_QUEUE.md` "Run 4" (take the next unticked item);
-decisions 40+ in `docs/WORD_FIDELITY_AUDIT.md`. Never push main / merge /
+decisions 40-56 in `docs/WORD_FIDELITY_AUDIT.md`. Never push main / merge /
 deploy. Local server: `venv/Scripts/python run.py` now starts LIVE-LIKE
 (browser store); `--server-store` = the old single-user mode.
-Done: R4-1 (builder Word designs: cause = single-user mode), R4-2 (Arabic
-locally), R4-3 (Arabic PDF policy faces loaded), R4-4 (Arabic phones isolated),
-R4-5 (7 "Calibri" fonts = M365 cloud first-open download; no code change).
-Before/after images: scratch `ba/` (item 3) and `ph/` (item 4).
+Done: R4-1/2 (cause of both = the local single-user mode), R4-3 (Arabic PDF
+policy faces), R4-4 (Arabic phones isolated), R4-5 (7 "Calibri" fonts = M365
+cloud first-open download; no code change), R4-6 (t22 t14 t21 t3 t9 t24 +
+two cross-template fixes: RTL cell borders, estimator merged cells, foot push
+after the fit), R4-7 (step 7 calibration built; optical scale OFF pending the
+user's review). Item 8: Desktop "CVStand PDF font fix review" DONE. STOPPED at 2026-10-02
+~17:00: the system ran low on memory and Claude Code killed the full suite
+(--e2e), its watcher and the local server; per its rule they were NOT
+restarted. Still to do on the user's go: R4-8a full suite --e2e, R4-8b
+re-measure all 24 (scratch review4.py fid/<run>) + review page/Desktop
+folder, R4-8c restart run.py + real builder EN/AR Word check.
+Scratch: ovl.py now takes the app PDF image from Chromium (--pdfjs = old way).
 
 ---
 

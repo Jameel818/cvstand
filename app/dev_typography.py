@@ -4,8 +4,9 @@ One row per offered (language, family, weight): a sample name, a heading and
 a body line at the role's DEFAULT size, drawn twice - as typed (the size the
 user picks) and multiplied by the face's measured optical_scale - with the
 scale, its spread and the face's own line height beside them. It exists so a
-person can judge the calibration by eye; tests/e2e/test_typography_calibration
-screenshots it into tests/artifacts/ and checks every face loaded.
+person can judge the calibration by eye; tests/e2e/
+test_typography_calibration_page.py screenshots it into tests/e2e/artifacts/
+and checks every face loaded.
 
 Answers 404 unless the app runs in debug mode (checked per request:
 app.run(debug=True) sets debug only after create_app() has returned).
