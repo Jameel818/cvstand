@@ -29,7 +29,9 @@ def build(ctx: Ctx) -> None:
     r, t = ctx.r, ctx.t
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(pt(PAD))
-    sec.bottom_margin = Pt(pt(PAD + 24))
+    # the PDF cards end 24px above the page foot; 6px spare for the tiny
+    # trailing paragraph and rounding (was 24: the cards stopped ~22px short)
+    sec.bottom_margin = Pt(pt(PAD + 6))
     H = "role" if ctx.rtl else "body"
 
     # ---- the header card (802 x 212, radius 18)

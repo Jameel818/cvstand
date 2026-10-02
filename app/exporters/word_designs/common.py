@@ -219,7 +219,9 @@ class SidebarPage:
             first = next(box.c._tc.iter(qn("w:p")), None)
             if slack > 0 and first is not None:
                 bump_before(first, slack)
-        self.ctx.after_lines.append(go)
+        if not hasattr(self, "_pushes"):
+            self._pushes = []
+        self._pushes.append(go)
 
     @property
     def main_text_px(self) -> float:
@@ -277,6 +279,10 @@ class SidebarPage:
 
     def finish(self):
         self._fit_main()
+        # pushes run AFTER the fit: computed before it, the slack ignored what
+        # the fit then took out, and the foot block stopped short of the foot
+        # (modern-t21 Arabic, ~55px)
+        self.ctx.after_lines.extend(getattr(self, "_pushes", []))
         tail = self.main_row(split=True)
         self.side.finish()
         for b in self.rows:
@@ -490,6 +496,7 @@ class ColumnPage(SidebarPage):
 
     def finish(self):
         self._fit_main()
+        self.ctx.after_lines.extend(getattr(self, "_pushes", []))   # after the fit
         tail = self.main_row(split=True)
         for b in self.rows:
             b.finish()

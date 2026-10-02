@@ -421,4 +421,10 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     AR: t14 17.0 -> 9.7 %, t4 11.2 -> 7.9, t2 9.1 -> 8.6, t22 11.35 -> 11.2.
     English output is unchanged (same mapping). Paragraph borders (pBdr) were
     not changed - none of the designs draw a side paragraph border in Arabic.
+50. **Foot blocks are pushed AFTER the near-one-page fit** (common.py): the
+    push measured the column, then `_fit_main` took spacing out, so the foot
+    block (t21's stats card) ended short of the page foot - ~55px in Arabic.
+    Tried first and rejected: lowering t21's Arabic reserves (the demo went to
+    2 pages - the estimate was not high, the order was wrong). t4 and t18,
+    the other two users, re-measured: unchanged.
 
