@@ -14,10 +14,10 @@ from docx.oxml import parse_xml
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
+    Box, Ctx, cant_split, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
-from .common import ColumnPage, joined, single_px
+from .common import ColumnPage, Stack, joined, single_px
 
 ORANGE, INK, BODY, GREY, RULE = "CB3500", "111111", "333333", "444444", "D8D8D8"
 RAIL_W, PAD_T, GAP = 215, 40, 34
@@ -81,9 +81,9 @@ def build(ctx: Ctx) -> None:
     if r["title"]:
         run(ctx, top.p(before=6), r["title"], "bold", size=19, color=INK, caps=True, spacing=3)
 
-    def head(box, label, width, size=24, after=14):
+    def head(box, label, width, size=24, after=14, keep=False):
         rule_heading(ctx, box, label, width_px=width, size=size, color=INK, rule=INK,
-                     spacing=1, gap=14, rule_px=2, after=after)
+                     spacing=1, gap=14, rule_px=2, after=after, keep=keep)
 
     if r["summary"]:
         box = page.main_row(pad_top=20)
@@ -105,12 +105,21 @@ def build(ctx: Ctx) -> None:
 
     node = [0]
 
-    def rail(box, entries):
-        tb = box.table([tw(LEFT)])
-        cell = tb.rows[0].cells[0]
-        fmt_cell(ctx, cell, pad=(0, 20, 0, 0), borders={"start": (2, INK)})
-        eb = Box(ctx, cell, 0)
+    def rail(box, label, entries):
+        # one unbreakable row per entry, the heading in the first entry's row
+        # (Stack): the columns break across pages in a long CV, and Word
+        # ignores keep-with-next in a cell that breaks. Each entry draws its
+        # stretch of the 2px rail as its own cell border, gap included, so
+        # the rail stays continuous.
+        stack = Stack(ctx, box, LEFT)
         for i, (title, sub, text, lh) in enumerate(entries):
+            sb = stack.row()
+            if i == 0:
+                head(sb, label, LEFT)
+            inner = sb.table([tw(LEFT)])
+            cell = inner.rows[0].cells[0]
+            fmt_cell(ctx, cell, pad=(0, 20, 0, 0), borders={"start": (2, INK)})
+            eb = Box(ctx, cell, 0)
             p = eb.p(before=16 if i else 0)
             node[0] += 1
             cw = LEFT - 20
@@ -122,62 +131,75 @@ def build(ctx: Ctx) -> None:
                 run(ctx, eb.p(before=2), sub, size=11.5, color=ORANGE)
             if text:
                 run(ctx, eb.p(before=4, line=lh), text, size=11.5, color=GREY)
-        eb.finish()
+            eb.finish()
+        stack.done()
 
     def paren(x):
         d = joined([x["start"], x["end"]], "–")
         return f" ({d})" if d else ""
 
-    box = page.main_row(pad_top=20)
+    # the two columns may break across pages (a long CV): kept whole, the
+    # block jumped to page 2 and left page 1 with only the header
+    box = page.main_row(pad_top=20, split=True)
     tbl = box.table([tw(LEFT + GAP), tw(RIGHT)])
     lc, rc = tbl.rows[0].cells
     fmt_cell(ctx, lc, pad=(0, 0, 0, GAP))
     lb = Box(ctx, lc, 0)
     if r["experience"]:
-        head(lb, t("WORK EXPERIENCE"), LEFT)
-        rail(lb, [(j["role"] + paren(j), joined([j["company"], j["location"]], " · "),
+        rail(lb, t("WORK EXPERIENCE"), [(j["role"] + paren(j), joined([j["company"], j["location"]], " · "),
                    " ".join(j["bullets"]), 1.55) for j in r["experience"]])
     if r["education"]:
         if r["experience"]:
             lb.pad_top = 24
-        head(lb, t("EDUCATION"), LEFT)
-        rail(lb, [(e["degree"] + paren(e), e["school"], " ".join(e["bullets"]), 1.5)
+        rail(lb, t("EDUCATION"), [(e["degree"] + paren(e), e["school"], " ".join(e["bullets"]), 1.5)
                   for e in r["education"]])
     lb.finish()
 
-    rb = Box(ctx, rc, 0)
+    rb0 = Box(ctx, rc, 0)
+    stack = Stack(ctx, rb0, RIGHT)       # each label stays with what it labels
     c = r["contact"]
     k = 0
     for label, value in ((t("Address"), c["address"]), (t("Phone"), c["phone"]),
                          (t("Email"), c["email"]), (t("Web"), c["site"])):
         if value:
+            rb = stack.row()
             run(ctx, rb.p(align="end", before=18 if k else 0), label, "heading", size=22,
                 color=INK)
             run(ctx, rb.p(align="end", before=6, line=1.6), value, size=11.5, color=GREY)
             k += 1
     skills = r["skills"]
     if skills:
-        run(ctx, rb.p(align="end", before=18 if k else 0, after=14), t("Skills"), "heading",
-            size=22, color=INK)
         col = (RIGHT - 4) / 2
-        st = rb.table([tw(col + 4), tw(col)], rows=(len(skills) + 1) // 2)
-        for i, sk in enumerate(skills):
-            cell = st.rows[i // 2].cells[i % 2]
-            fmt_cell(ctx, cell, pad=(0, 0, 0, 4 if i % 2 == 0 else 0))
-            cb = Box(ctx, cell, 0, pad_top=16 if i >= 2 else 0)
-            if rated(sk):
-                pct, _ = skill_pct(sk)
-                line = single_px(ctx, "bold", 13)
-                pd = (66 - line) / 2
-                p = cb.p(align="center", before=pd, after=pd + 7)
-                run(ctx, p, f"{round(pct)}%", "bold", size=13, color=INK)
-                ring_anchored(p, x_pt=pt((col - 66) / 2), y_pt=pt(16 if i >= 2 else 0), d_px=66,
-                              width_px=10, pct=pct, on=INK, off=RULE)
-            run(ctx, cb.p(align="center", line=1.25), sk["name"], "bold", size=9.5, color=INK)
-            if sk["level"]:
-                run(ctx, cb.p(align="center"), sk["level"], "bold", size=8.5, color="5F5F5F")
-            cb.finish()
-        if len(skills) % 2:
-            Box(ctx, st.rows[-1].cells[1], 0).finish()
-    rb.finish()
+        # one unbreakable unit per pair of rings (a ring never leaves its
+        # label behind), the heading in the first: the grid may continue on
+        # the next page instead of moving there whole
+        for r0 in range(0, len(skills), 2):
+            rb = stack.row()
+            if r0 == 0:
+                run(ctx, rb.p(align="end", before=18 if k else 0, after=14), t("Skills"),
+                    "heading", size=22, color=INK)
+            st = rb.table([tw(col + 4), tw(col)])
+            pair = skills[r0:r0 + 2]
+            for j, sk in enumerate(pair):
+                i = r0 + j
+                cell = st.rows[0].cells[j]
+                fmt_cell(ctx, cell, pad=(0, 0, 0, 4 if j == 0 else 0))
+                cb = Box(ctx, cell, 0, pad_top=16 if i >= 2 else 0)
+                if rated(sk):
+                    pct, _ = skill_pct(sk)
+                    line = single_px(ctx, "bold", 13)
+                    pd = (66 - line) / 2
+                    p = cb.p(align="center", before=pd, after=pd + 7)
+                    run(ctx, p, f"{round(pct)}%", "bold", size=13, color=INK)
+                    ring_anchored(p, x_pt=pt((col - 66) / 2), y_pt=pt(16 if i >= 2 else 0),
+                                  d_px=66, width_px=10, pct=pct, on=INK, off=RULE)
+                run(ctx, cb.p(align="center", line=1.25), sk["name"], "bold", size=9.5,
+                    color=INK)
+                if sk["level"]:
+                    run(ctx, cb.p(align="center"), sk["level"], "bold", size=8.5, color="5F5F5F")
+                cb.finish()
+            if len(pair) == 1:
+                Box(ctx, st.rows[0].cells[1], 0).finish()
+    stack.done()
+    rb0.finish()
     page.finish()

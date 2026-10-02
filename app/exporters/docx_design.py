@@ -421,10 +421,11 @@ def vmerge(cell, val: str) -> None:
 # ---- components -----------------------------------------------------------------
 
 def rule_heading(ctx: Ctx, box: Box, label: str, *, width_px: float, size, color, rule,
-                 spacing=0, gap=12, rule_px=1, before=0, after=10, caps=False):
+                 spacing=0, gap=12, rule_px=1, before=0, after=10, caps=False, keep=False):
     """HEADING ——————  : the label, then a hairline to the column's end: a tab
-    to the end edge with a leader in the rule colour, lifted to mid-height."""
-    p = box.p(before=before, after=after, tabs=[(width_px, "end", "underscore")])
+    to the end edge with a leader in the rule colour, lifted to mid-height.
+    `keep`: kept on the page of what follows (no heading alone at a page foot)."""
+    p = box.p(before=before, after=after, tabs=[(width_px, "end", "underscore")], keep=keep)
     run(ctx, p, label, "heading", size=size, color=color, spacing=spacing, caps=caps)
     run(ctx, p, " " * max(1, round(gap / 4)), "body", size=size)
     # the leader is drawn in the TAB's run: its colour, its size (thickness),
