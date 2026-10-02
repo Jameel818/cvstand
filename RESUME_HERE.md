@@ -17,6 +17,9 @@ Word); item 4 chosen sizes in Word (tests/test_docx_sizes.py); item 5 review
 page docs/review/word_fidelity_review.html + Desktop "CVStand Word fidelity
 review" (236 images, 96 .docx); item 6 full suite --e2e 5232 passed / 47
 skipped / 0 failed. No golden image changed.
+2026-10-02: the app was started locally from feature/word-fidelity
+(`venv/Scripts/python run.py`, http://127.0.0.1:5000/builder, debug server,
+default data dir) for the user's manual test before any merge. Nothing merged.
 Open for the user: (1) the Arabic PDF draws fallback faces (audit FINDING);
 (2) Arabic PDF reference phones reversed (queue follow-up); (3) 7 cloud-named
 fonts draw Calibri in Word here; (4) t22 long CV: two-column block starts on
