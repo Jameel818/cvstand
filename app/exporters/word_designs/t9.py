@@ -170,7 +170,9 @@ def build(ctx: Ctx) -> None:
             run(ctx, p, dates, "bold", size=11, color=INK)
         for v in (ed["school"], f"{t('GPA')} {ed['gpa']}" if ed["gpa"] else ""):
             if v:
-                run(ctx, eb.p(), v, size=12, color=INK)
+                # a <br> line inside the block keeps the page's 16px strut
+                # (no font-size on .tpl): 16 x Archivo's 1.088 line, not 12px's
+                run(ctx, eb.p(line=16 * 1.088 / 12), v, size=12, color=INK)
         eb.finish()
 
     if r["skills"]:
