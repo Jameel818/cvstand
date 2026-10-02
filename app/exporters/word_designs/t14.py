@@ -18,7 +18,9 @@ from ..docx_design import (
     Box, Ctx, design, dots_shape, fmt_cell, fmt_p, fmt_table, page_rects, photo_run, pt,
     row_height, run, tiny, tw, vmerge, vml_anchored, vml_oval,
 )
-from .common import SidebarPage, Stack, block, date_range, joined
+from docx.oxml.ns import qn
+
+from .common import SidebarPage, Stack, block, date_range, joined, single_px
 
 CREAM, NAVY, ORANGE, PHOTO = "F7F4EC", "0E2B53", "B93E12", "2A4570"
 INK, LVL, DOT_OFF, RULE = "2E2C28", "6F6A5E", "BEB9A6", "8A8A93"
@@ -41,7 +43,11 @@ def build(ctx: Ctx) -> None:
     for i in range(3):
         vmerge(head.rows[i].cells[1], "restart" if i == 0 else "continue")
     pc = head.rows[0].cells[1]
-    tiny(pc.paragraphs[0], before_px=30)            # the photo starts 30px down
+    # the photo starts 30px down. Word drops a paragraph's space-before at
+    # the top of the page (it sat at 0px), and a cell top margin would push
+    # the whole row (Word gives every cell the row's largest), so the gap is
+    # an empty line exactly as tall: 20pt mark, AUTO multiple of its line
+    gap = pc.paragraphs[0]
     pp = pc.add_paragraph()
     fmt_p(ctx, pp, line=1.0)
     photo_run(ctx, pp, size_px=761 - PANEL_W, height_px=300, shape="rect",
@@ -60,6 +66,11 @@ def build(ctx: Ctx) -> None:
         tiny(cell.paragraphs[0])
     for i in (1, 2):
         tiny(head.rows[i].cells[1].paragraphs[0])
+    # after that loop: python-docx hands back the merge's TOP cell for those
+    # continuation cells, so it re-tinied this very paragraph (photo at 0px)
+    tiny(gap, 40)
+    gap._p.find(qn("w:pPr") + "/" + qn("w:spacing")).set(
+        qn("w:line"), str(round(240 * 30 / single_px(ctx, "body", 20 / 0.72))))
     # the gap down to the columns (346px main, 360px side): an at-least row
     # measured from the panel's foot is unknown, so the columns start right
     # after the photo (330px) + 16px
@@ -93,6 +104,8 @@ def build(ctx: Ctx) -> None:
         vml_anchored(p, x_pt=pt(x), y_pt=0, w_pt=pt(17), h_pt=pt(line_px + 16), fill=ORANGE)
         fb.finish()
 
+    done = [0]
+
     def section(label, items, write):
         if not items:
             return
@@ -100,8 +113,11 @@ def build(ctx: Ctx) -> None:
         for i, it in enumerate(items):
             b = st.row()
             if i == 0:
-                if side.pending is None:
+                # the column's 13px flex gap above every flag but the first
+                # (measured: the 2nd and 3rd flags sat on the text above)
+                if side.pending is None or done[0]:
                     b.pad_top = 13
+                done[0] += 1
                 flag(b, label)
                 b.pad_top = 13
             write(b, i, it)

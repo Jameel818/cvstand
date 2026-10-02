@@ -381,7 +381,14 @@ def fmt_cell(ctx: Ctx, cell, *, fill=None, pad=None, valign=None, borders=None, 
         b = OxmlElement("w:tcBorders")
         phys = {}
         for logical, (px, colour) in borders.items():
-            phys[ctx.edge(logical)] = (px, colour)
+            # measured in real Word (run 4): in a bidiVisual table a cell's
+            # w:left / w:right BORDER is its leading / trailing edge - w:right
+            # drew the Arabic timeline rail on the far (left) side, away from
+            # its nodes - while w:tcMar left / right stay physical (below)
+            if logical in ("start", "end"):
+                phys["left" if logical == "start" else "right"] = (px, colour)
+            else:
+                phys[ctx.edge(logical)] = (px, colour)
         for edge in ("top", "left", "bottom", "right"):
             if edge in phys:
                 px, colour = phys[edge]

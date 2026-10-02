@@ -277,7 +277,12 @@ class Measure:
                     e = bd.find(qn(f"w:{edge}"))
                     if e is not None and e.get(qn("w:val")) not in ("nil", "none"):
                         total += n * int(e.get(qn("w:sz"), 0)) / 8
-        for tr in rows:
+        # a vertically merged cell (vMerge restart ... continue) spans its
+        # rows: its height is shared by them, not added to its first row (a
+        # header whose photo spans three rows, modern-t14, read ~170pt tall)
+        heights: list[float] = []
+        spans: list[tuple[int, int, float]] = []       # (first row, grid col, height)
+        for ri, tr in enumerate(rows):
             row_h = 0.0
             trpr = tr.find(qn("w:trPr"))
             at_least = 0.0
@@ -285,14 +290,20 @@ class Measure:
                 th = trpr.find(qn("w:trHeight"))
                 if th is not None:
                     at_least = int(th.get(qn("w:val"))) / 20
+            col = 0
             for tc in tr.findall(qn("w:tc")):
                 tcpr = tc.find(qn("w:tcPr"))
                 w = 0.0
                 l, r_, t, b = dl, dr, dt, db
+                gcol = col
+                gs = tcpr.find(qn("w:gridSpan")) if tcpr is not None else None
+                col += int(gs.get(qn("w:val"))) if gs is not None else 1
+                restart = False
                 if tcpr is not None:
                     vm = tcpr.find(qn("w:vMerge"))
                     if vm is not None and vm.get(qn("w:val")) != "restart":
                         continue
+                    restart = vm is not None
                     tw_ = tcpr.find(qn("w:tcW"))
                     if tw_ is not None:
                         w = int(tw_.get(qn("w:w"))) / 20
@@ -301,9 +312,31 @@ class Measure:
                         l, r_, t, b = (self._mar(mar, e, d) for e, d in
                                        (("left", dl), ("right", dr), ("top", dt), ("bottom", db)))
                 ch = t + self.block(tc, max(1.0, w - l - r_)) + b
+                if restart:
+                    spans.append((ri, gcol, ch))
+                    continue
                 row_h = max(row_h, ch)
-            total += max(row_h, at_least)
-        return total
+            heights.append(max(row_h, at_least))
+        for first, gcol, ch in spans:
+            last = first
+            while last + 1 < len(rows) and self._continues(rows[last + 1], gcol):
+                last += 1
+            short = ch - sum(heights[first:last + 1])
+            if short > 0:
+                heights[last] += short
+        return total + sum(heights)
+
+    @staticmethod
+    def _continues(tr, gcol: int) -> bool:
+        """Is the cell at grid column `gcol` of `tr` a vMerge continuation?"""
+        col = 0
+        for tc in tr.findall(qn("w:tc")):
+            if col == gcol:
+                vm = tc.find(qn("w:tcPr") + "/" + qn("w:vMerge"))
+                return vm is not None and vm.get(qn("w:val")) != "restart"
+            gs = tc.find(qn("w:tcPr") + "/" + qn("w:gridSpan"))
+            col += int(gs.get(qn("w:val"))) if gs is not None else 1
+        return False
 
     @staticmethod
     def _mar(mar, edge, default=0.0) -> float:

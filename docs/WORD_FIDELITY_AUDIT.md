@@ -405,4 +405,20 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     pins for every offered role. (Raleway and Playfair Display are heading-
     only; a body set to them falls back to the template's body face, as the
     dropdowns never offer that.)
+48. **The height estimator now shares a vertically merged cell across its
+    rows** (docx_measure.Measure.table). It added the merged cell to its first
+    row, so modern-t14's header (photo merged over three rows) read 415pt
+    instead of 249pt; `_fit_main` then believed the demo overflowed and cut the
+    navy column's spacing by ~20 %. Measured after: 249.5pt = the 346px the
+    CSS sets. Affects only tables with vMerge measured as a whole (_above:
+    t14, t21) - t21's estimate did not change.
+49. **Right-to-left cell borders are logical in Word: fixed for every design.**
+    Measured in real Word: in a bidiVisual table w:right on a cell drew on its
+    LEFT (leading-edge semantics), while w:tcMar left/right stayed physical.
+    fmt_cell mapped "start" to w:right in Arabic, so every Arabic timeline rail
+    / side rule sat on the far side of its cell (t14, t22: away from the
+    nodes; t2, t4 ...). Now "start" is always w:left for borders. Re-measured
+    AR: t14 17.0 -> 9.7 %, t4 11.2 -> 7.9, t2 9.1 -> 8.6, t22 11.35 -> 11.2.
+    English output is unchanged (same mapping). Paragraph borders (pBdr) were
+    not changed - none of the designs draw a side paragraph border in Arabic.
 
