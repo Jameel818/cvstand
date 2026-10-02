@@ -436,4 +436,34 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     the app PDF's page 1 from Chromium itself (same HTML, print media, the
     auto-fit awaited); Word's PDFs stay on pdf.js (no such shadings). Only
     numbers measured from run 4 item 6 onward use it.
+52. **Step 7 built on feature/word-fidelity, not a new branch.** §9.3 (amended
+    2026-09-28) says step 7 goes on a new branch; this run's hard rule is
+    "Branch feature/word-fidelity" only. The run rule wins; the step-7 files
+    are self-contained (tools/_ink.py, tools/calibrate_fonts.py,
+    app/typography/calibration.json, app/dev_typography.py, the registry
+    accessors, a switch in render.py / typography.js) and can be split out.
+53. **The optical scale is measured and wired, but OFF until you approve it.**
+    The spec's method (ink height) contradicts the spec's own expectation:
+    it says Amiri, Scheherazade and Lateef "look smaller than Cairo"; ink
+    height measures Amiri 0.881 and Scheherazade 0.860 (they would SHRINK -
+    their tall lam/alef and deep descenders count as size, while their body
+    is small) - only Lateef (1.251) goes the expected way. Applying it
+    unreviewed would move documents you approved. CVSTAND_OPTICAL_SCALE=1
+    turns it on; 13 before/after images (modern-t2, chosen font, off vs on)
+    are on the Desktop. With it off, nothing renders differently (typography
+    tests, goldens untouched).
+54. **Ink = the MEAN over several strings the templates print, not the
+    spec's one word.** "محمد" alone reads Amiri at 126 % of Cairo vs 111 %
+    over real headings; `ink_headline` keeps the spec's number, `spread` the
+    min/max ratio across strings (the measurement's own noise). Clamp
+    0.85-1.8 as the spec says (DECIDE 1): only Lemonada hits it (raw 0.838),
+    listed as `clamped`. Jomhuria measures 1.501 (the spec guessed ~1.7).
+55. **Line heights: the plan expected all five Naskh faces taller than
+    Cairo; measured four** - Markazi Text's own line is SHORT (1.30 em vs
+    Cairo 1.88). Recorded in the test, not hidden. Word (plan DECIDE 2): the
+    chosen SIZES already reach Word since run 2 item 4; the optical scale is
+    not applied to Word while it is off in the preview/PDF.
+56. Found, not fixed (pre-existing, both before and after): with Jomhuria as
+    the Arabic heading face, "المهارات" draws one letter in a fallback face
+    (a missing joined form in Jomhuria).
 

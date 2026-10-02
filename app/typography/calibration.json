@@ -1,0 +1,435 @@
+{
+ "generated_by": "tools/calibrate_fonts.py",
+ "clamp": [
+  0.85,
+  1.8
+ ],
+ "reference": {
+  "en": "Inter",
+  "ar": "Cairo"
+ },
+ "en": {
+  "Anton": {
+   "weight": 400,
+   "ink": 98.4,
+   "ink_headline": 98,
+   "optical_scale": 0.904,
+   "spread": [
+    0.839,
+    0.942
+   ],
+   "clamped": null,
+   "line_height": 1.7334
+  },
+  "Anton SC": {
+   "weight": 400,
+   "ink": 88.4,
+   "ink_headline": 87,
+   "optical_scale": 1.007,
+   "spread": [
+    0.862,
+    1.115
+   ],
+   "clamped": null,
+   "line_height": 1.7334
+  },
+  "Archivo": {
+   "weight": 400,
+   "ink": 85.0,
+   "ink_headline": 88,
+   "optical_scale": 1.047,
+   "spread": [
+    1.0,
+    1.066
+   ],
+   "clamped": null,
+   "line_height": 1.51
+  },
+  "Archivo Black": {
+   "weight": 400,
+   "ink": 86.0,
+   "ink_headline": 90,
+   "optical_scale": 1.035,
+   "spread": [
+    1.014,
+    1.054
+   ],
+   "clamped": null,
+   "line_height": 1.347
+  },
+  "Bebas Neue": {
+   "weight": 400,
+   "ink": 72.0,
+   "ink_headline": 72,
+   "optical_scale": 1.236,
+   "spread": [
+    1.042,
+    1.361
+   ],
+   "clamped": null,
+   "line_height": 1.3
+  },
+  "Inter": {
+   "weight": 400,
+   "ink": 89.0,
+   "ink_headline": 95,
+   "optical_scale": 1.0,
+   "spread": [
+    1.0,
+    1.0
+   ],
+   "clamped": null,
+   "line_height": 1.4302
+  },
+  "Lora": {
+   "weight": 400,
+   "ink": 92.2,
+   "ink_headline": 97,
+   "optical_scale": 0.965,
+   "spread": [
+    0.942,
+    1.0
+   ],
+   "clamped": null,
+   "line_height": 1.5
+  },
+  "Montserrat": {
+   "weight": 400,
+   "ink": 87.4,
+   "ink_headline": 90,
+   "optical_scale": 1.018,
+   "spread": [
+    0.987,
+    1.032
+   ],
+   "clamped": null,
+   "line_height": 1.562
+  },
+  "Playfair Display": {
+   "weight": 700,
+   "ink": 90.8,
+   "ink_headline": 90,
+   "optical_scale": 0.982,
+   "spread": [
+    0.914,
+    1.021
+   ],
+   "clamped": null,
+   "line_height": 1.41
+  },
+  "Poppins": {
+   "weight": 400,
+   "ink": 91.8,
+   "ink_headline": 97,
+   "optical_scale": 0.969,
+   "spread": [
+    0.951,
+    1.013
+   ],
+   "clamped": null,
+   "line_height": 1.762
+  },
+  "Raleway": {
+   "weight": 700,
+   "ink": 87.4,
+   "ink_headline": 93,
+   "optical_scale": 1.021,
+   "spread": [
+    1.0,
+    1.054
+   ],
+   "clamped": null,
+   "line_height": 1.388
+  },
+  "Source Serif 4": {
+   "weight": 400,
+   "ink": 89.4,
+   "ink_headline": 91,
+   "optical_scale": 0.996,
+   "spread": [
+    0.98,
+    1.026
+   ],
+   "clamped": null,
+   "line_height": 1.371
+  },
+  "Work Sans": {
+   "weight": 400,
+   "ink": 86.4,
+   "ink_headline": 88,
+   "optical_scale": 1.03,
+   "spread": [
+    1.014,
+    1.054
+   ],
+   "clamped": null,
+   "line_height": 1.448
+  }
+ },
+ "ar": {
+  "Alexandria": {
+   "weight": 400,
+   "ink": 118.91,
+   "ink_headline": 55,
+   "optical_scale": 0.88,
+   "spread": [
+    0.816,
+    0.944
+   ],
+   "clamped": null,
+   "line_height": 1.732
+  },
+  "Almarai": {
+   "weight": 700,
+   "ink": 104.7,
+   "ink_headline": 51,
+   "optical_scale": 1.014,
+   "spread": [
+    0.955,
+    1.324
+   ],
+   "clamped": null,
+   "line_height": 1.561
+  },
+  "Amiri": {
+   "weight": 400,
+   "ink": 118.7,
+   "ink_headline": 68,
+   "optical_scale": 0.881,
+   "spread": [
+    0.77,
+    1.155
+   ],
+   "clamped": null,
+   "line_height": 2.76
+  },
+  "Aref Ruqaa": {
+   "weight": 700,
+   "ink": 123.36,
+   "ink_headline": 112.2,
+   "optical_scale": 0.861,
+   "spread": [
+    0.623,
+    1.071
+   ],
+   "clamped": null,
+   "line_height": 1.66
+  },
+  "Baloo Bhaijaan 2": {
+   "weight": 400,
+   "ink": 100.02,
+   "ink_headline": 46,
+   "optical_scale": 1.046,
+   "spread": [
+    1.033,
+    1.067
+   ],
+   "clamped": null,
+   "line_height": 1.712
+  },
+  "Cairo": {
+   "weight": 400,
+   "ink": 104.6,
+   "ink_headline": 50,
+   "optical_scale": 1.0,
+   "spread": [
+    1.0,
+    1.0
+   ],
+   "clamped": null,
+   "line_height": 1.883
+  },
+  "El Messiri": {
+   "weight": 400,
+   "ink": 95.47,
+   "ink_headline": 50,
+   "optical_scale": 1.096,
+   "spread": [
+    1.018,
+    1.448
+   ],
+   "clamped": null,
+   "line_height": 1.563
+  },
+  "IBM Plex Sans Arabic": {
+   "weight": 400,
+   "ink": 107.01,
+   "ink_headline": 51,
+   "optical_scale": 0.977,
+   "spread": [
+    0.924,
+    1.01
+   ],
+   "clamped": null,
+   "line_height": 1.729
+  },
+  "Jomhuria": {
+   "weight": 400,
+   "ink": 69.67,
+   "ink_headline": 36,
+   "optical_scale": 1.501,
+   "spread": [
+    1.423,
+    1.59
+   ],
+   "clamped": null,
+   "line_height": 1.5527
+  },
+  "Lalezar": {
+   "weight": 400,
+   "ink": 95.18,
+   "ink_headline": 50,
+   "optical_scale": 1.099,
+   "spread": [
+    0.917,
+    1.247
+   ],
+   "clamped": null,
+   "line_height": 1.567
+  },
+  "Lateef": {
+   "weight": 400,
+   "ink": 83.6,
+   "ink_headline": 41,
+   "optical_scale": 1.251,
+   "spread": [
+    1.191,
+    1.347
+   ],
+   "clamped": null,
+   "line_height": 2.0654
+  },
+  "Lemonada": {
+   "weight": 700,
+   "ink": 126.7,
+   "ink_headline": 64,
+   "optical_scale": 0.85,
+   "spread": [
+    0.762,
+    0.942
+   ],
+   "clamped": 0.838,
+   "line_height": 1.998
+  },
+  "Mada": {
+   "weight": 400,
+   "ink": 85.04,
+   "ink_headline": 37,
+   "optical_scale": 1.23,
+   "spread": [
+    1.108,
+    1.472
+   ],
+   "clamped": null,
+   "line_height": 1.605
+  },
+  "Marhey": {
+   "weight": 700,
+   "ink": 119.33,
+   "ink_headline": 48,
+   "optical_scale": 0.89,
+   "spread": [
+    0.78,
+    1.054
+   ],
+   "clamped": null,
+   "line_height": 1.802
+  },
+  "Markazi Text": {
+   "weight": 400,
+   "ink": 84.91,
+   "ink_headline": 39,
+   "optical_scale": 1.232,
+   "spread": [
+    1.147,
+    1.311
+   ],
+   "clamped": null,
+   "line_height": 1.2979
+  },
+  "Noto Kufi Arabic": {
+   "weight": 400,
+   "ink": 107.33,
+   "ink_headline": 55,
+   "optical_scale": 0.975,
+   "spread": [
+    0.921,
+    1.276
+   ],
+   "clamped": null,
+   "line_height": 2.157
+  },
+  "Noto Naskh Arabic": {
+   "weight": 400,
+   "ink": 98.55,
+   "ink_headline": 40,
+   "optical_scale": 1.061,
+   "spread": [
+    1.021,
+    1.102
+   ],
+   "clamped": null,
+   "line_height": 2.039
+  },
+  "Noto Sans Arabic": {
+   "weight": 400,
+   "ink": 107.87,
+   "ink_headline": 49,
+   "optical_scale": 0.97,
+   "spread": [
+    0.912,
+    1.032
+   ],
+   "clamped": null,
+   "line_height": 2.169
+  },
+  "Rakkas": {
+   "weight": 400,
+   "ink": 110.51,
+   "ink_headline": 95.3,
+   "optical_scale": 0.947,
+   "spread": [
+    0.711,
+    1.296
+   ],
+   "clamped": null,
+   "line_height": 1.491
+  },
+  "Readex Pro": {
+   "weight": 400,
+   "ink": 111.85,
+   "ink_headline": 51,
+   "optical_scale": 0.935,
+   "spread": [
+    0.873,
+    1.0
+   ],
+   "clamped": null,
+   "line_height": 1.755
+  },
+  "Scheherazade New": {
+   "weight": 400,
+   "ink": 121.6,
+   "ink_headline": 56,
+   "optical_scale": 0.86,
+   "spread": [
+    0.741,
+    0.96
+   ],
+   "clamped": null,
+   "line_height": 2.4336
+  },
+  "Tajawal": {
+   "weight": 400,
+   "ink": 91.33,
+   "ink_headline": 46,
+   "optical_scale": 1.145,
+   "spread": [
+    1.093,
+    1.492
+   ],
+   "clamped": null,
+   "line_height": 1.391
+  }
+ }
+}

@@ -17,7 +17,10 @@ offered weight really exists in the downloaded fonts and fails loudly if not.
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
 
 LANGS = ("en", "ar")
 # Three groups (spec §2): the NAME (.cv-name), the section HEADINGS
@@ -285,3 +288,27 @@ def built_weights(lang: str, role: str, family: str) -> tuple[int, ...]:
     if weights and role == "body":
         weights.add(EMPHASIS_WEIGHT)
     return tuple(sorted(weights))
+
+
+# ---- step 7 calibration (tools/calibrate_fonts.py -> calibration.json) -------
+
+_CALIBRATION = Path(__file__).with_name("calibration.json")
+
+
+@lru_cache(maxsize=1)
+def _calibration() -> dict:
+    try:
+        return json.loads(_CALIBRATION.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+
+
+def optical_scale(lang: str, family: str) -> float:
+    """Multiplier that makes `family` paint the reference face's optical size
+    (Inter EN / Cairo AR) at the same pt; 1.0 when uncalibrated."""
+    return _calibration().get(lang, {}).get(family, {}).get("optical_scale", 1.0)
+
+
+def line_height(lang: str, family: str) -> float | None:
+    """The face's own line at line-height: normal (max of hhea / win), or None."""
+    return _calibration().get(lang, {}).get(family, {}).get("line_height")

@@ -1,4 +1,9 @@
-# Typography step 7 — calibration: PLAN ONLY (not approved, no code)
+# Typography step 7 — calibration
+
+**Status 2026-10-02 (run 4 item 7):** session 1 BUILT (tool, instrument check,
+calibration.json, registry accessors, /dev/typography + e2e). Session 2 WIRED
+but OFF (`CVSTAND_OPTICAL_SCALE=1`) pending the user's review - see
+docs/WORD_FIDELITY_AUDIT.md decisions 52-56. Original plan below.
 
 Written 2026-09-30 overnight, per the user's work order (item 8). Spec:
 `docs/CVSTAND_FONT_CONTROLS.md` §4.1 (optical size), §7.4 (calibration

@@ -104,28 +104,32 @@
   function largest(list) {
     return list.reduce(function (m, i) { return i.text && i.size > m ? i.size : m; }, 0);
   }
-  function setRole(list, target) {
-    if (!target) return;
+  // `optical` (step 7, off unless enabled server-side) multiplies whatever
+  // size applies - the chosen one, or the template's own when none is chosen
+  function setRole(list, target, optical) {
+    optical = optical || 1;
+    if (!target && optical === 1) return;
     var ref = largest(list);
     if (!ref) return;
-    var k = target / ref;
+    var k = (target || ref) * optical / ref;
     list.forEach(function (i) { factor.set(i.el, k); });
     if (Math.abs(k - 1) > 1e-9) active = true;
   }
 
-  setRole(info.filter(function (i) { return i.role === "name"; }), C.name.size_px);
+  setRole(info.filter(function (i) { return i.role === "name"; }), C.name.size_px,
+          C.name.optical);
 
-  if (C.section.size_px) {
+  if (C.section.size_px || (C.section.optical || 1) !== 1) {
     var roots = Array.prototype.slice.call(tpl.querySelectorAll(".cv-section"))
       .filter(function (s) { return !s.parentElement.closest(".cv-section"); });
     roots.forEach(function (root) {
       setRole(info.filter(function (i) {
         return i.el === root || root.contains(i.el);
-      }), C.section.size_px);
+      }), C.section.size_px, C.section.optical);
     });
   }
 
-  if (C.body.size_px) {
+  if (C.body.size_px || (C.body.optical || 1) !== 1) {
     var body = info.filter(function (i) { return i.role === "body"; });
     var chars = {};
     body.forEach(function (i) { if (i.text) chars[i.size] = (chars[i.size] || 0) + i.text; });
@@ -134,7 +138,7 @@
       if (chars[s] > most) { most = chars[s]; dominant = parseFloat(s); }
     });
     if (dominant) {
-      var k = C.body.size_px / dominant;
+      var k = (C.body.size_px || dominant) * (C.body.optical || 1) / dominant;
       body.forEach(function (i) { factor.set(i.el, k); });
       if (Math.abs(k - 1) > 1e-9) active = true;
     }

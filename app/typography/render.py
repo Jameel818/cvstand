@@ -135,6 +135,22 @@ def _nearest_table(lang: str, role: str, family: str) -> dict[str, int]:
     return {str(w): nearest_weight(lang, role, family, w) for w in range(100, 1000, 100)}
 
 
+def optical_enabled() -> bool:
+    """Step 7's optical scale is measured (calibration.json) but OFF until the
+    user approves it from the before/after review (run 4, decision 53): the
+    ink-height method shrinks Amiri/Scheherazade, which the spec expected to
+    grow. CVSTAND_OPTICAL_SCALE=1 turns it on (review renders, tests)."""
+    import os
+    return os.environ.get("CVSTAND_OPTICAL_SCALE") == "1"
+
+
+def _optical(lang: str, family: str | None) -> float:
+    if not family or not optical_enabled():
+        return 1.0
+    from .registry import optical_scale
+    return optical_scale(lang, family)
+
+
 def config(values: dict, lang: str) -> dict | None:
     """The runtime's instructions, or None when nothing was chosen."""
     eff = effective(values)
@@ -150,6 +166,7 @@ def config(values: dict, lang: str) -> dict | None:
             "weight": e["weight"],
             "nearest": _nearest_table(lang, DOC_ROLES[role], family) if family else None,
             "size_px": size * PT_TO_PX if size is not None else None,
+            "optical": _optical(lang, family),
         }
         if role == "body":
             r["emphasis"] = EMPHASIS_WEIGHT if family else None

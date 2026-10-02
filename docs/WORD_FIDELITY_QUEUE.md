@@ -88,7 +88,7 @@ Gutter:
   - [x] t3 - no change kept (a row-gap calibration measured no gain, reverted); AR 10.7 -> 9.3 % (5.4) from the RTL border fix; EN 13.5 % (tol 6.5); demo 1/1, long 2; grade CLOSE (near MATCHES)
   - [x] t9 - EN 14.8 -> 14.6 % (tol 8.1 -> 7.6), AR 13.9 % (10.4); education lines keep the PDF's 16px strut (no font-size on .tpl), the drift at TECHNICAL halved (-17.8 -> -9.3 px); demo 1/1, long 2; grade CLOSE
   - [x] t24 - AR 23.7 -> 10.1 % (tol 6.3; the Arabic PDF now draws the policy faces, item 3), EN 15.0 % (10.9); education date column sized to its text (degree was ~6px late); demo 1/1, long 2; grade CLOSE. EN's rest: Word draws Microsoft's cloud Open Sans (heavier, ~2px taller lines)
-- [ ] R4-7. (time permitting) typography step 7 calibration, before/after, no goldens
+- [x] R4-7. (time permitting) typography step 7 calibration, before/after, no goldens - tools/_ink.py + tools/calibrate_fonts.py (--instrument reproduces SIZE_ADJUST: Tajawal -0.7 %, Amiri +0.7 %; --check), app/typography/calibration.json (35 families EN+AR), registry optical_scale()/line_height(), /dev/typography (debug only) + e2e screenshot; the scale is wired into typography.js but OFF (CVSTAND_OPTICAL_SCALE=1) pending your review: 13 before/after images; goldens that would change: NONE (no typography keys in any golden)
 - [ ] R4-8a. Close Word; full suite incl. browser tests
 - [ ] R4-8b. Review page + Desktop folders (fidelity review; "CVStand PDF font fix review")
 - [ ] R4-8c. Restart local server from feature/word-fidelity; real builder download uses the designs EN + AR

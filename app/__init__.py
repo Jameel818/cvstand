@@ -78,6 +78,8 @@ def create_app(config_object: type = Config) -> Flask:
     # the resume's own `lang` - see app/i18n.py for why.
     i18n.register(app)
     app.register_blueprint(bp)
+    from .dev_typography import bp as dev_typography_bp   # 404 unless debug
+    app.register_blueprint(dev_typography_bp)
 
     # The public brand, on every page. A context processor rather than a
     # per-route variable for the same reason as `_current_user` below:
