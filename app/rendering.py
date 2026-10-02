@@ -86,9 +86,33 @@ def canvas_html(data: dict, template_key: str) -> str:
     tpl = _env().get_template(_template_path(template_key))
     token = set_lang(lang_of(data))
     try:
-        return tpl.render(r=normalize(data), meta=registry.get(template_key))
+        r = normalize(data)
+        if dir_of(data) == "rtl":
+            r = _isolate_phones(r)
+        return tpl.render(r=r, meta=registry.get(template_key))
     finally:
         reset_lang(token)
+
+
+# Unicode bidi rule W2: European digits that follow Arabic letters become
+# Arabic numbers, so in "الهاتف: 555-0100-22" the hyphens turn neutral and the
+# number reads "22-0100-555" (run 4, item 4 - reference phones in the Arabic
+# PDF). An LRI...PDI isolate keeps each phone one left-to-right unit wherever a
+# template puts it, in all 50 templates at once. Right-to-left documents only:
+# English output stays byte-identical.
+_LRI, _PDI = "⁦", "⁩"
+
+
+def _isolate_phones(r: dict) -> dict:
+    def wrap(v):
+        return f"{_LRI}{v}{_PDI}" if isinstance(v, str) and v.strip() else v
+    r = dict(r)
+    if isinstance(r.get("contact"), dict) and "phone" in r["contact"]:
+        r["contact"] = dict(r["contact"], phone=wrap(r["contact"]["phone"]))
+    if isinstance(r.get("references"), list):
+        r["references"] = [dict(x, phone=wrap(x["phone"])) if isinstance(x, dict) and "phone" in x
+                           else x for x in r["references"]]
+    return r
 
 
 _FONT_LINK = (

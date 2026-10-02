@@ -79,8 +79,8 @@ Gutter:
 - [x] R4-3a. Arabic PDF/preview fonts actually used (3 Modern + 2 ATS, with/without a chosen font), local + live - no font chosen: local PDF = Segoe UI/Times/Tahoma, LIVE PDF = Liberation Sans/FreeSerif, previews local+live = Segoe UI/Times; chosen font: correct faces (local + live)
 - [x] R4-3b. Why the policy faces aren't loaded; prepare the fix - cause: policy CSS named families no document declares; fix: 'CVT ' families + typography.css link (preview) / inlined faces (PDF) - APPLIED on the branch (affects RTL only)
 - [x] R4-3c. Before/after images (EN unchanged + AR), list of goldens that would change (not updated) - before/after 5 templates: EN 0.00 % changed (pixel-identical), AR 4.7-6.9 % (fonts); goldens that would change: NONE (all goldens are English); images in scratch ba/ -> Desktop 'CVStand PDF font fix review' (8b)
-- [ ] R4-4. Arabic PDF reference phones reversed: fix in HTML/PDF templates, before/after, goldens listed
-- [ ] R4-5. Seven fonts drawn as Calibri in Word: cause + fix, real Word check for each, tests
+- [x] R4-4. Arabic PDF reference phones reversed: fix in HTML/PDF templates, before/after, goldens listed - cause bidi W2 (digits after Arabic become Arabic numbers); every phone in an RTL document wrapped in LRI..PDI in canvas_html (all 50 templates); t4 AR now 555-0100-22 (was 22-0100-555), t2/t20 AR unchanged (0.00 %), EN 0.00 %; goldens that would change: NONE; tests/test_rtl_phone_isolates.py
+- [x] R4-5. Seven fonts drawn as Calibri in Word: cause + fix, real Word check for each, tests - cause: all 7 are Microsoft 365 cloud fonts; Word prefers its cloud copy and shows Calibri on a PC's FIRST open while it downloads (cache dirs dated the minute of run 2's check); real Word now 7/7 exact (ats-t1, t2, t11, EN+AR, offered roles); no code change (renaming the faces would change the user's font names - decision 47); tests/test_docx_cloud_fonts.py (19)
 - [ ] R4-6. Polish weakest: t22, t14, t21, t3, t9, t24 (EN + AR, demo + long, re-grade)
 - [ ] R4-7. (time permitting) typography step 7 calibration, before/after, no goldens
 - [ ] R4-8a. Close Word; full suite incl. browser tests

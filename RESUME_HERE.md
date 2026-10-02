@@ -1,3 +1,17 @@
+# RESUME HERE — 2026-10-02 (WORD FIDELITY run 4 on `feature/word-fidelity`; NOT merged; main untouched)
+
+## AUTONOMOUS RUN 4 (user away ~7 h)
+Queue: `docs/WORD_FIDELITY_QUEUE.md` "Run 4" (take the next unticked item);
+decisions 40+ in `docs/WORD_FIDELITY_AUDIT.md`. Never push main / merge /
+deploy. Local server: `venv/Scripts/python run.py` now starts LIVE-LIKE
+(browser store); `--server-store` = the old single-user mode.
+Done: R4-1 (builder Word designs: cause = single-user mode), R4-2 (Arabic
+locally), R4-3 (Arabic PDF policy faces loaded), R4-4 (Arabic phones isolated),
+R4-5 (7 "Calibri" fonts = M365 cloud first-open download; no code change).
+Before/after images: scratch `ba/` (item 3) and `ph/` (item 4).
+
+---
+
 # RESUME HERE — 2026-10-01 (WORD FIDELITY run 2 on `feature/word-fidelity`; NOT merged; main untouched)
 
 ## AUTONOMOUS RUN 2 (user away ~15 h)

@@ -379,3 +379,30 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
 45. test_typography_render's `_own()` now also removes the RTL policy block:
     those tests prove the typography FEATURE emits nothing without a choice;
     the policy is a separate layer that now reuses its 'CVT ' faces.
+46. **Arabic phone numbers: one fix for all 50 templates, in `canvas_html`.**
+    Cause: Unicode bidi rule W2 - European digits that follow Arabic letters
+    become Arabic numbers, the hyphens between them turn neutral, and
+    "الهاتف: 555-0100-22" draws as "22-0100-555" (t4 references). In a
+    right-to-left document every contact and reference phone is wrapped in an
+    LRI...PDI isolate before the template sees it, so wherever a template puts
+    it, it stays one left-to-right unit. English output is byte-identical (no
+    isolates; before/after 0.00 % on t2/t4/t20), Word is untouched (its own
+    path already splits runs). Goldens that would change: none (English only).
+47. **The seven "Calibri" fonts: cause found, no code change.** Lora, Raleway,
+    Work Sans, Playfair Display, Lalezar, Aref Ruqaa and Bebas Neue are all in
+    Microsoft 365's cloud-font catalogue. Word prefers Microsoft's copy to the
+    embedded one; on a PC that has not fetched the family yet it shows a
+    stand-in (Calibri) while it downloads. Proof: their cache folders
+    (%LOCALAPPDATA%/Microsoft/FontCache/4/CloudFonts) are dated 2026-10-01
+    21:45, the minute of the run-2 check that saw Calibri (logged 23:25 that
+    night). Real Word today: all 7 draw the exact face (advance widths equal
+    our TTFs) in ats-t1, modern-t2 and modern-t11, EN and AR, with the roles
+    the dropdowns offer. Rejected: renaming the embedded faces to private
+    names to dodge the cloud lookup - Word's font box would then show a name
+    the user never chose ("keep font choices"), and it would have to apply to
+    Montserrat, Poppins and Open Sans too. Word without Microsoft 365 and
+    LibreOffice use the embedded copy, which tests/test_docx_cloud_fonts.py
+    pins for every offered role. (Raleway and Playfair Display are heading-
+    only; a body set to them falls back to the template's body face, as the
+    dropdowns never offer that.)
+
