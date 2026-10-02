@@ -343,3 +343,27 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
 | t2 AR | 9.8 -> 9.1 | 7.1 | 1 / 2 | CLOSE (PDF draws fallback faces) |
 | t4 EN | 18.9 -> 8.4 | 3.9 | 1 / 2 | CLOSE (near MATCHES) |
 | t4 AR | 11.5 -> 11.2 | 8.7 | 1 / 2 | CLOSE (fallback faces; Arabic name ~15 px taller) |
+
+## Run 4 (2026-10-02) - decisions made during the run
+40. **Problems 1 and 2 had one cause: the local server's single-user mode.**
+    `run.py` started with CVSTAND_SERVER_STORE=1 (default), so every visitor
+    got the one stored `data/resume.json` - the user's own document: an Arabic
+    name over English text, no photo, level words, chosen fonts - in English
+    AND in Arabic. The live site runs CVSTAND_SERVER_STORE=0 (the browser owns
+    the document, a new visitor starts from the demo CV in the interface
+    language). main behaves identically locally (checked on a scratch worktree),
+    so it was not a regression of this branch. The Word designs DID reach the
+    download (checked through the real builder for t2 t4 t8 t11 t22, EN/AR) -
+    they only looked plainer on that document.
+41. **`run.py` now starts live-like** (browser store, a throwaway SECRET_KEY per
+    process, as the multi-visitor guard requires); `run.py --server-store`
+    keeps the old single-user mode. Production never runs run.py (gunicorn).
+42. **Real-data fixes** found on the user's kind of document: level WORDS in
+    t2/t5/t18's fixed value cells broke mid-word ("Proficie/nt") - the cell
+    now takes the word's width; t11 Arabic lost its last language line - the
+    side spread's reserve is 24 pt in Arabic (4 pt English); a NameError in t2
+    with a chosen font + level words (a shadowed name) - caught by the new e2e.
+43. **New e2e on the REAL builder path**: gallery "Use this" -> language ->
+    Fonts panel (heading font + body size) -> Download Word; fails unless the
+    file carries the template's design drawings, its own headings, the chosen
+    font and size, RTL in Arabic. Arabic e2e runs on the live-configured server.

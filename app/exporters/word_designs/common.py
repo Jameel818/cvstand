@@ -124,7 +124,7 @@ class SidebarPage:
         the page gives up space before `heads` instead of spilling."""
         self.spread_side(heads, reserve_pt=reserve_pt, grow=False)
 
-    def spread_side(self, heads, *, reserve_pt: float = 4.0, grow: bool = True) -> None:
+    def spread_side(self, heads, *, reserve_pt: float | None = None, grow: bool = True) -> None:
         """The side column as the PDF's `justify-content: space-between`:
         the page's slack shared out before each of `heads` (python-docx
         paragraphs). The page's bottom margin stands in for the column's
@@ -132,6 +132,8 @@ class SidebarPage:
         finish()."""
         from ..docx_design import PAGE_H_PT, pt, tiny
         from ..docx_measure import Measure, spread
+        if reserve_pt is None:
+            reserve_pt = 24.0 if self.ctx.rtl else 4.0   # the Arabic estimate runs short
         sec = self.ctx.doc.sections[0]
         avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
         if grow:

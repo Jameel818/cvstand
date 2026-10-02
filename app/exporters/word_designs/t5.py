@@ -13,7 +13,7 @@ from ..docx_design import (
     Box, Ctx, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height, run,
     skill_pct, slider_shape, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, bullets, joined, pill, rounded_block
+from .common import SidebarPage, Stack, bullets, joined, pill, rounded_block, text_px
 
 FRAME, NAVY, CORAL, TRACK, INK = "F2F2F2", "003366", "F26A5F", "F4D0CC", "1A1A1A"
 CARD, MUTED, RULE = "E6E8EC", "555555", "D9D9D9"
@@ -178,8 +178,10 @@ def build(ctx: Ctx) -> None:
                     cb.pad_top = 16
                     if rated(sk):
                         pct, label = skill_pct(sk)
-                        sw = col - 36 - 10 - 52
-                        inner = cb.table([tw(sw + 10), tw(52)])
+                        # min-width:52px in the PDF: a level word widens it
+                        lw = max(52, text_px(ctx, "bold", label, 12) + 2)
+                        sw = col - 36 - 10 - lw
+                        inner = cb.table([tw(sw + 10), tw(lw)])
                         a, lab = inner.rows[0].cells
                         fmt_cell(ctx, a, valign="center")
                         fmt_cell(ctx, lab, valign="center")

@@ -16,7 +16,7 @@ from ..docx_design import (
     Box, Ctx, bar_shape, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height,
     run, skill_pct, tiny, tw,
 )
-from .common import SidebarPage, Stack, block, bullets, date_range, joined
+from .common import SidebarPage, Stack, block, bullets, date_range, joined, text_px
 
 NAVY, BRASS, KICK, RAIL_RULE, BAND_RULE = "002B66", "C08A2E", "C9973A", "617CA0", "6B84A6"
 VAL, INK, BODY, RULE, TRACK = "E3E9F2", "26303C", "39424E", "C9C6BC", "DCDEE4"
@@ -142,9 +142,13 @@ def build(ctx: Ctx) -> None:
         box = page.main_row(pad_top=16)
         page.push_to_bottom(box, bottom_px=0)      # margin-top:auto in the PDF
         rhead(box, t("Skills"))
-        bw = T - 124 - 64 - 24
+        # the value column is 64px; the longest level word widens it (Word
+        # would break "Foundational" mid-word in a fixed cell)
+        lw = max([64] + [text_px(ctx, "bold", skill_pct(sk)[1], 10.5, 0.3) + 2
+                         for sk in r["skills"] if rated(sk)])
+        bw = T - 124 - lw - 24
         # ONE table, a row per skill (back-to-back tables would merge in Word)
-        tbl = box.table([tw(124 + 12), tw(bw), tw(12 + 64)], rows=len(r["skills"]))
+        tbl = box.table([tw(124 + 12), tw(bw), tw(12 + lw)], rows=len(r["skills"]))
         for i, sk in enumerate(r["skills"]):
             a, b, c3 = tbl.rows[i].cells
             for cell in (a, b, c3):

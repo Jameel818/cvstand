@@ -67,3 +67,23 @@ Gutter:
 
 ## Final
 - [x] Final report, RESUME_HERE, commit, push, ls-remote, clean status
+
+## Run 4 (2026-10-02, ~7 h, user away) — builder path NOT verified until item 1 says so
+- [x] R4-1a. Which process serves :5000 (folder, branch, commit); stop any old server - port 5000 = this folder's run.py (feature/word-fidelity a602f8a = 775963 + a note); no other server
+- [x] R4-1b. Real builder (Playwright, fresh context): t2 t4 t8 t11 t22 "Use this" + Word EN/AR vs Desktop files; export endpoint reaches docx_design - real builder (fresh context): t2 t4 t8 t11 t22 EN/AR all carry their design drawings; the endpoint calls render_docx -> docx_design
+- [x] R4-1c. Builder with user-like data: no photo, empty sections, a chosen font, a changed size - user-like data (no photo, level words, chosen fonts/size): designs hold (EN 7-8 %); fixed level words breaking in t2/t5/t18 value cells, t11 AR spill (spread reserve), a NameError (t2) only with level words
+- [x] R4-1d. Fix the cause + e2e test on the real builder path (template, language, Fonts panel, Download Word) - cause = local single-user mode (one stored data/resume.json, mixed language) -> run.py now live-like; tests/e2e/test_word_design_builder.py (6 cases)
+- [x] R4-2a. Arabic: local builder vs live site (labels, sample, direction, previews, downloads) - live = Arabic demo; local = the stored English-bodied document; main locally identical (not a branch regression)
+- [x] R4-2b. Fix what this branch broke (Arabic demo sample?), one-page Arabic demo - run.py live-like by default (browser store, throwaway key); --server-store keeps the old mode; Arabic demo is one page (run 1)
+- [x] R4-2c. e2e: switch to Arabic -> preview Arabic + RTL, PDF and Word Arabic - tests/e2e/test_arabic_builder.py on the live-configured server
+- [ ] R4-3a. Arabic PDF/preview fonts actually used (3 Modern + 2 ATS, with/without a chosen font), local + live
+- [ ] R4-3b. Why the policy faces aren't loaded; prepare the fix
+- [ ] R4-3c. Before/after images (EN unchanged + AR), list of goldens that would change (not updated)
+- [ ] R4-4. Arabic PDF reference phones reversed: fix in HTML/PDF templates, before/after, goldens listed
+- [ ] R4-5. Seven fonts drawn as Calibri in Word: cause + fix, real Word check for each, tests
+- [ ] R4-6. Polish weakest: t22, t14, t21, t3, t9, t24 (EN + AR, demo + long, re-grade)
+- [ ] R4-7. (time permitting) typography step 7 calibration, before/after, no goldens
+- [ ] R4-8a. Close Word; full suite incl. browser tests
+- [ ] R4-8b. Review page + Desktop folders (fidelity review; "CVStand PDF font fix review")
+- [ ] R4-8c. Restart local server from feature/word-fidelity; real builder download uses the designs EN + AR
+- [ ] R4-final. Report, RESUME_HERE, commit, push, ls-remote, clean status

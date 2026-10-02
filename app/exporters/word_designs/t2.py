@@ -9,6 +9,7 @@ from ..docx_design import (
     skill_pct, tw, vml_oval,
 )
 from .common import SidebarPage, Stack, date_range, joined
+from .common import text_px as width_of
 
 NAVY, GOLD, TRACK = "002366", "FFD700", "E0E0E0"
 SIDE_TEXT, SIDE_MUTED = "DFE3EA", "C8CFDB"
@@ -70,7 +71,10 @@ def build(ctx: Ctx) -> None:
             run(ctx, b.p(before=top), sk["name"], size=12, color="FFFFFF")
             return
         pct, label = skill_pct(sk)
-        bar_w, lab_w, gapw = 74, 26, 8
+        # the value box is 26px; a level WORD ("Proficient") would overflow it
+        # in the PDF and break mid-word in a fixed Word cell: it takes its width
+        bar_w, gapw = 74, 8
+        lab_w = max(26, width_of(ctx, "body", label, 10) + 2)
         name_w = W - bar_w - lab_w - 2 * gapw
         tbl = b.table([tw(name_w + gapw), tw(bar_w), tw(gapw + lab_w)])
         c = tbl.rows[0].cells
