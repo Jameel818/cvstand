@@ -14,7 +14,7 @@ from ..docx_design import (
     Box, Ctx, design, fmt_cell, page_rects, photo_run, pt, rated, ring_anchored, run,
     skill_pct, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, block, bullets, joined, single_px
+from .common import SidebarPage, Stack, block, bullets, joined, single_px, text_px
 
 FRAME, RAIL, YELLOW, INK, CARD = "F2F2F2", "4A4C4A", "FFD633", "1A1A1A", "DFDEDD"
 LEVEL, MUTED, RULE = "EEC300", "555555", "D9D9D9"
@@ -75,9 +75,16 @@ def build(ctx: Ctx) -> None:
         card = block(ctx, b, W, fill=CARD, pad=(12, 14, 12, 14))
         dates = [x for x in (ed["start"], "—" if ed["start"] and ed["end"] else "", ed["end"])
                  if x]
-        tbl = card.table([tw(44), tw(W - 28 - 44)])     # 32px of date + the 12px gap
+        # the date column is as wide as its widest line (flex-shrink:0) + the
+        # 12px gap - a fixed 44px set the degree ~6px late beside "2014"
+        # (+3px spare). Arabic keeps 44px: the digits' estimate in the Arabic
+        # bold face ran short and "2013" wrapped (real Word, run 4)
+        dw = (max(text_px(ctx, "bold", x, 11.5) for x in dates) + 15) if dates else 1
+        if ctx.rtl and dates:
+            dw = 44
+        tbl = card.table([tw(dw), tw(W - 28 - dw)])
         d, txt = tbl.rows[0].cells
-        fmt_cell(ctx, d, pad=(0, 0, 0, 12))
+        fmt_cell(ctx, d, pad=(0, 0, 0, 12 if dates else 0))
         db = Box(ctx, d, 0)
         for x in dates:
             run(ctx, db.p(line=1.4), x, "bold", size=11.5, color=INK)

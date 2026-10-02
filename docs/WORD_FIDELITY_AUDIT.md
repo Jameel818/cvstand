@@ -427,4 +427,13 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     Tried first and rejected: lowering t21's Arabic reserves (the demo went to
     2 pages - the estimate was not high, the order was wrong). t4 and t18,
     the other two users, re-measured: unchanged.
+51. **Measuring instrument error found: pdf.js cannot draw the PDF's skill
+    rings.** Chromium prints a conic-gradient ring as a function-based shading
+    (ShadingType 1, PostScript function); pdf.js has none and painted the
+    rings solid magenta, so every ring template's PDF image was wrong in the
+    overlay and its % inflated (t2, t5, t11, t12, t22, t24 ... in runs 1-3).
+    The REAL PDF is fine (Acrobat/Chrome draw it). The scratch tool now takes
+    the app PDF's page 1 from Chromium itself (same HTML, print media, the
+    auto-fit awaited); Word's PDFs stay on pdf.js (no such shadings). Only
+    numbers measured from run 4 item 6 onward use it.
 
