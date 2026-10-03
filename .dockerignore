@@ -23,6 +23,10 @@ junit_e2e.xml
 screenshots/
 tools/
 
+# Review material (Word fidelity review pages + ~16 MB of images): repo only,
+# the app never reads it.
+docs/review/
+
 # Font SOURCES in the project root: Thmanyah (its licence forbids uploading
 # or hosting the files) and fourteen retail faces with no licence at all.
 # `COPY . .` would otherwise put them in the image. Anchored and case-exact:

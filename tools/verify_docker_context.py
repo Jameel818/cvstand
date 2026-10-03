@@ -72,6 +72,9 @@ FORBIDDEN_GLOBS = [
     # never uploaded. The Dockerfile does `COPY . .`, so only .dockerignore
     # keeps them out of the image. See .gitignore and FONTS.md.
     "Fonts/**/*",
+    # Review pages and their images (docs/review/): repo only, ~16 MB.
+    "docs/review/*",
+    "docs/review/**/*",
 ]
 
 
