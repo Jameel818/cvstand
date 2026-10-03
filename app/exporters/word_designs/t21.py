@@ -40,11 +40,15 @@ def build(ctx: Ctx) -> None:
     hcell = head.rows[0].cells[0]
     fmt_cell(ctx, hcell, fill=LIME, pad=(0, 0, 0, 0))
     hb = Box(ctx, hcell, tw(850 - 2 * PAD))
-    inner = hb.table([tw(34 + 118 + 26), tw(850 - 2 * PAD - 178 - 34)])
+    # the name column runs to the card's edge; its 34px end padding is the
+    # cell's (it was subtracted twice: the name ended 34px short of the PDF's)
+    inner = hb.table([tw(34 + 118 + 26), tw(850 - 2 * PAD - 178)])
     pcell, ncell = inner.rows[0].cells
     fmt_cell(ctx, pcell, valign="bottom", pad=(0, 34, 0, 26))
     fmt_cell(ctx, ncell, valign="center", pad=(0, 0, 0, 34))
-    pb = Box(ctx, pcell, 0, pad_top=18)
+    # the photo's line runs ~6px taller than the picture in Word: 12, not 18
+    # (the contact bar sat 6px low - measured, run 6)
+    pb = Box(ctx, pcell, 0, pad_top=12)
     photo_run(ctx, pb.p(line=1.0, after=8), size_px=118, ring_px=5, ring=FOREST,
               placeholder="D8D8D8")
     pb.finish()
@@ -197,7 +201,10 @@ def build(ctx: Ctx) -> None:
     ach = [a for a in r["achievements"] if a["metric"]]
     if ach:
         box = page.main_row(pad_top=18)
-        page.push_to_bottom(box)                    # margin-top:auto in the PDF
+        # margin-top:auto in the PDF. In Arabic the default 24pt reserve left
+        # the foot cards ~18px short of the PDF's; English needs all of it (10
+        # spilled the stats card onto page 2) - measured in Word, run 6
+        page.push_to_bottom(box, reserve_pt=10.0 if ctx.rtl else 24.0)
         card = rounded_block(ctx, box, T, fill=FOREST, bg=PAGE, radius=18,
                              pad=(16, 26, 16, 26))
         n = len(ach)
