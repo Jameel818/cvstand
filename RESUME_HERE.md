@@ -6,8 +6,9 @@ every Word / server I start. Never push main / merge / deploy / env / DNS.
 Step 7 stays OFF. No golden updates without approval.
 - [x] R4-8a full suite in 5 batches: 5278 passed / 47 skipped / 0 failed
   (decisions 57-59 in docs/WORD_FIDELITY_AUDIT.md).
-- [ ] R4-8b re-measure all 24 (scratch a1d5eef3.../review4.py, ovl.py) +
-  review page + Desktop folder.
+- [x] R4-8b all 24 re-measured (scratch a1d5eef3.../ovl.py r5 + review5.py r5);
+  review page + Desktop folder refreshed. shots.py/ovl.py now refuse to attach
+  to an existing Word and only ever stop the PID they started.
 - [ ] R4-8c restart run.py (live-like), real builder EN/AR check, leave running.
 - [ ] Merge prep (NOT executed): gate items + go-live list + plan.
 Two WINWORD windows open at start (19:24, one = the user's own Arabic doc
