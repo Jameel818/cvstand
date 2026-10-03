@@ -1,3 +1,25 @@
+# RESUME HERE — 2026-10-04 (WORD FIDELITY run 6 on `feature/word-fidelity`; NOT merged; main untouched)
+
+## RUN 6 - portability, the t22 rail, the 90% target (queue "Run 6")
+- docs/review/ excluded from the image (R6-1).
+- Design shapes = DrawingML + VML fallback (app/exporters/docx_dml.py); layout
+  byte-identical; LibreOffice now draws t2 bars / t22 rings and rail.
+- t22 rail word: fixed artwork, Arabic Cairo Black 900 (96.8% of the rail),
+  Word = header picture from tools/build_t22_rail.py (--check).
+- 90% target: 46/48 demo files <= 10% strict in Word, all 1 page; exceptions
+  modern-t9 EN (14.6%: Archivo 900 vs Archivo Black + a URL wrap) and AR
+  (12.7%: content taller in Word, fit needed). Decisions 61-68.
+- Suite: batches 1-3 + most of 4 green after fixes; **batch 5 NOT run (low
+  memory)** - run it before merging (merge plan §1a).
+- Local server: run.py live-like on :5000 (left running). LibreOffice is an
+  ADMIN EXTRACT in this session's scratchpad (lo/x/program/soffice.exe), not
+  installed; a partial winget download sits in %LOCALAPPDATA%\Temp\WinGet.
+- Measuring tools (scratch a1d5eef3.../): ovl.py, vprof.py (DTW column
+  offsets), heat.py (where the % sits), dy.py, wvw.py (Word-vs-Word),
+  review6.py. Results: fid/final6.
+
+---
+
 # RESUME HERE — 2026-10-03 (WORD FIDELITY run 5 on `feature/word-fidelity`; NOT merged; main untouched)
 
 ## RUN 5 (finishing run 4 item 8, low-memory rules)

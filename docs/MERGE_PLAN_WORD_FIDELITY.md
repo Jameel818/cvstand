@@ -12,7 +12,7 @@ Branch head: see `git ls-remote origin refs/heads/feature/word-fidelity`.
 
 | Gate item | Status | Evidence |
 |---|---|---|
-| Full suite incl. browser tests, on the final commit | SUITE_STATUS | see §1a |
+| Full suite incl. browser tests, on the final commit | **NOT COMPLETE - batch 5 not run (low memory)** | see §1a |
 | `tools/verify_docker_context.py` | PASS | 450 required files survive `.dockerignore`, no local state ships. Required now also: the 24 Word designs, `word_layouts.json`, `word_themes.json`, `calibration.json`, the two demo résumés, the t22 rail pictures (`app/static/rails/*.png`). Forbidden now also: `docs/review/` (excluded from the image in run 6) |
 | `tests/test_requirements_cover_imports.py` | PASS | no new runtime package (the rail pictures are pre-rendered; Word export still needs no browser) |
 | Secrets audit (§9.4) | PASS | `git ls-files`: no `.env`, `*.db`, `venv/`, `data/resume.json`; `.env.example` placeholders only; no key patterns in tracked text |
@@ -23,7 +23,30 @@ Branch head: see `git ls-remote origin refs/heads/feature/word-fidelity`.
 | Other programs | DONE | LibreOffice 26.8: t2/t22 EN+AR shapes now drawn (bars, rings, rail) — review page "Portability" |
 
 ### 1a. Full suite on the final commit
-SUITE_DETAIL
+Run 6, five batches (Word closed), at `0e5f6e8` and fixed up to `6eef4c4`:
+- Batch 1 (everything outside tests/e2e): 4005 passed / 47 skipped / 2
+  failed - both from the t22 rail change (the RTL mirroring guard: the rail
+  box no longer mirrored -> the word now moves inside a mirrored box; the
+  policy-faces test now excludes the rail's fixed face). Both files re-run:
+  pass (212 incl. HTML goldens).
+- Batch 2: 70 passed.
+- Batch 3: 409 passed / 1 failed - the PDF font test counted the rail's fixed
+  Cairo Black as an unchosen font; it now allows AND requires it in t22 AR.
+  Re-run: 8/8.
+- Batch 4: stopped by Claude Code for LOW SYSTEM MEMORY at ~95 %, 3 failures
+  before that point - the t22 cases of test_typography_apply (the rail no
+  longer follows the Fonts panel, as required); the test now leaves the rail
+  to test_t22_rail.py. Re-run: t22 cases 24/24; the rest of batch 4 (Word
+  builder, Word layout/theme gates, calibration page, the rail) 17/17.
+- **Batch 5 (autofit / overflow / void gates, 247 tests) did not run on this
+  commit** - the low-memory stop came first and, per Claude Code's rule, it
+  was not restarted. It passed in run 5 at e52b464; since then the PDF side
+  changed only for the t22 rail (and the rail's checks pass). **Run it before
+  step A** (close Word/LibreOffice and other heavy apps; ~5 min):
+  `venv/Scripts/python -m pytest --e2e -q tests/e2e/test_autofit_gate.py tests/e2e/test_overflow_gate.py tests/e2e/test_void_gate.py`
+  and, for a clean record, the non-t22 part of batch 4:
+  `venv/Scripts/python -m pytest --e2e -q tests/e2e/test_typography_apply.py`
+- Known intermittent: test_form_feedback::test_adding_a_role_and_naming_it_works_end_to_end.
 
 ## 2. What goes live
 

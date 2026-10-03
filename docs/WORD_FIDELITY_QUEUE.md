@@ -102,6 +102,6 @@ Gutter:
 - [x] R6-2c. tests/test_docx_portable.py (every shape DrawingML + VML fallback, docPr ids unique, ring angles, estimator equivalence); Word opened all 96 run-6 files with no prompt
 - [x] R6-3. t22 rail word fixed artwork: never follows the Fonts panel (CSS/typography.js/autofit skip .vrail); Arabic Cairo Black 900 (96.8% of the rail; Alexandria too thick for the rail); Word = 300 dpi header picture (tools/build_t22_rail.py); tests/e2e/test_t22_rail.py + portability tests; English goldens unchanged (247/247)
 - [x] R6-4. 90% target: 46/48 demo files <= 10% strict (all 1 page); exceptions t9 EN (Archivo 900 vs Word's Archivo Black + a URL wrap) and t9 AR (content taller in Word, fit needed) - decisions 61-68
-- [ ] R6-5. Full suite on the final commit, in batches (incl. browser batches 4 and 5)
-- [ ] R6-6. Review page + Desktop folder (48-file table, LibreOffice column, rail before/after); merge plan gate results
-- [ ] R6-7. Local server running (live-site mode)
+- [x] R6-5. Full suite on the final commit, in batches - batches 1-3 run (4 failures, all from the fixed t22 rail, fixed and re-run green); batch 4 stopped by LOW MEMORY at ~95% (its 3 t22 failures fixed, the rest re-run green); batch 5 NOT run (stopped before it; not restarted per Claude Code's rule) - see the merge plan §1a
+- [x] R6-6. Review page + Desktop folder (48-file table, LibreOffice column, rail before/after); merge plan gate results
+- [x] R6-7. Local server running (live-site mode, :5000; GET /export/pdf -> 405)
