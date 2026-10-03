@@ -272,9 +272,14 @@ RTL_TYPOGRAPHY = """<style>
        then 230px thick - wider than the rail. Centred along the track. */
     font-size: 202px !important;
     justify-content: center !important;
-    /* Cairo's ink sits off-centre in its 0.715 line box: moved 40px toward
-       the page edge, the ink is centred across the rail (measured). */
-    inset-inline-start: 78.5px !important;
+  }
+  /* Cairo's ink sits off-centre in its 0.715 line box: the WORD moves 40px
+     toward the page edge (the box keeps its mirrored place - the RTL
+     mirroring guard measures it), so the ink is centred across the rail.
+     The box is turned 90deg: its local -y is the page's +x. */
+  [dir="rtl"] .tpl .vrail span {
+    position: relative !important;
+    top: -40px !important;
   }
   /* FIXED: no policy face, no font choice reaches the rail word (it outranks
      both the [dir=rtl] .tpl * policy rule (0,2,0) and the typography rules). */

@@ -64,4 +64,10 @@ def test_a_chosen_role_drops_only_its_own_policy_faces():
     # ... but "template" keeps the name on the policy face
     kept = css(font_heading="Cairo", font_name="template")
     assert kept.split(name)[1].startswith('"CVT Tajawal"')
-    assert "CVT " not in css(font_body="Lateef", font_heading="Cairo", font_name="Alexandria")
+    every = css(font_body="Lateef", font_heading="Cairo", font_name="Alexandria")
+    # the only 'CVT ' face left is modern-t22's rail word: fixed artwork that
+    # never follows a choice (run 6 user requirement) - every ROLE rule is clear
+    rail = every[every.index('[dir="rtl"] .tpl .vrail,'):]
+    rail = rail[:rail.index("}") + 1]
+    assert "CVT " not in every.replace(rail, "")
+    assert '"CVT Cairo"' in rail
