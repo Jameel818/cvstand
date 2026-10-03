@@ -94,3 +94,14 @@ Gutter:
 - [x] R4-8c. Restart local server from feature/word-fidelity; real builder download uses the designs EN + AR - run 5: run.py live-like on :5000 (left RUNNING); real builder t2 t4 t11 t22 EN+AR: Word draws every design, Arabic RTL, Arabic PDF = Tajawal + IBM Plex Sans Arabic only, t4 AR phones 555-0100-22 (PDF + Word). Found + fixed: t11 (and t6, t19) Arabic contact line phone reversed in Word - joined runs split per item (decision 60, tests/test_docx_joined_rtl.py); re-checked in Word
 - [x] R4-9 (run 5). Merge prepared, NOT executed: docs/MERGE_PLAN_WORD_FIDELITY.md (gate table, what goes live, merge / deploy / live-check / rollback). verify_docker_context.py PASS (now also requires the 24 Word designs, word_layouts/themes.json, calibration.json, demo resumes: 447 files); requirements test PASS; secrets audit PASS. OPEN: suite batches 4-5 on the final commit were stopped by low memory - re-run before merging
 - [x] R4-final. Report, RESUME_HERE, commit, push, ls-remote, clean status
+
+## Run 6 (2026-10-03/04) - portability, the t22 rail, the 90% target
+- [x] R6-1. docs/review/ excluded from the Docker image; verify_docker_context.py forbids it (proved: removing the line fails the check)
+- [x] R6-2a. Real Word first: t2/t22 EN+AR render (run 5 images); the user's LibreOffice defects reproduced (t2 AR bars missing; t22 AR rail horizontal/broken, rings grey only)
+- [x] R6-2b. Shapes as DrawingML + VML fallback (app/exporters/docx_dml.py): bars, dots, sliders, rects, roundrects, custom paths, rings, nodes, page ovals, page-height fills; layout byte-identical to before (unwrapped), estimator reads the fallback; Word stacking range fixed; LibreOffice 26.8: bars, rings, rail now appear
+- [x] R6-2c. tests/test_docx_portable.py (every shape DrawingML + VML fallback, docPr ids unique, ring angles, estimator equivalence); Word opened all 96 run-6 files with no prompt
+- [x] R6-3. t22 rail word fixed artwork: never follows the Fonts panel (CSS/typography.js/autofit skip .vrail); Arabic Cairo Black 900 (96.8% of the rail; Alexandria too thick for the rail); Word = 300 dpi header picture (tools/build_t22_rail.py); tests/e2e/test_t22_rail.py + portability tests; English goldens unchanged (247/247)
+- [x] R6-4. 90% target: 46/48 demo files <= 10% strict (all 1 page); exceptions t9 EN (Archivo 900 vs Word's Archivo Black + a URL wrap) and t9 AR (content taller in Word, fit needed) - decisions 61-68
+- [ ] R6-5. Full suite on the final commit, in batches (incl. browser batches 4 and 5)
+- [ ] R6-6. Review page + Desktop folder (48-file table, LibreOffice column, rail before/after); merge plan gate results
+- [ ] R6-7. Local server running (live-site mode)

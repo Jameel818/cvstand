@@ -518,3 +518,67 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     the check held: Word draws each design (8/13/5/16 design shapes), Arabic
     is w:bidi + w:rtl + w:bidiVisual, Arabic PDFs embed only Tajawal + IBM
     Plex Sans Arabic, t4 AR reference phones read 555-0100-22 in PDF and Word.
+
+### Run 6 (2026-10-03/04): portability, the t22 rail, the 90% target
+61. **docs/review/ no longer ships** (.dockerignore; verify_docker_context.py
+    forbids it and now also requires app/static/rails/*.png).
+62. **Design shapes are DrawingML with the VML as mc:Fallback** (docx_dml.py):
+    inline groups (bars, dot rows, sliders), anchored rect / roundrect /
+    custom-path shapes, rings (oval + arc), timeline nodes, page ovals and
+    the page-height header fills. Each shape is described ONCE (`Sp`) and both
+    forms come from the same numbers. Proven: with every AlternateContent
+    unwrapped to its fallback, all 24 x EN/AR document.xml files are
+    byte-identical to the pre-DrawingML commit (only t22's header differs: the
+    rail, decision 64). Found on the way: docx_measure read inline VML only
+    (w:pict) - wrapped, every inline bar stopped counting and the one-page fit
+    would have drifted; it now measures the fallback.
+63. **Word draws DrawingML, so two Word differences had to be met**: small
+    relativeHeight values for behind-text shapes stacked in REVERSE (t24's
+    page frame covered its side panel; t22's white fill hid the rail picture)
+    - behind-text shapes now use Word's own 251658240+ range; and an inline
+    DrawingML bar row is ~1px shorter per row than the VML one (t3's skills
+    block: 2-5px less below it) - accepted, it moved Word toward the PDF.
+    LibreOffice 26.8 (run headless from an administrative extract, nothing
+    installed system-wide): t2 AR skill bars now appear, t22 AR rail is
+    vertical and whole, t22 rings show their arcs (before: bars missing, rail
+    horizontal and broken, grey tracks only).
+64. **modern-t22 rail word = fixed artwork** (user requirement): never follows
+    the Fonts panel (render.py's Details rule, typography.js and autofit.js
+    all skip `.vrail`; font, weight, size identical with every choice set -
+    tests/e2e/test_t22_rail.py), Arabic in **Cairo Black 900 at 202px**:
+    ink 1010px = 96.8% of the 1043.5px track, 204px thick inside the 215px
+    rail. Alexandria 900 needs 187px for the same length and is then 230px
+    thick - wider than the rail, its strokes clipped at the edge, and heavier
+    and less open to read - so Cairo. English unchanged (goldens 247/247,
+    no golden needed approval). Word: a 300 dpi PNG of the template's own
+    rail (tools/build_t22_rail.py, --check for staleness) anchored to the page
+    in the header, behind the text, exactly on the PDF's 215px strip.
+    t22 EN 21.0 -> 8.5%, AR 11.2 -> 7.8%.
+65. **A general "floor carry" was tried and reverted**: taking the extra height
+    of lines held up by the no-collision floor out of the gap below helped
+    some Arabic templates and hurt others (t24 AR 10 -> 15%): the estimator's
+    face for digits in an Arabic document is not the one Word draws.
+66. **Polish found real bugs, not only spacing**: t21's header name column
+    lost its 34px end padding twice (name 34px short); t5's bottom margin
+    double-counted the column padding (the side column was squeezed);
+    rounded blocks hung their bottom corner masks at an estimated height (a
+    square strip under the corners - they now hang on the closing spacer);
+    finish_rtl CREATED a default header on Arabic pages without header shapes
+    (t13 AR band 23px low; 11.1 -> 4.9%); t19's 42/58 header split wrapped the
+    contact line in Word; t15's side gaps were cell margins the fit could not
+    shrink and its Arabic photo was 200px against the PDF's 268.
+67. **Two Word line rules measured**: an ALL-CAPS Latin line has no
+    descenders, so its multiple may go to 0.6 (MIN_MULT_CAPS); and below a
+    multiple of 1 Word takes ~77% of the removed height from ABOVE the first
+    line where CSS takes half (WORD_UP_BELOW_SINGLE) - half_leading now
+    corrects it (t7's 70px caps name: +16/+30px off -> 1-2px).
+68. **The 90% target (<= 10% strict) - exceptions**: modern-t9 EN and AR.
+    t9 EN (~14.6%): its main column is aligned within 3px; what remains is
+    glyph design - the PDF draws Archivo at weight 900, Word cannot select a
+    weight inside a family and uses the separate "Archivo Black" (heavier,
+    wider), on 34px headings - plus Chromium wrapping the portfolio URL onto
+    two lines in the side column where Word fits it on one. t9 AR (~12.7%):
+    its Arabic content is genuinely taller in Word than in the PDF and the
+    near-one-page fit must squeeze it (10pt reserve spilled to page 2; 20pt
+    kept, from 50). Renaming font faces to reach Archivo 900 was ruled out by
+    decision 47.
