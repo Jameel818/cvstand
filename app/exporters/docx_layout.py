@@ -304,12 +304,17 @@ _VML_NS = 'xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsof
 
 
 def _rect(x_pt: float, w_pt: float, y_pt: float, h_pt: float, color: str, n: int) -> str:
-    return (f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-            f'{_VML_NS}><w:pict><v:rect id="cvstand_fill_{n}" o:allowincell="f" '
-            f'style="position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
-            f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:{n - 251658240};'
-            f'mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
-            f'fillcolor="#{color}" stroked="f"/></w:pict></w:r>')
+    """A page-anchored fill behind the text: DrawingML with the VML as its
+    fallback (docx_dml - LibreOffice ignored the VML-only fills)."""
+    from .docx_dml import Sp, anchored_run
+    z = n - 251658240
+    vml = (f'<v:rect id="cvstand_fill_{n}" o:allowincell="f" '
+           f'style="position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
+           f'width:{w_pt:.2f}pt;height:{h_pt:.2f}pt;z-index:{z};'
+           f'mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
+           f'fillcolor="#{color}" stroked="f"/>')
+    return anchored_run(f"cvstand_fill_{n}", Sp("rect", x_pt, y_pt, w_pt, h_pt, fill=color),
+                        vml, rel_h="page", rel_v="page", z=z, in_cell=False)
 
 
 def _header_shapes(section, rects_all: list, rects_first: list) -> None:

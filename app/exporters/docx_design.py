@@ -40,6 +40,7 @@ from docx.shared import Pt
 
 from . import docx_theme
 from .docx_layout import PPR_ORDER, TBLPR_ORDER, TCPR_ORDER, _header_shapes, _put, _w
+from .docx_dml import Sp, anchored_run, inline_group_run
 
 PX = 0.72                      # pt per template px (850px canvas on a 612pt page)
 PAGE_W_PX = 850
@@ -499,34 +500,36 @@ def bar_shape(ctx: Ctx, para, pct: float, width_px: float, *, on: str, off: str,
     n = _SHAPE_N[0]
     parts = [f'<v:roundrect style="position:absolute;left:0;top:0;width:{W};height:{H}" '
              f'arcsize="{arc:.3f}" fillcolor="#{off}" stroked="f"/>']
+    sps = [Sp("roundRect", 0, 0, W, H, fill=off, radius=arc)]
     if f > 0:
         parts.append(f'<v:roundrect style="position:absolute;left:{x0};top:0;width:{f};'
                      f'height:{H}" arcsize="{arc:.3f}" '
                      f'fillcolor="#{on}" stroked="f"/>')
+        sps.append(Sp("roundRect", x0, 0, f, H, fill=on, radius=arc))
         if not fill_round and f < W:
             # square off the fill's far end
             half = max(1, min(f // 2, H))
             sx = x0 if ctx.rtl else f - half
             parts.append(f'<v:rect style="position:absolute;left:{sx};top:0;width:{half};'
                          f'height:{H}" fillcolor="#{on}" stroked="f"/>')
+            sps.append(Sp("rect", sx, 0, half, H, fill=on))
     lift_pt = pt(lift) if lift is not None else max(0.0, pt(height) * 0.15)
-    _inline_group(para, f"cvstand_bar_{n}", width_px, height, W, H, parts, lift_pt)
+    _inline_group(para, f"cvstand_bar_{n}", width_px, height, W, H, parts, lift_pt, sps)
 
 
 def _inline_group(para, gid: str, width_px: float, height_px: float, cw: int, ch: int,
-                  parts: list[str], lift_pt: float) -> None:
-    """Append ONE inline VML group (an editable drawing in the text line) to
-    `para`. Its run's font is 1pt and so is the paragraph mark, so the line is
-    as tall as the drawing, no taller."""
-    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-          'xmlns:v="urn:schemas-microsoft-com:vml" '
-          'xmlns:o="urn:schemas-microsoft-com:office:office"')
-    xml = (f'<w:r {ns}><w:rPr><w:position w:val="{int(round(lift_pt * 2))}"/>'
-           f'<w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr><w:pict>'
-           f'<v:group id="{gid}" style="width:{pt(width_px):.2f}pt;'
+                  parts: list[str], lift_pt: float, sps: list[Sp]) -> None:
+    """Append ONE inline group (an editable drawing in the text line) to
+    `para`: DrawingML (wpg) with the VML v:group as its fallback (docx_dml).
+    Its run's font is 1pt and so is the paragraph mark, so the line is as tall
+    as the drawing, no taller."""
+    rpr = (f'<w:rPr><w:position w:val="{int(round(lift_pt * 2))}"/>'
+           f'<w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr>')
+    vml = (f'<v:group id="{gid}" style="width:{pt(width_px):.2f}pt;'
            f'height:{pt(height_px):.2f}pt" coordsize="{cw},{ch}" coordorigin="0,0">'
-           + "".join(parts) + '</v:group></w:pict></w:r>')
-    para._p.append(parse_xml(xml))
+           + "".join(parts) + '</v:group>')
+    para._p.append(parse_xml(inline_group_run(gid, pt(width_px), pt(height_px), cw, ch,
+                                              sps, vml, rpr)))
     ppr = _ppr(para._p)
     rpr = ppr.find(qn("w:rPr"))
     if rpr is None:
@@ -547,24 +550,28 @@ def dots_shape(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, d=
     total = max(total, filled)
     width = total * d + (total - 1) * gap
     k = 10                                  # coordinate units per px
-    parts = []
+    parts, sps = [], []
     for i in range(total):
         slot = (total - 1 - i) if ctx.rtl else i
         x = slot * (d + gap) * k
         if i < filled:
             parts.append(f'<v:oval style="position:absolute;left:{x};top:0;width:{d * k};'
                          f'height:{d * k}" fillcolor="#{on}" stroked="f"/>')
+            sps.append(Sp("ellipse", x, 0, d * k, d * k, fill=on))
         elif hollow:
             sw = stroke * k
             parts.append(f'<v:oval style="position:absolute;left:{x + sw / 2:.0f};'
                          f'top:{sw / 2:.0f};width:{d * k - sw:.0f};height:{d * k - sw:.0f}" '
                          f'filled="f" strokecolor="#{off}" strokeweight="{pt(stroke):.2f}pt"/>')
+            sps.append(Sp("ellipse", round(x + sw / 2), round(sw / 2), round(d * k - sw),
+                          round(d * k - sw), line=off, line_w=pt(stroke)))
         else:
             parts.append(f'<v:oval style="position:absolute;left:{x};top:0;width:{d * k};'
                          f'height:{d * k}" fillcolor="#{off}" stroked="f"/>')
+            sps.append(Sp("ellipse", x, 0, d * k, d * k, fill=off))
     _SHAPE_N[0] += 1
     _inline_group(para, f"cvstand_dots_{_SHAPE_N[0]}", width, d, round(width * k), d * k,
-                  parts, pt(lift))
+                  parts, pt(lift), sps)
 
 
 def slider_shape(ctx: Ctx, para, pct: float, width_px: float, *, on: str, off: str,
@@ -584,14 +591,19 @@ def slider_shape(ctx: Ctx, para, pct: float, width_px: float, *, on: str, off: s
     rw = ring * k
     parts = [f'<v:roundrect style="position:absolute;left:0;top:{ty:.0f};width:{W};height:{th:.0f}" '
              f'arcsize="{arc}" fillcolor="#{off}" stroked="f"/>']
+    sps = [Sp("roundRect", 0, round(ty), W, round(th), fill=off, radius=arc)]
     if f > 0:
         parts.append(f'<v:roundrect style="position:absolute;left:{x0};top:{ty:.0f};width:{f};'
                      f'height:{th:.0f}" arcsize="{arc}" fillcolor="#{on}" stroked="f"/>')
+        sps.append(Sp("roundRect", x0, round(ty), f, round(th), fill=on, radius=arc))
     parts.append(f'<v:oval style="position:absolute;left:{kx + rw / 2:.0f};top:{rw / 2:.0f};'
                  f'width:{knob * k - rw:.0f};height:{knob * k - rw:.0f}" fillcolor="#FFFFFF" '
                  f'strokecolor="#{on}" strokeweight="{pt(ring):.2f}pt"/>')
+    sps.append(Sp("ellipse", round(kx + rw / 2), round(rw / 2), round(knob * k - rw),
+                  round(knob * k - rw), fill="FFFFFF", line=on, line_w=pt(ring)))
     _SHAPE_N[0] += 1
-    _inline_group(para, f"cvstand_bar_{_SHAPE_N[0]}", width_px, knob, W, H, parts, pt(lift))
+    _inline_group(para, f"cvstand_bar_{_SHAPE_N[0]}", width_px, knob, W, H, parts, pt(lift),
+                  sps)
 
 
 def dots(ctx: Ctx, para, filled: int, total: int, *, on: str, off: str, size=12, gap=5):
@@ -709,15 +721,50 @@ def page_ovals(ctx: Ctx, ovals: list) -> None:
     for n, (cx, cy, d, colour) in enumerate(ovals):
         if ctx.rtl:
             cx = PAGE_W_PX - cx
-        para._p.append(parse_xml(
-            f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-            f'xmlns:v="urn:schemas-microsoft-com:vml" '
-            f'xmlns:o="urn:schemas-microsoft-com:office:office"><w:pict>'
-            f'<v:oval id="cvstand_dot_{n}" o:allowincell="f" style="position:absolute;'
-            f'margin-left:{pt(cx - d / 2):.2f}pt;margin-top:{pt(cy):.2f}pt;width:{pt(d):.2f}pt;'
-            f'height:{pt(d):.2f}pt;z-index:{n - 251650000};mso-position-horizontal-relative:page;'
-            f'mso-position-vertical-relative:page" fillcolor="#{colour}" stroked="f"/>'
-            f'</w:pict></w:r>'))
+        z = n - 251650000
+        vml = (f'<v:oval id="cvstand_dot_{n}" o:allowincell="f" style="position:absolute;'
+               f'margin-left:{pt(cx - d / 2):.2f}pt;margin-top:{pt(cy):.2f}pt;width:{pt(d):.2f}pt;'
+               f'height:{pt(d):.2f}pt;z-index:{z};mso-position-horizontal-relative:page;'
+               f'mso-position-vertical-relative:page" fillcolor="#{colour}" stroked="f"/>')
+        sp = Sp("ellipse", pt(cx - d / 2), pt(cy), pt(d), pt(d), fill=colour)
+        para._p.append(parse_xml(anchored_run(f"cvstand_dot_{n}", sp, vml, rel_h="page",
+                                              rel_v="page", z=z, in_cell=False)))
+
+
+def header_picture(ctx: Ctx, path, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float,
+                   name: str) -> None:
+    """A picture on every page, anchored to the PAGE in the header, behind the
+    text and not editable as text - fixed artwork (modern-t22's rail word).
+    DrawingML only: every reader that matters draws a header picture."""
+    for header in [ctx.doc.sections[0].header] + (
+            [ctx.doc.sections[0].first_page_header]
+            if ctx.doc.sections[0].different_first_page_header_footer else []):
+        header.is_linked_to_previous = False
+        para = header.paragraphs[0]
+        para.paragraph_format.space_after = 0
+        r = para.add_run()
+        r.add_picture(str(path), width=Pt(w_pt), height=Pt(h_pt))
+        inline = r._r.find(".//" + qn("wp:inline"))
+        drawing = inline.getparent()
+        from .docx_dml import EMU, _next_id
+        anchor = parse_xml(
+            '<wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
+            'distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="5000" '
+            'behindDoc="1" locked="1" layoutInCell="0" allowOverlap="1">'
+            '<wp:simplePos x="0" y="0"/>'
+            f'<wp:positionH relativeFrom="page"><wp:posOffset>{int(round(x_pt * EMU))}'
+            '</wp:posOffset></wp:positionH>'
+            f'<wp:positionV relativeFrom="page"><wp:posOffset>{int(round(y_pt * EMU))}'
+            '</wp:posOffset></wp:positionV>'
+            f'<wp:extent cx="{int(round(w_pt * EMU))}" cy="{int(round(h_pt * EMU))}"/>'
+            '<wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/>'
+            f'<wp:docPr id="{_next_id()}" name="{name}"/>'
+            '<wp:cNvGraphicFramePr><a:graphicFrameLocks '
+            'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>'
+            '</wp:cNvGraphicFramePr></wp:anchor>')
+        anchor.append(inline.find(qn("a:graphic")))
+        drawing.remove(inline)
+        drawing.append(anchor)
 
 
 def vml_anchored(para, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float, fill: str,
@@ -738,20 +785,23 @@ def vml_anchored(para, *, x_pt: float, y_pt: float, w_pt: float, h_pt: float, fi
              f'mso-position-horizontal-relative:text;mso-position-vertical-relative:line')
     stroke_attr = (f'strokecolor="#{stroke}" strokeweight="{weight_pt:.2f}pt"' if stroke
                    else 'stroked="f"')
-    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-          'xmlns:v="urn:schemas-microsoft-com:vml" '
-          'xmlns:o="urn:schemas-microsoft-com:office:office"')
     fill_attr = f'fillcolor="#{fill}"' if fill else 'filled="f"'
+    geo = dict(fill=fill or None, line=stroke, line_w=weight_pt)
     if path:
         shape = (f'<v:shape id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
                  f'coordsize="{coords}" path="{path}" {fill_attr} {stroke_attr}/>')
+        cw, ch = (float(v) for v in coords.split(","))
+        sp = Sp("custom", x_pt, y_pt, w_pt, h_pt, path=path, coords=(cw, ch), **geo)
     elif arc is not None:
         shape = (f'<v:roundrect id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
                  f'arcsize="{arc:.3f}" {fill_attr} {stroke_attr}/>')
+        sp = Sp("roundRect", x_pt, y_pt, w_pt, h_pt, radius=arc, **geo)
     else:
         shape = (f'<v:rect id="cvstand_shape_{n}" o:allowincell="t" style="{style}" '
                  f'{fill_attr} {stroke_attr}/>')
-    para._p.append(parse_xml(f'<w:r {ns}><w:pict>{shape}</w:pict></w:r>'))
+        sp = Sp("rect", x_pt, y_pt, w_pt, h_pt, **geo)
+    para._p.append(parse_xml(anchored_run(f"cvstand_shape_{n}", sp, shape, rel_h="text",
+                                          rel_v="line", z=z, in_cell=True)))
 
 
 def ring_anchored(para, *, x_pt: float, y_pt: float, d_px: float, width_px: float, pct: float,
@@ -769,21 +819,24 @@ def ring_anchored(para, *, x_pt: float, y_pt: float, d_px: float, width_px: floa
     d = pt(d_px) - sw
     _SHAPE_N[0] += 1
     n = _SHAPE_N[0]
-    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-          'xmlns:v="urn:schemas-microsoft-com:vml" '
-          'xmlns:o="urn:schemas-microsoft-com:office:office"')
     base = (f'position:absolute;margin-left:{x_pt + inset:.2f}pt;margin-top:{y_pt + inset:.2f}pt;'
             f'width:{d:.2f}pt;height:{d:.2f}pt;mso-position-horizontal-relative:text;'
             f'mso-position-vertical-relative:line')
-    shapes = [f'<v:oval id="cvstand_ring_{n}" o:allowincell="t" style="{base};z-index:{30 + n}" '
-              f'filled="f" strokecolor="#{off}" strokeweight="{sw:.2f}pt"/>']
+    box = (x_pt + inset, y_pt + inset, d, d)
+    shapes = [(f"cvstand_ring_{n}", 30 + n, Sp("ellipse", *box, line=off, line_w=sw),
+               f'<v:oval id="cvstand_ring_{n}" o:allowincell="t" style="{base};z-index:{30 + n}" '
+               f'filled="f" strokecolor="#{off}" strokeweight="{sw:.2f}pt"/>')]
     if pct > 0:
         end = 359.9 if pct >= 100 else pct * 3.6
-        shapes.append(f'<v:arc id="cvstand_ringfill_{n}" o:allowincell="t" '
-                      f'style="{base};z-index:{31 + n}" startangle="0" endangle="{end:.1f}" '
-                      f'filled="f" strokecolor="#{on}" strokeweight="{sw:.2f}pt"/>')
-    for sh in shapes:
-        para._p.append(parse_xml(f'<w:r {ns}><w:pict>{sh}</w:pict></w:r>'))
+        geo = (Sp("ellipse", *box, line=on, line_w=sw) if pct >= 100 else
+               Sp("arc", *box, line=on, line_w=sw, start=0, end=end))
+        shapes.append((f"cvstand_ringfill_{n}", 31 + n, geo,
+                       f'<v:arc id="cvstand_ringfill_{n}" o:allowincell="t" '
+                       f'style="{base};z-index:{31 + n}" startangle="0" endangle="{end:.1f}" '
+                       f'filled="f" strokecolor="#{on}" strokeweight="{sw:.2f}pt"/>'))
+    for name, z, sp, vml in shapes:
+        para._p.append(parse_xml(anchored_run(name, sp, vml, rel_h="text", rel_v="line",
+                                              z=z, in_cell=True)))
 
 
 def vml_oval(ctx: Ctx, para, *, x_pt: float, y_pt: float, d_pt: float, fill: str,
@@ -792,15 +845,14 @@ def vml_oval(ctx: Ctx, para, *, x_pt: float, y_pt: float, d_pt: float, fill: str
     column (a timeline node sitting ON the line)."""
     stroke_attr = (f'strokecolor="#{stroke}" strokeweight="{weight_pt:.2f}pt"' if stroke
                    else 'stroked="f"')
-    xml = (f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-           f'xmlns:v="urn:schemas-microsoft-com:vml" '
-           f'xmlns:o="urn:schemas-microsoft-com:office:office"><w:pict>'
-           f'<v:oval id="cvstand_node_{n}" o:allowincell="t" '
+    vml = (f'<v:oval id="cvstand_node_{n}" o:allowincell="t" '
            f'style="position:absolute;margin-left:{x_pt:.2f}pt;margin-top:{y_pt:.2f}pt;'
            f'width:{d_pt:.2f}pt;height:{d_pt:.2f}pt;z-index:{n + 10};'
            f'mso-position-horizontal-relative:text;mso-position-vertical-relative:line" '
-           f'fillcolor="#{fill}" {stroke_attr}/></w:pict></w:r>')
-    para._p.append(parse_xml(xml))
+           f'fillcolor="#{fill}" {stroke_attr}/>')
+    sp = Sp("ellipse", x_pt, y_pt, d_pt, d_pt, fill=fill, line=stroke, line_w=weight_pt)
+    para._p.append(parse_xml(anchored_run(f"cvstand_node_{n}", sp, vml, rel_h="text",
+                                          rel_v="line", z=n + 10, in_cell=True)))
 
 
 # ---- the document -----------------------------------------------------------------

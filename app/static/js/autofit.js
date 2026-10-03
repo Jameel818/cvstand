@@ -78,7 +78,11 @@
     if (!t) return [];
     var out = [t];                       // .tpl's own top/bottom page insets count
     var all = t.querySelectorAll("*");
-    for (var i = 0; i < all.length; i++) out.push(all[i]);
+    // `.vrail` (modern-t22's rail word) is FIXED artwork: its size never
+    // follows the fit or a chosen size (user requirement, run 6).
+    for (var i = 0; i < all.length; i++) {
+      if (!all[i].closest(".vrail")) out.push(all[i]);
+    }
     return out;
   }
 

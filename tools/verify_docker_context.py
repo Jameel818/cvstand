@@ -56,6 +56,9 @@ REQUIRED_GLOBS = [
     "app/word_layouts.json",
     "app/word_themes.json",
     "app/typography/calibration.json",
+    # modern-t22's rail word as the Word export places it (tools/build_t22_rail.py)
+    "app/static/rails/modern-t22-en.png",
+    "app/static/rails/modern-t22-ar.png",
     # The builder's seed résumé (store.seed_resume -> config.DEMO_RESUME_PATHS):
     # a new visitor's first document. Missing, the builder 500s on first load.
     "data/demo_resume.json",

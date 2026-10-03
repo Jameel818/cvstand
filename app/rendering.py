@@ -265,13 +265,23 @@ RTL_TYPOGRAPHY = """<style>
      why English HTML for this template is unchanged apart from the class. */
   [dir="rtl"] .tpl .vrail {
     transform: translate(50%, -50%) rotate(90deg) !important;
-    /* 214px suits six Latin caps; the Arabic term is two words and its
-       ascenders/descenders overflow the 215px rail, so it is set smaller. */
-    font-size: 140px !important;
-    /* The Latin rail uses flex-start because 'RESUME' at 214px nearly fills
-       the 1043.5px track. The Arabic term runs ~700px, so it is centred
-       along the rail instead of hanging off one end. */
+    /* The Arabic term fills the rail end to end, as 'RESUME' does (user
+       requirement, run 6): Cairo Black. Measured (ink, 'سيرة ذاتية'): Cairo
+       900 fills 97% of the 1043.5px track at 202px with 202px of ink across
+       the 215px rail; Alexandria 900 needs 187px for the same length and is
+       then 230px thick - wider than the rail. Centred along the track. */
+    font-size: 202px !important;
     justify-content: center !important;
+    /* Cairo's ink sits off-centre in its 0.715 line box: moved 40px toward
+       the page edge, the ink is centred across the rail (measured). */
+    inset-inline-start: 78.5px !important;
+  }
+  /* FIXED: no policy face, no font choice reaches the rail word (it outranks
+     both the [dir=rtl] .tpl * policy rule (0,2,0) and the typography rules). */
+  [dir="rtl"] .tpl .vrail,
+  [dir="rtl"] .tpl .vrail * {
+    font-family: "CVT Cairo", "Cairo", sans-serif !important;
+    font-weight: 900 !important;
   }
 
   [dir="rtl"] .tpl .sec-head {

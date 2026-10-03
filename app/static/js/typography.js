@@ -37,7 +37,10 @@
   if (!cfgEl || !tpl) return;
   var C = JSON.parse(cfgEl.textContent);
 
-  var els = [tpl].concat(Array.prototype.slice.call(tpl.querySelectorAll("*")));
+  // FIXED decoration (modern-t22's rail word, `.vrail`): a user requirement
+  // says it never follows the Fonts panel - no weight, size or pin here.
+  var els = [tpl].concat(Array.prototype.slice.call(tpl.querySelectorAll("*")))
+    .filter(function (el) { return !el.closest(".vrail"); });
 
   function roleOf(el) {
     if (el.closest(".cv-name")) return "name";

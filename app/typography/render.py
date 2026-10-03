@@ -75,6 +75,9 @@ _RUNTIME = Path(__file__).resolve().parent.parent / "static" / "js" / "typograph
 PT_TO_PX = 4 / 3
 
 _HEADLINE_ALL = ".cv-name, .cv-name *, .cv-section, .cv-section *"
+#: Elements no font choice may reach: modern-t22's rail word is fixed artwork
+#: (user requirement, run 6 - fixed font, weight and size in every case).
+_FIXED_ALL = ".vrail, .vrail *"
 
 #: The document's three roles -> the registry role whose lists apply and the
 #: elements they style. Section titles are the registry's "heading" role.
@@ -183,7 +186,7 @@ def _css(values: dict) -> str:
     rules.append("html[data-cvt] .tpl { font-synthesis: none !important; }")
     if eff["body"]["family"]:
         rules.append(
-            f"html[data-cvt] .tpl,\nhtml[data-cvt] .tpl :not(:where({_HEADLINE_ALL})) "
+            f"html[data-cvt] .tpl,\nhtml[data-cvt] .tpl :not(:where({_HEADLINE_ALL}, {_FIXED_ALL})) "
             f"{{ font-family: {family_stack(eff['body']['family'])} !important; }}")
     for role in ("section", "name"):
         fam = eff[role]["family"]

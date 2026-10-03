@@ -6,61 +6,39 @@ columns - Work Experience and Education on a 2px rail with hollow nodes
 ("Role (dates)", orange company, one paragraph) | end-aligned contact under
 big labels and a 2-up grid of skill RINGS. From modern/t22.j2.
 
-The rail is a text box anchored to the page in the header (editable text, on
-every page); the PDF's 5px text stroke is not reproduced."""
+The rail word is a picture anchored to the page in the header (fixed artwork,
+on every page; see _rail)."""
 from __future__ import annotations
 
-from docx.oxml import parse_xml
+from pathlib import Path
+
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, cant_split, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
+    Box, Ctx, cant_split, design, fmt_cell, header_picture, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
 from .common import ColumnPage, Stack, joined, single_px
 
 ORANGE, INK, BODY, GREY, RULE = "CB3500", "111111", "333333", "444444", "D8D8D8"
 RAIL_W, PAD_T, GAP = 215, 40, 34
+RAILS = Path(__file__).resolve().parents[2] / "static" / "rails"
 
 
 def _rail(ctx: Ctx) -> None:
-    """The vertical RESUME word: a page-anchored text box behind the text."""
-    page_rects(ctx, [(0, 850, 0, 1100, "FFFFFF")])
-    t = ctx.t
-    word = t("RESUME")
-    if ctx.rtl:
-        size, flow, jc = 140, "top-to-bottom", "center"
-        style_id = "CVRole"            # the PDF draws it in the body face (bold)
-        cx = 850 - 118.5
-        tdir = "tbRl"
-    else:
-        size, flow, jc = 214, "bottom-to-top", "left"
-        style_id = "CVHeading"
-        cx = 118.5
-        tdir = "btLr"
-    w_px, h_px = RAIL_W, 1090.0              # a little longer than the PDF's 1043.5px track
-    top = 553.25 - h_px / 2
-    x = cx - w_px / 2
-    hp = int(round(size * 0.72 * 2))
-    spacing = ""      # Word's Archivo 900 already sets wider than Chromium's
-    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
-          'xmlns:v="urn:schemas-microsoft-com:vml" '
-          'xmlns:o="urn:schemas-microsoft-com:office:office"')
-    rtl = "<w:rtl/>" if ctx.rtl else ""
-    bidi = "<w:bidi/>" if ctx.rtl else ""
-    xml = (
-        f'<w:r {ns}><w:pict><v:rect id="cvstand_rail" o:allowincell="f" '
-        f'style="position:absolute;margin-left:{pt(x):.2f}pt;margin-top:{pt(top):.2f}pt;'
-        f'width:{pt(w_px):.2f}pt;height:{pt(h_px):.2f}pt;z-index:-251640000;'
-        f'mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
-        f'filled="f" stroked="f"><v:textbox style="mso-layout-flow-alt:{flow}" inset="0,0,0,0">'
-        f'<w:txbxContent><w:p><w:pPr>{bidi}<w:spacing w:before="0" w:after="0" w:line="172" '
-        f'w:lineRule="auto"/><w:jc w:val="{jc}"/><w:textDirection w:val="{tdir}"/></w:pPr>'
-        f'<w:r><w:rPr><w:rStyle w:val="{style_id}"/><w:color w:val="{ORANGE}"/>{spacing}'
-        f'<w:sz w:val="{hp}"/><w:szCs w:val="{hp}"/>{rtl}</w:rPr><w:t>{word}</w:t></w:r>'
-        f'</w:p></w:txbxContent></v:textbox></v:rect></w:pict></w:r>')
-    para = ctx.doc.sections[0].header.paragraphs[0]
-    para._p.append(parse_xml(xml))
+    """The vertical rail word: a PICTURE anchored to the page in the header,
+    behind the text, at the PDF rail's exact place and size (the 215px strip,
+    full page height). Fixed artwork by user requirement (run 6): it never
+    follows the Fonts panel, cannot be edited as text, cannot wrap or break,
+    and looks the same in Word, LibreOffice and Google Docs - a text box
+    showed horizontal and broken into lines in LibreOffice. The picture is the
+    template's own rail, rendered by tools/build_t22_rail.py at 300 dpi."""
+    # (no white page fill: Word stacks it IN FRONT of the picture - measured
+    # with Shapes.ZOrderPosition - and the page is white anyway)
+    lang = "ar" if ctx.rtl else "en"
+    x = 850 - RAIL_W if ctx.rtl else 0          # physical: the start edge
+    header_picture(ctx, RAILS / f"modern-t22-{lang}.png", x_pt=pt(x), y_pt=0,
+                   w_pt=pt(RAIL_W), h_pt=pt(1100), name="cvstand_rail")
 
 
 @design("modern-t22")
