@@ -29,6 +29,7 @@ sys.path.insert(0, str(ROOT))
 from app import registry  # noqa: E402
 from app.exporters.docx_theme import THEMES_PATH, WORD_SUBSTITUTES  # noqa: E402
 from app.rendering import document_html  # noqa: E402
+from app.typography import CSS_FAMILY_PREFIX  # noqa: E402
 
 SAMPLES = {
     "en": ROOT / "data" / "sample_resume.json",
@@ -61,6 +62,9 @@ _MEASURE = r"""() => {
 
 def _face(measured: str) -> dict:
     family, weight = measured.split("|")
+    # The browser reports the CSS name; Word needs the face's own name. The
+    # Arabic policy faces are declared as 'CVT <family>' since run 4 item 3.
+    family = family.removeprefix(CSS_FAMILY_PREFIX)
     return {"family": WORD_SUBSTITUTES.get(family, family), "weight": int(weight)}
 
 

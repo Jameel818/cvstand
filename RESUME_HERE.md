@@ -1,3 +1,20 @@
+# RESUME HERE — 2026-10-03 (WORD FIDELITY run 5 on `feature/word-fidelity`; NOT merged; main untouched)
+
+## RUN 5 (finishing run 4 item 8, low-memory rules)
+Rules this run: never Word + browser tests at once; suite in batches; close
+every Word / server I start. Never push main / merge / deploy / env / DNS.
+Step 7 stays OFF. No golden updates without approval.
+- [x] R4-8a full suite in 5 batches: 5278 passed / 47 skipped / 0 failed
+  (decisions 57-59 in docs/WORD_FIDELITY_AUDIT.md).
+- [ ] R4-8b re-measure all 24 (scratch a1d5eef3.../review4.py, ovl.py) +
+  review page + Desktop folder.
+- [ ] R4-8c restart run.py (live-like), real builder EN/AR check, leave running.
+- [ ] Merge prep (NOT executed): gate items + go-live list + plan.
+Two WINWORD windows open at start (19:24, one = the user's own Arabic doc
+"كحلي ذهبي-2") are the USER'S - never close them.
+
+---
+
 # RESUME HERE — 2026-10-02 (WORD FIDELITY run 4 on `feature/word-fidelity`; NOT merged; main untouched)
 
 ## AUTONOMOUS RUN 4 (user away ~7 h)

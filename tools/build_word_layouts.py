@@ -238,7 +238,12 @@ _MEASURE = r"""(arg) => {
   const labelOf = e => { const c = e.cloneNode(true);
       c.querySelectorAll('br').forEach(b => b.replaceWith(' '));
       return c.textContent.replace(/\s+/g, ' ').trim(); };
-  items.sort((a, b) => a.r.y - b.r.y || a.r.x - b.r.x);
+  // reading order: items level with each other (within ~4px) are one row,
+  // read from the line's start - right to left in Arabic. A bare `y` sort let
+  // a sub-pixel font-metric change swap t13's side-by-side Arabic education /
+  // certifications (R4-8a), and `x` ascending read an RTL row backwards.
+  items.sort((a, b) => Math.abs(a.r.y - b.r.y) > 0.004 ? a.r.y - b.r.y
+                       : (arg.rtl ? b.r.x - a.r.x : a.r.x - b.r.x));
   for (const it of items) {
     // these never show a heading in Word; they must not claim one either (the
     // chips beside t5's "Contact" pill took it from the contact lines)

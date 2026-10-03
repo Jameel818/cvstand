@@ -41,3 +41,27 @@ def test_an_english_document_carries_none_of_it():
 def test_a_chosen_font_still_wins_over_the_policy():
     doc = document_html(dict(AR, font_body="Noto Naskh Arabic"), "modern-t2", for_pdf=True)
     assert "CVT Noto Naskh Arabic" in doc
+
+
+def test_a_chosen_role_drops_only_its_own_policy_faces():
+    """typography.js lays the page out once BEFORE data-cvt switches the chosen
+    rules on; a declared policy face in a chosen role's stack was fetched by
+    that layout and never drawn (R4-8a: every Arabic test_choices_apply case)."""
+    from app.rendering import RTL_TYPOGRAPHY, rtl_typography
+    from app.schema import typography_of
+    css = lambda **k: rtl_typography(typography_of(dict(AR, **k))[0])
+    body = '[dir="rtl"] .tpl * {\n    font-family: '
+    name = '[dir="rtl"] .tpl .cv-name * {\n    font-family: '
+    sec = '[dir="rtl"] .tpl .cv-section * {\n    font-family: '
+    assert css() == RTL_TYPOGRAPHY
+    only_body = css(font_body="Lateef")
+    assert only_body.split(body)[1].startswith('"IBM Plex Sans Arabic"')
+    assert only_body.split(name)[1].startswith('"CVT Tajawal"')     # unchosen role keeps it
+    # an unset name follows the Headings font, so its policy face goes too ...
+    headings = css(font_heading="Cairo")
+    assert headings.split(sec)[1].startswith('"Cairo"')
+    assert headings.split(name)[1].startswith('"Tajawal"')
+    # ... but "template" keeps the name on the policy face
+    kept = css(font_heading="Cairo", font_name="template")
+    assert kept.split(name)[1].startswith('"CVT Tajawal"')
+    assert "CVT " not in css(font_body="Lateef", font_heading="Cairo", font_name="Alexandria")

@@ -467,3 +467,39 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     the Arabic heading face, "المهارات" draws one letter in a fallback face
     (a missing joined form in Jomhuria).
 
+
+### Run 5 (2026-10-03): R4-8a full suite, in batches (low-memory rules)
+57. **Item 3's 'CVT ' policy faces broke four checks, all found by the full
+    suite, none by the fast loop.** (a) `test_font_roles` still expected the
+    bare family names - now expects 'CVT ...' AND that each face is LOADED
+    (`document.fonts.check`), stricter than before. (b) `test_typography_apply`
+    "no choices -> no typography file": still exact in English; in Arabic the
+    request set must be a non-empty subset of the policy faces. (c) A REAL
+    product defect: an Arabic résumé with a chosen font still DOWNLOADED the
+    policy faces of that role (Tajawal 700/800, IBM Plex 400/700 with all
+    three roles chosen) and never drew them - typography.js reads computed
+    styles before it sets data-cvt, and that first layout resolves the policy
+    stack. Fix: `rendering.rtl_typography(choices)` drops the 'CVT ' faces from
+    the policy rule of every role a chosen font APPLIES to (via
+    typography.render.effective - an unset name follows Headings,
+    `font_name: "template"` keeps the policy face; the first attempt read the
+    raw keys and moved 98 "name on template" cases, caught by
+    test_one_group_chosen_leaves_the_others_alone). Rendering is unchanged;
+    only the wasted downloads go. tests/test_arabic_policy_fonts.py pins it.
+    (d) `tools/build_word_themes.py --check` said STALE because the browser now
+    reports 'CVT Tajawal': regenerating would have written that name into
+    every Arabic .docx (no PC has it). The tool strips CSS_FAMILY_PREFIX; the
+    shipped word_themes.json is unchanged (byte-identical).
+58. **word_layouts.json: modern-t13's Education / Certifications order was a
+    sub-pixel accident, in BOTH languages.** They sit side by side at the same
+    y; the tool sorted y then x-ascending, so a font-metric change swapped
+    Arabic, and English had been Certifications-first although Education is
+    on the left. Items within 0.004 of the page height (~4 px) are now one
+    row, read from the line's start (x descending in Arabic). Result: t13
+    EN + AR read Education, Certifications - the order the shipped t13 Word
+    design (word_designs/t13.py) already writes; the json only feeds the
+    generic fallback. No other template moved.
+59. `test_form_feedback::test_adding_a_role_and_naming_it_works_end_to_end`
+    failed once in a batch ("Saved" where "Unsaved changes" was expected) and
+    passed 5/5 alone and in the first batch run: an intermittent timing flake
+    under load, recorded, not changed.

@@ -15,7 +15,8 @@ import re
 
 import pytest
 
-from app.rendering import RTL_TYPOGRAPHY, autofit_script, document_html
+from app.rendering import RTL_TYPOGRAPHY, autofit_script, document_html, rtl_typography
+from app.schema import typography_of
 from app.typography import (
     CSS_FAMILY_PREFIX, EMPHASIS_WEIGHT, FONTS, LATIN_EXT_FALLBACK, OFFERED,
     TYPOGRAPHY_KEYS, built_faces, built_weights, nearest_weight,
@@ -192,7 +193,11 @@ def test_a_pre_split_resume_keeps_its_name(lang, heading, size):
 def test_typography_comes_after_the_rtl_rules():
     """Equal-looking specificity is decided by source order; ours must win."""
     doc = _doc(AR, font_heading="Cairo", font_name="Tajawal")
-    assert doc.index(RTL_TYPOGRAPHY) < doc.index('id="cv-typography"')
+    # the policy rules as THIS document carries them: a chosen role's 'CVT '
+    # policy faces are left out (rendering.rtl_typography, R4-8a)
+    policy = rtl_typography(typography_of(dict(AR, font_heading="Cairo", font_name="Tajawal"))[0])
+    assert policy != RTL_TYPOGRAPHY
+    assert doc.index(policy) < doc.index('id="cv-typography"')
     assert doc.index('id="cv-typography-config"') < doc.index("window.ResumeAutofit")
 
 

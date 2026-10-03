@@ -178,10 +178,23 @@ def test_an_arabic_resume_uses_the_policys_cv_roles(page, live_server):
               taj: document.querySelector('.tpl').classList.contains('cv-sections-taj'),
               sec: f(document.querySelector('.tpl .cv-section'))};
     }""")
+    # Since R4-3 the policy faces are declared as 'CVT <family>' (typography.css
+    # for the preview, inlined @font-face for the PDF): a bare 'Tajawal' was
+    # named by the policy CSS but declared by no document, so Chromium drew a
+    # system fallback. Each face must also be LOADED, not merely named.
+    loaded = page.evaluate("""async (fams) => {
+      await document.fonts.ready;
+      const out = {};
+      for (const [fam, w] of fams) {
+        await document.fonts.load(`${w} 16px "${fam}"`, 'ب');
+        out[fam] = document.fonts.check(`${w} 16px "${fam}"`, 'ب');
+      }
+      return out;
+    }""", [[got["body"], 400], [got["name"], 800], [got["sec"], 700]])
     if got["dir"] != "rtl":
         pytest.skip("the showcase resume is not Arabic on this build")
-    assert got["body"] == "IBM Plex Sans Arabic", got["body"]
-    assert got["name"] == "Tajawal", got["name"]
+    assert got["body"] == "CVT IBM Plex Sans Arabic", got["body"]
+    assert got["name"] == "CVT Tajawal", got["name"]
     assert got["nameWeight"] == "800", (
         f"the policy says the name is Tajawal ExtraBold, got weight "
         f"{got['nameWeight']}")
@@ -190,7 +203,9 @@ def test_an_arabic_resume_uses_the_policys_cv_roles(page, live_server):
     # The expectation is READ FROM THE ROOT rather than hardcoded: pinning
     # this to "Cairo" made the test assert the wrong half the moment the
     # split landed, and modern-t2 is Archivo-led, so it is in the Tajawal half.
-    want = "Tajawal" if got["taj"] else "Cairo"
+    want = "CVT Tajawal" if got["taj"] else "CVT Cairo"
     assert got["sec"] == want, (
         f"modern-t2 carries cv-sections-taj={got['taj']}, so its section "
         f"titles should be {want}, got {got['sec']}")
+    assert all(loaded.values()), (
+        f"a policy face is named but not loaded (system fallback drawn): {loaded}")

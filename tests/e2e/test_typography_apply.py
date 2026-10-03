@@ -19,7 +19,7 @@ WHAT IS PROVED, over all 49 templates in both languages
               Calibrated on a default render whose answer is known.
     NETWORK   the typography files requested are exactly the faces the text
               uses - nothing unchosen - and a résumé with no choices requests
-              no typography file at all.
+              no typography file at all (Arabic: only the policy's faces).
 
 Sizes, and the Latin-Ext fallback, are proved on a few templates below.
 """
@@ -32,7 +32,7 @@ from pathlib import Path
 import pytest
 
 from app import registry
-from app.rendering import document_html
+from app.rendering import POLICY_FACES, document_html
 from app.typography import CSS_FAMILY_PREFIX, face, nearest_weight
 
 pytestmark = [pytest.mark.e2e]
@@ -141,8 +141,18 @@ def test_choices_apply_to_every_role(browser, live_server, key, lang):
     try:
         base_pg, base_req = _open(ctx, live_server.url, document_html(BASE[lang], key))
         before = base_pg.evaluate(COLLECT)
-        # NO choices -> no typography file of any kind.
-        assert not [u for u in base_req if FONT_FILE.search(u) or "typography.css" in u]
+        # NO choices -> no typography file of any kind in English. An Arabic
+        # document loads the font POLICY's own faces (run 4 item 3: before it,
+        # the policy named families no document declared and every Arabic CV
+        # drew a system fallback) - those faces and nothing else.
+        if lang == "en":
+            assert not [u for u in base_req if FONT_FILE.search(u) or "typography.css" in u]
+        else:
+            policy = {face(f, w)["woff2"] or face(f, w)["ttf"]
+                      for f, ws in POLICY_FACES for w in ws}
+            got_base = {FONT_FILE.search(u).group(1) for u in base_req if FONT_FILE.search(u)}
+            assert got_base and got_base <= policy, (
+                f"unchosen non-policy faces fetched: {sorted(got_base - policy)}")
         base_pg.close()
 
         pg, requests = _open(ctx, live_server.url,

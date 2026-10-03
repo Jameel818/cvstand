@@ -797,14 +797,14 @@
       },
       {
        "caps": true,
-       "k": "recognition",
-       "label": "الشهادات",
+       "k": "education",
+       "label": "التعليم",
        "rule": false
       },
       {
        "caps": true,
-       "k": "education",
-       "label": "التعليم",
+       "k": "recognition",
+       "label": "الشهادات",
        "rule": false
       }
      ],
@@ -880,14 +880,14 @@
       },
       {
        "caps": true,
-       "k": "recognition",
-       "label": "Certifications",
+       "k": "education",
+       "label": "Education",
        "rule": false
       },
       {
        "caps": true,
-       "k": "education",
-       "label": "Education",
+       "k": "recognition",
+       "label": "Certifications",
        "rule": false
       }
      ],

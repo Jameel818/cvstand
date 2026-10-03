@@ -9,6 +9,7 @@ and print CSS so preview and PDF share one code path.
 """
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -375,6 +376,42 @@ POLICY_FACES = (("IBM Plex Sans Arabic", (400, 700)), ("Tajawal", (400, 700, 800
                 ("Cairo", (400, 700, 800, 900)))
 
 
+#: RTL_TYPOGRAPHY's rules, by the document role whose chosen font replaces them: the
+#: selector line that opens each rule (the name rule and the .cv-sections-taj
+#: rule carry the same stack, so the selector is what tells them apart).
+_POLICY_RULES = (("body", '  [dir="rtl"] .tpl,\n  [dir="rtl"] .tpl * {'),
+                 ("section", '  [dir="rtl"] .tpl .cv-section,\n'),
+                 ("section", '  [dir="rtl"] .cv-sections-taj .cv-section,\n'),
+                 ("name", '  [dir="rtl"] .tpl .cv-name,\n'))
+
+
+def rtl_typography(choices: dict) -> str:
+    """RTL_TYPOGRAPHY, minus the 'CVT ' policy faces of every role a chosen
+    font APPLIES to (typography.render.effective: an unset name follows the
+    Headings font; `font_name: "template"` keeps the policy face).
+
+    typography.js reads each element's computed style BEFORE it sets
+    data-cvt (which switches the chosen-font rules on), so the first layout
+    still resolves the policy's stacks. Since the policy faces are declared
+    (item 3 above) that layout FETCHED them - Tajawal and IBM Plex for an
+    Arabic résumé whose every role had another font. The rendered result is
+    the same either way (the chosen rule wins once data-cvt is set); this
+    only stops the download of faces nobody will draw. A role left on
+    "Template default" keeps its policy face, and the undeclared bare names
+    stay as the pre-item-3 stack."""
+    from .typography.render import effective
+    eff = effective(choices)
+    css = RTL_TYPOGRAPHY
+    for role, anchor in _POLICY_RULES:
+        if not eff[role]["family"]:
+            continue
+        at = css.index(anchor)
+        end = css.index("}", at)
+        rule = re.sub(r'"CVT [^"]+", ', "", css[at:end])
+        css = css[:at] + rule + css[end:]
+    return css
+
+
 def policy_faces(for_pdf: bool) -> str:
     from .typography import built_faces
     from .typography.render import TYPOGRAPHY_CSS_URL, _inline_faces
@@ -433,8 +470,8 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
     #
     # for_pdf inlines the chosen faces instead of linking typography.css, for
     # the same reason font_head does (no base URL on the PDF path).
-    ty_head, ty_body = document_blocks(
-        typography_of(data)[0], lang_of(data), for_pdf=for_pdf)
+    choices = typography_of(data)[0]
+    ty_head, ty_body = document_blocks(choices, lang_of(data), for_pdf=for_pdf)
     # `dir` on <html> is what makes the whole document mirror: it is what the
     # logical CSS properties in the templates resolve against, and what the
     # RTL-scoped rules below select on. For lang="en" this emits dir="ltr",
@@ -444,7 +481,7 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
         lang=lang_of(data),
         dir=dir_of(data),
         fonts=font_head(for_pdf=for_pdf, lang=lang_of(data)),
-        rtl_css=(RTL_TYPOGRAPHY + policy_faces(for_pdf)) if dir_of(data) == "rtl" else "",
+        rtl_css=(rtl_typography(choices) + policy_faces(for_pdf)) if dir_of(data) == "rtl" else "",
         typography_head=ty_head,
         canvas=canvas,
         typography_body=ty_body,
