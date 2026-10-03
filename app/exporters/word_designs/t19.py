@@ -12,7 +12,7 @@ from docx.shared import Pt
 from ..docx_design import (
     Box, Ctx, bar, design, fmt_cell, pt, rated, run, skill_pct, tw,
 )
-from .common import ColumnPage, bullets, date_range, joined
+from .common import ColumnPage, bullets, date_range, joined, text_px
 
 INK, PLUM, BODY, META, MUTED, RULE, TRACK = ("1B1B22", "6B2A5A", "2E2E38", "3E3E48", "5A5A64",
                                             "D9D7DD", "E4E2E7")
@@ -36,7 +36,12 @@ def build(ctx: Ctx) -> None:
     bits = [x for x in (c["email"], c["phone"], c["address"], c["site"]) if x]
     bits += [s.get("label") for s in c["social"] if s.get("label")]
     top.pad_top = 14
-    ht = top.table([tw(T * 0.42), tw(T * 0.58)], borders={"top": (2, INK)})
+    # the title takes its natural width and the contact line the rest, as the
+    # PDF's flex row does: a fixed 42/58 split wrapped the contact line onto a
+    # second line in Word and set the page 13px low (measured, run 6)
+    tw_px = (text_px(ctx, "body", r["title"].upper(), 13.5, 3.2) + 24) if r["title"] else 0
+    tw_px = min(max(tw_px, T * 0.25), T * 0.42)
+    ht = top.table([tw(tw_px), tw(T - tw_px)], borders={"top": (2, INK)})
     a, b = ht.rows[0].cells
     fmt_cell(ctx, a, valign="bottom")
     fmt_cell(ctx, b, valign="bottom")
