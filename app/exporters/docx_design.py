@@ -977,6 +977,31 @@ def apply_chosen_sizes(document, data: dict, is_section, base_hp: int = 20) -> N
 
 
 MIN_MULT, MIN_MULT_AR = 0.75, 0.78
+#: An ALL-CAPS Latin line has no descenders and no marks: its ink is about
+#: the cap height, so its lines may sit as tight as the PDF's (a two-line
+#: caps name at CSS 0.82-1.0 in Archivo Black came out ~16px taller per line
+#: in Word at 0.75 - measured, run 6)
+MIN_MULT_CAPS = 0.6
+#: The share of the height a multiple below 1 removes that Word takes from
+#: ABOVE the first line (measured in Word, run 6; CSS takes half).
+WORD_UP_BELOW_SINGLE = 0.77
+
+
+def _all_caps(p, text: str) -> bool:
+    """Every letter of `p` is drawn as a capital: the text is upper case, or
+    every run that holds letters carries w:caps."""
+    letters = [c for c in text if c.isalpha()]
+    if not letters:
+        return False
+    if all(c.isupper() for c in letters):
+        return True
+    for r in p.iter(qn("w:r")):
+        t = "".join(x.text or "" for x in r.iter(qn("w:t")))
+        if any(c.isalpha() for c in t):
+            rpr = r.find(qn("w:rPr"))
+            if rpr is None or rpr.find(qn("w:caps")) is None:
+                return False
+    return True
 
 
 def true_lines(ctx: Ctx) -> None:
@@ -995,6 +1020,8 @@ def true_lines(ctx: Ctx) -> None:
         single = m._metrics(best)["line"]
         text = "".join(t.text or "" for t in p.iter(qn("w:t")))
         floor = MIN_MULT_AR if _ARABIC.search(text) else MIN_MULT
+        if floor == MIN_MULT and _all_caps(p, text):
+            floor = MIN_MULT_CAPS
         mult = max(floor, css / single)
         sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
         sp.set(qn("w:line"), str(int(round(240 * mult))))
@@ -1030,9 +1057,17 @@ def half_leading(ctx: Ctx) -> None:
             continue
         single = m._metrics(best)["line"]
         hl = (css - single) * size / 2           # pt
+        sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
+        if hl < 0:
+            # Below single, CSS moves the glyphs up by HALF the removed height;
+            # Word moves them up by ~77% of what its multiple removes (measured,
+            # run 6: modern-t7's 70px caps name rode 10-11px high once its
+            # lines matched the PDF's). The difference goes down as before.
+            mult = int(sp.get(qn("w:line"), 240)) / 240
+            word_up = WORD_UP_BELOW_SINGLE * max(0.0, 1 - mult) * single * size
+            hl = word_up - (single - css) * size / 2
         if hl <= 0.2:
             continue
-        sp = p.find(qn("w:pPr")).find(qn("w:spacing"))
         tw_hl = int(round(hl * 20))
         after0 = int(sp.get(qn("w:after"), 0))
         nxt = _next_below(p) if after0 < tw_hl else None
