@@ -11,7 +11,12 @@ Step 7 stays OFF. No golden updates without approval.
   to an existing Word and only ever stop the PID they started.
 - [x] R4-8c run.py (live-like) RUNNING on :5000 (python PIDs 20692 + reloader child 10132,
   started 2026-10-03 ~21:10); builder EN/AR check done, t11/t6/t19 AR phone fix (decision 60).
-- [ ] Merge prep (NOT executed): gate items + go-live list + plan.
+- [x] Merge prep (NOT executed): docs/MERGE_PLAN_WORD_FIDELITY.md. Waiting for the
+  user's approval of step A (merge) and, separately, step B (push main = deploy).
+  OPEN before step A: re-run suite batches 4-5 (typography_apply + calibration
+  page + word gates; autofit/overflow/void gates) - stopped by LOW MEMORY at
+  ~21:45 on 2026-10-03, not restarted per Claude Code's rule. Decision for the
+  user: docs/review/ (16 MB) ships in the Docker image (docs/ not excluded).
 Two WINWORD windows open at start (19:24, one = the user's own Arabic doc
 "كحلي ذهبي-2") are the USER'S - never close them.
 

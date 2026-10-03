@@ -50,6 +50,16 @@ REQUIRED_GLOBS = [
     "data/sample_resume_ar.json",
     # The DOCX export's master documents (app/config.py::WORD_MASTERS_DIR).
     "word_masters/*.docx",
+    # Word fidelity: the 24 per-template Word designs, the measured layouts
+    # and themes they fall back on, and the step-7 calibration table.
+    "app/exporters/word_designs/*.py",
+    "app/word_layouts.json",
+    "app/word_themes.json",
+    "app/typography/calibration.json",
+    # The builder's seed résumé (store.seed_resume -> config.DEMO_RESUME_PATHS):
+    # a new visitor's first document. Missing, the builder 500s on first load.
+    "data/demo_resume.json",
+    "data/demo_resume_ar.json",
 ]
 
 # Paths that MUST NOT ship: local state and developer material.
