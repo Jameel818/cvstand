@@ -72,7 +72,9 @@ def build(ctx: Ctx) -> None:
     def education(b, i, ed):
         if i:
             b.pad_top += 10
-        card = block(ctx, b, W, fill=CARD, pad=(12, 14, 12, 14))
+        # Word sets the card's 1.4 lines ~6px taller than the PDF: the
+        # padding gives it back (measured, run 6 - as modern-t5)
+        card = block(ctx, b, W, fill=CARD, pad=(9, 14, 9, 14))
         dates = [x for x in (ed["start"], "—" if ed["start"] and ed["end"] else "", ed["end"])
                  if x]
         # the date column is as wide as its widest line (flex-shrink:0) + the
@@ -110,12 +112,17 @@ def build(ctx: Ctx) -> None:
 
     # ---- main column
     T = page.main_text_px
+    # Arabic: the Tajawal name cannot be set as tight in Word as the PDF's 0.98
+    # (no-collision floor) and came out ~12px taller; the gaps under it give
+    # that back (measured, run 6 - as modern-t5)
+    ar = ctx.rtl
     top = page.main_row(pad_top=6, pad_x=(GAP + 6, PAD + 6))
     run(ctx, top.p(line=0.98), r["name"], "name", size=50, color=INK, caps=True, spacing=-1)
     if r["title"]:
-        run(ctx, top.p(before=8), r["title"], size=17, color="333333", caps=True, spacing=1)
+        run(ctx, top.p(before=0 if ar else 8), r["title"], size=17, color="333333", caps=True,
+            spacing=1)
     if r["achievements"]:
-        box = page.main_row(pad_top=10)
+        box = page.main_row(pad_top=6 if ar else 10)
         ach = [a for a in r["achievements"] if a["metric"]]
         n = max(1, len(ach))
         tbl = box.table([tw(T) // n] * n, borders={"top": (1, RULE), "bottom": (1, RULE)})
@@ -132,7 +139,7 @@ def build(ctx: Ctx) -> None:
     for j, job in enumerate(r["experience"]):
         box = page.main_row(pad_top=10 if j == 0 else 14)
         if j == 0:
-            bar(box, t("Professional Experience"), INK, "FFFFFF", 1, T, after=4)
+            bar(box, t("Professional Experience"), INK, "FFFFFF", 1, T, after=12)
         tbl = box.table([tw(6 + 52 + 16), tw(T - 74)])
         d, body = tbl.rows[0].cells
         fmt_cell(ctx, d, pad=(0, 6, 0, 16))
@@ -156,6 +163,8 @@ def build(ctx: Ctx) -> None:
         bullets(ctx, bb, job["bullets"], size=11.5, color="333333", line=1.5)
         bb.finish()
 
+    # (the bars' gaps below: the PDF's content sits ~8px further below each
+    # dark bar than Word gave - measured, run 6)
     if r["skills"]:
         skills = r["skills"]
         G = T - 8                                   # margin 6px 4px 0
@@ -163,7 +172,7 @@ def build(ctx: Ctx) -> None:
         for rr in range((len(skills) + 2) // 3):
             box = page.main_row(pad_top=10 if rr == 0 else 0)
             if rr == 0:
-                bar(box, t("Creative & Technical Skills"), INK, "FFFFFF", 1, T, after=6)
+                bar(box, t("Creative & Technical Skills"), INK, "FFFFFF", 1, T, after=13)
             tbl = box.table([tw(col)] * 3, ind=tw(4))
             for k in range(3):
                 cell = tbl.rows[0].cells[k]
@@ -193,7 +202,7 @@ def build(ctx: Ctx) -> None:
 
     if r["recognition"]:
         box = page.main_row(pad_top=10)
-        bar(box, t("Certifications"), INK, "FFFFFF", 1, T, after=4)
+        bar(box, t("Certifications"), INK, "FFFFFF", 1, T, after=12)
         recs = r["recognition"]
         col = (T - 12 - 26) / 2
         tbl = box.table([tw(col + 26 + 6), tw(col + 6)], rows=(len(recs) + 1) // 2)

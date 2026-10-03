@@ -197,7 +197,11 @@ def anchored_run(name: str, sp: Sp, vml_shape: str, *, rel_h: str, rel_v: str, z
     the VML z-index (negative: behind the text)."""
     cx, cy = int(round(sp.w * EMU)), int(round(sp.h * EMU))
     behind = 1 if z < 0 else 0
-    rh = max(0, _Z_BASE + z) if z < 0 else _Z_BASE + 1024 + z
+    # Word orders shapes by relativeHeight within its own 251658240+ range;
+    # small values (1, 2, ...) for the behind-text fills came out in REVERSE
+    # (modern-t24's page frame covered its full-height side panel, measured
+    # in Word, run 6). Behind: 251658240 + n, the VML z-index's order kept.
+    rh = 2 * _Z_BASE + z if z < 0 else _Z_BASE + 1024 + z
     drawing = (
         f'<wp:anchor distT="0" distB="0" distL="0" distR="0" simplePos="0" '
         f'relativeHeight="{rh}" behindDoc="{behind}" locked="0" '

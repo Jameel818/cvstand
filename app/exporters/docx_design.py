@@ -749,7 +749,7 @@ def header_picture(ctx: Ctx, path, *, x_pt: float, y_pt: float, w_pt: float, h_p
         from .docx_dml import EMU, _next_id
         anchor = parse_xml(
             '<wp:anchor xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
-            'distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="5000" '
+            'distT="0" distB="0" distL="0" distR="0" simplePos="0" relativeHeight="251700000" '
             'behindDoc="1" locked="1" layoutInCell="0" allowOverlap="1">'
             '<wp:simplePos x="0" y="0"/>'
             f'<wp:positionH relativeFrom="page"><wp:posOffset>{int(round(x_pt * EMU))}'
