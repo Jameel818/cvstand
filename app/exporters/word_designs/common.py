@@ -239,6 +239,8 @@ class SidebarPage:
         from ..docx_measure import Measure, _before, _set_before
         sec = self.ctx.doc.sections[0]
         if reserve_pt is None:
+            reserve_pt = getattr(self, "main_reserve_pt", None)
+        if reserve_pt is None:
             # measured: the Arabic estimate runs 20-50pt short on a full page
             # (joined-form widths under-count Arabic line lengths a little)
             reserve_pt = 50.0 if self.ctx.rtl else 10.0

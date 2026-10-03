@@ -108,6 +108,11 @@ def build(ctx: Ctx) -> None:
     # column ~20px too high)
     page.center_side(reserve_pt=8.0 if ctx.rtl else None)
     page.fit_side(heads)          # ... and a full rail gives up gaps, never spills
+    # the main column's near-one-page fit: in Arabic the default 50pt reserve
+    # squeezed this column well past what the page needs; 10pt let it spill
+    # (measured in Word, run 6)
+    if ctx.rtl:
+        page.main_reserve_pt = 20.0
 
     # ---- main column
     T = page.main_text_px
