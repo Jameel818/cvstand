@@ -156,7 +156,10 @@ def build(ctx: Ctx) -> None:
             run(ctx, p, dates, "bold", size=11, color=INK)
         sub = joined([job["role"], job["location"]], " · ") if job["company"] else job["location"]
         if sub:
-            run(ctx, eb.p(before=1, after=5), sub, "bold", size=13, color=INK)
+            # English: the bullets sit ~3px further below this line in the PDF
+            # (measured in Word, run 6)
+            run(ctx, eb.p(before=1, after=5 if ctx.rtl else 8), sub, "bold", size=13,
+                color=INK)
         bullets(ctx, eb, job["bullets"], size=12, color=INK, line=1.5)
         eb.finish()
 
@@ -175,7 +178,9 @@ def build(ctx: Ctx) -> None:
             if v:
                 # a <br> line inside the block keeps the page's 16px strut
                 # (no font-size on .tpl): 16 x Archivo's 1.088 line, not 12px's
-                run(ctx, eb.p(line=16 * 1.088 / 12), v, size=12, color=INK)
+                # (English lines ran ~1.5px short each in Word at 1.088 - run 6)
+                run(ctx, eb.p(line=16 * (1.088 if ctx.rtl else 1.18) / 12), v, size=12,
+                    color=INK)
         eb.finish()
 
     if r["skills"]:

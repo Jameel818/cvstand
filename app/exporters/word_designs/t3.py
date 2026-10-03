@@ -80,7 +80,8 @@ def build(ctx: Ctx) -> None:
 
     def row(**kw):
         box = page.main_row(pad_top=gap[0], **kw)
-        gap[0] = 22
+        # English rows ran ~1px per 100px long in Word (measured, run 6)
+        gap[0] = 22 if ctx.rtl else 20
         return box
 
     if r["summary"]:
