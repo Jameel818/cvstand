@@ -23,6 +23,7 @@ import re
 from functools import lru_cache
 
 from docx.oxml.ns import qn
+_MC = "http://schemas.openxmlformats.org/markup-compatibility/2006"
 
 _STYLE_FACE = {"CVName": "name", "CVHeading": "heading", "CVRole": "role",
                "CVBodyBold": "body_bold", "CVMetric": "heading", "CVAccentText": "body"}
@@ -189,9 +190,16 @@ class Measure:
                         ph = int(ext.get("cy")) / 12700
                         lines[-1][1] = max(lines[-1][1], ph / max(mult, 1e-6))
                         lines[-1][0] += int(ext.get("cx")) / 12700
-                elif tag == "pict":
+                elif tag in ("pict", "AlternateContent"):
                     # an INLINE VML shape (a bar) takes its height; an
-                    # absolutely positioned one (a node, a page fill) none
+                    # absolutely positioned one (a node, a page fill) none.
+                    # Since run 6 every design shape is DrawingML with this
+                    # VML as its mc:Fallback (docx_dml): measured from the
+                    # fallback, so the estimate is exactly what it was.
+                    if tag == "AlternateContent":
+                        child = child.find(f"{{{_MC}}}Fallback/{qn('w:pict')}")
+                        if child is None:
+                            continue
                     shape = next(iter(child), None)
                     style = shape.get("style", "") if shape is not None else ""
                     if "position:absolute" not in style:

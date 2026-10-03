@@ -149,3 +149,22 @@ def test_t22_rail_word_fills_the_rail(lang):
     l, t, r, b = im.getchannel("A").point(lambda a: 255 if a > 128 else 0).getbbox()
     assert (b - t) / 3 >= 0.95 * 1043.5, (lang, (b - t) / 3)
     assert l > 0 and r < im.width                     # not clipped by the strip
+
+
+def test_the_estimator_measures_wrapped_shapes_as_before():
+    """docx_measure read inline VML (w:pict) for a skill bar's height; run 6
+    wraps it in mc:AlternateContent. The estimate must be what it was, or the
+    near-one-page fit drifts silently (found while wrapping: every inline bar
+    stopped counting)."""
+    from app.exporters.docx_measure import Measure
+    doc, resolved = docx_design.render(EN, "modern-t2", None)
+    root = doc.element.body
+    p = next(el for el in root.iter(W + "p")
+             if el.find(f".//{MC}AlternateContent") is not None
+             and el.find(f".//{MC}AlternateContent//{WP}inline") is not None)
+    import copy
+    q = copy.deepcopy(p)
+    for alt in list(q.iter(MC + "AlternateContent")):
+        alt.getparent().replace(alt, alt.find(f"{MC}Fallback/{W}pict"))
+    m = Measure(resolved)
+    assert m.paragraph(p, 200) == m.paragraph(q, 200) > 0
