@@ -9,7 +9,8 @@ Step 7 stays OFF. No golden updates without approval.
 - [x] R4-8b all 24 re-measured (scratch a1d5eef3.../ovl.py r5 + review5.py r5);
   review page + Desktop folder refreshed. shots.py/ovl.py now refuse to attach
   to an existing Word and only ever stop the PID they started.
-- [ ] R4-8c restart run.py (live-like), real builder EN/AR check, leave running.
+- [x] R4-8c run.py (live-like) RUNNING on :5000 (python PIDs 20692 + reloader child 10132,
+  started 2026-10-03 ~21:10); builder EN/AR check done, t11/t6/t19 AR phone fix (decision 60).
 - [ ] Merge prep (NOT executed): gate items + go-live list + plan.
 Two WINWORD windows open at start (19:24, one = the user's own Arabic doc
 "كحلي ذهبي-2") are the USER'S - never close them.

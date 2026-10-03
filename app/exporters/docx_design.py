@@ -62,6 +62,7 @@ _ARABIC = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]")
 RPR_ORDER = docx_theme.RPR_ORDER
 _MULT = re.compile(r"([0-9][0-9.,]*)([×+])")   # a stat like "2×"
 _RANGE = re.compile(r"(\S+)(\s+[–—]\s+)(\S+)")   # a date range: start – end
+_SEP = " · "                                      # a joined list: a · b · c
 
 ROLE_STYLE = {"body": None, "bold": "CVBodyBold", "name": "CVName", "heading": "CVHeading",
               "role": "CVRole", "metric": "CVMetric", "accent": "CVAccentText"}
@@ -297,6 +298,21 @@ def run(ctx: Ctx, para, text: str, role: str = "body", *, size=None, color=None,
         # when the neutral sign is its own right-to-left run
         run(ctx, para, m.group(1), role, **kw)
         return run(ctx, para, m.group(2), role, rtl=True, **kw)
+    if (ctx.rtl and not rtl and _SEP in (text or "") and _ARABIC.search(text)
+            and any(p and not _ARABIC.search(p) for p in text.split(_SEP))):
+        # A joined line ("555-0138-64 · laila@... · دبي") in an Arabic
+        # document: one run holding Arabic gets w:rtl, and Word then reorders
+        # the phone inside it ("64-0138-555" - found in t11's contact line,
+        # run 5). Each item is its own run (w:rtl only where it has Arabic),
+        # each separator a right-to-left run, so the items read right to left
+        # as the PDF draws them.
+        parts = text.split(_SEP)
+        for i, part in enumerate(parts):
+            if i:
+                last = run(ctx, para, _SEP, role, rtl=True, **kw)
+            if part:
+                last = run(ctx, para, part, role, **kw)
+        return last
     r = para.add_run(text)
     rpr = r._r.get_or_add_rPr()
     sid = ROLE_STYLE[role]

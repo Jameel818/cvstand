@@ -503,3 +503,18 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     failed once in a batch ("Saved" where "Unsaved changes" was expected) and
     passed 5/5 alone and in the first batch run: an intermittent timing flake
     under load, recorded, not changed.
+60. **R4-8c real builder check found one Word defect: t11's Arabic contact
+    line drew the phone reversed ("64-0138-555").** Local run.py (live-like:
+    GET /export/pdf -> 405 Allow: POST), fresh browser contexts, "Use this" +
+    Download Word/PDF for t2 t4 t11 t22, EN + AR, then Word's own PDF of each
+    download. The contact line is ONE joined run ("phone · email · دبي ·
+    site"); holding Arabic, it carried w:rtl, and Word reorders digit groups
+    inside an RTL run (the same trap as audit X13). docx_design.run() now
+    splits a joined " · " line in an Arabic document into one run per item
+    (w:rtl only where it has Arabic) with right-to-left separators - t6, t11
+    and t19 build their contact line this way; all three now match the PDF in
+    Word (phone 555-0138-64, same item order). English unchanged (one run).
+    tests/test_docx_joined_rtl.py (fails without the fix). Everything else in
+    the check held: Word draws each design (8/13/5/16 design shapes), Arabic
+    is w:bidi + w:rtl + w:bidiVisual, Arabic PDFs embed only Tajawal + IBM
+    Plex Sans Arabic, t4 AR reference phones read 555-0100-22 in PDF and Word.
