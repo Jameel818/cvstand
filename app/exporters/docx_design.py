@@ -881,8 +881,13 @@ def finish_rtl(doc) -> None:
                 break
         else:
             sect.append(el)
-    for part in [doc.element.body] + [s.header._element for s in doc.sections] + \
-            [s.first_page_header._element for s in doc.sections]:
+    # only headers that exist: reading `section.header._element` CREATES a
+    # header part with a default paragraph (~14pt), which pushed every Arabic
+    # page without header shapes down - modern-t13's band sat 23px low
+    # (measured in Word, run 6)
+    hdrs = [h for s in doc.sections for h in (s.header, s.first_page_header)
+            if not h.is_linked_to_previous]
+    for part in [doc.element.body] + [h._element for h in hdrs]:
         for p in part.iter(qn("w:p")):
             _put(_ppr(p), _w("bidi"), PPR_ORDER)
         for tbl in part.iter(qn("w:tbl")):

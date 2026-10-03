@@ -51,8 +51,11 @@ def build(ctx: Ctx) -> None:
         rc = tbl.rows[0].cells[1]
         fmt_cell(ctx, rc, valign="bottom")
         rb = Box(ctx, rc, 0)
+        # Arabic: Word spaced these (mostly Latin) lines ~4px wider each than
+        # the PDF's, the taller block pushing the whole band ~25px down
+        # (measured in Word, run 6): the PDF's pitch
         for b in bits:
-            run(ctx, rb.p(align="end", line=1.8), b, size=11.5, color=SOFT)
+            run(ctx, rb.p(align="end", line=1.48 if ar else 1.8), b, size=11.5, color=SOFT)
         rb.finish()
     if r["achievements"]:
         rule = band.p()
