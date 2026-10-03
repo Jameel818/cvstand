@@ -80,6 +80,9 @@ def _export(live_server, data, key) -> bytes:
 
 #: Template -> the ENGLISH text it draws with -webkit-text-stroke.
 STROKED = {"modern-t22": "RESUME"}
+#: Fixed artwork that never follows a font choice (run 6 user requirement):
+#: modern-t22's Arabic rail word is Cairo Black whatever the Fonts panel says.
+FIXED_FACES = {("modern-t22", "ar"): {"Cairo-Black"}}
 
 
 def _type3_chars(font) -> str:
@@ -141,6 +144,9 @@ def test_pdf_embeds_exactly_the_chosen_faces(live_server, cid, base, key,
     required = {face(*f)["postscript_name"] for f in (name, heading, body)}
     allowed = {face(*f)["postscript_name"]
                for f in pdf_faces(typography_of(data)[0], data.get("lang") or "en")}
+    fixed = FIXED_FACES.get((key, data.get("lang") or "en"), set())
+    assert fixed <= fonts, f"the fixed rail face is missing: {fixed - fonts}"
+    allowed |= fixed
     for t3 in [f for f in fonts if f.startswith("<Type3:")]:
         assert key in STROKED, f"{key} strokes no text, yet embeds a Type3: {t3}"
         chars = t3[len("<Type3:"):-1]

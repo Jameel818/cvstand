@@ -61,7 +61,10 @@ FONT_FILE = re.compile(r"/static/fonts/((?:web|ttf)/[^?#]+)")
 COLLECT = """() => {
   const tpl = document.querySelector('.tpl');
   return [tpl, ...tpl.querySelectorAll('*')].map((el, i) => {
-    const own = [...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim());
+    // modern-t22's rail word is fixed artwork that never follows a choice (run 6
+    // user requirement; tests/e2e/test_t22_rail.py holds it to that)
+    const own = !el.closest('.vrail')
+      && [...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim());
     const cs = getComputedStyle(el);
     return {
       i, own,
@@ -106,7 +109,7 @@ def _probe(pg, role: str) -> str:
     ok = pg.evaluate("""([sel]) => {
       const tpl = document.querySelector('.tpl');
       const pool = sel ? [...tpl.querySelectorAll(sel + ', ' + sel + ' *')]
-                       : [...tpl.querySelectorAll('*')].filter(e => !e.closest('.cv-name, .cv-section'));
+                       : [...tpl.querySelectorAll('*')].filter(e => !e.closest('.cv-name, .cv-section, .vrail'));
       const el = pool.find(e => [...e.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim()));
       if (!el) return false;
       el.setAttribute('data-probe', sel ? 'name' : 'body');
@@ -210,7 +213,7 @@ SIZE_CASES = [("ats-t1", "en"), ("ats-t1", "ar"), ("modern-t1", "en"),
 
 SIZES_JS = """() => {
   const tpl = document.querySelector('.tpl');
-  const own = el => [...el.childNodes].filter(n => n.nodeType === 3)
+  const own = el => el.closest('.vrail') ? 0 : [...el.childNodes].filter(n => n.nodeType === 3)
                      .reduce((s, n) => s + n.nodeValue.trim().length, 0);
   const all = [tpl, ...tpl.querySelectorAll('*')].map(el => ({
     el, text: own(el), size: parseFloat(getComputedStyle(el).fontSize),
