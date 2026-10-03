@@ -25,7 +25,7 @@ def build(ctx: Ctx) -> None:
     r, t = ctx.r, ctx.t
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(pt(PAD))
-    sec.bottom_margin = Pt(pt(PAD + 32))
+    sec.bottom_margin = Pt(pt(PAD))     # the frame; the column's own 32px padding is fit_side's
     page = SidebarPage(ctx, SIDE_W, side_fill=NAVY, side_pad=(32, 26, 32, 26),
                        main_pad_x=(GAP, PAD), full_height_fill=False, ind_px=PAD)
     # the grey frame and the inset navy column, on every page
@@ -69,8 +69,11 @@ def build(ctx: Ctx) -> None:
                 heads.append(pill(ctx, b, t("EDUCATION"), W, fill=INK, color="FFFFFF", size=16,
                                   before=20, after=20, spacing=0.5, bg=NAVY).spacer)
             # a grey card: the stacked dates, then degree / school
+            # Word sets the card's two 1.4 lines ~6px taller than the PDF: the
+            # padding gives it back, so the card - and its corner masks, placed
+            # at the estimated bottom - match (measured, run 6)
             card = rounded_block(ctx, b, W, fill=CARD, bg=NAVY, radius=12,
-                                 pad=(12, 14, 12, 14))
+                                 pad=(9, 14, 9, 14))
             dates = [x for x in (ed["start"], "—" if ed["start"] and ed["end"] else "",
                                  ed["end"]) if x]
             tbl = card.table([tw(44), tw(W - 28 - 44)])   # 32px of date + the 12px gap
@@ -96,13 +99,18 @@ def build(ctx: Ctx) -> None:
 
     # ---- main column
     T = page.main_text_px
-    top = page.main_row(pad_top=8, pad_x=(GAP + 6, PAD + 6))
+    # Arabic: Word cannot set the two-line Tajawal name as tight as the PDF's
+    # 0.95 (its multiple stops at the no-collision floor), so the block came
+    # out ~30px taller and pushed the whole column down (measured in Word,
+    # run 6). The gaps around it give that height back.
+    ar = ctx.rtl
+    top = page.main_row(pad_top=3 if ar else 8, pad_x=(GAP + 6, PAD + 6))
     for part in r["name"].split(" ", 1):
         run(ctx, top.p(line=0.95), part, "name", size=52, color=INK, caps=True, spacing=-1)
     if r["title"]:
-        run(ctx, top.p(before=8), r["title"], size=18, color="333333", spacing=1)
+        run(ctx, top.p(before=0 if ar else 8), r["title"], size=18, color="333333", spacing=1)
     if r["achievements"]:
-        box = page.main_row(pad_top=16)
+        box = page.main_row(pad_top=0 if ar else 16)
         n = len(r["achievements"])
         tbl = box.table([tw(T) // n] * n, borders={"top": (1, RULE), "bottom": (1, RULE)})
         for cell, a in zip(tbl.rows[0].cells, r["achievements"]):
@@ -117,7 +125,9 @@ def build(ctx: Ctx) -> None:
     H = "role" if ctx.rtl else "bold"
     node = [0]
     for j, job in enumerate(r["experience"]):
-        box = page.main_row(pad_top=16 if j == 0 else 12)
+        # Arabic entries run ~2px taller each in Word: the gaps between them
+        # give it back (measured, run 6)
+        box = page.main_row(pad_top=16 if j == 0 else (9 if ar else 12))
         if j == 0:
             pill(ctx, box, t("PROFESSIONAL EXPERIENCE"), T, fill=INK, color="FFFFFF", size=15,
                  pad_y=12, radius=16, spacing=1, after=16, bg=FRAME)

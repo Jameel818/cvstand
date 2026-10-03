@@ -407,9 +407,24 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
         r = max(1.0, min(radius_px, h_px / 2, width_px / 2))
         k = 100
         x_l, x_r = pt(-pad_left_px), pt(width_px - pad_left_px - r)
-        for key, x, y in (("tl", x_l, 0.0), ("tr", x_r, 0.0), ("bl", x_l, pt(h_px - r)),
-                          ("br", x_r, pt(h_px - r))):
-            vml_anchored(first, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
+        # The bottom masks: from the block's TOP they rest on the estimated
+        # height, and a block Word sets a few px taller (modern-t5's education
+        # cards: a square strip showed under the rounded corners, run 6) was
+        # left with its corners rounded above its real bottom. When the block
+        # ends in an empty spacer paragraph after a table (its bottom padding,
+        # as space before), they hang on THAT paragraph instead: its own
+        # spacing is known exactly, nothing above is estimated.
+        last_el = tc.findall(qn("w:p"))[-1]
+        prev = last_el.getprevious()
+        bottom_on, y_b = first, pt(h_px - r)
+        if (last_el is not first_el and prev is not None and prev.tag == qn("w:tbl")
+                and not "".join(t.text or "" for t in last_el.iter(qn("w:t"))).strip()):
+            sp = last_el.find(qn("w:pPr") + "/" + qn("w:spacing"))
+            before = int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0.0
+            bottom_on, y_b = Paragraph(last_el, inner.c), max(0.0, before + 0.3 - pt(r))
+        for key, on, x, y in (("tl", first, x_l, 0.0), ("tr", first, x_r, 0.0),
+                              ("bl", bottom_on, x_l, y_b), ("br", bottom_on, x_r, y_b)):
+            vml_anchored(on, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
                          path=_CORNER[key].format(r=k), coords=f"{k},{k}", z=20)
     ctx.after_lines.append(go)
 
