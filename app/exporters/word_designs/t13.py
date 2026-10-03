@@ -39,8 +39,13 @@ def build(ctx: Ctx) -> None:
     lb = Box(ctx, left, 0)
     run(ctx, lb.p(line=1.0), r["name"], "name", size=46, color="FFFFFF", caps=True,
         spacing=-1.2)
+    # Arabic: Word cannot set the Tajawal name as tight as the PDF's 1.0 (the
+    # no-collision floor) - the block came out ~13px taller and pushed the
+    # band down (measured, run 6); the gaps under it give that back
+    ar = ctx.rtl
     if r["title"]:
-        run(ctx, lb.p(before=9), r["title"], size=14, color=GOLD, caps=True, spacing=3.6)
+        run(ctx, lb.p(before=0 if ar else 9), r["title"], size=14, color=GOLD, caps=True,
+            spacing=3.6)
     lb.finish()
     if right:
         rc = tbl.rows[0].cells[1]
@@ -52,7 +57,8 @@ def build(ctx: Ctx) -> None:
     if r["achievements"]:
         rule = band.p()
         tiny(rule)
-        fmt_p(ctx, rule, before=22, after=16, border={"bottom": (1, BAND_RULE, 0)})
+        fmt_p(ctx, rule, before=17 if ar else 22, after=16,
+              border={"bottom": (1, BAND_RULE, 0)})
         n = len(r["achievements"])
         st = band.table([tw(T) // n] * n)
         for k, (cell, a) in enumerate(zip(st.rows[0].cells, r["achievements"])):

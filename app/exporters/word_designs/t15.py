@@ -29,17 +29,25 @@ def build(ctx: Ctx) -> None:
     side = page.side
     W = SIDE_PX - 60
     p = side.p(align="start")
-    photo_run(ctx, p, size_px=200 if ctx.rtl else 268, placeholder="E8DCC0")
+    # 268px in both languages, as the PDF (Arabic was 200: the side column
+    # started ~60px higher than the PDF's - measured, run 6)
+    photo_run(ctx, p, size_px=268, placeholder="E8DCC0")
+
+    heads = []
 
     def section(label, items, write):
         if not items:
             return
         st = Stack(ctx, side, W)
         for i, it in enumerate(items):
-            b = st.row(pad_top=(28 if label == first[0] else 13) if i == 0 else 0)
+            b = st.row()
             if i == 0:
-                run(ctx, b.p(after=8, line=1.25), label, "heading", size=19, color=AMBER,
-                    spacing=1)
+                # the gap as paragraph spacing (not the row's cell margin), so
+                # fit_side can shrink it
+                b.pad_top = 28 if label == first[0] else 13
+                hp = b.p(after=8, line=1.25)
+                run(ctx, hp, label, "heading", size=19, color=AMBER, spacing=1)
+                heads.append(hp)
             write(b, i, it)
         st.done()
 
@@ -91,9 +99,16 @@ def build(ctx: Ctx) -> None:
     for label, items, write in present:
         section(label, items, write)
 
+    # the full-size photo (as the PDF) can leave a long Arabic column too tall
+    # for the page: it gives up the gaps above its headings, never spills (the
+    # Arabic estimate of this column ran ~30pt short - measured, run 6)
+    page.fit_side(heads, reserve_pt=45.0 if ctx.rtl else 12.0)
+
     # ---- main column: the name on the band, then the flow from 300px down
     T = page.main_text_px
-    top = page.main_row(pad_top=112)
+    # the name block sits 10px nearer the start edge than the flow below
+    # (measured in the PDF, run 6: x 368 vs 378)
+    top = page.main_row(pad_top=112, pad_x=(28, 40))
     run(ctx, top.p(line=1.0), r["name"], "name", size=52, color=GREEN, spacing=0.5, caps=True)
     if r["title"]:
         run(ctx, top.p(before=12), r["title"], "bold", size=16, color="3F2C02")

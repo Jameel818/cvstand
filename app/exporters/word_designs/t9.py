@@ -103,7 +103,10 @@ def build(ctx: Ctx) -> None:
     if r["languages"]:
         rail_box(t("Languages"), lines([joined([lg["name"], lg["level"]], " — ")
                                         for lg in r["languages"]]))
-    page.center_side()            # justify-content:center in the PDF
+    # justify-content:center in the PDF. The Arabic estimate is no longer short
+    # here (measured in Word, run 6: the default 30pt reserve left the Arabic
+    # column ~20px too high)
+    page.center_side(reserve_pt=8.0 if ctx.rtl else None)
     page.fit_side(heads)          # ... and a full rail gives up gaps, never spills
 
     # ---- main column

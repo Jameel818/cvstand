@@ -125,7 +125,9 @@ def build(ctx: Ctx) -> None:
         for i, sk in enumerate(skills):
             cell = tbl.rows[i // 2].cells[i % 2]
             fmt_cell(ctx, cell, pad=(0, 0, 0, 24 if i % 2 == 0 else 0))
-            cb = Box(ctx, cell, 0, pad_top=8 if i >= 2 else 0)
+            # Word sets each name + bar row ~2px taller than the PDF (measured,
+            # run 6): the gap between rows gives it back
+            cb = Box(ctx, cell, 0, pad_top=6 if i >= 2 else 0)
             p = cb.p(tabs=[(col, "end", None)])
             run(ctx, p, sk["name"], size=11.5, color=INK)
             if rated(sk):
