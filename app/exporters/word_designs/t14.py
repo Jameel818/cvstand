@@ -96,7 +96,10 @@ def build(ctx: Ctx) -> None:
     def flag(b, label):
         """383px orange flag from the page edge: 366px block + the 17px that
         overhang the navy column (an anchored shape, as t4's ribbon)."""
-        fb = block(ctx, b, SIDE_PX, fill=ORANGE, pad=(8, 22, 8, 0))
+        # the PDF centres the label across the whole 383px flag (overhang
+        # included): 17px more start padding centres it there (it sat 8.7px
+        # short - measured, run 6)
+        fb = block(ctx, b, SIDE_PX, fill=ORANGE, pad=(8, 39, 8, 0))
         p = fb.p(align="center")
         run(ctx, p, label, "heading", size=22, color="FFFFFF", caps=True, spacing=6)
         line_px = 22 * 1.5
@@ -130,7 +133,9 @@ def build(ctx: Ctx) -> None:
         run(ctx, b.p(ind_start=78, ind_end=24), value, size=12.5, color=INK)
 
     def skill(b, i, sk):
-        p = b.p(before=9 if i else 0, ind_start=78, tabs=[(SIDE_PX - 24, "end", None)])
+        # the level word ends 7px in from the column edge in the PDF (it sat
+        # 17px short at SIDE_PX - 24 - measured, run 6)
+        p = b.p(before=9 if i else 0, ind_start=78, tabs=[(SIDE_PX - 7, "end", None)])
         run(ctx, p, sk["name"], "bold", size=12.5, color=INK)
         if sk["level"]:
             run(ctx, p, "\t", size=11)
@@ -154,7 +159,9 @@ def build(ctx: Ctx) -> None:
         run(ctx, box.p(), label, role, size=25, color="FFFFFF", spacing=1)
         rule = box.p()
         tiny(rule)
-        fmt_p(ctx, rule, before=9, after=14, border={"bottom": (1, RULE, 0)})
+        # the first entry sits ~3px closer to the rule in the PDF (measured in
+        # Word, run 6)
+        fmt_p(ctx, rule, before=9, after=11, border={"bottom": (1, RULE, 0)})
 
     node = [0]
 
@@ -193,7 +200,7 @@ def build(ctx: Ctx) -> None:
         entry(box, job["role"], joined([job["company"], job["location"]], " · "),
               date_range(job["start"], job["end"]), " ".join(job["bullets"]))
     if r["recognition"] or r["tools"]:
-        box = page.main_row(fill=NAVY, pad_top=16)
+        box = page.main_row(fill=NAVY, pad_top=11)    # 16 sat 5px low (run 6)
         # the label is not a .cv-section in the PDF (Arabic: the body face)
         nhead(box, t("Recognition") if r["recognition"] else t("Tools"),
               role="heading" if not ctx.rtl else "role")
