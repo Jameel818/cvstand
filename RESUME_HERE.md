@@ -2,7 +2,8 @@
 - Save confirmed: tree clean, local = origin at 965fc7d before this note.
 - Server was NOT running at start (run 6's process had ended); restarted
   `venv/Scripts/python run.py` (live-like, :5000) and LEFT RUNNING:
-  /builder 200, GET /export/pdf 405.
+  /builder 200, GET /export/pdf 405. LATER KILLED by Claude Code for low
+  system memory while idle - NOT running now; restart only when asked.
 - Status unchanged from run 6 below: 46/48 <= 10% (t9 EN 14.58, t9 AR 12.65);
   t22 rail done (Cairo Black 900, fixed artwork); DrawingML+VML done.
 - STILL PENDING: suite batch 5 (merge plan §1a), modern-t9 EN/AR fit,
