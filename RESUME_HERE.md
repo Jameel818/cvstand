@@ -1,3 +1,15 @@
+# RESUME HERE — 2026-10-05 (status-only session; NO fixes; `feature/word-fidelity`; NOT merged; main untouched)
+- Save confirmed: tree clean, local = origin at 965fc7d before this note.
+- Server was NOT running at start (run 6's process had ended); restarted
+  `venv/Scripts/python run.py` (live-like, :5000) and LEFT RUNNING:
+  /builder 200, GET /export/pdf 405.
+- Status unchanged from run 6 below: 46/48 <= 10% (t9 EN 14.58, t9 AR 12.65);
+  t22 rail done (Cairo Black 900, fixed artwork); DrawingML+VML done.
+- STILL PENDING: suite batch 5 (merge plan §1a), modern-t9 EN/AR fit,
+  then the merge decision (user's call). Step 7 OFF. No golden updates.
+
+---
+
 # RESUME HERE — 2026-10-04 (WORD FIDELITY run 6 on `feature/word-fidelity`; NOT merged; main untouched)
 
 ## RUN 6 - portability, the t22 rail, the 90% target (queue "Run 6")
