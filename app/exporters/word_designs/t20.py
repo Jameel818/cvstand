@@ -30,8 +30,13 @@ def build(ctx: Ctx) -> None:
     p = side.p()
     photo = photo_run(ctx, p, size_px=W, height_px=214, shape="rect", placeholder="DCD9C8",
                       ring_px=1, ring="CFCBB6")
-    # flex-shrink in the PDF: a full column takes height from the photo block
-    page.shrink_side_photo(photo)
+    # flex-shrink in the PDF: a full column takes height from the photo block,
+    # down to nothing (overflow:hidden = min-height 0): with the column full it
+    # is a thin strip there; a 40px floor left a beige block in Word (run 7).
+    # Not below 22px: the picture's paragraph keeps its own text line (~16pt),
+    # so a thinner picture saves nothing and the estimate ran short (an empty
+    # page 2)
+    page.shrink_side_photo(photo, min_px=22)
 
     heads = []
 

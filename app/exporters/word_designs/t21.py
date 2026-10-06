@@ -39,7 +39,10 @@ def build(ctx: Ctx) -> None:
     fmt_table(head, [tw(850 - 2 * PAD)], ind=tw(PAD))
     hcell = head.rows[0].cells[0]
     fmt_cell(ctx, hcell, fill=LIME, pad=(0, 0, 0, 0))
-    hb = Box(ctx, hcell, tw(850 - 2 * PAD))
+    # a tiny first paragraph ABOVE the inner table: the card's top corner
+    # masks hang on the cell's first paragraph, which was the one after the
+    # table - they drew as stray lime wedges at the card's foot (run 7)
+    hb = Box(ctx, hcell, tw(850 - 2 * PAD), pad_top=0.01)
     # the name column runs to the card's edge; its 34px end padding is the
     # cell's (it was subtracted twice: the name ended 34px short of the PDF's)
     inner = hb.table([tw(34 + 118 + 26), tw(850 - 2 * PAD - 178)])
@@ -147,16 +150,14 @@ def build(ctx: Ctx) -> None:
     # the card's top corners
     round_corners_top = True
     if round_corners_top:
-        from ..docx_design import vml_anchored
-        from .common import _CORNER
+        from .common import corner_mask
         first_p = next(side.c._tc.iter("{http://schemas.openxmlformats.org/"
                                        "wordprocessingml/2006/main}p"))
         from docx.text.paragraph import Paragraph
         fp = Paragraph(first_p, side.c)
         left_pad = 24 if ctx.rtl else 26
         for key, x in (("tl", -left_pad), ("tr", SIDE_W - left_pad - 18)):
-            vml_anchored(fp, x_pt=pt(x), y_pt=0, w_pt=pt(18), h_pt=pt(18), fill=PAGE,
-                         path=_CORNER[key].format(r=100), coords="100,100", z=20)
+            corner_mask(fp, key, x_pt=pt(x), y_pt=0, r_pt=pt(18), fill=PAGE)
 
     # ---- main column
     T = page.main_text_px

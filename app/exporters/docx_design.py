@@ -661,12 +661,14 @@ def photo_run(ctx: Ctx, para, *, size_px: float, shape: str = "circle", ring_px:
     if ring_px and ring:
         dr = ImageDraw.Draw(im)
         rw = int(ring_px * scale)
+        # PIL draws an outline INWARD from its box: the box is the picture's
+        # edge, so the ring is its outer rw px as the CSS border. Inset by rw/2
+        # it left an outer strip of the photo/placeholder colour - a second
+        # frame around t18's white mat (run 7)
         if shape == "circle":
-            dr.ellipse((rw / 2, rw / 2, W - 1 - rw / 2, H - 1 - rw / 2), outline="#" + ring,
-                       width=rw)
+            dr.ellipse((0, 0, W - 1, H - 1), outline="#" + ring, width=rw)
         else:
-            dr.rectangle((rw / 2, rw / 2, W - 1 - rw / 2, H - 1 - rw / 2), outline="#" + ring,
-                         width=rw)
+            dr.rectangle((0, 0, W - 1, H - 1), outline="#" + ring, width=rw)
     buf = io.BytesIO()
     im.save(buf, "PNG")
     buf.seek(0)
@@ -1152,8 +1154,155 @@ def _load() -> None:
     from . import word_designs  # noqa: F401  (registers the designs)
 
 
+#: The PDF's auto-fit (static/js/autofit.js) seats a page that is only a
+#: little too long by scaling the TYPE down to 0.90 (after its rhythm stage);
+#: Word has no auto-fit, so a side column the PDF fitted spilled one section
+#: onto page 2 (the user's 12pt Details downloads, run 7: t3 t4 t7 t9 t15 t16).
+#: Same rule here: when the side column's estimate runs more than TRIGGER pt
+#: past the page, every text size is scaled by the largest step that brings
+#: it within TARGET pt; line heights follow (they are multiples of the size),
+#: spacing and layout never change. The step used
+#: is kept on the document as `cvstand_fit` ((gaps, type) or None).
+#: (gaps, type) steps in the PDF's order: its rhythm stage first (gaps down
+#: to 0.85 - here the block gaps only: Word's line spacing stays natural,
+#: docs/CVSTAND_FONT_CONTROLS.md "Page flow"), then type down to 0.90.
+TYPE_FIT_STEPS = tuple((g, 1.0) for g in (0.97, 0.94, 0.91, 0.88, 0.85)) + tuple(
+    (0.85, f) for f in (0.98, 0.96, 0.94, 0.92, 0.90))
+#: Any page estimated past its foot is fitted - the estimate is not good
+#: enough for a margin: a chosen Markazi Text ran SHORT (t15 Arabic +6pt and
+#: t7 +10pt spilled in Word) while the default faces run long (t1 +15, t14
+#: +17 one page). 5pt keeps the one-page default demos t12 Arabic (+3) as
+#: run 6 measured them; t16 Arabic (+7) takes the gentlest step.
+TYPE_FIT_TRIGGER_PT = 5.0
+#: The estimate is good to about +-30pt per template (t1 one page at +15,
+#: t7 one line over at +12 - measured in Word, run 7): aim for 15pt spare;
+#: when even the floor step cannot, take it if it lands within FLOOR_OK.
+TYPE_FIT_TARGET_PT = -15.0
+TYPE_FIT_FLOOR_OK_PT = 15.0
+
+
+def side_overflow_pt(doc, resolved) -> float | None:
+    """How far (pt) the tallest full-height side column (a cell merged down a
+    top-level table's rows, SidebarPage) plus what stands above its table
+    runs past one page; None when the page has no side column."""
+    return _overflows(doc, resolved)[0]
+
+
+def page_overflow_pt(doc, resolved) -> float:
+    """The page estimate the type fit works to: the side column's when the
+    design has one, else the whole body's (a full-width ColumnPage, t12)."""
+    side, _main, page = _overflows(doc, resolved)
+    return page if side is None else side
+
+
+def _cell_w(pr) -> float:
+    """A cell's text width (pt): its width less its left/right margins."""
+    w = int(pr.find(qn("w:tcW")).get(qn("w:w"))) / 20
+    mar = pr.find(qn("w:tcMar"))
+    if mar is not None:
+        for e in ("left", "right"):
+            x = mar.find(qn(f"w:{e}"))
+            w -= int(x.get(qn("w:w"))) / 20 if x is not None else 0.0
+    return max(1.0, w)
+
+
+def _overflows(doc, resolved) -> tuple[float | None, float | None, float]:
+    """(side, main, page): how far (pt) a SidebarPage's side column and its
+    main column (the rows' other cells) - each plus what stands above the
+    table - run past one page ((None, None) without a side column), and the
+    whole body's estimate past one page."""
+    from .docx_measure import Measure
+    m = Measure(resolved)
+    sec = doc.sections[0]
+    avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+    above, side, main = 0.0, None, None
+    for el in doc.element.body:
+        if el.tag == qn("w:p"):
+            above += m.paragraph(el, PAGE_W_PX * PX)
+            continue
+        if el.tag != qn("w:tbl"):
+            continue
+        rows = el.findall(qn("w:tr"))
+        if len(rows) > 3:
+            col_h = 0.0
+            for ri, tr in enumerate(rows):
+                row_h = 0.0
+                for tc in tr.findall(qn("w:tc")):
+                    pr = tc.find(qn("w:tcPr"))
+                    vm = pr.find(qn("w:vMerge")) if pr is not None else None
+                    if vm is None:
+                        row_h = max(row_h, m.block(tc, _cell_w(pr)) if pr is not None else 0.0)
+                    elif ri == 0 and vm.get(qn("w:val")) == "restart":
+                        over = above + m.block(tc, _cell_w(pr)) - avail
+                        side = over if side is None else max(side, over)
+                col_h += row_h
+            if side is not None:
+                main = above + col_h - avail
+        above += m.table(el)
+    return side, main, above - avail
+
+
+#: A main column estimated further than this past the page is a long CV: it
+#: flows to page 2 whatever the side column does, so nothing is scaled
+#: (measured: the 12pt Details demos <= +111pt, long CVs >= +143pt).
+TYPE_FIT_MAIN_MAX_PT = 130.0
+#: A full-width page (no side column) further over than this is a long CV:
+#: the fit recovers ~200pt at most (t12 at 12pt Details: +199 -> +12).
+TYPE_FIT_PAGE_MAX_PT = 250.0
+
+
+def scale_gaps(doc, k: float) -> None:
+    """Every paragraph's space before/after times `k` (autofit's rhythm
+    stage, block gaps only - never the line spacing)."""
+    for sp in doc.element.body.iter(qn("w:spacing")):
+        for a in ("before", "after"):
+            v = sp.get(qn(f"w:{a}"))
+            if v and int(v) > 0:
+                sp.set(qn(f"w:{a}"), str(int(round(int(v) * k))))
+
+
+def scale_type(doc, k: float) -> None:
+    """Every text run's size times `k` (autofit's type stage). Dot glyphs
+    (Arial, a graphic) and the 1pt structural runs keep theirs."""
+    for r in doc.element.body.iter(qn("w:r")):
+        rpr = r.find(qn("w:rPr"))
+        if rpr is None:
+            continue
+        fonts = rpr.find(qn("w:rFonts"))
+        if fonts is not None and (fonts.get(qn("w:ascii")) or "") == "Arial":
+            continue
+        for tag in ("sz", "szCs"):
+            el = rpr.find(qn(f"w:{tag}"))
+            if el is not None:
+                hp = int(el.get(qn("w:val")))
+                if hp > 2:
+                    el.set(qn("w:val"), str(max(3, int(round(hp * k)))))
+
+
 def render(data: dict, template_key: str, photo: Path | None):
-    """(document, resolved theme) for a template with a Word design."""
+    """(document, resolved theme) for a template with a Word design: built
+    as chosen; if its side column would spill a little, rebuilt with the
+    PDF's type fit (TYPE_FIT_*). A long CV flows on at the chosen sizes."""
+    doc, resolved = _render(data, template_key, photo)
+    doc.cvstand_fit = None
+    side, main, page = _overflows(doc, resolved)
+    if side is None:
+        if not TYPE_FIT_TRIGGER_PT < page <= TYPE_FIT_PAGE_MAX_PT:
+            return doc, resolved
+    elif side <= TYPE_FIT_TRIGGER_PT or main > TYPE_FIT_MAIN_MAX_PT:
+        return doc, resolved
+    for gaps, type_k in TYPE_FIT_STEPS:
+        d2, r2 = _render(data, template_key, photo, gaps, type_k)
+        over = page_overflow_pt(d2, r2)
+        if over <= TYPE_FIT_TARGET_PT or (
+                (gaps, type_k) == TYPE_FIT_STEPS[-1] and over <= TYPE_FIT_FLOOR_OK_PT):
+            d2.cvstand_fit = (gaps, type_k)
+            return d2, r2
+    return doc, resolved
+
+
+def _render(data: dict, template_key: str, photo: Path | None, gaps: float = 1.0,
+            type_k: float = 1.0):
     from ..labels import reset_lang, set_lang, t
     from ..schema import lang_of, normalize
 
@@ -1181,6 +1330,10 @@ def render(data: dict, template_key: str, photo: Path | None):
         ctx.labels = labels
         DESIGNS[template_key](ctx)
         chosen_sizes(ctx, data)
+        if gaps != 1.0:
+            scale_gaps(doc, gaps)
+        if type_k != 1.0:
+            scale_type(doc, type_k)
         true_lines(ctx)
         half_leading(ctx)
         flat_headers(doc)

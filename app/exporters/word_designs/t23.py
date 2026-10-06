@@ -9,7 +9,7 @@ from docx.shared import Pt
 from ..docx_design import (
     Box, Ctx, bar, design, fmt_cell, page_ovals, page_rects, pt, rated, run, skill_pct, tw,
 )
-from .common import SidebarPage, Stack, block, bullets, joined
+from .common import SidebarPage, Stack, block, bullets, joined, rounded_block
 
 GREY, INK, BODY, MUTED, TRACK, RULE = "EFEFEF", "151517", "3C3C40", "6B6B70", "DCDCDC", "DEDEDE"
 SIDE_PX = 330
@@ -25,7 +25,10 @@ def build(ctx: Ctx) -> None:
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(0.1)
     sec.bottom_margin = Pt(pt(34))
-    page = SidebarPage(ctx, SIDE_PX, side_fill=GREY, side_pad=(56, 30, 34, 24),
+    # no cell shading on the rail: the page rect below IS the grey, and a cell
+    # fill covered the rail half of every seam dot (shapes behind the text
+    # vanish under cell shading - the dots showed as half circles, run 7)
+    page = SidebarPage(ctx, SIDE_PX, side_fill=None, side_pad=(56, 30, 34, 24),
                        main_pad_x=(46, 44), full_height_fill=False)
     # the grey rail, the black seam and its three dots, on every page
     page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, GREY), (SIDE_PX, 2, 0, 1100, INK)])
@@ -79,13 +82,12 @@ def build(ctx: Ctx) -> None:
     if r["title"]:
         box = page.main_row(pad_top=46)
         w = min(T, len(r["title"]) * 13.5 + 60 + len(r["title"]) * 1.5)
-        tbl = box.table([tw(w)], ind=tw(T - w))
-        cell = tbl.rows[0].cells[0]
-        fmt_cell(ctx, cell, fill=INK, pad=(0, 30, 0, 30), valign="center")
-        cb = Box(ctx, cell, 0, pad_top=11, pad_bottom=11)
+        # the PDF's pill (border-radius 999px): corners masked round
+        cb = rounded_block(ctx, box, w, fill=INK, bg="FFFFFF", radius=99,
+                           pad=(11, 30, 11, 30), ind_px=T - w)
         run(ctx, cb.p(align="center"), r["title"], "name", size=18, color="FFFFFF",
             spacing=1.5, caps=True)
-        cb.finish()
+        cb.finish_round()
     if r["achievements"]:
         box = page.main_row(pad_top=24 if r["title"] else 46)
         n = len(r["achievements"])

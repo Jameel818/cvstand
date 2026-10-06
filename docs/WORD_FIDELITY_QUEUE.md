@@ -105,3 +105,14 @@ Gutter:
 - [x] R6-5. Full suite on the final commit, in batches - batches 1-3 run (4 failures, all from the fixed t22 rail, fixed and re-run green); batch 4 stopped by LOW MEMORY at ~95% (its 3 t22 failures fixed, the rest re-run green); batch 5 NOT run (stopped before it; not restarted per Claude Code's rule) - see the merge plan §1a
 - [x] R6-6. Review page + Desktop folder (48-file table, LibreOffice column, rail before/after); merge plan gate results
 - [x] R6-7. Local server running (live-site mode, :5000; GET /export/pdf -> 405)
+
+## Run 7 (2026-10-06) - the user's review of the 24 Arabic downloads (decisions 69-73)
+- [x] R7-1. Confirm every finding in Microsoft Word on the user's own files (one AR batch). The files carried Details 12pt Markazi Text (t1-t4, t6-t16), reproduced exactly. Real in Word: overflow (t3 t4 t7 t9 t12 t15 t16), t23 pill + half dots, t21 header fragments, t18 frame, t20 block, t10 sliders, t1 side spacing, sidebar hairlines. The rest is LibreOffice only (LibreOffice 26.8 draws the fills on the user's own files)
+- [x] R7-2. Overflow: Word takes the PDF's autofit steps (gaps to 0.85, type to 0.90, never the line spacing). Your 7 AR overflows are now 1 page in Word. EN at the same settings: t7 t9 t12 still 2 pages at the floor
+- [x] R7-3. Sidebar lines = corner-mask hairlines in print (not gridlines) -> masks overlap by 0.75pt; every other border scanned (48 designs) is in the PDF
+- [x] R7-4. t23 dots + pill, t21 header masks, photo ring outer edge (t18 + all ringed photos), t20 photo strip, t10 sliders; EN gets the same code
+- [ ] R7-5. Not fixed: t1 sidebar spacing (estimator ~60pt long on t1's side column), t10 card's rounded border, t21 side card's bottom corners, t4 AR blank p2 at 12pt with the default face
+- [x] R7-6. Word re-measure of the 14 changed templates: all 56 Word PDFs made, demo 28/28 1 page. The strict-% compare was KILLED for low memory (not restarted)
+- [x] R7-7. Tests: Word batch 854 passed / 23 skipped (incl. tests/test_docx_run7_fixes.py, 63). Browser batch 5 NOT run (low memory)
+- [x] R7-8. Review page: "Run 7" section + docs/review/run7 before/after (44 images)
+- [ ] R7-9. Open: the strict-% re-measure of the 14 changed templates (scratch ovl.py r7 ... - Word PDFs exist; only the compare remains); suite batch 5; then the merge decision

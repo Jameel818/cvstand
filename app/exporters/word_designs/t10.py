@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from docx.shared import Pt
 
-from ..docx_design import Box, Ctx, bar, design, fmt_cell, photo_run, pt, rated, run, skill_pct, tw
+from ..docx_design import (
+    Box, Ctx, design, fmt_cell, photo_run, pt, rated, run, skill_pct, slider_shape, tw,
+)
 from .common import SidebarPage, Stack, bullets, date_range, joined
 
 RUST, INK, BODY, BLUE, SKY, TRACK, RULE = ("A93005", "111111", "333333", "0369A1", "38BDF8",
@@ -149,7 +151,11 @@ def build(ctx: Ctx) -> None:
                     pct, label = skill_pct(sk)
                     run(ctx, p, "\t", size=12)
                     run(ctx, p, label, "bold", size=12, color=INK)
-                    cb.pad_top = 8
-                    bar(ctx, cb, pct, col, on=SKY, off=TRACK, height=6)
+                    # the PDF's slider (skill_slider: 6px track, 16px white knob
+                    # ringed 3px in the fill), not a plain bar (run 7); the knob
+                    # reaches 5px above the track, which sits 8px below the label
+                    cb.pad_top = 3
+                    slider_shape(ctx, cb.p(line=1.0), pct, col, on=SKY, off=TRACK, track=6,
+                                 knob=16, ring=3)
             cb.finish()
     page.finish()

@@ -331,10 +331,11 @@ class Stack:
 
 
 def block(ctx: Ctx, box: Box, width_px: float, *, fill=None, pad=(0, 0, 0, 0), border=None,
-          valign=None) -> Box:
+          valign=None, ind_px: float = 0) -> Box:
     """A filled / bordered block (ribbon, pill, card, bar): a one-cell table.
-    `pad` (top, start, bottom, end) px - top/bottom as paragraph spacing."""
-    tbl = box.table([tw(width_px)])
+    `pad` (top, start, bottom, end) px - top/bottom as paragraph spacing;
+    `ind_px` indents the table from the start edge."""
+    tbl = box.table([tw(width_px)], **({"ind": tw(ind_px)} if ind_px else {}))
     cell = tbl.rows[0].cells[0]
     fmt_cell(ctx, cell, fill=fill, pad=(0, pad[1], 0, pad[3]), borders=border, valign=valign)
     return Box(ctx, cell, tw(width_px - pad[1] - pad[3]), pad_top=pad[0], pad_bottom=pad[2])
@@ -381,6 +382,18 @@ _CORNER = {  # VML paths of a corner MASK (square minus a quarter circle), r x r
     "bl": "m0,0 qy{r},{r} l0,{r} x e",
     "br": "m{r},0 qy0,{r} l{r},{r} x e",
 }
+#: The same masks grown by an outer strip `a` (k units = the mask's side):
+#: a mask whose edge sits exactly on the cell's edge left an anti-aliased
+#: hairline of the cell's fill along the block's square outline in Word's
+#: print/PDF (t5/t21 pills, run 7) - the strip covers that edge.
+_CORNER_OVER = {
+    "tl": "m0,0 l{k},0 l{k},{a} qx{a},{k} l0,{k} x e",
+    "tr": "m0,0 l0,{a} qx{b},{k} l{k},{k} l{k},0 x e",
+    "bl": "m{a},0 qy{k},{b} l{k},{k} l0,{k} l0,0 x e",
+    "br": "m{b},0 qy0,{b} l0,{k} l{k},{k} l{k},0 x e",
+}
+#: How far (pt) a corner mask reaches past the block's edge.
+CORNER_OVERLAP_PT = 0.75
 
 
 def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: str,
@@ -426,16 +439,29 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
             bottom_on, y_b = Paragraph(last_el, inner.c), max(0.0, before + 0.3 - pt(r))
         for key, on, x, y in (("tl", first, x_l, 0.0), ("tr", first, x_r, 0.0),
                               ("bl", bottom_on, x_l, y_b), ("br", bottom_on, x_r, y_b)):
-            vml_anchored(on, x_pt=x, y_pt=y, w_pt=pt(r), h_pt=pt(r), fill=bg,
-                         path=_CORNER[key].format(r=k), coords=f"{k},{k}", z=20)
+            corner_mask(on, key, x_pt=x, y_pt=y, r_pt=pt(r), fill=bg)
     ctx.after_lines.append(go)
 
 
+def corner_mask(para, key: str, *, x_pt: float, y_pt: float, r_pt: float, fill: str) -> None:
+    """One corner mask (`key` tl/tr/bl/br) whose r x r square starts at
+    (x_pt, y_pt) from `para`'s text column/top, grown CORNER_OVERLAP_PT past
+    the block's two outer edges (see _CORNER_OVER)."""
+    from ..docx_design import vml_anchored
+    k, o = 100, CORNER_OVERLAP_PT
+    s = r_pt + o
+    a = int(round(k * o / s))
+    dx = -o if key in ("tl", "bl") else 0.0
+    dy = -o if key in ("tl", "tr") else 0.0
+    vml_anchored(para, x_pt=x_pt + dx, y_pt=y_pt + dy, w_pt=s, h_pt=s, fill=fill,
+                 path=_CORNER_OVER[key].format(k=k, a=a, b=k - a), coords=f"{k},{k}", z=20)
+
+
 def rounded_block(ctx: Ctx, box: Box, width_px: float, *, fill: str, bg: str, radius: float,
-                  pad=(0, 0, 0, 0)) -> Box:
+                  pad=(0, 0, 0, 0), ind_px: float = 0) -> Box:
     """A filled block (one-cell table, as `block`) whose corners are rounded
     by round_corners() when its Box is finished through `.finish_round()`."""
-    inner = block(ctx, box, width_px, fill=fill, pad=pad)
+    inner = block(ctx, box, width_px, fill=fill, pad=pad, ind_px=ind_px)
     if not inner.pad_top:
         # the corner masks hang on the cell's first paragraph: make sure there
         # is one ABOVE any table (a cell-end paragraph after a table is not

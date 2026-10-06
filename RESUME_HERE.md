@@ -1,3 +1,19 @@
+# RESUME HERE - 2026-10-06 (WORD FIDELITY run 7 on `feature/word-fidelity`; NOT merged; main untouched)
+- User's review of the 24 AR downloads: findings confirmed in real Word first.
+  Their files = Details 12pt Markazi Text (t1-t4, t6-t16). Most LibreOffice
+  findings were their LibreOffice version (26.8 draws the fills).
+- Fixed (decisions 69-73, queue "Run 7"): Word type fit = the PDF's autofit
+  steps (docx_design.render, TYPE_FIT_*, doc.cvstand_fit) -> all 7 AR
+  overflows 1 page in Word; corner-mask hairlines; t23 dots + pill; t21
+  header masks; photo ring outer edge; t20 photo strip; t10 sliders.
+- NOT done: strict-% re-measure (Word PDFs in a1d5eef3 scratch fid/r7 exist;
+  the compare stage was KILLED for low memory); suite batch 5 (browser); t1
+  side spacing; EN t7/t9/t12 at 12pt still 2 pages.
+- Server NOT running (stopped for the memory rules). Step 7 OFF. No goldens.
+- This session's scratch: 3f1e2a02.../ (u/ = user's files in Word, a/ = after).
+
+---
+
 # RESUME HERE — 2026-10-05 (status-only session; NO fixes; `feature/word-fidelity`; NOT merged; main untouched)
 - Save confirmed: tree clean, local = origin at 965fc7d before this note.
 - Server was NOT running at start (run 6's process had ended); restarted

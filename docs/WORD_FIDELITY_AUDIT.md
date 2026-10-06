@@ -582,3 +582,50 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     near-one-page fit must squeeze it (10pt reserve spilled to page 2; 20pt
     kept, from 50). Renaming font faces to reach Archivo 900 was ruled out by
     decision 47.
+
+### Run 7 (2026-10-06): the user's review of the 24 Arabic downloads
+69. **The review files were reproduced exactly before anything was fixed.**
+    The user's downloads carried their Fonts panel: t1-t4 and t6-t16 at
+    Details 12pt in Markazi Text, the other nine at the template's own
+    sizes (run-size signatures matched 24/24). Every finding was confirmed in
+    Microsoft Word on the user's own files first (one batch); the review had
+    been made in LibreOffice.
+70. **Most LibreOffice findings were the reviewer's LibreOffice, not the
+    files.** Word drew every full-height column, page tint, timeline line,
+    t15's amber band, t13/t14's connectors, t8's foot band and t14's navy top.
+    LibreOffice 26.8 (run 6's extract) drew t2's column and t5's tint on the
+    user's own t2/t5 files too - the reviewer's version does not draw page-
+    anchored header shapes. Nothing changed for those (the fills already are
+    DrawingML + VML header shapes, the cheap route is already taken).
+71. **Word overflowed for real at the chosen sizes** (t3 t4 t7 t9 t12 t15
+    t16 Arabic, 12pt Markazi): the PDF fitted because autofit.js shrinks
+    rhythm then type (to 0.90); Word had nothing. docx_design.render now
+    re-renders with the same ladder - block gaps to 0.85 (paragraph space
+    before/after only: Word's line spacing stays natural), then type to 0.90
+    - when the estimate runs past the page (side column for SidebarPage
+    designs, the body for full-width ones), and keeps the step on the
+    document (cvstand_fit). Never on a long CV (main column > +130pt, or a
+    full-width page > +250pt). The estimate's error is +-30pt and face-
+    dependent (Markazi runs short, the defaults long), so the trigger is 5pt
+    and the target 15pt spare. Default demos: none fitted except t16 Arabic
+    (a gap step).
+72. **Lines in the sidebars were real print lines, not gridlines**: every
+    rounded block's corner masks sat exactly on the block's edge and left an
+    anti-aliased hairline of the block's fill along its square outline in
+    Word's print/PDF (t5 pills and heading bars, t21 pills). Masks now reach
+    0.75pt past both outer edges (common._CORNER_OVER, corner_mask). Every
+    table/cell/paragraph border in all 48 designs (XML scan) is one the PDF
+    draws (dividers, timeline rules, boxed sections). Word's on-screen
+    gridlines (View > Gridlines) never print.
+73. **t23**: the rail's cell shading covered half of every seam dot (shapes
+    behind the text vanish under cell shading) - the page rect alone is the
+    grey now; the title pill is a rounded block. **t21**: the header card's
+    top corner masks hung on the paragraph after its inner table (stray lime
+    wedges at the card's foot) - a tiny first paragraph carries them.
+    **t18 (and every ringed photo)**: PIL draws outlines inward; the ring's
+    box was inset by half the ring, leaving an outer strip of the placeholder
+    colour (the "extra border") - the ring is now the picture's outer edge.
+    **t20**: the photo block shrinks to a 22px strip (the PDF's flex item has
+    no floor; below ~22px Word's own line keeps the height and the estimate
+    ran short - an empty page 2). **t10**: the PDF's slider (track + ringed
+    knob), not a plain bar.
