@@ -629,3 +629,35 @@ as the known Open Sans case). Only matters when a user CHOOSES one of them.
     no floor; below ~22px Word's own line keeps the height and the estimate
     ran short - an empty page 2). **t10**: the PDF's slider (track + ringed
     knob), not a plain bar.
+
+### Run 8 (2026-10-07): sidebars on Word's screen, the merge gate
+74. **The pale sidebar bands and the light line were Word's dimmed header
+    layer**, not a cell or border fault. With the header shapes removed,
+    Word's PDF shows the coloured cell exactly where designed; the page
+    shape is 1px wider on purpose (no print seam), and Word dims the header
+    while the body is edited - so above/below the table and along that 1-2pt
+    overhang the colour showed pale. Print was always solid.
+75. **Fix: the page shapes are copied into the BODY** (body_page_shapes):
+    page 1's set in a body-level first paragraph, the every-page set in the
+    last paragraph (= the last page; page 2 of a two-page CV). A shape
+    anchored INSIDE a table cell stays in that cell in Word 2013+ whatever
+    layoutInCell says (measured: the first try never reached the page top),
+    so a ~0.3pt spacer paragraph carries them when the body starts with a
+    table. Middle pages of a 3+ page CV keep the header's (dim on screen,
+    solid in print). t22's header (rail picture) is left alone. Verified on
+    Word's screen by window capture (PrintWindow - the screen itself shows
+    whatever window is in front) for 19 templates EN+AR, and in Word's PDF.
+76. **t1's side gaps**: the Arabic estimate reads t1's side column ~20pt
+    long (Word ink 719pt vs estimate 740pt on the user's file), and fit_side
+    squeezed the PDF's 51px section gaps before the type fit could see the
+    overflow. Arabic t1 now discounts that bias and counts its squeeze as
+    overflow (opt-in: ctx.side_bias_pt / squeeze_is_over), so the PDF's steps
+    act first. English unchanged (its demo spilled with the bias).
+77. **t10's card** is a rounded 1px outline behind the grid (radius 8px),
+    sized once line heights are final. English draws ~20px taller than the
+    grid (the estimate is long there); Arabic matches.
+78. **User settings** (run 8 item 2): chosen fonts/sizes far above the
+    default can give two Word pages where the PDF stays on one - its autofit
+    also compresses line height, Word's lines stay natural. Measured and
+    reported (merge plan §1b); the option the user may approve is a type
+    floor of 0.88 (O1: English t7/t9/t12 at 12pt one page).

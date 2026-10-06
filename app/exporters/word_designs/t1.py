@@ -130,7 +130,18 @@ def build(ctx: Ctx) -> None:
         section(t("Tools"), rows, tool_row)
     section(t("Languages"), [joined([x["name"], x["level"]], " — ") for x in r["languages"]],
             lambda b, i, s: run(ctx, b.p(line=1.7), s, size=12.5, color=BODY))
-    page.fit_side(heads)       # a full side column gives up gaps, never spills
+    # a full side column gives up gaps, never spills. The Arabic estimate
+    # reads this column ~20pt longer than Word draws it (measured on the user's 12pt
+    # Markazi file, run 8: ink ends at 719pt, the estimate at 740pt): both
+    # the gap fit and the type fit discount it, so the PDF's 51px section
+    # gaps stay (they had shrunk to ~2/3 for nothing)
+    # The squeeze also counts as overflow here, so the type fit (the PDF's
+    # autofit) acts first and the gaps only give up what is left. Arabic
+    # only: English's estimate is not long (its demo spilled with the bias)
+    if ctx.rtl:
+        ctx.side_bias_pt = 20.0
+        ctx.squeeze_is_over = True
+    page.fit_side(heads)
 
     # ---- main column
     T = page.main_text_px

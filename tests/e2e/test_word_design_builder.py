@@ -74,7 +74,10 @@ def test_builder_word_download_is_the_template_design(page, live_server, tmp_pat
         text = "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", run))
         if sz and text.strip():
             sizes[int(sz.group(1))] += len(text)
-    assert sizes.most_common(1)[0][0] == round(11 * 4 / 3 * 0.72 * 2)
+    # the chosen 11pt; a page that would spill takes the PDF's type fit, down
+    # to 0.90 of it (docx_design.TYPE_FIT_STEPS, run 7) - t22 does here
+    want = round(11 * 4 / 3 * 0.72 * 2)
+    assert round(want * 0.90) <= sizes.most_common(1)[0][0] <= want
     if lang == "ar":
         assert "<w:bidi/>" in xml and re.search(r"[؀-ۿ]", xml)
     else:

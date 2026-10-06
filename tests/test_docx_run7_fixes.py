@@ -58,11 +58,16 @@ def _lines(xml: bytes) -> Counter:
 @pytest.mark.parametrize("lang", ["en", "ar"])
 def test_default_demo_is_not_fitted(key, lang):
     """The demo at the template's own sizes is what run 6 measured: never
-    rescaled (one exception - t16 Arabic's estimate runs 7pt long, it takes
-    a gap step only, never type)."""
+    rescaled. Exceptions: t16 Arabic's estimate runs 7pt long, it takes a gap
+    step only, never type; t1 Arabic counts its side-gap squeeze as overflow
+    since run 8 (its sections keep the PDF's spacing), a mild fit - Word
+    measured 6.6% strict, one page."""
     doc, _ = docx_design.render(_data(lang), key, None)
     if (key, lang) == ("modern-t16", "ar"):
         assert doc.cvstand_fit is None or doc.cvstand_fit[1] == 1.0
+    elif (key, lang) == ("modern-t1", "ar"):
+        assert doc.cvstand_fit is None or (doc.cvstand_fit[0] >= 0.85
+                                           and doc.cvstand_fit[1] >= 0.94)
     else:
         assert doc.cvstand_fit is None
 

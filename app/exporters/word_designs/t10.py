@@ -21,6 +21,30 @@ def _head(ctx, box, label, after=14):
     run(ctx, box.p(after=after), label, "heading", size=24, color=INK, spacing=-0.3)
 
 
+def _round_card(ctx, tbl, widths, *, radius, colour):
+    """A rounded 1px outline around `tbl`, anchored in its first cell's first
+    paragraph (y 0 = the table's top: no cell top margin, the paragraph's
+    space before included) and measured once the line heights are final.
+    x from that cell's text column: in Arabic the first cell is the right
+    one (bidiVisual) with no physical left padding."""
+    from docx.oxml.ns import qn
+    from docx.text.paragraph import Paragraph
+    from ..docx_design import vml_anchored
+    from ..docx_measure import Measure
+    cell = tbl.rows[0].cells[0]
+    total = sum(widths) / 20                        # pt
+    pad0 = 0.0 if ctx.rtl else pt(20)               # cell 0's physical left padding
+    x = -(total - widths[0] / 20) - pad0 if ctx.rtl else -pad0
+
+    def go():
+        h = Measure(ctx.resolved).table(tbl._tbl)
+        first = Paragraph(cell._tc.find(qn("w:p")), cell)
+        arc = min(1.0, pt(radius) / (min(total, h) / 2))
+        vml_anchored(first, x_pt=x, y_pt=0.0, w_pt=total, h_pt=h, fill=None, arc=arc,
+                     stroke=colour, weight_pt=pt(1), behind=True)
+    ctx.after_lines.append(go)
+
+
 @design("modern-t10")
 def build(ctx: Ctx) -> None:
     r, t = ctx.r, ctx.t
@@ -135,8 +159,10 @@ def build(ctx: Ctx) -> None:
         inner = T - 40
         col = (inner - 44) / 3
         widths = [tw(20 + col), tw(22 + col), tw(22 + col + 20)]
-        tbl = box.table(widths, rows=rows, borders={"top": (1, RULE), "bottom": (1, RULE),
-                                                    "left": (1, RULE), "right": (1, RULE)})
+        # the PDF's card: 1px #cfcfcf, radius 8px - a rounded outline drawn
+        # behind the grid (a table border has square corners, run 8)
+        tbl = box.table(widths, rows=rows)
+        _round_card(ctx, tbl, widths, radius=8, colour=RULE)
         for i in range(rows * 3):
             cell = tbl.rows[i // 3].cells[i % 3]
             k = i % 3

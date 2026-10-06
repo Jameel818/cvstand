@@ -116,3 +116,15 @@ Gutter:
 - [x] R7-7. Tests: Word batch 854 passed / 23 skipped (incl. tests/test_docx_run7_fixes.py, 63). Browser batch 5 NOT run (low memory)
 - [x] R7-8. Review page: "Run 7" section + docs/review/run7 before/after (44 images)
 - [ ] R7-9. Open: the strict-% re-measure of the 14 changed templates (scratch ovl.py r7 ... - Word PDFs exist; only the compare remains); suite batch 5; then the merge decision
+
+## Run 8 (2026-10-07) - sidebars on Word's screen, open items, merge gate (decisions 74-78)
+- [x] R8-0. Sidebars: cause = Word dims the header layer (the colour lived only there). The fix copies the page shapes into the body (page 1 + last page). Verified on Word's screen (19 templates EN+AR, before/after window captures) and in Word's PDF; tests/test_docx_run8_sidebars.py. Page-2 options: A (page 1 only) vs B (page 1 + last page, applied)
+- [x] R7-5/R8-4. t1 Arabic side spacing like the PDF (estimate bias + squeeze counted as overflow), 1 page
+- [x] R7-5/R8-5. t10 skills card rounded (outline shape)
+- [x] R7-9/R8-1. Strict-% re-measure of the 20 changed templates (5 Word batches of 8): 46/48 <= 10% (t9 EN/AR as run 6), all 1 page
+- [x] R8-2. User-settings gate in Word: (a) Markazi 12pt all 24 EN+AR, (b) Source Serif 4 max (6 EN), (c) Noto Naskh Arabic max (6 AR) - every 2-page file listed in the merge plan §1b, with the PDF's page count
+- [ ] R8-3. English t7/t9/t12 at 12pt: options O1 (type 0.88: all 1 page), O2 (gaps 0.80: t7 still 2), O3 (gaps 0.80 + type 0.86: all 1 page), or accept 2 pages - recommendation O1; WAITING for the user's approval (not applied)
+- [x] R8-6. Stale t7/t15 images regenerated; review page Run 8 section (sidebar screen strips, page-2 options, item-3 options)
+- [x] R8-7. Batch 5: 247 passed; full suite 5374 passed / 0 failed on the final code
+- [x] R8-8. Merge plan: gate results, verdict READY for step A on the user's go
+- [x] R8-9. Local server restarted (live-site mode)

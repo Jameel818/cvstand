@@ -118,6 +118,9 @@ class Ctx:
     def __post_init__(self):
         self.rtl = self.lang == "ar"
         self.css_lines = {}     # paragraph element -> the template's CSS line-height
+        self.squeezed_pt = 0.0  # gaps a too-full column gave up (SidebarPage.spread_side)
+        self.side_bias_pt = 0.0  # how far the estimate reads the side column long (t1)
+        self.squeeze_is_over = False  # a design whose gap squeeze counts as overflow (t1)
         self.after_lines = []   # callables run once the true line heights are set
         self.labels = set()     # every catalogue label this design printed (ctx.t)
 
@@ -1181,6 +1184,79 @@ TYPE_FIT_TARGET_PT = -15.0
 TYPE_FIT_FLOOR_OK_PT = 15.0
 
 
+_MC_ALT = "{http://schemas.openxmlformats.org/markup-compatibility/2006}AlternateContent"
+
+
+def body_page_shapes(doc, last_page: bool = True) -> int:
+    """Copy the header's page shapes (full-height columns, bands, page tints,
+    seam dots) into the BODY, behind the text, placed on the page: page 1's
+    set in the body's first paragraph and, with `last_page`, the every-page
+    set in its last paragraph (the last page: page 2 of a two-page CV).
+
+    Word dims the header layer while the body is edited, so a colour drawn
+    only in the header showed pale on screen above and below the table and
+    as a light line where it overhangs the coloured cell (the user's Word
+    screenshots, run 8) - print was always solid. Body shapes are solid on
+    screen; the header's stay for print and for any middle page. On a one-
+    page CV both copies land on page 1 - the same shapes twice, invisible.
+    Anchored in BODY-level paragraphs placed on the page: Word 2013+ keeps a
+    shape anchored inside a table cell within that cell whatever its
+    layoutInCell says (measured, run 8: the copy never reached the page top),
+    so when the body starts with a table a 1pt-font spacer paragraph
+    (~0.3pt tall) goes in front of it to carry them. A header holding a
+    picture (t22's rail word) is left alone. Returns the number copied."""
+    import copy
+    from .docx_dml import _next_id
+    sec = doc.sections[0]
+
+    def shape_runs(hdr):
+        return [r for r in hdr._element.iter(qn("w:r"))
+                if r.find(_MC_ALT) is not None or r.find(qn("w:drawing")) is not None]
+    first_hdr = sec.first_page_header if sec.different_first_page_header_footer else sec.header
+    if any(h._element.find(".//" + qn("pic:pic")) is not None
+           for h in (first_hdr, sec.header)):
+        return 0
+    runs1 = shape_runs(first_hdr)
+    body = doc.element.body
+    if not runs1 or len(body) == 0:
+        return 0
+    first = body[0]
+    if first.tag != qn("w:p"):
+        first = OxmlElement("w:p")
+        ppr = OxmlElement("w:pPr")
+        ppr.append(_w("spacing", before=0, after=0, line=60, lineRule="auto"))
+        mark = OxmlElement("w:rPr")
+        _rpr_put(mark, "sz", val=2)
+        _rpr_put(mark, "szCs", val=2)
+        ppr.append(mark)
+        first.append(ppr)
+        body.insert(0, first)
+    jobs = [(first, r, "_p1") for r in runs1]
+    if last_page:
+        tail = [el for el in body if el.tag == qn("w:p")]
+        if tail and tail[-1] is not first:
+            jobs += [(tail[-1], r, "_pn") for r in shape_runs(sec.header)]
+    for host, r, tag in jobs:
+        c = copy.deepcopy(r)
+        for dp in c.iter(qn("wp:docPr")):
+            dp.set("id", str(_next_id()))
+            dp.set("name", dp.get("name", "") + tag)
+        for el in c.iter():
+            vid = el.get("id")
+            if vid and el.tag.startswith("{urn:schemas-microsoft-com:vml}"):
+                el.set("id", vid + tag)
+        for anchor in c.iter(qn("wp:anchor")):
+            anchor.set("layoutInCell", "0")
+        rpr = c.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = OxmlElement("w:rPr")
+            c.insert(0, rpr)
+        _rpr_put(rpr, "sz", val=2)
+        _rpr_put(rpr, "szCs", val=2)
+        host.append(c)
+    return len(jobs)
+
+
 def side_overflow_pt(doc, resolved) -> float | None:
     """How far (pt) the tallest full-height side column (a cell merged down a
     top-level table's rows, SidebarPage) plus what stands above its table
@@ -1239,6 +1315,10 @@ def _overflows(doc, resolved) -> tuple[float | None, float | None, float]:
             if side is not None:
                 main = above + col_h - avail
         above += m.table(el)
+    if side is not None:
+        side -= getattr(doc, "cvstand_side_bias", 0.0)
+        if getattr(doc, "cvstand_squeeze_is_over", False):
+            side += doc.cvstand_squeezed      # the gaps fit_side already took
     return side, main, above - avail
 
 
@@ -1339,9 +1419,13 @@ def _render(data: dict, template_key: str, photo: Path | None, gaps: float = 1.0
         flat_headers(doc)
         for fn in ctx.after_lines:
             fn()
+        doc.cvstand_squeezed = ctx.squeezed_pt
+        doc.cvstand_side_bias = ctx.side_bias_pt
+        doc.cvstand_squeeze_is_over = ctx.squeeze_is_over
     finally:
         reset_lang(token)
     end_paragraph(doc)
     if lang == "ar":
         finish_rtl(doc)
+    body_page_shapes(doc)
     return doc, resolved

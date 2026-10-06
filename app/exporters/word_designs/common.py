@@ -147,8 +147,14 @@ class SidebarPage:
         tc, width = self.side.c._tc, self.side.w / 20
         # measured once the line heights are final (docx_design.true_lines)
         def go():
+            from ..docx_measure import _before
             m = Measure(self.ctx.resolved)
-            spread(m, tc, width, heads, avail - self._above(m), reserve_pt, grow=grow)
+            had = sum(_before(h) for h in heads)
+            spread(m, tc, width, heads, avail - self._above(m) + self.ctx.side_bias_pt,
+                   reserve_pt, grow=grow)
+            # what a too-full column gave up (kept on the document as
+            # cvstand_squeezed: a diagnostic, run 8)
+            self.ctx.squeezed_pt += max(0.0, had - sum(_before(h) for h in heads))
         self.ctx.after_lines.append(go)
 
     def pin_top(self, box: Box, y_px: float, *, min_gap_px: float = 0) -> None:

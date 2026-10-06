@@ -1,3 +1,19 @@
+# RESUME HERE - 2026-10-07 (WORD FIDELITY run 8 on `feature/word-fidelity`; NOT merged; main untouched)
+- Sidebars solid on Word's SCREEN: the colour lived only in the header, which
+  Word dims while editing -> page shapes copied into the body (page 1 + last
+  page; docx_design.body_page_shapes). 19 templates checked by Word window
+  capture (scratch 3f1e2a02.../wshot.ps1 uses PrintWindow - never the screen).
+- 46/48 <= 10% strict in Word (t9 EN 15.2 / AR 12.6 as run 6), all 1 page.
+  Full suite 5374 passed / 0 failed; batch 5 247 passed.
+- t1 AR side spacing like the PDF; t10 card rounded.
+- WAITING on the user: item 3 (EN t7/t9/t12 at 12pt) - O1 type floor 0.88
+  recommended, NOT applied. Then the merge (merge plan: READY for step A).
+- User-settings gate: large chosen sizes -> 2 Word pages where the PDF fits
+  (merge plan §1b).
+- Local server: run.py live-like on :5000, left running.
+
+---
+
 # RESUME HERE - 2026-10-06 (WORD FIDELITY run 7 on `feature/word-fidelity`; NOT merged; main untouched)
 - User's review of the 24 AR downloads: findings confirmed in real Word first.
   Their files = Details 12pt Markazi Text (t1-t4, t6-t16). Most LibreOffice
