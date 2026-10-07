@@ -276,16 +276,22 @@ def test_pdf_embeds_rfn_families_as_their_unmodified_ttf():
 
 ARABIC = sorted({f for (lang, _r), fams in OFFERED.items() if lang == "ar" for f in fams})
 NO_LATIN_EXT = {"Almarai", "Aref Ruqaa", "El Messiri", "IBM Plex Sans Arabic",
-                "Jomhuria", "Lateef", "Scheherazade New", "Tajawal"}
+                "Jomhuria", "Lateef", "Scheherazade New", "Tajawal", "Zain"}
 
 
 @pytest.mark.parametrize("family", ARABIC)
 def test_fallback_only_where_latin_ext_is_missing(family):
     stack = family_stack(family)
-    fallback = LATIN_EXT_FALLBACK[FONTS[family].generic]
     assert stack.startswith(f"'{CSS_FAMILY_PREFIX}{family}'")
-    assert (f"'{CSS_FAMILY_PREFIX}{fallback}'" in stack) == (family in NO_LATIN_EXT)
     assert stack.endswith(FONTS[family].generic)
+    fallback = LATIN_EXT_FALLBACK.get(FONTS[family].generic)
+    if fallback is None:
+        # A generic with no Latin fallback (Cascadia's monospace): the face
+        # must carry Latin-Ext itself, or render would have nothing to add.
+        assert family not in NO_LATIN_EXT
+        assert stack.count(CSS_FAMILY_PREFIX) == 1
+        return
+    assert (f"'{CSS_FAMILY_PREFIX}{fallback}'" in stack) == (family in NO_LATIN_EXT)
 
 
 @pytest.mark.parametrize("family", sorted(NO_LATIN_EXT))

@@ -50,6 +50,9 @@ ALLOWED = {
     "Almarai", "Alexandria", "Mada", "Readex Pro", "Noto Sans Arabic",
     "El Messiri", "Markazi Text", "Scheherazade New", "Lateef", "Aref Ruqaa",
     "Lalezar", "Jomhuria", "Rakkas", "Marhey", "Baloo Bhaijaan 2", "Lemonada",
+    # added 2026-10-07 (Arabic Headings / Details)
+    "Beiruti", "Changa", "Zain", "Parastoo", "Alyamama", "Cascadia Code",
+    "Cascadia Mono", "Vazirmatn", "Estedad",
 }
 
 #: Named so a grep finds them. All are licensed per-seat or per-domain and are

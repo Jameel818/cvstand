@@ -48,7 +48,6 @@ def test_builder_word_download_is_the_template_design(page, live_server, tmp_pat
     expect(page).to_have_url(re.compile(r"/builder"))
     expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
 
-    page.click('.sec[data-sid="fonts"] > summary')
     page.select_option("#ty_heading_font", FONT[lang])
     page.select_option("#ty_body_size", BODY_SIZE)
     page.wait_for_timeout(1200)                       # the debounced save

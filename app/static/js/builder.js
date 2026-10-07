@@ -25,7 +25,27 @@
      configurations (private windows, site data blocked) rather than returning
      null — an uncaught throw here would take the whole builder down at boot,
      for a feature the user could live without. */
-  const STORE_KEY = "cvstand:resume";
+  /* ONE RÉSUMÉ PER LANGUAGE (2026-10-07).
+
+     There used to be one slot, "cvstand:resume", for both languages, and the
+     page's seed (#resume-data: the demo CV in the chosen language) was used
+     only while that slot was empty. So the document a visitor saw in Arabic
+     depended on what they had last done in English:
+       - one English edit, then العربية: the Arabic builder opened on the
+         English text, headings in Arabic around it ("English text instead of
+         Arabic");
+       - an Arabic CV, then an English edit, then back: the English edit had
+         overwritten the only copy, and the Arabic was gone ("Arabic details
+         lost").
+     Measured in Chromium before the fix, both every time. Each language now
+     keeps its own document, and switching the header only chooses which one
+     is open: nothing typed in one language is touched by work in the other.
+
+     The language comes from the page (`doc_lang`, the header's choice), never
+     from the cookie - see `docLang` below. */
+  const LEGACY_STORE_KEY = "cvstand:resume";
+  const STORE_LANG = JSON.parse($("#i18n-data").textContent).doc_lang || "en";
+  const STORE_KEY = LEGACY_STORE_KEY + ":" + STORE_LANG;
   const TPL_KEY = "cvstand:template";
 
   function readStored(key) {
@@ -34,6 +54,32 @@
   function writeStored(key, value) {
     try { window.localStorage.setItem(key, value); return true; } catch (_) { return false; }
   }
+  function removeStored(key) {
+    try { window.localStorage.removeItem(key); } catch (_) { /* nothing to free */ }
+  }
+
+  /* The old shared slot moves, once, into the slot of the language it is
+     WRITTEN in - read from its text, not its `lang`, because the old boot
+     code re-stamped `lang` with whatever the header said, so an English CV
+     opened once in Arabic says "ar". A slot that already has a document is
+     never overwritten. */
+  const ARABIC_LETTER = /[؀-ۿ]/;
+  function writtenIn(doc) {
+    const text = [doc.name, doc.title, doc.summary].filter((x) => typeof x === "string").join(" ");
+    return ARABIC_LETTER.test(text) ? "ar" : "en";
+  }
+  (function adoptLegacySlot() {
+    const raw = readStored(LEGACY_STORE_KEY);
+    if (raw == null) return;
+    try {
+      const doc = JSON.parse(raw);
+      if (doc && typeof doc === "object" && !Array.isArray(doc)) {
+        const key = LEGACY_STORE_KEY + ":" + writtenIn(doc);
+        if (readStored(key) == null && !writeStored(key, raw)) return;   // keep it if it cannot move
+      }
+    } catch (_) { /* corrupt: nothing to move */ }
+    removeStored(LEGACY_STORE_KEY);
+  })();
 
   const seed = JSON.parse($("#resume-data").textContent);
   let data = (() => {
@@ -152,9 +198,8 @@
     { id: "references", title: T("References"),
       list: { path: "references", label: T("Reference"), titleKey: "name",
         item: [F("name", T("Name")), F("title", T("Title")), F("phone", T("Phone")), F("email", T("Email"))] } },
-    /* Rendered by fontsBody(), not by the generic field/list machinery: its
-       controls depend on each other (a font decides which weights exist). */
-    { id: "fonts", title: T("Fonts"), custom: "fonts" },
+    /* The Fonts controls are not a form section any more: they live in the
+       ribbon above the preview (ribbonHTML below). */
   ];
 
   /* ---------- path helpers ---------- */
@@ -246,27 +291,43 @@
     </div>`;
   }
 
-  /* ---------- Fonts section (docs/CVSTAND_FONT_CONTROLS.md §3.5) ----------
-     Six optional controls: Font / Weight / Size for Headlines (the name and
-     section titles) and Details (everything else). Every list comes from the
-     server's registry for the DOCUMENT's language (#typography-data); nothing
-     here knows a font name. "Template default" (null) is the first option of
-     all six and keeps the template exactly as designed.
+  /* ---------- the font ribbon (docs/CVSTAND_FONT_CONTROLS.md §3.5) ----------
+     Nine optional controls above the preview, like Word's ribbon: Font /
+     Weight / Size for the Name, the section Headings and the Details. They
+     were a "Fonts" section at the bottom of the form until 2026-10-07; moved,
+     not copied - same ids, same options, same résumé keys, so the preview,
+     the PDF and the Word file read exactly what they read before. Every list
+     comes from the server's registry for the DOCUMENT's language
+     (#typography-data); nothing here knows a font name. "Template default"
+     (null) is the first option of each and keeps the template as designed.
 
-     The selects carry data-ty, never a `name`, so the generic input handler
-     (which writes strings by path) ignores them; they have their own change
-     handler below, which writes numbers and nulls. */
+     The selects carry data-ty, never a `name`, so the form's input handler
+     (which writes strings by path) never sees them; they have their own
+     change handler below, which writes numbers and nulls. */
   const TY = JSON.parse($("#typography-data").textContent);
   const TY_KEYS = {
     name: ["font_name", "font_name_weight", "font_name_size"],
     heading: ["font_heading", "font_heading_weight", "font_heading_size"],
     body: ["font_body", "font_body_weight", "font_body_size"],
   };
+  const TY_ALL = [].concat(TY_KEYS.name, TY_KEYS.heading, TY_KEYS.body);
   const TY_ROLE_TITLE = { name: "Name", heading: "Headings", body: "Details" };
   /* The Name font is null by default, meaning "Same as Headings" (the
      Headings font and weight); this reserved value is "Template default". */
   const NAME_TEMPLATE = "template";
   const TY_FIELD_TITLE = ["Font", "Weight", "Size"];
+  /* Compact mode shows these instead of the words. Decorative: every control
+     keeps its <label> for assistive technology, and a tooltip (title). */
+  const TY_ICON = {
+    font: '<span class="rb-ico-t" aria-hidden="true">Aa</span>',
+    weight: '<span class="rb-ico-t rb-ico-b" aria-hidden="true">B</span>',
+    size: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 15 6 5h.8l3.5 10M3.6 11.6h5.6M14.5 4v12M12 6.5 14.5 4 17 6.5M12 13.5l2.5 2.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  };
+  const TY_GROUP_ICON = {
+    name: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="6.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 17c.9-3.4 3.3-5 6.2-5s5.3 1.6 6.2 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    heading: '<span class="rb-ico-t rb-ico-b" aria-hidden="true">H</span>',
+    body: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 9h14M3 13h14M3 17h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  };
 
   function tyFamily(role, name) {
     for (const g of TY.roles[role].groups) {
@@ -307,56 +368,170 @@
     /* Weight follows the font: nothing to choose without one (a weight on
        the template's own face could be a faux bold), and a font with a
        single weight shows that weight, disabled, rather than hiding the
-       control - the layout stays still (§3.5). */
-    let weightSel;
+       control - the ribbon stays still (§3.5). Only weights the font really
+       has are listed: the registry's offered_weights(). */
+    let weightOpts, weightOff = false;
     if (!fam) {
-      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="">${noChoice}</option></select>`;
+      weightOpts = `<option value="">${noChoice}</option>`;
+      weightOff = true;
     } else if (fam.single) {
       const only = fam.weights[0];
-      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}" disabled><option value="${only}">${only} — ${T("only weight")}</option></select>`;
+      weightOpts = `<option value="${only}">${only} — ${T("only weight")}</option>`;
+      weightOff = true;
     } else {
-      weightSel = `<select id="${id("weight")}" data-ty="weight" data-role="${role}"><option value="">${noChoice}</option>` +
-        fam.weights.map((x) => `<option value="${x}"${x === w ? " selected" : ""}>${x} — ${T(TY.weight_labels[String(x)])}</option>`).join("") +
-        `</select>`;
+      weightOpts = `<option value="">${noChoice}</option>` +
+        fam.weights.map((x) => `<option value="${x}"${x === w ? " selected" : ""}>${x} — ${T(TY.weight_labels[String(x)])}</option>`).join("");
     }
-    const sizeSel = `<select id="${id("size")}" data-ty="size" data-role="${role}"><option value="">${T("Template default")}</option>` +
-      R.sizes.map((x) => `<option value="${x}"${x === size ? " selected" : ""}>${x} ${T("pt")}</option>`).join("") + `</select>`;
+    const sizeOpts = `<option value="">${T("Template default")}</option>` +
+      R.sizes.map((x) => `<option value="${x}"${x === size ? " selected" : ""}>${x} ${T("pt")}</option>`).join("");
 
-    /* The sample draws in the chosen face at the weight the CV uses for plain
-       text, so it is also what makes the browser fetch that one face. */
+    /* The font select draws its own value in the chosen face, at the weight
+       the CV uses for plain text: it is the sample, and it is what makes the
+       browser fetch that one face. */
     const inherited = follows ? tyNum(data.font_heading_weight) : null;
     const sampleW = w || inherited || (fam ? fam.nearest[role === "body" ? "400" : "700"] : 400);
-    const sample = fam ? `<div class="ty-sample" dir="auto" style="font-family:${esc(fam.stack)};font-weight:${sampleW}">${esc(TY.sample)}</div>` : "";
+    const face = fam ? ` style="font-family:${esc(fam.stack)};font-weight:${sampleW}"` : "";
     const tag = fam && fam.playful ? `<small class="ty-tag">${T("Creative, best for design/creative roles")}</small>` : "";
     const effSize = size == null ? R.default_size : size;
     const faint = role === "body" && fam && w === TY.light.weight && effSize < TY.light.below_pt
       ? `<small class="ty-hint">${T("Very light text may look faint when printed.")}</small>` : "";
 
-    return `<div class="ty-group" data-ty-role="${role}"><h4>${T(TY_ROLE_TITLE[role])}</h4>
-      <div class="field"><label for="${id("font")}">${T("Font")}</label>
-        <select id="${id("font")}" data-ty="font" data-role="${role}">${fontOpts}</select>${sample}${tag}</div>
-      <div class="grid-2">
-        <div class="field"><label for="${id("weight")}">${T("Weight")}</label>${weightSel}</div>
-        <div class="field"><label for="${id("size")}">${T("Size")}</label>${sizeSel}</div>
-      </div>${faint}</div>`;
+    const title = T(TY_ROLE_TITLE[role]);
+    const ctl = (f, i, inner, extra) => {
+      const lbl = T(TY_FIELD_TITLE[i]);
+      return `<div class="rb-ctl rb-${f}"><label for="${id(f)}" title="${esc(lbl)}"><span class="rb-lbl">${lbl}</span>${TY_ICON[f]}</label>` +
+        `<select id="${id(f)}" data-ty="${f}" data-role="${role}" title="${esc(title + " · " + lbl)}"${extra || ""}>${inner}</select></div>`;
+    };
+    return `<div class="ty-group" data-ty-role="${role}" role="group" aria-labelledby="ty_${role}_title">` +
+      `<div class="rb-ctls">${ctl("font", 0, fontOpts, face)}` +
+      `${ctl("weight", 1, weightOpts, weightOff ? " disabled" : "")}${ctl("size", 2, sizeOpts)}</div>` +
+      `${tag}${faint}<div class="rb-caption" id="ty_${role}_title" title="${esc(title)}">` +
+      `${TY_GROUP_ICON[role]}<span class="rb-lbl">${title}</span></div></div>`;
   }
 
-  function fontsBody() {
-    return `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${T("Optional. Anything left on Template default keeps the template's own look.")}</p>` +
-      tyRoleHTML("name") + tyRoleHTML("heading") + tyRoleHTML("body");
-  }
-
-  /* Re-draw the section in place, keeping keyboard focus on the control the
-     user was on - a re-render must not throw them back to the top. */
-  function refreshFonts() {
-    const body = $('#resume-form .sec[data-sid="fonts"] .sec-body');
-    if (!body) return;
+  /* Re-draw the groups in place, keeping keyboard focus on the control the
+     user was on - a re-render must not throw them back to the start. */
+  function refreshRibbon() {
+    const box = $("#ribbon-groups");
     const active = document.activeElement;
     const keep = active && active.dataset && active.dataset.ty
       ? `select[data-ty="${active.dataset.ty}"][data-role="${active.dataset.role}"]` : null;
-    body.innerHTML = fontsBody();
-    if (keep) { const el = $(keep, body); if (el) el.focus(); }
+    box.innerHTML = tyRoleHTML("name") + tyRoleHTML("heading") + tyRoleHTML("body");
+    if (keep) { const el = $(keep, box); if (el) el.focus(); }
+    /* Nothing to reset when every choice is already the template's own. */
+    $("#fonts-default").disabled = !TY_ALL.some((k) => data[k] != null);
   }
+
+  /* LABELS OR ICONS. Labels beside the controls by default; the toggle hides
+     them (icons + tooltips), and a narrow screen is compact whatever the
+     toggle says - nine labelled controls do not fit a phone. The choice is a
+     per-browser convenience, so it lives in localStorage, and a browser that
+     stores nothing simply keeps the default. */
+  const LABELS_KEY = "cvstand:ribbon-labels";
+  const narrow = window.matchMedia("(max-width: 900px)");
+  function applyRibbonMode() {
+    const hidden = readStored(LABELS_KEY) === "hide";
+    $("#ribbon").classList.toggle("is-compact", hidden || narrow.matches);
+    const btn = $("#ribbon-labels");
+    btn.hidden = narrow.matches;
+    btn.setAttribute("aria-pressed", String(!hidden));
+    const tip = hidden ? T("Show labels") : T("Hide labels");
+    btn.title = tip;
+    btn.setAttribute("aria-label", tip);
+  }
+  $("#ribbon-labels").addEventListener("click", () => {
+    writeStored(LABELS_KEY, readStored(LABELS_KEY) === "hide" ? "show" : "hide");
+    applyRibbonMode();
+  });
+  if (narrow.addEventListener) narrow.addEventListener("change", applyRibbonMode);
+
+  /* ---------- undo (2026-10-07) ----------
+     Every change the user makes in the builder - typing, a list entry or
+     bullet added or removed, a photo, a font / weight / size, Default fonts,
+     a template - first pushes a snapshot of the state it is about to change.
+     Undo restores the last one: the résumé (`data`) and the template, which
+     between them are everything the preview, the PDF and the Word file are
+     made from - the exports POST exactly this state, so they follow an undo
+     with no code of their own.
+
+     Typing is coalesced: one step per burst in one field (a pause of more
+     than UNDO_BURST_MS, or another field, starts a new step), the way a word
+     processor undoes a word rather than a letter. At most UNDO_LIMIT steps
+     are kept, oldest dropped first. The history lives for the page: it is a
+     way back from a mistake, not a version store. */
+  const UNDO_LIMIT = 100;
+  const UNDO_BURST_MS = 1000;
+  const undoStack = [];
+  let undoBurst = { field: null, at: 0 };
+
+  function snapshot() {
+    return { data: JSON.stringify(data), templateKey };
+  }
+  function recordUndo(field) {
+    const now = Date.now();
+    if (field && undoBurst.field === field && now - undoBurst.at < UNDO_BURST_MS) {
+      undoBurst.at = now;                    // same burst: the step is already saved
+      return;
+    }
+    undoBurst = { field: field || null, at: now };
+    undoStack.push(snapshot());
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+    paintUndo();
+  }
+  function paintUndo() {
+    const btn = $("#undo-btn");
+    btn.disabled = !undoStack.length;
+    btn.title = undoStack.length ? T("Undo") + " (Ctrl+Z)" : T("Nothing to undo");
+  }
+
+  function undo() {
+    const prev = undoStack.pop();
+    if (!prev) return;
+    undoBurst = { field: null, at: 0 };
+    const focused = document.activeElement;
+    const keepName = focused && focused.name ? focused.name : null;
+    data = JSON.parse(prev.data);
+    if (prev.templateKey !== templateKey) {
+      templateKey = prev.templateKey;
+      writeStored(TPL_KEY, templateKey);
+      paintTemplateName(templateKey);
+      markCurrent();
+    }
+    renderForm();
+    refreshRibbon();
+    paintUndo();
+    if (keepName) {
+      const el = $(`#resume-form [name="${CSS.escape(keepName)}"]`);
+      if (el) el.focus();
+    }
+    clearTimeout(renderTimer);
+    doRender();
+    scheduleSave();
+  }
+  $("#undo-btn").addEventListener("click", undo);
+  /* Ctrl+Z (Cmd+Z on a Mac) is THIS undo everywhere on the page, inside a
+     text box too: the browser's own undo there would only rewind that one
+     box, and its edit would then arrive as a new change. Ctrl+Shift+Z is
+     left alone (redo is not offered). */
+  document.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
+    if (e.key !== "z" && e.key !== "Z") return;
+    e.preventDefault();
+    undo();
+  });
+
+  /* DEFAULT FONTS: every Name / Headings / Details choice back to null, which
+     is "this template's own face, weight and size" in whichever language the
+     document is in - the template decides, so there is nothing to look up.
+     One undo step. */
+  $("#fonts-default").addEventListener("click", () => {
+    if (!TY_ALL.some((k) => data[k] != null)) return;
+    recordUndo();
+    TY_ALL.forEach((k) => { data[k] = null; });
+    refreshRibbon();
+    scheduleRender();
+    scheduleSave();
+  });
 
   /* The server rendered these as template default because they are not
      offered for this document's language - after a language switch, most
@@ -385,13 +560,12 @@
     close.addEventListener("click", () => { box.hidden = true; });
     box.append(text, close);
     box.hidden = false;
-    refreshFonts();
+    refreshRibbon();
     scheduleSave();
   }
 
   function sectionHTML(sec, n) {
     let body = "";
-    if (sec.custom === "fonts") body += fontsBody();
     (sec.fields || []).forEach((f) => { body += inputHTML(f, f.path); });
     if (sec.hint) body += `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${sec.hint}</p>`;
     if (sec.list) {
@@ -449,6 +623,7 @@
     const el = e.target;
     if (el.dataset.photo !== undefined) return;
     if (!el.name) return;
+    recordUndo("field:" + el.name);
     const v = coerce(el.name, el.value);
     if (v === undefined) {
       const keys = el.name.split(".");
@@ -469,6 +644,8 @@
     const btn = e.target.closest("button[data-act]");
     if (!btn) return;
     const { act, path, idx } = btn.dataset;
+    if (!["add", "rm", "addbullet", "rmbullet"].includes(act)) return;
+    recordUndo();
     if (act === "add") {
       const sec = SPEC.find((s) => s.list && s.list.path === path);
       const arr = ensureArray(path);
@@ -483,10 +660,11 @@
     onChange(true);
   });
 
-  /* Fonts section: its selects have no `name`, so only this handler sees them. */
-  $("#resume-form").addEventListener("change", (e) => {
+  /* The ribbon: its selects have no `name`, so only this handler sees them. */
+  $("#ribbon-groups").addEventListener("change", (e) => {
     const el = e.target.closest("select[data-ty]");
     if (!el) return;
+    recordUndo();
     const role = el.dataset.role;
     const [fk, wk, sk] = TY_KEYS[role];
     if (el.dataset.ty === "font") {
@@ -507,7 +685,7 @@
     } else {
       data[sk] = tyNum(el.value);
     }
-    refreshFonts();
+    refreshRibbon();
     scheduleRender();
     scheduleSave();
   });
@@ -545,6 +723,7 @@
       }
       const j = await res.json();
       showErrors(null);
+      recordUndo();
       setPath(data, el.dataset.photo, j.url);
       onChange(true);
     } catch (_) {
@@ -556,6 +735,7 @@
   $("#resume-form").addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-clear-photo]");
     if (!btn) return;
+    recordUndo();
     setPath(data, btn.dataset.clearPhoto, "");
     onChange(true);
   });
@@ -626,7 +806,7 @@
          Name size). Applied silently - nothing the user sees changes. */
       if (j.migrations && j.migrations.length) {
         j.migrations.forEach((m) => { data[m.key] = m.value; });
-        refreshFonts();
+        refreshRibbon();
         scheduleSave();
       }
       if (j.resets && j.resets.length) applyTypographyResets(j.resets);
@@ -858,6 +1038,7 @@
           });
         } catch (_) { /* the local choice stands */ }
       }
+      if (key !== templateKey) recordUndo();
       templateKey = key;
       paintTemplateName(key);
       markCurrent();
@@ -928,6 +1109,9 @@
   }
   applyLevelVocab(docLang);
   renderForm();
+  refreshRibbon();
+  applyRibbonMode();
+  paintUndo();
   applyZoom();
   /* After T() exists and before anything is drawn: the bar is server-rendered
      from the server's meta, which on a deployment is not what `templateKey`

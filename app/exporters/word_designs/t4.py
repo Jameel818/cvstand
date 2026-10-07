@@ -18,8 +18,9 @@ SIDE_PX = 300
 
 def _ribbon(ctx, box, label):
     """Clay ribbon, 314px: it overhangs the 300px rail by 14px, with a dark
-    fold triangle under the overhang (CSS clip-path polygon(0 0,100% 0,0 100%),
-    physical, so the same shape in Arabic, at the rail's other edge)."""
+    fold triangle under the overhang whose straight edge sits against the
+    rail (t4.j2: polygon(0 0,100% 0,0 100%) in LTR, mirrored in Arabic -
+    2026-10-07; it used to keep the LTR shape and face outwards)."""
     b = block(ctx, box, SIDE_PX, fill=CLAY, pad=(10, 34, 10, 0))
     p = b.p()
     run(ctx, p, label, "heading", size=19, color="FFFFFF", spacing=0.5)
@@ -30,8 +31,9 @@ def _ribbon(ctx, box, label):
     # y is measured from the paragraph's top INCLUDING its space before
     # (measured in Word): the ribbon's 10px top padding is that space
     vml_anchored(p, x_pt=pt(x), y_pt=0, w_pt=pt(14), h_pt=pt(line_px + 20), fill=CLAY)
+    fold = "m0,0 l14,0 l14,8 x e" if ctx.rtl else "m0,0 l14,0 l0,8 x e"
     vml_anchored(p, x_pt=pt(x), y_pt=pt(line_px + 20), w_pt=pt(14), h_pt=pt(8), fill=FOLD,
-                 path="m0,0 l14,0 l0,8 x e", coords="14,8")
+                 path=fold, coords="14,8")
     b.finish()
 
 

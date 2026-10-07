@@ -14,7 +14,9 @@ from playwright.sync_api import expect
 
 pytestmark = [pytest.mark.e2e]
 
-STORE_KEY = "cvstand:resume"
+#: One stored résumé per language since 2026-10-07 ("cvstand:resume:<lang>").
+#: The shell's <html lang> is the document's language, so it names the slot.
+STORE_KEY = "'cvstand:resume:' + document.documentElement.lang"
 SELECTS = [f"#ty_{role}_{f}" for role in ("name", "heading", "body")
            for f in ("font", "weight", "size")]
 
@@ -25,12 +27,13 @@ def _open_fonts(page, live_server, lang="en"):
     else:
         page.goto(live_server.url + "/builder")
     expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
-    page.click('.sec[data-sid="fonts"] > summary')
-    expect(page.locator("#ty_heading_font")).to_be_visible()
+    # The controls live in the ribbon above the preview (2026-10-07): always
+    # on screen, nothing to open.
+    expect(page.locator("#ribbon #ty_heading_font")).to_be_visible()
 
 
 def _stored(page) -> dict:
-    return json.loads(page.evaluate(f"localStorage.getItem('{STORE_KEY}')") or "{}")
+    return json.loads(page.evaluate(f"localStorage.getItem({STORE_KEY})") or "{}")
 
 
 def _preview_name(page):
@@ -39,8 +42,8 @@ def _preview_name(page):
 
 def test_nine_selects_template_default_first_and_grouped(page, live_server):
     _open_fonts(page, live_server)
-    expect(page.locator('.sec[data-sid="fonts"] summary')).to_contain_text("Fonts")
-    titles = page.locator('.sec[data-sid="fonts"] .ty-group h4').all_inner_texts()
+    assert page.locator("#ribbon").get_attribute("aria-label") == "Fonts"
+    titles = page.locator("#ribbon .ty-group .rb-caption").all_inner_texts()
     assert titles == ["Name", "Headings", "Details"]
     for sel in SELECTS:
         expect(page.locator(sel)).to_have_count(1)
@@ -57,7 +60,7 @@ def test_nine_selects_template_default_first_and_grouped(page, live_server):
 
 def test_arabic_interface_names_the_section_and_its_groups(page, live_server):
     _open_fonts(page, live_server, "ar")
-    expect(page.locator('.sec[data-sid="fonts"] summary')).to_contain_text("الخطوط")
+    assert page.locator("#ribbon").get_attribute("aria-label") == "الخطوط"
     assert page.locator("#ty_heading_font option").first.inner_text() == "افتراضي القالب"
     groups = page.locator("#ty_heading_font optgroup").evaluate_all(
         "els => els.map(e => e.label)")
@@ -88,7 +91,7 @@ def test_name_offers_template_default_then_same_as_headings(page, live_server):
 
 def test_arabic_name_labels(page, live_server):
     _open_fonts(page, live_server, "ar")
-    titles = page.locator('.sec[data-sid="fonts"] .ty-group h4').all_inner_texts()
+    titles = page.locator("#ribbon .ty-group .rb-caption").all_inner_texts()
     assert titles[1:] == ["عناوين الأقسام", "التفاصيل"]
     assert page.locator("#ty_name_font > option").nth(1).inner_text() == "مثل عناوين الأقسام"
 
@@ -99,11 +102,10 @@ def test_a_pre_split_resume_opens_migrated(page, live_server):
     page.goto(live_server.url + "/builder")
     expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
     page.evaluate(f"""() => {{
-      const d = JSON.parse(localStorage.getItem('{STORE_KEY}') || document.querySelector('#resume-data').textContent);
+      const d = JSON.parse(localStorage.getItem({STORE_KEY}) || document.querySelector('#resume-data').textContent);
       d.font_heading = 'Montserrat'; d.font_heading_size = 32; delete d.font_name_size;
-      localStorage.setItem('{STORE_KEY}', JSON.stringify(d)); }}""")
+      localStorage.setItem({STORE_KEY}, JSON.stringify(d)); }}""")
     page.reload()
-    page.click('.sec[data-sid="fonts"] > summary')
     expect(page.locator("#ty_name_size")).to_have_value("32")
     expect(page.locator("#ty_heading_size")).to_have_value("13")
     expect(page.locator("#form-notice")).to_be_hidden()
@@ -154,12 +156,12 @@ def test_light_weight_small_size_hint(page, live_server):
 def test_choice_reaches_the_preview_and_survives_a_reload(page, live_server):
     _open_fonts(page, live_server)
     page.select_option("#ty_heading_font", "Montserrat")
-    expect(page.locator('[data-ty-role="heading"] .ty-sample')).to_be_visible()
+    # The sample is the font select itself, drawn in the chosen face.
+    expect(page.locator("#ty_heading_font")).to_have_css("font-family", re.compile(r"CVT Montserrat"))
     expect(_preview_name(page)).to_have_css("font-family", re.compile(r"CVT Montserrat"))
     page.wait_for_timeout(1200)
     assert _stored(page)["font_heading"] == "Montserrat"
     page.reload()
-    page.click('.sec[data-sid="fonts"] > summary')
     expect(page.locator("#ty_heading_font")).to_have_value("Montserrat")
     expect(_preview_name(page)).to_have_css("font-family", re.compile(r"CVT Montserrat"))
 

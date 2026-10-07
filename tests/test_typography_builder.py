@@ -74,9 +74,14 @@ def test_every_builder_T_literal_has_arabic():
     assert not missing, missing
 
 
-def test_the_section_is_called_fonts():
+def test_the_controls_are_the_ribbon_called_fonts():
+    """Moved on 2026-10-07 from a form section to the ribbon above the
+    preview - MOVED, so the form must not carry a second copy."""
     src = BUILDER_JS.read_text(encoding="utf-8")
-    assert '{ id: "fonts", title: T("Fonts"), custom: "fonts" }' in src
+    assert 'id: "fonts"' not in src, "the Fonts form section is back beside the ribbon"
+    html = (BUILDER_JS.parents[2] / "templates" / "builder.html").read_text(encoding="utf-8")
+    assert """<section class="ribbon" id="ribbon" aria-label="{{ t('Fonts') }}">""" in html
+    assert html.index('id="ribbon"') < html.index('id="preview-scroll"'), "the ribbon is above the preview"
     assert str(ui_t("Fonts", "ar")) == "الخطوط"
 
 

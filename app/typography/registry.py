@@ -74,7 +74,7 @@ LEGACY_SECTION_CLAMP_PT = {"en": (11, 18), "ar": (12, 20)}
 LIGHT_WEIGHT = 200
 LIGHT_WARNING_PT = {"en": 10, "ar": 11}
 
-# Eight Arabic families stop at Latin-1 upstream (measured, build.json
+# Nine Arabic families stop at Latin-1 upstream (measured, build.json
 # `latin_ext`), so a rare Latin letter (Ł, ř, Ş) needs a Latin family that has
 # it. Chosen by the family's generic, and built at every weight 200-900 so the
 # fallback never has to synthesise either. Loaded by the browser only when a
@@ -155,6 +155,19 @@ FONTS: dict[str, Font] = {f.family: f for f in (
     Font("Marhey", _span(300, 700), PLAYFUL, playful=True),
     Font("Baloo Bhaijaan 2", _span(400, 800), PLAYFUL, playful=True),
     Font("Lemonada", _span(300, 700), PLAYFUL, playful=True),
+    # ---- Arabic, added 2026-10-07 (user request) -------------------------
+    # Weights measured from the google/fonts files themselves (wght axis or
+    # the statics' usWeightClass) at the pinned commit, not from a catalogue:
+    # Zain ships no 500/600, Parastoo starts at 400, Alyamama at 300.
+    Font("Beiruti", _span(200, 900), KUFI),
+    Font("Changa", _span(200, 800), KUFI),
+    Font("Zain", (200, 300, 400, 700, 800, 900), KUFI),
+    Font("Parastoo", _span(400, 700), NASKH, "serif"),
+    Font("Alyamama", _span(300, 900), NASKH, "serif"),
+    Font("Cascadia Code", _span(200, 700), KUFI, "monospace"),
+    Font("Cascadia Mono", _span(200, 700), KUFI, "monospace"),
+    Font("Vazirmatn", _span(100, 900), KUFI),
+    Font("Estedad", _span(100, 900), KUFI),
 )}
 
 # Which families each dropdown lists, in the spec's order (§3.1-3.4).
@@ -168,11 +181,12 @@ OFFERED: dict[tuple[str, str], tuple[str, ...]] = {
                         "Mada", "Readex Pro", "El Messiri", "Noto Naskh Arabic",
                         "Markazi Text", "Scheherazade New", "Lateef", "Aref Ruqaa",
                         "Lalezar", "Jomhuria", "Rakkas", "Marhey", "Baloo Bhaijaan 2",
-                        "Lemonada"),
+                        "Lemonada", "Beiruti", "Changa", "Zain"),
     ("ar", "body"): ("Markazi Text", "Noto Naskh Arabic", "Readex Pro", "Amiri",
                      "Scheherazade New", "Noto Kufi Arabic", "IBM Plex Sans Arabic",
                      "Noto Sans Arabic", "Lateef", "Mada", "Baloo Bhaijaan 2", "Tajawal",
-                     "Cairo", "Alexandria", "El Messiri"),
+                     "Cairo", "Alexandria", "El Messiri", "Parastoo", "Alyamama",
+                     "Cascadia Code", "Cascadia Mono", "Vazirmatn", "Estedad", "Zain"),
 }
 # The Name lists ARE the Headings lists (spec §3.1 / §3.3).
 OFFERED[("en", "name")] = OFFERED[("en", "heading")]

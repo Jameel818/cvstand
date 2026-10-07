@@ -191,6 +191,18 @@
    "clamped": null,
    "line_height": 1.561
   },
+  "Alyamama": {
+   "weight": 400,
+   "ink": 98.01,
+   "ink_headline": 49,
+   "optical_scale": 1.067,
+   "spread": [
+    1.018,
+    1.172
+   ],
+   "clamped": null,
+   "line_height": 1.662
+  },
   "Amiri": {
    "weight": 400,
    "ink": 118.7,
@@ -227,6 +239,18 @@
    "clamped": null,
    "line_height": 1.712
   },
+  "Beiruti": {
+   "weight": 700,
+   "ink": 87.7,
+   "ink_headline": 43,
+   "optical_scale": 1.211,
+   "spread": [
+    1.141,
+    1.531
+   ],
+   "clamped": null,
+   "line_height": 1.386
+  },
   "Cairo": {
    "weight": 400,
    "ink": 104.6,
@@ -239,6 +263,42 @@
    "clamped": null,
    "line_height": 1.883
   },
+  "Cascadia Code": {
+   "weight": 400,
+   "ink": 101.53,
+   "ink_headline": 49,
+   "optical_scale": 1.03,
+   "spread": [
+    1.01,
+    1.066
+   ],
+   "clamped": null,
+   "line_height": 1.3213
+  },
+  "Cascadia Mono": {
+   "weight": 400,
+   "ink": 101.53,
+   "ink_headline": 49,
+   "optical_scale": 1.03,
+   "spread": [
+    1.01,
+    1.066
+   ],
+   "clamped": null,
+   "line_height": 1.3213
+  },
+  "Changa": {
+   "weight": 700,
+   "ink": 108.6,
+   "ink_headline": 49,
+   "optical_scale": 0.978,
+   "spread": [
+    0.919,
+    1.307
+   ],
+   "clamped": null,
+   "line_height": 2.048
+  },
   "El Messiri": {
    "weight": 400,
    "ink": 95.47,
@@ -250,6 +310,18 @@
    ],
    "clamped": null,
    "line_height": 1.563
+  },
+  "Estedad": {
+   "weight": 400,
+   "ink": 106.93,
+   "ink_headline": 49,
+   "optical_scale": 0.978,
+   "spread": [
+    0.898,
+    1.043
+   ],
+   "clamped": null,
+   "line_height": 1.525
   },
   "IBM Plex Sans Arabic": {
    "weight": 400,
@@ -383,6 +455,18 @@
    "clamped": null,
    "line_height": 2.169
   },
+  "Parastoo": {
+   "weight": 400,
+   "ink": 85.56,
+   "ink_headline": 40,
+   "optical_scale": 1.223,
+   "spread": [
+    1.147,
+    1.26
+   ],
+   "clamped": null,
+   "line_height": 1.4602
+  },
   "Rakkas": {
    "weight": 400,
    "ink": 110.51,
@@ -430,6 +514,30 @@
    ],
    "clamped": null,
    "line_height": 1.391
+  },
+  "Vazirmatn": {
+   "weight": 400,
+   "ink": 103.63,
+   "ink_headline": 50,
+   "optical_scale": 1.009,
+   "spread": [
+    0.965,
+    1.06
+   ],
+   "clamped": null,
+   "line_height": 1.709
+  },
+  "Zain": {
+   "weight": 400,
+   "ink": 105.7,
+   "ink_headline": 48,
+   "optical_scale": 0.99,
+   "spread": [
+    0.904,
+    1.386
+   ],
+   "clamped": null,
+   "line_height": 1.66
   }
  }
 }

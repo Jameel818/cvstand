@@ -22,14 +22,16 @@ from playwright.sync_api import expect
 
 pytestmark = pytest.mark.e2e
 
-STORE_KEY = "cvstand:resume"
+#: One stored résumé per language since 2026-10-07 ("cvstand:resume:<lang>").
+#: The shell's <html lang> is the document's language, so it names the slot.
+STORE_KEY = "'cvstand:resume:' + document.documentElement.lang"
 MINE = "Zahra Al-Mansouri"
 
 
 def _stored(page):
     raw = page.evaluate(
         "() => { try { return localStorage.getItem('%s'); } catch (_) { return null; } }"
-        % STORE_KEY
+        .replace("'%s'", "%s") % STORE_KEY
     )
     return json.loads(raw) if raw else None
 

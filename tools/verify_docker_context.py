@@ -44,6 +44,17 @@ REQUIRED_GLOBS = [
     "app/static/fonts/typography.css",
     "app/static/fonts/ttf/*.ttf",
     "app/static/fonts/web/*.woff2",
+    # The Arabic families added 2026-10-07, named one by one: the globs above
+    # still match if a whole family is excluded, and a Word download would
+    # then embed nothing for it. Cascadia ships TTF only (unmodified, RFN).
+    *(f"app/static/fonts/ttf/{slug}-*.ttf" for slug in (
+        "beiruti", "changa", "zain", "parastoo", "alyamama", "cascadia-code",
+        "cascadia-mono", "vazirmatn", "estedad")),
+    *(f"app/static/fonts/web/{slug}-*.woff2" for slug in (
+        "beiruti", "changa", "zain", "parastoo", "alyamama", "vazirmatn", "estedad")),
+    *(f"app/static/fonts/licenses/{name}-OFL.txt" for name in (
+        "Beiruti", "Changa", "Zain", "Parastoo", "Alyamama", "Cascadia-Code",
+        "Cascadia-Mono", "Vazirmatn", "Estedad")),
     "app/static/icons/*.png",
     # The showcase samples the landing hero and gallery cards render.
     "data/sample_resume.json",

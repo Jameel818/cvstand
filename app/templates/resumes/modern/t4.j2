@@ -18,8 +18,12 @@
         render when r.references is non-empty (the shared sample has none, so the
         block is absent rather than faked).
      5. Right-column gap 20 kept; no compression needed for the shared sample. #}
-{% macro ribbon(label) %}
-<div style="box-sizing:border-box; position:relative; background:#C4562F; color:#ffffff; font-family:Archivo,sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px; padding-block: 10px 10px; padding-inline: 34px 0; width:314px;">{{ label }}<span style="position:absolute; inset-inline-end:0; bottom:-8px; width:14px; height:8px; background:#8E3A1E; clip-path:polygon(0 0, 100% 0, 0 100%);"></span></div>
+{# The fold triangle's straight edge sits against the rail's edge, where the
+   ribbon turns back behind the page: its inline START. clip-path is physical,
+   so Arabic, whose rail edge is on the right, gets the mirrored polygon -
+   until 2026-10-07 it reused the left-hand one and the fold faced outwards. #}
+{% macro ribbon(label, rtl=false) %}
+<div style="box-sizing:border-box; position:relative; background:#C4562F; color:#ffffff; font-family:Archivo,sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px; padding-block: 10px 10px; padding-inline: 34px 0; width:314px;">{{ label }}<span style="position:absolute; inset-inline-end:0; bottom:-8px; width:14px; height:8px; background:#8E3A1E; clip-path:polygon({{ '0 0, 100% 0, 100% 100%' if rtl else '0 0, 100% 0, 0 100%' }});"></span></div>
 {% endmacro %}
 <div class="tpl cv-sections-taj" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; display:flex; font-family:'Source Sans 3',sans-serif; color:#37474C;">
 
@@ -33,7 +37,7 @@
 
     {% set c = r.contact %}
     {% if c.phone or c.email or c.address or c.site or c.social %}
-    {{ ribbon(t('Contact')) }}
+    {{ ribbon(t('Contact'), r.dir == 'rtl') }}
     <div style="padding:0 34px; display:flex; flex-direction:column; gap:10px; font-size:12.5px; line-height:1.45; overflow-wrap:anywhere;">
       {% if c.phone %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Phone') }}</div><div>{{ c.phone }}</div></div>{% endif %}
       {% if c.email %}<div><div style="font-weight:700; color:#ffffff; font-size:13px;">{{ t('Email') }}</div><div>{{ c.email }}</div></div>{% endif %}
@@ -44,7 +48,7 @@
     {% endif %}
 
     {% if r.education %}
-    {{ ribbon(t('Education')) }}
+    {{ ribbon(t('Education'), r.dir == 'rtl') }}
     <div style="padding:0 34px; display:flex; flex-direction:column; gap:14px; font-size:12.5px; line-height:1.45;">
       {% for ed in r.education %}
       <div>
@@ -58,7 +62,7 @@
     {% endif %}
 
     {% if r.skills %}
-    {{ ribbon(t('Skills')) }}
+    {{ ribbon(t('Skills'), r.dir == 'rtl') }}
     <div style="padding:0 34px; display:flex; flex-direction:column; gap:9px;">
       {% for sk in r.skills %}
       <div>
@@ -80,7 +84,7 @@
     {% endif %}
 
     {% if r.languages %}
-    {{ ribbon(t('Language')) }}
+    {{ ribbon(t('Language'), r.dir == 'rtl') }}
     <div style="padding:0 34px; display:flex; flex-direction:column; gap:8px; font-size:12.5px;">
       {% for l in r.languages %}
       <div style="display:flex; justify-content:space-between; gap:8px;"><span style="font-weight:600; color:#ffffff;">{{ l.name }}</span><span style="color:#AEB4D2;">{{ l.level }}</span></div>

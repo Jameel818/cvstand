@@ -38,7 +38,9 @@ from tests import samples
 
 pytestmark = pytest.mark.e2e
 
-STORE_KEY = "cvstand:resume"
+#: One stored résumé per language since 2026-10-07 ("cvstand:resume:<lang>").
+#: The shell's <html lang> is the document's language, so it names the slot.
+STORE_KEY = "'cvstand:resume:' + document.documentElement.lang"
 AR_NAME = samples.ARABIC["name"]
 EN_NAME = samples.ENGLISH["name"]
 MINE = "Zahra Al-Mansouri"
@@ -72,7 +74,7 @@ def _doc_html(page):
 def _stored(page):
     raw = page.evaluate(
         "() => { try { return localStorage.getItem('%s'); } catch (_) { return null; } }"
-        % STORE_KEY)
+        .replace("'%s'", "%s") % STORE_KEY)
     return json.loads(raw) if raw else None
 
 
@@ -124,21 +126,28 @@ def test_a_later_visitor_is_not_stuck_with_the_first_ones_language(browser, depl
 # ------------------------------------------------ what must NOT be swept away
 
 def test_a_resume_you_have_typed_into_survives_the_switch(page, deployed_server):
-    """The CONTENT survives; the language follows.
+    """Each language keeps its OWN document; nothing typed is ever lost.
 
-    This asserted the opposite until 2026-09-22, when the `Résumé language`
-    control was removed as redundant: with no control, a document that did not
-    follow the header would be one whose language could never be changed. What
-    must never move is the text the user typed — that is what is asserted
-    here, and `tests/e2e/test_language_switch.py` holds the rest.
-    """
+    History. Until 2026-09-22 this asserted that the language did NOT follow
+    the header; from then until 2026-10-07 it asserted that one stored
+    document followed it - the typed English text re-opened inside the Arabic
+    template. That was the user's report of 2026-10-07: Arabic templates
+    "show English text instead of Arabic", and an English edit then
+    overwrote the only copy of an Arabic CV ("Arabic details lost").
+
+    Now: switching opens the other language's own document (the Arabic demo,
+    for a first visit), and switching back gives the typed one back, byte for
+    byte. What must never happen is still asserted: losing the text."""
     page.goto(deployed_server.url + "/builder")
     page.fill("#f_name", MINE)
     expect(page.locator("#save-state")).to_have_text("Saved")
 
     page.goto(deployed_server.url + "/lang/ar?next=/builder")
-
-    expect(page.locator("#f_name")).to_have_value(MINE)
-    assert _stored(page)["name"] == MINE
+    expect(page.locator("#f_name")).to_have_value(AR_NAME)
     assert page.locator("html").get_attribute("dir") == "rtl", "the app switched"
     assert _doc_html(page).get_attribute("dir") == "rtl", "and the document with it"
+    expect(page.frame_locator("#preview-frame").locator(".tpl")).not_to_contain_text("Zahra")
+
+    page.goto(deployed_server.url + "/lang/en?next=/builder")
+    expect(page.locator("#f_name")).to_have_value(MINE)
+    assert _stored(page)["name"] == MINE

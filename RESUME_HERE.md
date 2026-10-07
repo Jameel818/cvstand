@@ -1,3 +1,35 @@
+# RESUME HERE - 2026-10-07 (BUILDER UI run on `feature/builder-ui`, branched from `feature/word-fidelity`; NOT merged; main untouched)
+Both branches still wait for the merge decision; this one carries word-fidelity too.
+1. Font RIBBON above the preview (builder.html #ribbon, builder.js ribbon block):
+   Name/Headings/Details x Font/Weight/Size; labels or icons+tooltips (toggle,
+   localStorage `cvstand:ribbon-labels`); compact automatically <=900px. Moved,
+   not copied: same ids/keys, the form's Fonts section is gone.
+2. UNDO (100 steps, Ctrl+Z everywhere, typing coalesced per field burst):
+   text, list entries, photo, fonts, Default fonts, template. NOTE: the builder
+   has NO colour control, so "colour choices" has nothing to undo yet.
+3. CAIRO one step lighter in the ARABIC shell only (app.css "CAIRO ONE STEP
+   LIGHTER"); English and CV templates untouched (e2e test_shell_cairo_weight).
+4. modern-t4 Arabic ribbon folds mirrored (t4.j2 + word_designs/t4.py, VML+DML);
+   English pixel-identical. There is NO Arabic golden for t4 (goldens are EN).
+5. BUG fixed: (a) one localStorage résumé shared by both languages -> now
+   `cvstand:resume:<lang>`, old slot migrated by its script; (b) sw.js served
+   code cache-first under a hand-bumped VERSION never bumped since 09-14 -> code
+   network-first + VERSION stamped by /sw.js from a static fingerprint.
+   Tests: e2e/test_resume_per_language.py (mutation-checked), test_pwa.py.
+6. DEFAULT FONTS button (all nine keys null), undoable.
+7. Nine Arabic families via tools/build_fonts.py (pinned commit, OFL, +32 faces,
+   +7.8 MB): Beiruti, Changa, Zain (Headings); Parastoo, Alyamama, Cascadia
+   Code, Cascadia Mono, Vazirmatn, Estedad, Zain (Details). All have Arabic.
+   Cascadia ships unmodified (RFN). Zain has no Latin-Ext (Work Sans fallback).
+   Calibration measured (step 7 still OFF). Samples: Desktop "CVStand new
+   Arabic fonts"; review images: Desktop "CVStand builder-ui review".
+   Real Word: all 9 drawn from the embedded file; Beiruti/Changa/Alyamama
+   samples are 2 pages in Word (1 in PDF) - the known §1b user-settings gate.
+Suite: fast 4247+ passed; browser 5 batches all green; Word batch done.
+Local server: run.py live-like on :5000, left running.
+
+---
+
 # RESUME HERE - 2026-10-07 (WORD FIDELITY run 8 on `feature/word-fidelity`; NOT merged; main untouched)
 - Sidebars solid on Word's SCREEN: the colour lived only in the header, which
   Word dims while editing -> page shapes copied into the body (page 1 + last

@@ -33,7 +33,10 @@ RESERVED = {"Raleway", "Playfair Display", "Lora", "IBM Plex Sans Arabic",
             "Scheherazade New", "Lateef",
             # step 6, template defaults: Source Sans 3 reserves 'Source' in
             # SINGLE quotes, which the first parser (and this test) missed.
-            "IBM Plex Mono", "Merriweather", "Source Sans 3"}
+            "IBM Plex Mono", "Merriweather", "Source Sans 3",
+            # 2026-10-07: their OFL reserves "Cascadia Code"; the reader takes
+            # the unquoted name as "Cascadia", which both names contain
+            "Cascadia Code", "Cascadia Mono"}
 
 ARABIC_FAMILIES = {f for (lang, _r), fams in OFFERED.items() if lang == "ar" for f in fams}
 ASCII_PRINTABLE = set(range(0x20, 0x7F))
@@ -48,7 +51,8 @@ LATIN_EXT_SAMPLE = {0x0141, 0x0142, 0x0159, 0x015E}
 #: "Ł" or "ř" in an Arabic CV falls through to the generic fallback, which
 #: step 3's font stack has to account for. Pinned so a change is noticed.
 ARABIC_WITHOUT_LATIN_EXT = {"Almarai", "Aref Ruqaa", "El Messiri", "IBM Plex Sans Arabic",
-                            "Jomhuria", "Lateef", "Scheherazade New", "Tajawal"}
+                            "Jomhuria", "Lateef", "Scheherazade New", "Tajawal",
+                            "Zain"}   # Zain: measured 2026-10-07, upstream stops at Latin-1
 #: Thin/ExtraLight as Google's official static TTFs encode them (Windows GDI).
 LEGACY_WEIGHT_CLASS = {100: (250,), 200: (250, 275)}
 
@@ -88,8 +92,10 @@ def test_the_build_is_not_vacuous():
     methods = {}
     for f in FACES:
         methods[f["method"]] = methods.get(f["method"], 0) + 1
-    assert len(FACES) == 123
-    assert methods == {"instanced": 77, "subset-static": 22, "unmodified": 24}
+    # 2026-10-07: +32 faces for the nine new Arabic families (18 instanced,
+    # Zain's 6 subset from statics, Cascadia's 8 unmodified)
+    assert len(FACES) == 155
+    assert methods == {"instanced": 95, "subset-static": 28, "unmodified": 32}
     assert sum(1 for f in FACES if f.get("use") == "word") == 11
 
 
@@ -208,8 +214,14 @@ def _declared_rfn(family: str) -> list[str]:
         encoding="utf-8", errors="replace")
     out = []
     for line in text.splitlines():
-        if re.search(r"Reserved\s+Font\s+Names?", line, re.I) and "refers to" not in line:
-            out += re.findall(r"[\"“”']([^\"“”']+)[\"“”']", line)
+        m = re.search(r"Reserved\s+Font\s+Names?", line, re.I)
+        if m and "refers to" not in line:
+            quoted = re.findall(r"[\"“”']([^\"“”']+)[\"“”']", line)
+            # Unquoted, as Aref Ruqaa ("EURM10.") and Cascadia ("Cascadia
+            # Code.") write it: the first word, as tools/build_fonts.py reads
+            # it - which for Cascadia is "Cascadia", the conservative reading
+            # that keeps Cascadia Mono unmodified too (FONTS.md).
+            out += quoted or re.findall(r"^\s*([A-Z][\w-]*)", line[m.end():])
     return out
 
 

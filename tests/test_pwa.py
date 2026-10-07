@@ -168,3 +168,44 @@ def test_the_icons_exist_and_are_real_pngs(client):
         res = client.get(f"/static/icons/{name}")
         assert res.status_code == 200, name
         assert res.data[:8] == b"\x89PNG\r\n\x1a\n", name
+
+
+# ---- 2026-10-07: the worker can no longer serve an old builder.js ----------
+# Half of the "Arabic templates show English text" report: VERSION was to be
+# bumped by hand whenever app code changed, never was after 2026-09-14, and
+# code was cache-first - so a returning browser ran 14 September's builder.js.
+# tests/e2e/test_resume_per_language.py holds the other half.
+
+def _version(client) -> str:
+    import re
+    src = client.get("/sw.js").get_data(as_text=True)
+    return re.search(r'const VERSION = "([^"]+)";', src).group(1)
+
+
+def test_the_version_is_stamped_by_the_server_not_by_hand(client):
+    v = _version(client)
+    assert v.startswith("v2-") and len(v) == len("v2-") + 12, v
+
+
+def test_any_static_change_is_a_new_worker(client, tmp_path, monkeypatch):
+    """A new worker is what makes `activate` sweep the old caches."""
+    from app import routes
+    (tmp_path / "js").mkdir()
+    (tmp_path / "js" / "sw.js").write_text(
+        (routes.ROOT_STATIC / "js" / "sw.js").read_text(encoding="utf-8"), encoding="utf-8")
+    app_js = tmp_path / "js" / "builder.js"
+    app_js.write_text("one", encoding="utf-8")
+    monkeypatch.setattr(routes, "ROOT_STATIC", tmp_path)
+    before = _version(client)
+    app_js.write_text("two, longer", encoding="utf-8")
+    assert _version(client) != before
+
+
+def test_code_is_network_first(client):
+    """JS and CSS change with every release: online, the server's copy wins
+    and the cache is only the offline fallback - as for pages. A source
+    assertion for the same reason as test_navigations_are_network_first."""
+    src = client.get("/sw.js").get_data(as_text=True)
+    code = src[src.index("if (isStatic(url) && isCode(url))"):src.index('req.mode === "navigate"')]
+    assert code.index("fetch(req)") < code.index("caches.match(req)")
+    assert r"/\.(js|css|json)$/" in src

@@ -24,11 +24,12 @@ by a template.
 | Anton, Archivo, Archivo Narrow, Fraunces, IBM Plex Mono, Inter, Merriweather, Montserrat, Open Sans, Poppins, Source Sans 3 | OFL 1.1 | the Latin families the 49 templates declare |
 | Anton SC, Archivo Black, Bebas Neue, Raleway, Playfair Display, Source Serif 4, Work Sans, Lora | OFL 1.1 | typography controls, English (user's choice) |
 | Almarai, Alexandria, Mada, Readex Pro, Noto Sans Arabic, El Messiri, Markazi Text, Scheherazade New, Lateef, Aref Ruqaa, Lalezar, Jomhuria, Rakkas, Marhey, Baloo Bhaijaan 2, Lemonada | OFL 1.1 | typography controls, Arabic (user's choice) |
+| Beiruti, Changa, Zain (Headings); Parastoo, Alyamama, Cascadia Code, Cascadia Mono, Vazirmatn, Estedad, Zain (Details) | OFL 1.1 | typography controls, Arabic (user's choice, added 2026-10-07). From google/fonts at the pinned commit; every face measured to carry all 36 Arabic base letters and an `arab` GSUB script. Cascadia Code and Cascadia Mono do have Arabic (Microsoft added it in 2024). |
 
 The typography controls also offer families already listed above (Anton,
 Archivo, Montserrat, Poppins, Inter, Tajawal, Cairo, Amiri, Noto Kufi Arabic,
 Noto Naskh Arabic, IBM Plex Sans Arabic), from their own files — see
-"Typography controls" below. All 35 are licensed OFL 1.1, which permits use in
+"Typography controls" below. All 44 are licensed OFL 1.1, which permits use in
 a sold product; each OFL.txt is in `app/static/fonts/licenses/`.
 
 **Noto Naskh Arabic** is allowed by the policy as an alternative to Amiri and
@@ -296,9 +297,10 @@ Each face is made in one of three ways, decided per family from its own
 for every family, plus Arabic for Arabic ones. **Arabic families keep their
 Latin**, so English words, emails and URLs in an Arabic CV render in the
 same family. The build fails if an Arabic face lacks printable ASCII, or if
-subsetting dropped any Latin character the source had. Measured: eight Arabic
+subsetting dropped any Latin character the source had. Measured: nine Arabic
 families stop at Latin-1 UPSTREAM (Almarai, Aref Ruqaa, El Messiri, IBM Plex
-Sans Arabic, Jomhuria, Lateef, Scheherazade New, Tajawal), so a "Ł" or "ř"
+Sans Arabic, Jomhuria, Lateef, Scheherazade New, Tajawal, and since 2026-10-07
+Zain), so a "Ł" or "ř"
 in those falls through to the generic fallback. The test pins that list.
 
 **Thin/ExtraLight weight class.** Google's official static TTFs store
@@ -307,7 +309,14 @@ Windows GDI convention. The build reads the weight from the style name and
 accepts only those legacy values; instances it makes always get the exact
 weight.
 
-### Why six families ship as unmodified TTF
+### Why eight families ship as unmodified TTF
+
+*(Six until 2026-10-07. Cascadia Code and Cascadia Mono joined them: their
+OFL.txt reserves "Cascadia Code", and the build's RFN reader takes the
+unquoted name as "Cascadia", which both names contain. Reading it strictly,
+only Cascadia Code is reserved; shipping Mono unmodified as well is the
+conservative side of that line and costs ~1.6 MB. Both ship Google Fonts'
+official static TTFs from the family download, never subset or renamed.)*
 
 Raleway, Playfair Display, Lora, IBM Plex Sans Arabic ("Plex"), Scheherazade
 New and Lateef each declare a **Reserved Font Name** in their `OFL.txt` that

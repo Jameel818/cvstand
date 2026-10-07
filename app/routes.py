@@ -453,6 +453,19 @@ def manifest():
     })
 
 
+def _static_fingerprint() -> str:
+    """Twelve hex digits that change whenever any shipped static file does:
+    its path, size and modification time, so no file is read (the fonts
+    alone are tens of MB). A stat walk of a few hundred files per /sw.js
+    request - which a browser makes once per navigation at most."""
+    h = hashlib.sha256()
+    for p in sorted(ROOT_STATIC.rglob("*")):
+        if p.is_file() and "__pycache__" not in p.parts:
+            st = p.stat()
+            h.update(f"{p.relative_to(ROOT_STATIC).as_posix()}|{st.st_size}|{st.st_mtime_ns}\n".encode())
+    return h.hexdigest()[:12]
+
+
 @bp.get("/sw.js")
 def service_worker():
     """The worker, served from the ROOT so its scope is the whole app.
@@ -461,7 +474,17 @@ def service_worker():
     would cache the stylesheet and never see a single page. The file lives
     under static/ for editing; this route is what gives it authority.
     """
-    resp = send_file(ROOT_STATIC / "js" / "sw.js", mimetype="text/javascript")
+    # THE VERSION IS STAMPED HERE, NOT BY HAND. sw.js said "bump VERSION
+    # whenever app.css or builder.js changes", and from 2026-09-14 to
+    # 2026-10-07 nobody did - so a browser that had ever opened the site kept
+    # running the builder.js of 14 September (cache-first, and an unchanged
+    # worker never re-installs). That old builder.js is one of the two causes
+    # of Arabic résumés showing English text. The fingerprint of the shipped
+    # static files makes every change a new worker, whose `activate` sweeps
+    # the old caches.
+    src = (ROOT_STATIC / "js" / "sw.js").read_text(encoding="utf-8")
+    src = src.replace('const VERSION = "v2";', f'const VERSION = "v2-{_static_fingerprint()}";', 1)
+    resp = current_app.response_class(src, mimetype="text/javascript")
     # Belt and braces: the scope is already / because the script is served
     # from /, but this makes the intent explicit and survives a move.
     resp.headers["Service-Worker-Allowed"] = "/"

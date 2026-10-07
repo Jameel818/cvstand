@@ -25,17 +25,27 @@
                   time. The cache is only ever a fallback for being offline,
                   where "the last version of this page you actually loaded" is
                   the honest answer and the only one available.
-     static       cache-first. CSS, JS, fonts and icons carry no language.
+     code         network-first too (CSS, JS). It carries no language, but it
+                  CHANGES with every release, and a cache-first copy outlived
+                  them all: VERSION was meant to be bumped by hand and never
+                  was, so from 2026-09-14 a returning browser kept the
+                  builder.js of that day - which still treated the résumé's
+                  language as its own setting, so an Arabic visitor saw English
+                  text (the 2026-10-07 report). Online, code is always the
+                  server's; the cache is the offline fallback, as for pages.
+     binaries     cache-first. Fonts and icons: large, and never edited in
+                  place under the same name.
 
    That leaves one accepted limitation, stated rather than hidden: switch
    interface language, go offline, and a cached page may come back in the
    previous language until you are online again. The alternative — no offline
    shell at all — is worse.
 
-   CACHE VERSIONING is manual. Flask serves /static with no content hash, so
-   there is nothing in a URL to tell a new build from an old one. Bump VERSION
-   whenever app.css, builder.js or autofit.js changes; `activate` deletes every
-   cache that is not the current one, so a bump is a full, clean refresh.
+   CACHE VERSIONING is automatic. Flask serves /static with no content hash,
+   so the /sw.js route (app/routes.py::service_worker) stamps VERSION with a
+   fingerprint of the shipped static files: any change is a new worker, and
+   `activate` deletes every cache that is not the current one. Do not bump the
+   literal below by hand - the route replaces it exactly.
 */
 const VERSION = "v2";
 const SHELL_CACHE = `cvstand-shell-${VERSION}`;
@@ -58,6 +68,9 @@ const PRECACHE = [
 ];
 
 const isStatic = (url) => url.pathname.startsWith("/static/");
+/* Code: what a release changes. Everything else under /static/ (fonts,
+   icons, rail artwork) is a binary that is replaced, never edited in place. */
+const isCode = (url) => /\.(js|css|json)$/.test(url.pathname);
 const isLive = (url) =>
   url.pathname.startsWith("/api/") ||
   url.pathname.startsWith("/export/") ||
@@ -94,6 +107,21 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (isLive(url)) return;
+
+  if (isStatic(url) && isCode(url)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(ASSET_CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
 
   if (req.mode === "navigate") {
     event.respondWith(

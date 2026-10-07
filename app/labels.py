@@ -720,8 +720,6 @@ _UI_AR: dict[str, str] = {
 
     # --- builder: the Fonts section (docs/CVSTAND_FONT_CONTROLS.md) -------
     "Fonts": "الخطوط",
-    "Optional. Anything left on Template default keeps the template's own look.":
-        "اختياري. كل ما يبقى على افتراضي القالب يحتفظ بمظهر القالب الأصلي.",
     "Headings": "عناوين الأقسام",
     "Same as Headings": "مثل عناوين الأقسام",
     "Details": "التفاصيل",
@@ -737,6 +735,14 @@ _UI_AR: dict[str, str] = {
     "Some font choices are not available in this language and were reset to the template default:":
         "بعض خيارات الخطوط غير متاحة في هذه اللغة، فأُعيدت إلى افتراضي القالب:",
     "Dismiss": "إخفاء",
+    # the ribbon above the preview (2026-10-07): commands and the labels toggle
+    "Undo": "تراجع",
+    "Nothing to undo": "لا يوجد ما يُتراجع عنه",
+    "Default fonts": "الخطوط الافتراضية",
+    "Reset Name, Headings and Details to this template's own fonts":
+        "إعادة الاسم وعناوين الأقسام والتفاصيل إلى خطوط هذا القالب الأصلية",
+    "Show labels": "إظهار التسميات",
+    "Hide labels": "إخفاء التسميات",
     # font groups (registry.GROUP_LABEL)
     "Sans": "بلا زوائد",
     "Serif": "بزوائد",

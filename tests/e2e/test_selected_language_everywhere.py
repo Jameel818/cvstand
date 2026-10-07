@@ -14,7 +14,9 @@ Two nouns, and the word between them is what keeps this honest:
              document apart from the interface was removed on 2026-09-22 as
              redundant, and without it a document that did not follow could
              never change language at all. What never moves is the TEXT they
-             wrote.
+             wrote. Since 2026-10-07 each language keeps its own CV in the
+             browser, so "follows" means the Arabic selection opens the
+             Arabic CV, and the English one is there again on the way back.
 
 Everything here is one browser context that selects العربية exactly once, on
 the landing page, the way a visitor does — then never mentions language again.
@@ -139,19 +141,26 @@ def test_what_the_visitor_wrote_survives_the_switch(
     """The line between "follows the language" and "rewrites your work".
 
     This visitor has typed into their CV. Selecting العربية turns the app AND
-    the document round — nav, buttons, labels, direction, headings — and does
-    not touch one character of what they wrote.
+    the document round - and since 2026-10-07 the document is the ARABIC one:
+    each language keeps its own CV, because one shared CV is what put English
+    text into the Arabic templates and let an English edit erase an Arabic CV
+    (tests/e2e/test_resume_per_language.py). Not one character of what they
+    wrote is touched: switching back gives it back.
     """
+    mine = "Halden Row"
     page.goto(deployed_server.url + "/builder")
-    page.fill("#f_name", EN_NAME)
+    page.fill("#f_name", mine)
     expect(page.locator("#save-state")).to_have_text("Saved")
 
     page.goto(deployed_server.url + "/lang/ar?next=/builder")
 
     assert page.locator("html").get_attribute("dir") == "rtl", "the app switched"
     expect(page.locator("body")).to_contain_text(AR["Full name"])
-    expect(page.locator("#f_name")).to_have_value(EN_NAME)   # their text, untouched
+    expect(page.locator("#f_name")).to_have_value(AR_NAME)     # the Arabic CV
     assert _doc(page).get_attribute("dir") == "rtl", "the document followed"
+
+    page.goto(deployed_server.url + "/lang/en?next=/builder")
+    expect(page.locator("#f_name")).to_have_value(mine)        # their text, untouched
 
 
 # ------------------------------------------ nobody clicked anything at all

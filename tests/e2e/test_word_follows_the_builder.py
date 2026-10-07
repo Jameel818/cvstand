@@ -94,7 +94,6 @@ def test_the_word_button_sends_and_gets_the_chosen_template_and_fonts(
         page.wait_for_url(re.compile(r"/builder"))
         expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
 
-        page.click('.sec[data-sid="fonts"] > summary')
         for sel, family in selects.items():
             page.select_option(sel, family)
         # the choice must be live in the preview before we download

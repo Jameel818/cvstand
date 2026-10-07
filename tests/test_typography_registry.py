@@ -36,6 +36,8 @@ SPEC_OFFERED = {
         "Lateef": (700, 800), "Aref Ruqaa": (700,), "Lalezar": (400,), "Jomhuria": (400,),
         "Rakkas": (400,), "Marhey": (700,), "Baloo Bhaijaan 2": (700, 800),
         "Lemonada": (700,),
+        # added 2026-10-07 (user request); weights measured from the files
+        "Beiruti": (700, 800, 900), "Changa": (700, 800), "Zain": (700, 800, 900),
     },
     ("ar", "body"): {
         "Markazi Text": (400,), "Noto Naskh Arabic": (400,), "Readex Pro": (200, 300, 400),
@@ -44,6 +46,10 @@ SPEC_OFFERED = {
         "Lateef": (200, 300, 400), "Mada": (200, 300, 400), "Baloo Bhaijaan 2": (400,),
         "Tajawal": (200, 300, 400), "Cairo": (200, 300, 400), "Alexandria": (200, 300, 400),
         "El Messiri": (400,),
+        # added 2026-10-07 (user request); weights measured from the files
+        "Parastoo": (400,), "Alyamama": (300, 400), "Cascadia Code": (200, 300, 400),
+        "Cascadia Mono": (200, 300, 400), "Vazirmatn": (200, 300, 400),
+        "Estedad": (200, 300, 400), "Zain": (200, 300, 400),
     },
 }
 
@@ -61,8 +67,9 @@ def test_the_spec_table_covers_every_slot():
     """Guards the guard: an empty or partial SPEC_OFFERED would pass vacuously."""
     assert set(SPEC_OFFERED) == set(OFFERED) == set(SLOTS)
     # 51 in the spec's four tables, plus the Name group's copy of the two
-    # heading tables (10 EN + 19 AR).
-    assert sum(len(v) for v in SPEC_OFFERED.values()) == 51 + 10 + 19
+    # heading tables (10 EN + 19 AR); then 3 Arabic Headings and 7 Arabic
+    # Details families added 2026-10-07 (the Headings 3 counted twice).
+    assert sum(len(v) for v in SPEC_OFFERED.values()) == 51 + 10 + 19 + 3 + 7 + 3
 
 
 @pytest.mark.parametrize("slot", SLOTS)

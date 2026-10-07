@@ -157,6 +157,7 @@ All Arabic fonts above also include Latin glyphs. English words, emails and URLs
 - Add a small tag to the playful display fonts (Marhey, Baloo Bhaijaan 2, Lemonada, Jomhuria, Rakkas, Lalezar): *"Creative, best for design/creative roles"*. This is informational only; do not block them.
 - **Light-weight warning.** If the Details weight is **200** and the size is under **10 pt (EN)** or **11 pt (AR)**, show a non-blocking hint: *"Very light text may look faint when printed."*
 - Every change updates the live preview immediately (CSS variables, no page reload).
+- **Amended 2026-10-07 (user request, branch `feature/builder-ui`).** The controls left the form: they are a Word-style **ribbon above the preview** (Name / Headings / Details groups, labels beside the controls or icons + tooltips, compact automatically at 900px and under), with an **Undo** (every builder change, 100 steps, Ctrl+Z) and a **Default fonts** command (all nine keys back to null, undoable). Moved, not duplicated: same ids, options and résumé keys, so the preview, PDF and Word are unchanged. The sample is the font select itself, drawn in the chosen face. Arabic gained Beiruti, Changa, Zain (Headings) and Parastoo, Alyamama, Cascadia Code, Cascadia Mono, Vazirmatn, Estedad, Zain (Details) — see FONTS.md.
 
 ---
 
