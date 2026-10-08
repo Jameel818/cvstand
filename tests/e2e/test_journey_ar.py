@@ -245,9 +245,11 @@ def test_the_language_switcher_flips_the_interface_only(page, live_server,
     # the cookie reaches the builder even though the switcher is not drawn there
     page.goto(live_server.url + "/builder")
     assert page.locator("html").get_attribute("dir") == "rtl"
-    assert page.locator(".lang-switch").count() == 0, (
-        "the builder grew a language switcher; this test drives it from the "
-        "gallery only because there was none")
+    # Since 2026-10-08 the builder bar has its own switcher (the choice must
+    # be makeable "on ANY page" - tests/e2e/test_language_choice_sticks.py
+    # drives it); here it only has to show the choice made in the gallery.
+    expect(page.locator(".lang-switch-bar a[lang='ar']")).to_have_attribute(
+        "aria-current", "true")
 
     # and back again: the shell returns to English, the document does not move
     page.goto(live_server.url + "/templates")

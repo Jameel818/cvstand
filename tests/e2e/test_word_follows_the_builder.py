@@ -95,6 +95,8 @@ def test_the_word_button_sends_and_gets_the_chosen_template_and_fonts(
         expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
 
         for sel, family in selects.items():
+            # one line since 2026-10-08: choose the Section, then its font
+            page.select_option("#ty_section", sel.split("_")[1])
             page.select_option(sel, family)
         # the choice must be live in the preview before we download
         expect(page.frame_locator("#preview-frame").locator("html")).to_have_attribute(

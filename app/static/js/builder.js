@@ -292,8 +292,13 @@
   }
 
   /* ---------- the font ribbon (docs/CVSTAND_FONT_CONTROLS.md §3.5) ----------
-     Nine optional controls above the preview, like Word's ribbon: Font /
-     Weight / Size for the Name, the section Headings and the Details. They
+     ONE LINE above the preview (user, 2026-10-08, to give the template the
+     height): Section -> Font -> Weight -> Size, with Undo and Default fonts
+     before it and the labels toggle after. The Section select chooses which
+     group - Name, Headings or Details - the three controls edit; they were
+     three groups of three side by side until then. Same nine résumé keys,
+     same options, same ids for the section on screen (#ty_<role>_<field>).
+     The controls
      were a "Fonts" section at the bottom of the form until 2026-10-07; moved,
      not copied - same ids, same options, same résumé keys, so the preview,
      the PDF and the Word file read exactly what they read before. Every list
@@ -323,11 +328,11 @@
     weight: '<span class="rb-ico-t rb-ico-b" aria-hidden="true">B</span>',
     size: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 15 6 5h.8l3.5 10M3.6 11.6h5.6M14.5 4v12M12 6.5 14.5 4 17 6.5M12 13.5l2.5 2.5 2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
-  const TY_GROUP_ICON = {
-    name: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="6.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 17c.9-3.4 3.3-5 6.2-5s5.3 1.6 6.2 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-    heading: '<span class="rb-ico-t rb-ico-b" aria-hidden="true">H</span>',
-    body: '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 9h14M3 13h14M3 17h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-  };
+  const TY_SECTION_ICON = '<svg class="rb-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4.5h14M3 10h14M3 15.5h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="6" cy="4.5" r="1.8" fill="currentColor"/><circle cx="13" cy="10" r="1.8" fill="currentColor"/><circle cx="8" cy="15.5" r="1.8" fill="currentColor"/></svg>';
+  const TY_ROLES = ["name", "heading", "body"];
+  /* Which group the controls edit. Not part of the résumé, so neither saved
+     nor undone; it stays where the reader put it while they work. */
+  let tyRole = "name";
 
   function tyFamily(role, name) {
     for (const g of TY.roles[role].groups) {
@@ -344,6 +349,15 @@
     if (data.font_name === NAME_TEMPLATE) return null;
     if (data.font_name == null) return tyFamily("name", data.font_heading);
     return tyFamily("name", data.font_name);
+  }
+
+  /* The Details at weight 200 below the print threshold: said whichever
+     section is on screen, since the controls that caused it may not be. */
+  function faintDetails() {
+    const fam = tyEffective("body");
+    const w = tyNum(data.font_body_weight), size = tyNum(data.font_body_size);
+    const eff = size == null ? TY.roles.body.default_size : size;
+    return !!fam && w === TY.light.weight && eff < TY.light.below_pt;
   }
 
   function tyRoleHTML(role) {
@@ -392,21 +406,24 @@
     const sampleW = w || inherited || (fam ? fam.nearest[role === "body" ? "400" : "700"] : 400);
     const face = fam ? ` style="font-family:${esc(fam.stack)};font-weight:${sampleW}"` : "";
     const tag = fam && fam.playful ? `<small class="ty-tag">${T("Creative, best for design/creative roles")}</small>` : "";
-    const effSize = size == null ? R.default_size : size;
-    const faint = role === "body" && fam && w === TY.light.weight && effSize < TY.light.below_pt
+    const faint = faintDetails()
       ? `<small class="ty-hint">${T("Very light text may look faint when printed.")}</small>` : "";
 
     const title = T(TY_ROLE_TITLE[role]);
+    const section = `<div class="rb-ctl rb-section"><label for="ty_section" title="${esc(T("Section"))}">` +
+      `<span class="rb-lbl">${T("Section")}</span>${TY_SECTION_ICON}</label>` +
+      `<select id="ty_section" data-ty="section" title="${esc(T("Section"))}">` +
+      TY_ROLES.map((r) => `<option value="${r}"${r === role ? " selected" : ""}>${T(TY_ROLE_TITLE[r])}</option>`).join("") +
+      `</select></div>`;
     const ctl = (f, i, inner, extra) => {
       const lbl = T(TY_FIELD_TITLE[i]);
       return `<div class="rb-ctl rb-${f}"><label for="${id(f)}" title="${esc(lbl)}"><span class="rb-lbl">${lbl}</span>${TY_ICON[f]}</label>` +
         `<select id="${id(f)}" data-ty="${f}" data-role="${role}" title="${esc(title + " · " + lbl)}"${extra || ""}>${inner}</select></div>`;
     };
-    return `<div class="ty-group" data-ty-role="${role}" role="group" aria-labelledby="ty_${role}_title">` +
-      `<div class="rb-ctls">${ctl("font", 0, fontOpts, face)}` +
-      `${ctl("weight", 1, weightOpts, weightOff ? " disabled" : "")}${ctl("size", 2, sizeOpts)}</div>` +
-      `${tag}${faint}<div class="rb-caption" id="ty_${role}_title" title="${esc(title)}">` +
-      `${TY_GROUP_ICON[role]}<span class="rb-lbl">${title}</span></div></div>`;
+    return `<div class="ty-group" data-ty-role="${role}" role="group" aria-label="${esc(title)}">` +
+      `${section}${ctl("font", 0, fontOpts, face)}` +
+      `${ctl("weight", 1, weightOpts, weightOff ? " disabled" : "")}${ctl("size", 2, sizeOpts)}` +
+      `${tag}${faint}</div>`;
   }
 
   /* Re-draw the groups in place, keeping keyboard focus on the control the
@@ -415,8 +432,9 @@
     const box = $("#ribbon-groups");
     const active = document.activeElement;
     const keep = active && active.dataset && active.dataset.ty
-      ? `select[data-ty="${active.dataset.ty}"][data-role="${active.dataset.role}"]` : null;
-    box.innerHTML = tyRoleHTML("name") + tyRoleHTML("heading") + tyRoleHTML("body");
+      ? (active.dataset.ty === "section" ? "#ty_section"
+        : `select[data-ty="${active.dataset.ty}"][data-role="${active.dataset.role}"]`) : null;
+    box.innerHTML = tyRoleHTML(tyRole);
     if (keep) { const el = $(keep, box); if (el) el.focus(); }
     /* Nothing to reset when every choice is already the template's own. */
     $("#fonts-default").disabled = !TY_ALL.some((k) => data[k] != null);
@@ -664,6 +682,11 @@
   $("#ribbon-groups").addEventListener("change", (e) => {
     const el = e.target.closest("select[data-ty]");
     if (!el) return;
+    if (el.dataset.ty === "section") {
+      tyRole = TY_ROLES.includes(el.value) ? el.value : "name";
+      refreshRibbon();
+      return;
+    }
     recordUndo();
     const role = el.dataset.role;
     const [fk, wk, sk] = TY_KEYS[role];

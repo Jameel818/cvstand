@@ -20,6 +20,13 @@ from playwright.sync_api import expect
 from tests.e2e.test_exports import EXPORT_TIMEOUT
 
 # (template, a heading word it prints in EN / AR, the design drawing it must carry)
+
+def _on(page, role):
+    """The one-line font bar (2026-10-08) shows ONE section's controls at a
+    time: choose it first, as a user would."""
+    if page.locator("#ty_section").input_value() != role:
+        page.select_option("#ty_section", role)
+
 CASES = [("modern-t2", "EXPERIENCE", "الخبرة", "cvstand_bar_"),
          ("modern-t11", "Experience", "الخبرة", "cvstand_dots_"),
          ("modern-t22", "WORK EXPERIENCE", "الخبرة العملية", "cvstand_rail")]
@@ -48,7 +55,9 @@ def test_builder_word_download_is_the_template_design(page, live_server, tmp_pat
     expect(page).to_have_url(re.compile(r"/builder"))
     expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
 
+    _on(page, "heading")
     page.select_option("#ty_heading_font", FONT[lang])
+    _on(page, "body")
     page.select_option("#ty_body_size", BODY_SIZE)
     page.wait_for_timeout(1200)                       # the debounced save
 

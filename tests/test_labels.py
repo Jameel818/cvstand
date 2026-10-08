@@ -94,6 +94,8 @@ EXCLUDED_NODES = {("modern/t22.j2", ch) for ch in "RESUM"}
 # convention builder.js uses for DOC_LANG_NAMES. Translating "EN" into Arabic
 # would leave an Arabic reader no way to find English.
 EXCLUDED_NODES |= {("base.html", "EN")}
+# ...and its copy in the builder bar (2026-10-08), same autonym, same reason.
+EXCLUDED_NODES |= {("builder.html", "EN")}
 
 # `{{ current_user['email'] }}` is a dict subscript, not a label, but "email"
 # folds to a real catalogue key so the bare-literal scan flags it. The test

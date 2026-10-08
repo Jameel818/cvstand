@@ -28,7 +28,7 @@
     {% if r.achievements %}
     <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:16px; border-top:1px solid rgba(255,255,255,0.28); margin-top:22px; padding-top:16px;">
       {% for a in r.achievements %}
-      <div>
+      <div style="text-align:center;">
         <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; line-height:1; color:#D8C79A;">{{ a.metric }}</div>
         <div style="font-size:9px; letter-spacing:1.2px; font-weight:700; text-transform:uppercase; color:#AFC0D4; margin-top:5px;">{{ a.label }}</div>
       </div>

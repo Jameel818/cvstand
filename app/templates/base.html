@@ -48,9 +48,9 @@
      and `next` returns the reader to the page they were already on. #}
   <div class="lang-switch">
     <span class="sr-only">{{ t('Language') }}</span>
-    <a href="{{ url_for('main.set_ui_language', code='en', next=request.path) }}"
+    <a href="{{ url_for('main.set_ui_language', code='en', next=lang_next()) }}"
        aria-current="{{ 'true' if ui_lang == 'en' else 'false' }}" lang="en">EN</a>
-    <a href="{{ url_for('main.set_ui_language', code='ar', next=request.path) }}"
+    <a href="{{ url_for('main.set_ui_language', code='ar', next=lang_next()) }}"
        aria-current="{{ 'true' if ui_lang == 'ar' else 'false' }}" lang="ar">العربية</a>
   </div>
   {# The account slot. Shows NOTHING to an anonymous visitor except after they

@@ -22,7 +22,9 @@ def _ribbon(ctx, box, label):
     rail (t4.j2: polygon(0 0,100% 0,0 100%) in LTR, mirrored in Arabic -
     2026-10-07; it used to keep the LTR shape and face outwards)."""
     b = block(ctx, box, SIDE_PX, fill=CLAY, pad=(10, 34, 10, 0))
-    p = b.p()
+    # Arabic: the English line (t4.j2), so the ribbon keeps the English height;
+    # true_lines() turns it into Word's multiple of the Arabic face's single
+    p = b.p(line=1.088) if ctx.rtl else b.p()
     run(ctx, p, label, "heading", size=19, color="FFFFFF", spacing=0.5)
     line_px = 19 * 1.088                 # the label's line (Archivo, CSS normal)
     # x from the text column's physical left: it starts 34px in (LTR) or at
@@ -124,8 +126,9 @@ def build(ctx: Ctx) -> None:
         for cell, a in zip(tbl.rows[0].cells, r["achievements"]):
             fmt_cell(ctx, cell, pad=(0, 0, 0, 14))
             cb = Box(ctx, cell, 0, pad_top=12, pad_bottom=12)
-            run(ctx, cb.p(line=1.0), a["metric"], "metric", size=24, color=CLAY)
-            run(ctx, cb.p(before=5), a["label"], "bold", size=9, color=MUTED, spacing=1,
+            # number and label centred in the chip, as in the PDF (user, 2026-10-08)
+            run(ctx, cb.p(align="center", line=1.0), a["metric"], "metric", size=24, color=CLAY)
+            run(ctx, cb.p(align="center", before=5), a["label"], "bold", size=9, color=MUTED, spacing=1,
                 caps=True)
             cb.finish()
     for j, job in enumerate(r["experience"]):

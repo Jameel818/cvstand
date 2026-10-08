@@ -70,7 +70,7 @@
     {% if r.achievements %}
     <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px; border-top:1px solid #DEDEDE; border-bottom:1px solid #DEDEDE; padding:12px 0;">
       {% for a in r.achievements %}
-      <div>
+      <div style="text-align:center;">
         <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:25px; color:#151517;">{{ a.metric }}</div>
         <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#6B6B70; margin-top:4px;">{{ a.label }}</div>
       </div>

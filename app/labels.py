@@ -735,7 +735,16 @@ _UI_AR: dict[str, str] = {
     "Some font choices are not available in this language and were reset to the template default:":
         "بعض خيارات الخطوط غير متاحة في هذه اللغة، فأُعيدت إلى افتراضي القالب:",
     "Dismiss": "إخفاء",
+    # error pages (2026-10-08)
+    "Home": "الرئيسية",
+    "Page not found": "الصفحة غير موجودة",
+    "That page does not exist. It may have moved, or the link is mistyped.":
+        "هذه الصفحة غير موجودة. ربما نُقلت، أو أن الرابط مكتوب بشكل خاطئ.",
+    "Something went wrong": "حدث خطأ ما",
+    "The server could not finish this request. Please try again.":
+        "تعذّر على الخادم إكمال هذا الطلب. يُرجى المحاولة مرة أخرى.",
     # the ribbon above the preview (2026-10-07): commands and the labels toggle
+    "Section": "القسم",
     "Undo": "تراجع",
     "Nothing to undo": "لا يوجد ما يُتراجع عنه",
     "Default fonts": "الخطوط الافتراضية",

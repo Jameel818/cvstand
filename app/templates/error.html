@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{# An error PAGE in the visitor's language, with the header and its language
+   switcher - not Flask's bare English "Not Found" (2026-10-08: the chosen
+   language must hold on every page, error pages included). Only page
+   navigations get it; /api/*, /export/* and files keep their plain answers,
+   which the builder reads as text. #}
+{% block title %}{{ t(title) }} — {{ brand_name }}{% endblock %}
+{% block content %}
+<section class="container error-page">
+  <p class="eyebrow">{{ code }}</p>
+  <h1>{{ t(title) }}</h1>
+  <p>{{ t(message) }}</p>
+  <p class="error-links">
+    <a class="btn btn-primary" href="{{ url_for('main.landing') }}">{{ t('Home') }}</a>
+    <a class="btn btn-ghost" href="{{ url_for('main.templates_gallery') }}">{{ t('Templates') }}</a>
+  </p>
+</section>
+{% endblock %}

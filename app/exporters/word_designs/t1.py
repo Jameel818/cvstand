@@ -59,8 +59,9 @@ def build(ctx: Ctx) -> None:
         for k, (cell, a) in enumerate(zip(tbl.rows[0].cells, r["achievements"])):
             fmt_cell(ctx, cell, pad=(0, 0, 0, 18 if k < n - 1 else 0))
             cb = Box(ctx, cell, 0, pad_top=16, pad_bottom=16)
-            run(ctx, cb.p(line=1.0), a["metric"], "metric", size=30, color=INK)
-            run(ctx, cb.p(before=6), a["label"], "bold", size=9, color=MUTED, spacing=1.4,
+            # number and label centred in the chip, as in the PDF (user, 2026-10-08)
+            run(ctx, cb.p(align="center", line=1.0), a["metric"], "metric", size=30, color=INK)
+            run(ctx, cb.p(align="center", before=6), a["label"], "bold", size=9, color=MUTED, spacing=1.4,
                 caps=True)
             cb.finish()
         gap2 = doc.add_paragraph()

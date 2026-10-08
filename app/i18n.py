@@ -92,6 +92,25 @@ def register(app) -> None:
         response.vary.add("Cookie")
         return response
 
+    @app.after_request
+    def _keep_the_choice_alive(response):
+        """A CHOICE lasts while the site is in use, not a year from the click.
+
+        The cookie was set once, by /lang/<code>, with a one-year max-age - so
+        a visitor who chose العربية and came back every week was silently
+        handed back to their browser's language a year after that one click.
+        Every page view now restarts the year (user, 2026-10-08: the choice
+        stays "until the user selects the other language himself"). Pages
+        only: static files and API answers would add a Set-Cookie to every
+        font and every keystroke's render for nothing."""
+        chosen = request.cookies.get(COOKIE)
+        if (chosen in UI_LANGS and request.method == "GET"
+                and response.mimetype == "text/html"
+                and not any(h.startswith(COOKIE + "=")
+                            for h in response.headers.getlist("Set-Cookie"))):
+            set_choice(response, chosen)
+        return response
+
     @app.context_processor
     def _inject():
         lang = current_lang()
@@ -101,4 +120,20 @@ def register(app) -> None:
             "ui_dir": dir_for(lang),
             "ui_langs": UI_LANGS,
             "ui_catalogue": lambda: ui_catalogue(lang),
+            "lang_next": lang_next,
         }
+
+
+def set_choice(response, lang: str) -> None:
+    """THE one way the choice is written: a first-party cookie for the whole
+    site, a year from now, readable by no other site (SameSite=Lax)."""
+    response.set_cookie(COOKIE, normalise(lang), max_age=COOKIE_MAX_AGE,
+                        path="/", samesite="Lax", httponly=False)
+
+
+def lang_next() -> str:
+    """Where the switcher returns to: THIS page, query string included -
+    `/templates?family=ats` used to come back as `/templates`, dropping the
+    filter the visitor had chosen along with their language."""
+    qs = request.query_string.decode("utf-8", "replace")
+    return request.path + ("?" + qs if qs else "")

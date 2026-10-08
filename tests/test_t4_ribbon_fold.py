@@ -55,3 +55,33 @@ def test_arabic_folds_are_mirrored_in_word():
     folds = _folds_word(ARABIC)
     assert folds, "the Word ribbons lost their folds"
     assert set(folds) == {"m0,0 l14,0 l14,8 x e|dml-x14"}, folds
+
+
+# ---- 2026-10-08: Arabic ribbons as tall as the English ones ----------------
+# The ribbon is padding + one line of its label. The Arabic faces' own line is
+# 1.5-1.9x their size against Archivo's 1.088x, so every Arabic ribbon came
+# out ~8px taller in the PDF and in Word (measured 48-49px vs 40-41px). The
+# Arabic label now takes Archivo's line. tests/e2e/test_t4_ribbon_height.py
+# measures the rendered heights.
+
+def test_arabic_ribbon_labels_take_the_english_line():
+    html_ar = canvas_html(ARABIC, "modern-t4")
+    html_en = canvas_html(ENGLISH, "modern-t4")
+    assert html_ar.count("line-height:1.088;") == 4
+    assert "line-height:1.088;" not in html_en, "the English ribbon moved"
+
+
+def test_arabic_word_ribbons_set_a_line_the_english_ones_do_not():
+    def ribbon_lines(data):
+        with zipfile.ZipFile(io.BytesIO(render_docx(data, "modern-t4"))) as z:
+            xml = z.read("word/document.xml").decode("utf-8")
+        # each ribbon label paragraph is followed by its fold's VML path
+        out = []
+        for m in re.finditer(r"<w:p>(?:(?!</w:p>).)*?m0,0 l14,0 l(?:0|14),8 x e(?:(?!</w:p>).)*?</w:p>", xml, re.S):
+            sp = re.search(r'<w:spacing [^>]*w:line="(\d+)"', m.group(0))
+            out.append(int(sp.group(1)) if sp else None)
+        return out
+    ar, en = ribbon_lines(ARABIC), ribbon_lines(ENGLISH)
+    assert len(ar) == 4 and len(en) == 4, (ar, en)
+    assert all(v == 240 for v in en), en                  # English: single, as before
+    assert all(v is not None and v < 240 for v in ar), ar   # Arabic: tighter than its face's single

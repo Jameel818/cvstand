@@ -101,6 +101,34 @@ def _resolve_key(explicit: str | None) -> str:
 
 # ---------------------------------------------------------------- pages
 
+#: Error pages for page NAVIGATIONS, in the visitor's language (2026-10-08).
+ERROR_PAGES = {
+    404: ("Page not found", "That page does not exist. It may have moved, or the link is mistyped."),
+    405: ("Page not found", "That page does not exist. It may have moved, or the link is mistyped."),
+    500: ("Something went wrong", "The server could not finish this request. Please try again."),
+}
+#: Machine answers keep Flask's plain errors: the builder reads their TEXT.
+_PLAIN_ERRORS = ("/api/", "/export/", "/static/", "/uploads/", "/sw.js", "/manifest.webmanifest")
+
+
+def register_error_pages(app) -> None:
+    """Flask's default 404 is a bare English page with no header - so a
+    mistyped link threw an Arabic visitor out of their language and gave
+    them no switcher to get back. Now it is a shell page like any other."""
+    from werkzeug.exceptions import HTTPException
+
+    def page(exc):
+        code = exc.code if isinstance(exc, HTTPException) else 500
+        if (request.method != "GET" or request.path.startswith(_PLAIN_ERRORS)
+                or code not in ERROR_PAGES):
+            return exc if isinstance(exc, HTTPException) else ("Internal Server Error", 500)
+        title, message = ERROR_PAGES[code]
+        return render_template("error.html", code=code, title=title, message=message), code
+
+    for code in ERROR_PAGES:
+        app.register_error_handler(code, page)
+
+
 @bp.get("/lang/<code>")
 def set_ui_language(code: str):
     """Switch the INTERFACE language and return where the user was.
@@ -116,10 +144,7 @@ def set_ui_language(code: str):
     if not target.startswith("/") or target.startswith("//"):
         target = url_for("main.landing")
     resp = redirect(target)
-    resp.set_cookie(
-        i18n_mod.COOKIE, i18n_mod.normalise(code),
-        max_age=i18n_mod.COOKIE_MAX_AGE, samesite="Lax", httponly=False,
-    )
+    i18n_mod.set_choice(resp, code)
     return resp
 
 

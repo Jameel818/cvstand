@@ -18,12 +18,16 @@
         render when r.references is non-empty (the shared sample has none, so the
         block is absent rather than faked).
      5. Right-column gap 20 kept; no compression needed for the shared sample. #}
+{# Arabic: the label takes Archivo's own line (1.088), so the ribbon is as tall
+   as the English one (40.7px). The Arabic faces' natural line is 1.5-1.9x
+   their size, which made every Arabic ribbon ~8px taller in the PDF and Word
+   (2026-10-08). The glyphs overflow into the 10px padding; nothing clips them. #}
 {# The fold triangle's straight edge sits against the rail's edge, where the
    ribbon turns back behind the page: its inline START. clip-path is physical,
    so Arabic, whose rail edge is on the right, gets the mirrored polygon -
    until 2026-10-07 it reused the left-hand one and the fold faced outwards. #}
 {% macro ribbon(label, rtl=false) %}
-<div style="box-sizing:border-box; position:relative; background:#C4562F; color:#ffffff; font-family:Archivo,sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px; padding-block: 10px 10px; padding-inline: 34px 0; width:314px;">{{ label }}<span style="position:absolute; inset-inline-end:0; bottom:-8px; width:14px; height:8px; background:#8E3A1E; clip-path:polygon({{ '0 0, 100% 0, 100% 100%' if rtl else '0 0, 100% 0, 0 100%' }});"></span></div>
+<div style="box-sizing:border-box; position:relative; background:#C4562F; color:#ffffff; font-family:Archivo,sans-serif; font-weight:800; font-size:19px; letter-spacing:0.5px; padding-block: 10px 10px; padding-inline: 34px 0; width:314px;{% if rtl %} line-height:1.088;{% endif %}">{{ label }}<span style="position:absolute; inset-inline-end:0; bottom:-8px; width:14px; height:8px; background:#8E3A1E; clip-path:polygon({{ '0 0, 100% 0, 100% 100%' if rtl else '0 0, 100% 0, 0 100%' }});"></span></div>
 {% endmacro %}
 <div class="tpl cv-sections-taj" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; display:flex; font-family:'Source Sans 3',sans-serif; color:#37474C;">
 
@@ -105,7 +109,7 @@
     {% if r.achievements %}
     <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:14px; border-top:1px solid #D8D2C7; border-bottom:1px solid #D8D2C7; padding:12px 0;">
       {% for a in r.achievements %}
-      <div>
+      <div style="text-align:center;">
         <div style="font-family:Archivo,sans-serif; font-weight:900; font-size:24px; line-height:1; color:#C4562F;">{{ a.metric }}</div>
         <div style="font-size:9px; letter-spacing:1px; font-weight:700; text-transform:uppercase; color:#6E7C80; margin-top:5px;">{{ a.label }}</div>
       </div>

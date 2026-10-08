@@ -18,6 +18,16 @@
       <span aria-hidden="true">▾</span>
     </button>
     <span class="spacer"></span>
+    {# The builder blanks the site header, so it had NO language switcher: the
+       one page where a visitor spends the most time could not change the
+       choice that every other page honours (2026-10-08). #}
+    <div class="lang-switch lang-switch-bar">
+      <span class="sr-only">{{ t('Language') }}</span>
+      <a href="{{ url_for('main.set_ui_language', code='en', next=lang_next()) }}"
+         aria-current="{{ 'true' if ui_lang == 'en' else 'false' }}" lang="en">EN</a>
+      <a href="{{ url_for('main.set_ui_language', code='ar', next=lang_next()) }}"
+         aria-current="{{ 'true' if ui_lang == 'ar' else 'false' }}" lang="ar" aria-label="العربية"><span class="ls-long">العربية</span><span class="ls-short" aria-hidden="true">ع</span></a>
+    </div>
     <span class="save-state" id="save-state">{{ t('Saved') }}</span>
     <div class="dl-wrap">
       <button type="button" class="btn btn-primary btn-sm" id="dl-toggle">{{ t('Download') }} ▾</button>

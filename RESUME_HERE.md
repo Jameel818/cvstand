@@ -1,3 +1,29 @@
+# RESUME HERE - 2026-10-08 (run 9 on `feature/builder-ui`; NOT merged; main untouched)
+1. modern-t4 Arabic ribbons now as tall as English (PDF 48->40px, Word 47->41px;
+   EN 40px unchanged): Arabic label takes Archivo's line 1.088 (t4.j2 + Word
+   true_lines). Folds still mirrored. Tests: test_t4_ribbon_fold.py, e2e/test_t4_ribbon_height.py.
+2. Speed: app/compress.py = gzip (stdlib) for text + TTF, `font/ttf` MIME, 1-day
+   cache on /static/fonts|icons|rails; CSS/JS stay no-cache. First-visit bytes
+   -40..70%; AR gallery slow-mobile 9.8s->6.7s; LCP <= 1.3s everywhere. Numbers:
+   Desktop "CVStand run 9 review/2 page speed". Railway untouched.
+3. Arabic heading clipping = outlined-SVG headings clip at their viewBox
+   (inline svg overflow hidden): "دقائق" tail and the dots of "احترافي" were cut.
+   Fix: overflow:visible (app.css). Live-text headings: none clipped (geometric
+   scan, AR+EN, desktop+phone). Test: e2e/test_heading_clipping.py.
+4. Language: cookie `ui_lang` (1 year, path /, Lax) renewed on every page view;
+   switcher keeps the query string; in-language error pages (404/405/500,
+   app/templates/error.html); builder bar has its own switcher (phone: "ع"/EN).
+   Accept-Language only decides for a visitor who never chose (stores nothing).
+   Tests: e2e/test_language_choice_sticks.py, test_language_cookie.py.
+5. One-line font bar: Section -> Font -> Weight -> Size (#ty_section).
+6. Stat chips centred (number + label) in modern t1 t3 t4 t7 t9 t11 t13 t16 t18
+   t19 t21 t23, PDF + Word. Goldens updated WITH approval: 36 HTML
+   (gpa/partial/sample x those 12) + 12 pixel (tests/golden/pixels/<those>.png).
+Suite: fast 4287 passed; browser 1559 all green in batches; Word batch (48 files) done.
+Review: Desktop "CVStand run 9 review". Local server: run.py live-like on :5000.
+
+---
+
 # RESUME HERE - 2026-10-07 (BUILDER UI run on `feature/builder-ui`, branched from `feature/word-fidelity`; NOT merged; main untouched)
 Both branches still wait for the merge decision; this one carries word-fidelity too.
 1. Font RIBBON above the preview (builder.html #ribbon, builder.js ribbon block):

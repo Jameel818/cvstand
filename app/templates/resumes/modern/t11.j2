@@ -34,7 +34,7 @@
     {% if r.achievements %}
     <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:12px;">
       {% for a in r.achievements %}
-      <div><div style="font-family:Archivo,sans-serif; font-weight:900; font-size:22px;">{{ a.metric }}</div><div style="font-size:8.5px; letter-spacing:1px; font-weight:700; text-transform:uppercase; margin-top:3px;">{{ a.label }}</div></div>
+      <div style="text-align:center;"><div style="font-family:Archivo,sans-serif; font-weight:900; font-size:22px;">{{ a.metric }}</div><div style="font-size:8.5px; letter-spacing:1px; font-weight:700; text-transform:uppercase; margin-top:3px;">{{ a.label }}</div></div>
       {% endfor %}
     </div>
     {% endif %}

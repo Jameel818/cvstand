@@ -72,12 +72,16 @@ def create_app(config_object: type = Config) -> Flask:
     # startup rather than lazily means a broken data directory is a boot
     # failure, not a 500 on somebody's first sign-in.
     _db.register(app)
+    from . import compress
+    compress.register(app)
     _db.init()
 
     # Interface language (cookie-driven) for the app shell. Independent of
     # the resume's own `lang` - see app/i18n.py for why.
     i18n.register(app)
     app.register_blueprint(bp)
+    from .routes import register_error_pages
+    register_error_pages(app)
     from .dev_typography import bp as dev_typography_bp   # 404 unless debug
     app.register_blueprint(dev_typography_bp)
 

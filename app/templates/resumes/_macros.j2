@@ -19,7 +19,8 @@
   {% set cap_css = opts.get('caption_css') or "font-size:9px; letter-spacing:1.4px; font-weight:700; text-transform:uppercase; color:#5C5C66; margin-top:6px;" %}
   <div style="display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:18px; {{ opts.get('band_css') or 'border-top:1px solid #16161A; border-bottom:1px solid #D6D6DA; padding:16px 0;' }}">
     {% for a in achievements %}
-    <div>
+    {# number and label centred in the chip (user, 2026-10-08) #}
+    <div style="text-align:center;">
       <div style="{{ metric_css }}">{{ a.metric }}</div>
       <div style="{{ cap_css }}">{{ a.label }}</div>
     </div>

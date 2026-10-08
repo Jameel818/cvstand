@@ -213,8 +213,9 @@ def build(ctx: Ctx) -> None:
         for k, (cell, a) in enumerate(zip(st.rows[0].cells, ach)):
             fmt_cell(ctx, cell, pad=(0, 0, 0, 12 if k < n - 1 else 0))
             cb = Box(ctx, cell, 0)
-            run(ctx, cb.p(), a["metric"], "metric", size=23, color=LIME)
-            run(ctx, cb.p(before=3), a["label"], "bold", size=9, color=MUTED, spacing=1,
+            # number and label centred in the chip, as in the PDF (user, 2026-10-08)
+            run(ctx, cb.p(align="center"), a["metric"], "metric", size=23, color=LIME)
+            run(ctx, cb.p(align="center", before=3), a["label"], "bold", size=9, color=MUTED, spacing=1,
                 caps=True)
             cb.finish()
         card.finish_round()
