@@ -2,7 +2,7 @@
 
 A cover letter is a page that has to look like it came from the same hand as
 the CV beside it. 49 bespoke letter designs would be 49 more things to keep
-in step; instead there is one layout (templates/resumes/letter.j2) that reads
+in step; instead there is one layout (templates/resumes/_letter.j2) that reads
 the selected template's identity:
 
     - its HEADER: where the name sits (a coloured band, a coloured side
@@ -116,7 +116,7 @@ def _ink_on(bg: str) -> str:
 
 
 def theme(template_key: str, lang: str) -> dict[str, Any]:
-    """Everything letter.j2 needs, with every colour checked against the
+    """Everything _letter.j2 needs, with every colour checked against the
     surface it will actually be drawn on (the letter places the headline and
     contact next to the name, which the CV does not always do)."""
     m = _themes()[template_key][lang]
@@ -148,6 +148,10 @@ def theme(template_key: str, lang: str) -> dict[str, Any]:
         "body_font": m["body"],
         "rail": side, "stripe": stripe,
         "taj": m.get("taj", False),
+        # The template's own Arabic section-face flag, carried over as is
+        # (rendering.RTL_TYPOGRAPHY). Spelled here and not in the .j2: the
+        # count of templates carrying it is a gate (test_template_fonts).
+        "split_class": " cv-sections-taj" if m.get("taj") else "",
     }
 
 
@@ -179,7 +183,7 @@ def contact_items(r: dict[str, Any]) -> list[str]:
 def canvas_html(data: dict[str, Any], template_key: str) -> str:
     """The letter's `.tpl` page for `template_key`, in the document's language."""
     rendering._template_path(template_key)          # an unknown key raises as the CV does
-    tpl = rendering._env().get_template("letter.j2")
+    tpl = rendering._env().get_template("_letter.j2")
     lang = lang_of(data)
     token = set_lang(lang)
     try:

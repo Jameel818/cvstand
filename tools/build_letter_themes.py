@@ -3,7 +3,7 @@
     venv/Scripts/python tools/build_letter_themes.py          # write
     venv/Scripts/python tools/build_letter_themes.py --check  # compare, exit 1 if stale
 
-The cover letter is ONE shared layout (app/templates/resumes/letter.j2) that
+The cover letter is ONE shared layout (app/templates/resumes/_letter.j2) that
 dresses itself in the selected template's identity, so it matches all 49
 without 49 designs. The identity is what a reader recognises at a glance:
 

@@ -113,13 +113,14 @@ def _print(docs: list[str], faces: list[str]) -> list[bytes]:
                         "window.ResumeAutofit ? window.ResumeAutofit.ready : null"
                     )
                     page.emulate_media(media="print")
-                    out.append(page.pdf(
+                    pdf = page.pdf(
                         width="850px",
                         height="1100px",
                         margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
                         print_background=True,
                         prefer_css_page_size=True,
-                    ))
+                    )
+                    out.append(pdf)
                     page.close()
             finally:
                 browser.close()
