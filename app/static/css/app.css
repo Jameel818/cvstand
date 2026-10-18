@@ -845,6 +845,13 @@ html { overflow-x: hidden; }
    ExtraBold on those is weight where no call to action exists. */
 [dir="rtl"] .btn { font-family: var(--font-cta); font-weight: 800; }
 [dir="rtl"] button { font-family: var(--font-cta); }
+/* BLUE BUTTONS ONE STEP LIGHTER, ARABIC ONLY (user, 2026-10-18): the text
+   of every filled primary button 800 -> 700. 700 and not 600: the shell
+   ships Tajawal at 700 and 800 only, so a 600 would be drawn by the 700
+   file anyway and the rule would say something the page does not do.
+   English never reaches this (it stays Inter 600). Outline / ghost buttons
+   keep 800. tests/e2e/test_primary_button_weight.py */
+[dir="rtl"] .btn-primary { font-weight: 700; }
 
 /* The gallery tabs are controls that happen not to be <button>s. They sat on
    body copy while the buttons beside them were on the CTA face. */
@@ -865,6 +872,18 @@ html { overflow-x: hidden; }
 [dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea {
   font-family: var(--font-body);
 }
+
+/* THE FONT RIBBON KEEPS ONE FACE (user, 2026-10-18): its labels, its
+   buttons, its selects and every option in their menus are interface, in
+   the face of the form fields beside them (--font-body: Inter in English,
+   IBM Plex Sans Arabic in Arabic), whatever font the user chooses. Options
+   and optgroups are named because a menu can be drawn from the option's own
+   style, not the select's. After `[dir=rtl] button` (Tajawal) on purpose,
+   so the ribbon's Undo / Default fonts match its labels in Arabic too.
+   tests/e2e/test_ribbon_font_fixed.py */
+.ribbon, .ribbon label, .ribbon button, .ribbon select,
+.ribbon option, .ribbon optgroup { font-family: var(--font-body); }
+.ribbon option { font-weight: 400; font-style: normal; }
 
 /* ---------------------------------------------------------------------------
    RTL. Every directional rule above is logical, so the interface mirrors on

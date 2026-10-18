@@ -399,12 +399,12 @@
     const sizeOpts = `<option value="">${T("Template default")}</option>` +
       R.sizes.map((x) => `<option value="${x}"${x === size ? " selected" : ""}>${x} ${T("pt")}</option>`).join("");
 
-    /* The font select draws its own value in the chosen face, at the weight
-       the CV uses for plain text: it is the sample, and it is what makes the
-       browser fetch that one face. */
-    const inherited = follows ? tyNum(data.font_heading_weight) : null;
-    const sampleW = w || inherited || (fam ? fam.nearest[role === "body" ? "400" : "700"] : 400);
-    const face = fam ? ` style="font-family:${esc(fam.stack)};font-weight:${sampleW}"` : "";
+    /* The ribbon is INTERFACE, not résumé (user, 2026-10-18): its labels, its
+       selects and the options inside them stay in the same face as the form
+       fields beside them, whatever font is chosen. The font select used to
+       draw its own value in the chosen face as a sample; that made the
+       ribbon's own text change with every choice. The preview is the sample
+       now - only it, the PDF and the Word file follow the chosen fonts. */
     const tag = fam && fam.playful ? `<small class="ty-tag">${T("Creative, best for design/creative roles")}</small>` : "";
     const faint = faintDetails()
       ? `<small class="ty-hint">${T("Very light text may look faint when printed.")}</small>` : "";
@@ -421,7 +421,7 @@
         `<select id="${id(f)}" data-ty="${f}" data-role="${role}" title="${esc(title + " · " + lbl)}"${extra || ""}>${inner}</select></div>`;
     };
     return `<div class="ty-group" data-ty-role="${role}" role="group" aria-label="${esc(title)}">` +
-      `${section}${ctl("font", 0, fontOpts, face)}` +
+      `${section}${ctl("font", 0, fontOpts)}` +
       `${ctl("weight", 1, weightOpts, weightOff ? " disabled" : "")}${ctl("size", 2, sizeOpts)}` +
       `${tag}${faint}</div>`;
   }

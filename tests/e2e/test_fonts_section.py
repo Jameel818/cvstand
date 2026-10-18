@@ -191,9 +191,11 @@ def test_choice_reaches_the_preview_and_survives_a_reload(page, live_server):
     _open_fonts(page, live_server)
     _on(page, "heading")
     page.select_option("#ty_heading_font", "Montserrat")
-    # The sample is the font select itself, drawn in the chosen face.
+    # The select keeps the interface face (2026-10-18, user): the preview is
+    # the sample. tests/e2e/test_ribbon_font_fixed.py covers every font.
     _on(page, "heading")
-    expect(page.locator("#ty_heading_font")).to_have_css("font-family", re.compile(r"CVT Montserrat"))
+    expect(page.locator("#ty_heading_font")).to_have_value("Montserrat")
+    expect(page.locator("#ty_heading_font")).not_to_have_css("font-family", re.compile(r"CVT"))
     expect(_preview_name(page)).to_have_css("font-family", re.compile(r"CVT Montserrat"))
     page.wait_for_timeout(1200)
     assert _stored(page)["font_heading"] == "Montserrat"
