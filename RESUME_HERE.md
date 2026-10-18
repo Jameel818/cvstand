@@ -1,3 +1,37 @@
+# RESUME HERE - 2026-10-19 (run 10 on `feature/builder-ui`, from ee25bc0; NOT merged; main untouched)
+1. Ribbon keeps the INTERFACE font (labels, buttons, selects, menu options = the
+   form fields' face, Inter / IBM Plex Sans Arabic) whatever font is chosen; the
+   Font select no longer draws itself in the chosen face. e2e/test_ribbon_font_fixed.py.
+2. Arabic blue (.btn-primary) buttons Tajawal 800 -> 700 (shell has no Tajawal 600);
+   English unchanged. e2e/test_primary_button_weight.py.
+3. COVER LETTER: "Add a cover letter" box (off by default) -> resume["cover_letter"]
+   (per-language store + undo for free). ONE layout resumes/_letter.j2 dressed in the
+   template's identity measured into app/letter_themes.json (tools/build_letter_themes.py,
+   --check gate): band / side column / open header, rail, colours (contrast >= 4.5,
+   deepened not replaced), CV role hooks (.cv-name/.cv-section) so the ribbon + Arabic
+   policy apply. Preview = own page after the CV + CV / Cover letter switch. Downloads
+   `part` = cv | letter | both (PDF joined with pypdf - now pinned; Word letter in its
+   own section with its own header). OFF = byte-identical CV outputs (294 outputs + 12
+   PDFs vs d20ff71). One page: schema caps; PDF autofit (all 49 x EN/AR); Word: English
+   long letters a step smaller (docx_letter.WORD_BODY_SIZES_EN, measured in real Word).
+   Review: Desktop "CVStand run 10 review/3 cover letter" (modern-t4, t13, t3, ats-t1).
+4. docs/AI_ASSISTANT_PLAN.md - PLAN ONLY (Haiku 5.5: Improve / Tailor / Write my letter,
+   costs, limits, privacy, errors, time). Root AI_ASSISTANT_PLAN.md points to it.
+5. IMPORT MY CV built, AI step DARK until ANTHROPIC_API_KEY exists (button "Coming soon").
+   app/importer.py (bytes-checked types, macro/DOCTYPE/zip-bomb refusal, pypdf, NFKC for
+   Arabic PDF text, upload kept in memory, verbatim_guard drops anything not word for
+   word in the CV), app/ai_quota.py (10/day per user in SQLite, refund on provider
+   failure, monthly budget default $15 / CVSTAND_AI_MONTHLY_USD). Review -> Replace / Add
+   / Cancel, one undo step. Tests mock the client (no API call was ever made).
+Suites: fast 4768 passed / 0 failed (opt-in run: 4776 passed, 77 old n/a skips);
+browser 6 batches, every e2e test, 0 failed; Word batch (100 files, real Word): letters
+1 page, CV + letter = CV + 1 page, EN + AR.
+NOT done / for the user: add ANTHROPIC_API_KEY on Railway to switch Import on (steps in
+the run-10 report); no golden changed; step 7 OFF; t22 rail untouched.
+Local server: run.py live-like on :5000.
+
+---
+
 # RESUME HERE - 2026-10-08 (run 9 on `feature/builder-ui`; NOT merged; main untouched)
 1. modern-t4 Arabic ribbons now as tall as English (PDF 48->40px, Word 47->41px;
    EN 40px unchanged): Arabic label takes Archivo's line 1.088 (t4.j2 + Word
