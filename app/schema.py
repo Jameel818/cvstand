@@ -25,6 +25,13 @@ from .typography.registry import FONT_KEY, TYPOGRAPHY_KEYS
 _STR = {"type": "string"}
 _STR_LIST = {"type": "array", "items": {"type": "string"}}
 
+# Cover-letter caps (characters). Chosen so the LONGEST letter the form allows
+# still prints on one page in every template, EN and AR, PDF and Word.
+LETTER_FIELD_MAX = 120
+LETTER_ADDRESS_MAX = 200
+LETTER_MAX_PARAGRAPHS = 5
+LETTER_PARAGRAPH_MAX = 600
+
 RESUME_SCHEMA: dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "Resume",
@@ -163,6 +170,26 @@ RESUME_SCHEMA: dict[str, Any] = {
                     "phone": _STR,
                     "email": _STR,
                 },
+            },
+        },
+        # The COVER LETTER (2026-10-18). OPTIONAL and absent-means-none, so
+        # every résumé saved before it stays valid and renders unchanged: no
+        # CV template reads this key, and normalize() never adds it. It lives
+        # in the résumé document so it shares its per-language storage and
+        # its undo. `enabled` is the builder's "Add a cover letter" box.
+        # The caps are what keeps the longest allowed letter on ONE page, in
+        # the PDF and in Word (tests/test_cover_letter.py measures it).
+        "cover_letter": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "enabled": {"type": "boolean"},
+                **{k: {"type": "string", "maxLength": LETTER_FIELD_MAX}
+                   for k in ("recipient_name", "recipient_title", "company", "date",
+                             "subject", "greeting", "closing", "signature")},
+                "company_address": {"type": "string", "maxLength": LETTER_ADDRESS_MAX},
+                "paragraphs": {"type": "array", "maxItems": LETTER_MAX_PARAGRAPHS,
+                               "items": {"type": "string", "maxLength": LETTER_PARAGRAPH_MAX}},
             },
         },
     },

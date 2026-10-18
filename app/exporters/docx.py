@@ -158,10 +158,19 @@ def _layout_photo(doc, photo_url: str, template_key: str, lang: str):
         return ""
 
 
-def render_docx(data: dict, template_key: str) -> bytes:
+def render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
+    """The Word file of the CV (`part="cv"`, the default and all an export
+    did before the cover letter existed), of the cover letter alone
+    ("letter"), or of both in one file, the letter in its own section on the
+    last page ("both"). The CV path is unchanged by the letter's existence."""
     tpl = registry.get(template_key)
     if tpl is None:
         raise DocxExportError(f"Unknown template {template_key!r}.")
+    if part not in ("cv", "letter", "both"):
+        raise DocxExportError(f"Unknown export part {part!r}.")
+    if part == "letter":
+        from . import docx_letter
+        return docx_letter.render(data, template_key)
     master_name = _master_for(tpl, data)
     if not master_name:
         raise DocxExportError(f"No Word master mapped for {template_key!r}.")
@@ -175,7 +184,7 @@ def render_docx(data: dict, template_key: str) -> bytes:
 
     if docx_design.has_design(template_key):
         # the template's own Word DESIGN, built in code (docs/WORD_FIDELITY_AUDIT.md)
-        return _render_design(data, template_key)
+        return _render_design(data, template_key, part)
 
     try:
         from docxtpl import DocxTemplate
@@ -202,6 +211,9 @@ def render_docx(data: dict, template_key: str) -> bytes:
         # the template's SHAPE: columns, band, fills, zone colours (the plan)
         docx_layout.apply(doc.docx, template_key, lang_of(data), resolved, ctx["lay"])
     faces = docx_theme.faces_drawn(doc.docx, resolved)
+    if part == "both":
+        from . import docx_letter
+        faces |= docx_letter.append(doc.docx, data, template_key)
     buf = io.BytesIO()
     doc.save(buf)
     # Step 6: the file carries the faces its text draws, so it looks the same
@@ -219,12 +231,15 @@ def _photo_path(photo_url: str) -> Path | None:
     return path if path.exists() else None
 
 
-def _render_design(data: dict, template_key: str) -> bytes:
+def _render_design(data: dict, template_key: str, part: str = "cv") -> bytes:
     import io
 
     doc, resolved = docx_design.render(data, template_key,
                                        _photo_path(normalize(data).get("photo_url", "")))
     faces = docx_design.faces_drawn(doc, resolved)
+    if part == "both":
+        from . import docx_letter
+        faces |= docx_letter.append(doc, data, template_key)
     buf = io.BytesIO()
     doc.save(buf)
     out = docx_font_embed.embed_fonts(buf.getvalue(), faces)

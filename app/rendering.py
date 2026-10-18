@@ -466,7 +466,7 @@ _DOC_TMPL = """<!DOCTYPE html>
 
 
 def document_html(data: dict, template_key: str, *, title: str | None = None,
-                  for_pdf: bool = False) -> str:
+                  for_pdf: bool = False, canvas: str | None = None) -> str:
     """Full standalone HTML doc: the canvas + fonts + print CSS + auto-fit.
 
     `for_pdf` embeds the font bytes instead of linking them — required, because
@@ -475,8 +475,14 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
     The auto-fit engine ships in every document and runs itself once the fonts
     have loaded, so the preview and the PDF paginate identically. Callers that
     need the outcome await `window.ResumeAutofit.ready`.
+
+    `canvas` replaces the résumé canvas with another page drawn in the same
+    template's identity - the cover letter (app/letter.py). Everything else
+    (fonts, the Arabic policy, the chosen fonts, auto-fit) is the same
+    document, which is what makes the letter follow the font ribbon.
     """
-    canvas = canvas_html(data, template_key)
+    if canvas is None:
+        canvas = canvas_html(data, template_key)
     name = (data.get("name") or "Resume").strip()
     # The user's font choices (docs/CVSTAND_FONT_CONTROLS.md), VALIDATED -
     # never the raw keys. Both blocks are "" when nothing was chosen, and they

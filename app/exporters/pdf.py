@@ -43,7 +43,43 @@ def chosen_faces(data: dict) -> list[str]:
             for fam, w in sorted(faces_for(values, lang_of(data)))]
 
 
-def render_pdf(data: dict, template_id: str) -> bytes:
+def render_pdf(data: dict, template_id: str, part: str = "cv") -> bytes:
+    """The PDF of the CV (`part="cv"`, the default and all an export did
+    before the cover letter existed), of the cover letter alone ("letter"),
+    or of both, the letter as the last page ("both"). Every document is
+    printed by the same Chromium the same way; "both" joins the two files."""
+    from .. import letter as letter_mod
+
+    # for_pdf embeds the fonts as data: URIs. set_content()'s base URL is
+    # about:blank, so a linked /static/fonts/... URL would resolve to nothing
+    # and Chromium would silently fall back to a default face.
+    docs = []
+    if part in ("cv", "both"):
+        docs.append(document_html(data, template_id, for_pdf=True))
+    if part in ("letter", "both"):
+        docs.append(letter_mod.document_html(data, template_id, for_pdf=True))
+    if not docs:
+        raise PdfExportError(f"unknown export part {part!r}")
+    pdfs = _print(docs, chosen_faces(data))
+    if len(pdfs) == 1:
+        return pdfs[0]
+    return _join(pdfs)
+
+
+def _join(pdfs: list[bytes]) -> bytes:
+    import io
+
+    from pypdf import PdfWriter
+
+    out = PdfWriter()
+    for blob in pdfs:
+        out.append(io.BytesIO(blob))
+    buf = io.BytesIO()
+    out.write(buf)
+    return buf.getvalue()
+
+
+def _print(docs: list[str], faces: list[str]) -> list[bytes]:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as exc:  # pragma: no cover
@@ -51,43 +87,40 @@ def render_pdf(data: dict, template_id: str) -> bytes:
             "playwright is not installed. Run: pip install playwright && playwright install chromium"
         ) from exc
 
-    # for_pdf embeds the fonts as data: URIs. set_content()'s base URL is
-    # about:blank, so a linked /static/fonts/... URL would resolve to nothing
-    # and Chromium would silently fall back to a default face.
-    html = document_html(data, template_id, for_pdf=True)
-    faces = chosen_faces(data)
-
+    out = []
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(args=["--no-sandbox"])
             try:
-                page = browser.new_page()
-                page.set_content(html, wait_until="networkidle")
-                # Fonts must be loaded before layout is measured for pagination.
-                page.evaluate("document.fonts && document.fonts.ready")
-                missing = page.evaluate(_LOAD_AND_CHECK, faces) if faces else []
-                if missing:
-                    log.error("PDF export: chosen font(s) did not load: %s", missing)
-                    raise PdfExportError(
-                        f"chosen font(s) did not load, refusing to print a fallback: {missing}")
-                # Auto-fit compresses vertical rhythm until the résumé seats on
-                # one page (app/static/js/autofit.js). It is inlined in every
-                # document and self-starts after fonts.ready; awaiting its
-                # promise here is what guarantees the PDF is printed from the
-                # SAME fitted layout the user approved in the preview. Without
-                # this await, page.pdf() can race the fit and print the
-                # unfitted, overflowing layout.
-                page.evaluate(
-                    "window.ResumeAutofit ? window.ResumeAutofit.ready : null"
-                )
-                page.emulate_media(media="print")
-                pdf = page.pdf(
-                    width="850px",
-                    height="1100px",
-                    margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
-                    print_background=True,
-                    prefer_css_page_size=True,
-                )
+                for html in docs:
+                    page = browser.new_page()
+                    page.set_content(html, wait_until="networkidle")
+                    # Fonts must be loaded before layout is measured for pagination.
+                    page.evaluate("document.fonts && document.fonts.ready")
+                    missing = page.evaluate(_LOAD_AND_CHECK, faces) if faces else []
+                    if missing:
+                        log.error("PDF export: chosen font(s) did not load: %s", missing)
+                        raise PdfExportError(
+                            f"chosen font(s) did not load, refusing to print a fallback: {missing}")
+                    # Auto-fit compresses vertical rhythm until the résumé seats on
+                    # one page (app/static/js/autofit.js). It is inlined in every
+                    # document and self-starts after fonts.ready; awaiting its
+                    # promise here is what guarantees the PDF is printed from the
+                    # SAME fitted layout the user approved in the preview. Without
+                    # this await, page.pdf() can race the fit and print the
+                    # unfitted, overflowing layout.
+                    page.evaluate(
+                        "window.ResumeAutofit ? window.ResumeAutofit.ready : null"
+                    )
+                    page.emulate_media(media="print")
+                    out.append(page.pdf(
+                        width="850px",
+                        height="1100px",
+                        margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
+                        print_background=True,
+                        prefer_css_page_size=True,
+                    ))
+                    page.close()
             finally:
                 browser.close()
     except PdfExportError:
@@ -95,4 +128,4 @@ def render_pdf(data: dict, template_id: str) -> bytes:
     except Exception as exc:  # noqa: BLE001 - surface any Playwright failure as ours
         raise PdfExportError(f"Chromium PDF render failed: {exc}") from exc
 
-    return pdf
+    return out

@@ -165,7 +165,35 @@
 
   const F = (path, label, opts = {}) => Object.assign({ path, label }, opts);
 
+  /* ---------- the cover letter (2026-10-18) ----------
+     `data.cover_letter`, in the résumé document itself: so it is stored per
+     language with the CV (cvstand:resume:<lang>), undone with it, and sent
+     with it to every render and export. Off by default; `enabled` is the
+     "Add a cover letter" box. The server draws it in the selected template's
+     identity (app/letter.py). */
+  const LETTER = JSON.parse($("#letter-data").textContent);
+  const LIM = LETTER.limits;
+  const letterOn = () => !!(data.cover_letter && data.cover_letter.enabled);
+
   const SPEC = [
+    /* Shown only while the letter is on, first - right under its switch. */
+    { id: "letter", title: T("Cover letter"), icon: true, when: letterOn,
+      hint: T("Drawn in your template's colours and fonts. One page, after the CV."),
+      fields: [
+        F("cover_letter.recipient_name", T("Recipient name"), { max: LIM.field }),
+        F("cover_letter.recipient_title", T("Recipient title"), { max: LIM.field }),
+        F("cover_letter.company", T("Company"), { max: LIM.field }),
+        F("cover_letter.company_address", T("Company address"), { type: "textarea", max: LIM.address }),
+        F("cover_letter.date", T("Date"), { max: LIM.field }),
+        F("cover_letter.subject", T("Subject / role"), { max: LIM.field }),
+        F("cover_letter.greeting", T("Greeting"), { max: LIM.field }),
+      ],
+      list: { path: "cover_letter.paragraphs", label: T("Paragraph"), heading: T("Body paragraphs"), string: true, textarea: true,
+              max: LIM.paragraph, most: LIM.paragraphs },
+      fieldsAfter: [
+        F("cover_letter.closing", T("Closing"), { max: LIM.field }),
+        F("cover_letter.signature", T("Signature name"), { max: LIM.field, hint: T("Empty: your name from Basics") }),
+      ] },
     { id: "basics", title: T("Basics"), fields: [
       F("name", T("Full name"), { ph: T("Wren Ashworth") }),
       F("title", T("Headline / role"), { ph: T("Creative Lead") }),
@@ -237,9 +265,10 @@
         </div>
       </div>`;
     }
+    const max = fld.max ? ` maxlength="${fld.max}"` : "";
     if (fld.type === "textarea") {
       return `<div class="field"><label for="${id}">${fld.label}</label>
-        <textarea id="${id}" name="${path}">${esc(val)}</textarea>
+        <textarea id="${id}" name="${path}"${max}>${esc(val)}</textarea>
         ${fld.hint ? `<small style="color:var(--muted);font-size:11.5px">${fld.hint}</small>` : ""}</div>`;
     }
     if (fld.type === "select") {
@@ -252,15 +281,19 @@
     }
     const t = fld.type === "number" ? "number" : "text";
     return `<div class="field"><label for="${id}">${fld.label}</label>
-      <input type="${t}" id="${id}" name="${path}" value="${esc(val)}" ${fld.ph ? `placeholder="${esc(fld.ph)}"` : ""}>
+      <input type="${t}" id="${id}" name="${path}" value="${esc(val)}" ${fld.ph ? `placeholder="${esc(fld.ph)}"` : ""}${max}>
       ${fld.hint ? `<small style="color:var(--muted);font-size:11.5px">${fld.hint}</small>` : ""}</div>`;
   }
 
   function entryHTML(listCfg, idx) {
     const base = `${listCfg.path}.${idx}`;
     if (listCfg.string) {
-      return `<div class="bullet-row">
-        <input type="text" name="${base}" value="${esc(getPath(data, base))}" placeholder="${esc(listCfg.label)}">
+      const max = listCfg.max ? ` maxlength="${listCfg.max}"` : "";
+      const box = listCfg.textarea
+        ? `<textarea name="${base}" aria-label="${esc(listCfg.label)} ${idx + 1}" rows="4"${max}>${esc(getPath(data, base))}</textarea>`
+        : `<input type="text" name="${base}" value="${esc(getPath(data, base))}" placeholder="${esc(listCfg.label)}"${max}>`;
+      return `<div class="bullet-row${listCfg.textarea ? " is-text" : ""}">
+        ${box}
         <button type="button" data-act="rm" data-path="${listCfg.path}" data-idx="${idx}">×</button>
       </div>`;
     }
@@ -516,6 +549,7 @@
       markCurrent();
     }
     renderForm();
+    syncLetterUI();
     refreshRibbon();
     paintUndo();
     if (keepName) {
@@ -582,37 +616,55 @@
     scheduleSave();
   }
 
+  const ENVELOPE = '<svg viewBox="0 0 20 20" aria-hidden="true" width="13" height="13"><rect x="2.5" y="4.5" width="15" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3 5.5 7 5.5 7-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
   function sectionHTML(sec, n) {
     let body = "";
+    const hint = sec.hint ? `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${sec.hint}</p>` : "";
+    if (sec.icon) body += hint;                       // the letter says what it is first
     (sec.fields || []).forEach((f) => { body += inputHTML(f, f.path); });
-    if (sec.hint) body += `<p style="font-size:12px;color:var(--muted);margin:12px 0 0">${sec.hint}</p>`;
+    if (!sec.icon) body += hint;
     if (sec.list) {
       const arr = Array.isArray(getPath(data, sec.list.path)) ? getPath(data, sec.list.path) : [];
+      if (sec.list.heading) body += `<div class="field"><label>${sec.list.heading}</label></div>`;
       body += `<div data-list="${sec.list.path}">`;
       arr.forEach((_, i) => { body += entryHTML(sec.list, i); });
       /* Composed, not one msgid per list: `sec.list.label` is ALREADY through
          T() where the section was declared, so translating only the verb keeps
          the two halves in one language. English is byte-identical — T("+ Add")
          returns "+ Add" — so the golden HTML gate does not move. */
-      body += `</div><button type="button" class="add" data-act="add" data-path="${sec.list.path}">${T("+ Add")} ${sec.list.label.toLowerCase()}</button>`;
+      const full = sec.list.most && arr.length >= sec.list.most ? " disabled" : "";
+      body += `</div><button type="button" class="add" data-act="add" data-path="${sec.list.path}"${full}>${T("+ Add")} ${sec.list.label.toLowerCase()}</button>`;
     }
-    const open = n <= 2 ? " open" : "";
-    return `<details class="sec"${open}><summary><span class="num">${n}</span>${sec.title}<span class="caret">›</span></summary>
+    (sec.fieldsAfter || []).forEach((f) => { body += inputHTML(f, f.path); });
+    const open = n <= 2 || sec.icon ? " open" : "";
+    const badge = sec.icon ? `<span class="num">${ENVELOPE}</span>` : `<span class="num">${n}</span>`;
+    return `<details class="sec${sec.icon ? " sec-letter" : ""}"${open}><summary>${badge}${sec.title}<span class="caret">›</span></summary>
       <div class="sec-body">${body}</div></details>`;
   }
+
+  /* The sections on screen: the letter's only while it is on. The CV's keep
+     their numbers 1-10 either way - the letter wears an envelope instead. */
+  const visibleSpec = () => SPEC.filter((sec) => !sec.when || sec.when());
 
   function renderForm() {
     const openIds = new Set($$("#resume-form .sec[open]").map((d) => d.dataset.sid));
     const form = $("#resume-form");
     $$(".sec", form).forEach((n) => n.remove());
-    let html = "";
-    SPEC.forEach((sec, i) => { html += sectionHTML(sec, i + 1); });
+    const shown = visibleSpec();
+    let html = "", n = 0;
+    shown.forEach((sec) => { html += sectionHTML(sec, sec.icon ? 0 : ++n); });
     form.insertAdjacentHTML("beforeend", html);
     $$("#resume-form .sec").forEach((d, i) => {
-      d.dataset.sid = SPEC[i].id;
-      if (openIds.size) d.open = openIds.has(SPEC[i].id);
+      d.dataset.sid = shown[i].id;
+      /* the letter opens itself when its box is ticked; otherwise every
+         section keeps the open/closed state the user left it in */
+      if (shown[i].icon && letterJustOn) d.open = true;
+      else if (openIds.size) d.open = openIds.has(shown[i].id);
     });
+    letterJustOn = false;
   }
+  let letterJustOn = false;
 
   /* ---------- change handling ---------- */
   let renderTimer, saveTimer, savePending = false;
@@ -666,6 +718,7 @@
     recordUndo();
     if (act === "add") {
       const sec = SPEC.find((s) => s.list && s.list.path === path);
+      if (sec.list.most && ensureArray(path).length >= sec.list.most) { undoStack.pop(); paintUndo(); return; }
       const arr = ensureArray(path);
       arr.push(sec.list.string ? "" : (sec.list.bullets ? { bullets: [] } : {}));
     } else if (act === "rm") {
@@ -837,7 +890,29 @@
       frame.onload = checkOverflow;
     } catch (_) {
       showErrors([T("Could not reach the preview service.")]);
+      return;
     }
+    renderLetter();
+  }
+
+  /* The letter's page, after the CV's, from the same résumé and template.
+     A failure here says nothing of its own: the CV's render above has
+     already reported whatever is wrong with the document. */
+  const letterFrame = $("#letter-frame");
+  const letterStage = $("#letter-stage");
+  async function renderLetter() {
+    if (!letterOn()) return;
+    try {
+      const res = await fetch(EP.render, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: stripPrivate(data), template_key: templateKey, doc: "letter" }),
+      });
+      if (!res.ok) return;
+      const j = await res.json();
+      letterFrame.srcdoc = j.doc;
+      letterFrame.onload = () => checkFit(letterFrame, $("#letter-warn"),
+        T("The letter runs past one page — shorten it."));
+    } catch (_) { /* the CV's render reports the connection */ }
   }
 
   /* The document auto-fits itself (app/static/js/autofit.js) once its fonts
@@ -849,7 +924,10 @@
      Reading `.tpl.scrollHeight` directly is not equivalent: absolutely-placed
      panels never grow it, so it under-reports on 7 of the Modern layouts. */
   function checkOverflow() {
-    const warn = $("#page-warn");
+    checkFit(frame, $("#page-warn"),
+      T("Content still runs past one page after auto-fit — trim it, or pick a denser layout."));
+  }
+  function checkFit(frame, warn, overText) {
     warn.hidden = true;
     let win;
     try { win = frame.contentWindow; } catch (_) { return; }
@@ -858,8 +936,7 @@
       if (!r || r.error) return;
       if (!r.fitted) {
         warn.classList.remove("is-info");
-        warn.textContent =
-          T("Content still runs past one page after auto-fit — trim it, or pick a denser layout.");
+        warn.textContent = overText;
         warn.hidden = false;
       } else if (r.compressed) {
         warn.classList.add("is-info");
@@ -889,8 +966,10 @@
     let scale;
     if (zoom === "fit") scale = Math.min(1, avail / 850);
     else scale = zoom;
-    stage.style.transform = `scale(${scale})`;
-    stage.style.marginBottom = `${(scale - 1) * 1100}px`;
+    [stage, letterStage].forEach((st) => {
+      st.style.transform = `scale(${scale})`;
+      st.style.marginBottom = `${(scale - 1) * 1100}px`;
+    });
     $("#zoom-lvl").textContent = zoom === "fit" ? T("Fit") : Math.round(scale * 100) + "%";
   }
   $$(".zoom button").forEach((b) => b.addEventListener("click", () => {
@@ -1077,8 +1156,23 @@
   const dlMenu = $("#dl-menu");
   $("#dl-toggle").addEventListener("click", (e) => { e.stopPropagation(); dlMenu.classList.toggle("is-open"); });
   document.addEventListener("click", () => dlMenu.classList.remove("is-open"));
+  /* With a cover letter, PDF and Word each download the CV, the letter, or
+     both in one file. "cv" whenever there is no letter: the menu is then
+     exactly what it always was. */
+  let dlPart = "cv";
+  function paintParts() {
+    $$("#dl-parts [data-part]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.part === dlPart)));
+  }
+  $("#dl-parts").addEventListener("click", (e) => {
+    e.stopPropagation();                    // choosing keeps the menu open
+    const b = e.target.closest("[data-part]");
+    if (!b) return;
+    dlPart = b.dataset.part;
+    paintParts();
+  });
   async function download(kind, url) {
     dlMenu.classList.remove("is-open");
+    const part = letterOn() ? dlPart : "cv";
     await doSave();
     /* POST the document rather than saving it and asking the server to export
        "the" résumé. The old flow only worked because there was exactly one:
@@ -1088,7 +1182,8 @@
     try {
       const res = await fetch(url, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: stripPrivate(data), template_key: templateKey }),
+        body: JSON.stringify(Object.assign({ data: stripPrivate(data), template_key: templateKey },
+          part === "cv" ? {} : { part })),
       });
       if (!res.ok) {
         const txt = await res.text();
@@ -1098,7 +1193,9 @@
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = (data.name || "resume").replace(/[^\w\-]+/g, "_").toLowerCase() + (kind === "PDF" ? ".pdf" : ".docx");
+      a.download = (data.name || "resume").replace(/[^\w\-]+/g, "_").toLowerCase() +
+        ({ cv: "", letter: "_cover_letter", both: "_cv_and_cover_letter" })[part] +
+        (kind === "PDF" ? ".pdf" : ".docx");
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     } catch (_) {
@@ -1107,6 +1204,74 @@
   }
   $("#dl-pdf").addEventListener("click", (e) => { e.preventDefault(); download("PDF", EP.pdf); });
   $("#dl-docx").addEventListener("click", (e) => { e.preventDefault(); download("Word", EP.docx); });
+
+  /* ---------- the cover letter: its box, the preview switch ---------- */
+  const LETTER_TEXT = ["recipient_name", "recipient_title", "company", "company_address", "date",
+                       "subject", "greeting", "closing", "signature"];
+  function letterIsEmpty(cl) {
+    if (!cl || typeof cl !== "object") return true;
+    return !LETTER_TEXT.some((k) => typeof cl[k] === "string" && cl[k].trim()) &&
+      !(Array.isArray(cl.paragraphs) && cl.paragraphs.some((x) => typeof x === "string" && x.trim()));
+  }
+  function today() {
+    try {
+      return new Date().toLocaleDateString(docLang === "ar" ? "ar" : "en-GB",
+        { day: "numeric", month: "long", year: "numeric" });
+    } catch (_) { return ""; }
+  }
+  function syncLetterUI() {
+    const on = letterOn();
+    $("#cl-toggle").checked = on;
+    letterStage.hidden = !on;
+    $("#doc-switch").hidden = !on;
+    $("#dl-parts").hidden = !on;
+    if (!on) {
+      dlPart = "cv";
+      paintParts();
+      setDoc("cv", false);
+      $("#letter-warn").hidden = true;
+    }
+  }
+  /* Ticking the box the first time fills in the demo letter in the
+     document's language, dated today, so there is something to edit; after
+     that, unticking only hides the letter and ticking brings it back as it
+     was. One undo step either way. */
+  $("#cl-toggle").addEventListener("change", (e) => {
+    recordUndo();
+    if (e.target.checked) {
+      if (letterIsEmpty(data.cover_letter)) {
+        data.cover_letter = Object.assign(JSON.parse(JSON.stringify(LETTER.demo)), { enabled: true, date: today() });
+      } else {
+        data.cover_letter.enabled = true;
+      }
+      letterJustOn = true;
+    } else if (data.cover_letter) {
+      data.cover_letter.enabled = false;
+    }
+    renderForm();
+    syncLetterUI();
+    applyZoom();
+    clearTimeout(renderTimer);
+    doRender();
+    scheduleSave();
+    if (e.target.checked) setDoc("letter");
+  });
+
+  /* CV / Cover letter: the letter is its own page after the CV; the switch
+     brings either one into view, and follows the reader's own scrolling. */
+  function setDoc(which, scroll = true) {
+    $$("#doc-switch [data-doc]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.doc === which)));
+    if (scroll) (which === "letter" ? letterStage : stage).scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+  $("#doc-switch").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-doc]");
+    if (b) setDoc(b.dataset.doc);
+  });
+  scroll.addEventListener("scroll", () => {
+    if (letterStage.hidden) return;
+    const mid = scroll.getBoundingClientRect().top + scroll.clientHeight / 2;
+    setDoc(letterStage.getBoundingClientRect().top < mid ? "letter" : "cv", false);
+  }, { passive: true });
 
   /* ---------- boot ---------- */
   /* ADOPT THE CHOSEN LANGUAGE.
@@ -1132,6 +1297,7 @@
   }
   applyLevelVocab(docLang);
   renderForm();
+  syncLetterUI();
   refreshRibbon();
   applyRibbonMode();
   paintUndo();

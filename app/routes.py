@@ -62,6 +62,7 @@ from .limits import RenderBusy, rate_limited, render_slot
 from .labels import all_levels, levels_for, ui_catalogue, ui_t
 from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
+from . import letter as letter_mod
 from .schema import (
     SUPPORTED_LANGS, ResumeValidationError, typography_migrations, typography_of, validate,
 )
@@ -87,8 +88,29 @@ def _store_disabled(message: str, *, allow: str | None = None):
     return jsonify({"ok": False, "error": message}), status, headers
 
 
-def _slug(data: dict) -> str:
-    return secure_filename((data.get("name") or "resume").strip()) or "resume"
+def _slug(data: dict, part: str = "cv") -> str:
+    base = secure_filename((data.get("name") or "resume").strip()) or "resume"
+    return {"cv": base, "letter": base + "_cover_letter",
+            "both": base + "_cv_and_cover_letter"}[part]
+
+
+class _BadPart(ValueError):
+    pass
+
+
+def _export_part(data: dict) -> str:
+    """Which document(s) to export: "cv" (default - every export before the
+    cover letter existed), "letter" or "both". Asking for a letter the
+    résumé does not have is the caller's mistake, not an empty page."""
+    if request.method == "POST":
+        part = (request.get_json(silent=True) or {}).get("part") or "cv"
+    else:
+        part = request.args.get("part") or "cv"
+    if part not in letter_mod.PARTS:
+        raise _BadPart(f"`part` must be one of {', '.join(letter_mod.PARTS)}.")
+    if part != "cv" and not letter_mod.enabled(data):
+        raise _BadPart("This résumé has no cover letter to export.")
+    return part
 
 
 def _resolve_key(explicit: str | None) -> str:
@@ -223,6 +245,9 @@ def builder():
         },
         # The Fonts section: the registry's lists for the DOCUMENT language.
         typography=typography_payload(doc_lang),
+        # The cover letter: the demo letter a first tick fills in (the
+        # DOCUMENT's language) and the schema's caps for the form's maxlength.
+        letter={"demo": letter_mod.demo(doc_lang), "limits": letter_mod.limits()},
     )
 
 
@@ -291,9 +316,17 @@ def api_render():
         validate(data)
     except ResumeValidationError as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 422
+    # `doc: "letter"` asks for the COVER LETTER page in this template's
+    # identity (app/letter.py) instead of the résumé. Absent = the résumé,
+    # exactly as before the letter existed.
+    as_letter = body.get("doc") == "letter"
     try:
-        html = canvas_html(data, key)
-        doc = document_html(data, key)
+        if as_letter:
+            html = letter_mod.canvas_html(data, key)
+            doc = letter_mod.document_html(data, key)
+        else:
+            html = canvas_html(data, key)
+            doc = document_html(data, key)
     except UnknownTemplate as exc:
         abort(400, str(exc))
     # Typography the registry does not offer for this document's language was
@@ -394,11 +427,15 @@ def export_pdf():
     except _BadExportBody as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 422
     try:
+        part = _export_part(data)
+    except _BadPart as exc:
+        return jsonify({"ok": False, "errors": [str(exc)]}), 422
+    try:
         # One Chromium per request (app/exporters/pdf.py). The slot is what
         # keeps a burst of exports from putting N of them on the box at once;
         # the rate limit above only governs how often ONE client may ask.
         with render_slot():
-            pdf = render_pdf(data, key)
+            pdf = render_pdf(data, key) if part == "cv" else render_pdf(data, key, part)
     except RenderBusy as exc:
         current_app.logger.warning("PDF export shed: %s", exc)
         return jsonify({"ok": False, "error": str(exc)}), 503, {"Retry-After": "30"}
@@ -409,7 +446,7 @@ def export_pdf():
         io.BytesIO(pdf),
         mimetype="application/pdf",
         as_attachment=True,
-        download_name=f"{_slug(data)}.pdf",
+        download_name=f"{_slug(data, part)}.pdf",
     )
 
 
@@ -426,7 +463,11 @@ def export_docx():
     except _BadExportBody as exc:
         return jsonify({"ok": False, "errors": exc.errors}), 422
     try:
-        blob = render_docx(data, key)
+        part = _export_part(data)
+    except _BadPart as exc:
+        return jsonify({"ok": False, "errors": [str(exc)]}), 422
+    try:
+        blob = render_docx(data, key) if part == "cv" else render_docx(data, key, part)
     except DocxExportError as exc:
         current_app.logger.warning("DOCX export unavailable: %s", exc)
         abort(501, str(exc))
@@ -434,7 +475,7 @@ def export_docx():
         io.BytesIO(blob),
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         as_attachment=True,
-        download_name=f"{_slug(data)}.docx",
+        download_name=f"{_slug(data, part)}.docx",
     )
 
 

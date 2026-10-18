@@ -32,6 +32,13 @@ playwright==1.62.0
 # tests/test_requirements_cover_imports.py keeps this file honest.
 fonttools==4.65.0
 
+# PDF files, read and joined (2026-10-18): the "CV + cover letter" download
+# joins two printed PDFs (app/exporters/pdf.py), and Import my CV reads the
+# text out of an uploaded PDF (app/importer.py). Pure Python, no native code;
+# it parses, it never executes anything a PDF carries. A RUNTIME dependency:
+# the image installs only this file. Pinned at the version this venv tests.
+pypdf==6.19.0
+
 # The AI writing assistant (app/assist.py). Optional at runtime: with no
 # ANTHROPIC_API_KEY set the feature answers 503 and the rest of the app is
 # unaffected, which is how it ships until Stage 3 turns payment on.

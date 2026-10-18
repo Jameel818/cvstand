@@ -1,0 +1,2826 @@
+{
+ "generated_by": "tools/build_letter_themes.py",
+ "note": "Measured from the rendered templates; do not edit by hand.",
+ "templates": {
+  "ats-t1": {
+   "ar": {
+    "accent": "#2563EB",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#64748B",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#0F172A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#0F172A",
+     "family": "CVT Tajawal",
+     "tracking": -0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#0F172A",
+    "title": "#2563EB"
+   },
+   "en": {
+    "accent": "#2563EB",
+    "body": "Archivo",
+    "contact": "#64748B",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#0F172A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#0F172A",
+     "family": "Archivo",
+     "tracking": -0.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#0F172A",
+    "title": "#2563EB"
+   }
+  },
+  "ats-t10": {
+   "ar": {
+    "accent": "#FDE047",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5C5C66",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "tracking": -1.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#5C5C66"
+   },
+   "en": {
+    "accent": "#FDE047",
+    "body": "Source Sans 3",
+    "contact": "#5C5C66",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#16161A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "Archivo",
+     "tracking": -1.8,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#5C5C66"
+   }
+  },
+  "ats-t11": {
+   "ar": {
+    "accent": "#0D9488",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4E5A57",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#14201E",
+     "family": "CVT Cairo",
+     "weight": 800
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#14201E",
+     "family": "CVT Tajawal",
+     "tracking": -0.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#14201E",
+    "title": "#0F766E"
+   },
+   "en": {
+    "accent": "#0D9488",
+    "body": "Open Sans",
+    "contact": "#4E5A57",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#14201E",
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#14201E",
+     "family": "Montserrat",
+     "tracking": -0.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#14201E",
+    "title": "#0F766E"
+   }
+  },
+  "ats-t12": {
+   "ar": {
+    "accent": "#1A1A1A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4A5568",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1C1F26",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#1C1F26",
+     "family": "CVT Tajawal",
+     "tracking": 0.4,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1C1F26",
+    "title": "#4A5568"
+   },
+   "en": {
+    "accent": "#1A1A1A",
+    "body": "Open Sans",
+    "contact": "#4A5568",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1C1F26",
+     "family": "Merriweather",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#1C1F26",
+     "family": "Merriweather",
+     "tracking": 0.4,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1C1F26",
+    "title": "#4A5568"
+   }
+  },
+  "ats-t13": {
+   "ar": {
+    "accent": "#2563EB",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#525866",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#2563EB",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#12141A",
+     "family": "CVT Tajawal",
+     "tracking": -1.2,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#12141A",
+    "title": "#2563EB"
+   },
+   "en": {
+    "accent": "#2563EB",
+    "body": "Source Sans 3",
+    "contact": "#525866",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#2563EB",
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#12141A",
+     "family": "Archivo",
+     "tracking": -1.2,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#12141A",
+    "title": "#2563EB"
+   }
+  },
+  "ats-t14": {
+   "ar": {
+    "accent": "#B45309",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#57524E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#181614",
+     "family": "CVT Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#181614",
+     "family": "CVT Tajawal",
+     "tracking": -0.4,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#181614",
+    "title": "#B93E12"
+   },
+   "en": {
+    "accent": "#B45309",
+    "body": "Source Sans 3",
+    "contact": "#57524E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#181614",
+     "family": "Archivo Narrow",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#181614",
+     "family": "Archivo Narrow",
+     "tracking": -0.4,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#181614",
+    "title": "#B93E12"
+   }
+  },
+  "ats-t15": {
+   "ar": {
+    "accent": "#7C3AED",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#544E5C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#191520",
+     "family": "CVT Tajawal",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#191520",
+    "title": "#6B2A5A"
+   },
+   "en": {
+    "accent": "#7C3AED",
+    "body": "Open Sans",
+    "contact": "#544E5C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "Poppins",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#191520",
+     "family": "Poppins",
+     "tracking": -0.8,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#191520",
+    "title": "#6B2A5A"
+   }
+  },
+  "ats-t16": {
+   "ar": {
+    "accent": "#C2410C",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5B534C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1714",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1A1714",
+     "family": "CVT Tajawal",
+     "tracking": 0,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1714",
+    "title": "#A6462B"
+   },
+   "en": {
+    "accent": "#C2410C",
+    "body": "Source Sans 3",
+    "contact": "#5B534C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1714",
+     "family": "Fraunces",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1A1714",
+     "family": "Fraunces",
+     "tracking": 0,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1714",
+    "title": "#A6462B"
+   }
+  },
+  "ats-t17": {
+   "ar": {
+    "accent": "#166534",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4E574F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1F4436",
+     "family": "CVT Cairo",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#141A17",
+     "family": "CVT Tajawal",
+     "tracking": 0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#141A17",
+    "title": "#1F4436"
+   },
+   "en": {
+    "accent": "#166534",
+    "body": "Inter",
+    "contact": "#4E574F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1F4436",
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#141A17",
+     "family": "Anton",
+     "tracking": 0.5,
+     "weight": 400
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#141A17",
+    "title": "#1F4436"
+   }
+  },
+  "ats-t18": {
+   "ar": {
+    "accent": "#4F46E5",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#525573",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#35408E",
+     "family": "CVT Cairo",
+     "weight": 800
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#16182B",
+     "family": "CVT Tajawal",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#16182B",
+    "title": "#35408E"
+   },
+   "en": {
+    "accent": "#4F46E5",
+    "body": "Montserrat",
+    "contact": "#525573",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#35408E",
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#16182B",
+     "family": "Montserrat",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#16182B",
+    "title": "#35408E"
+   }
+  },
+  "ats-t19": {
+   "ar": {
+    "accent": "#B45309",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5D584D",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#B0761A",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1C1A15",
+     "family": "CVT Tajawal",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1C1A15",
+    "title": "#B0761A"
+   },
+   "en": {
+    "accent": "#B45309",
+    "body": "Source Sans 3",
+    "contact": "#5D584D",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#B0761A",
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1C1A15",
+     "family": "Source Sans 3",
+     "tracking": -0.8,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1C1A15",
+    "title": "#B0761A"
+   }
+  },
+  "ats-t2": {
+   "ar": {
+    "accent": "#0D9488",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5B6472",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#14213D",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#14213D",
+     "family": "CVT Tajawal",
+     "tracking": -0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#14213D",
+    "title": "#0F766E"
+   },
+   "en": {
+    "accent": "#0D9488",
+    "body": "Archivo",
+    "contact": "#5B6472",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#14213D",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#14213D",
+     "family": "Archivo",
+     "tracking": -0.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#14213D",
+    "title": "#0F766E"
+   }
+  },
+  "ats-t20": {
+   "ar": {
+    "accent": "#8B1E3F",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5A5054",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6E1F2B",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#1B1517",
+     "family": "CVT Tajawal",
+     "tracking": 0,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1B1517",
+    "title": "#6E1F2B"
+   },
+   "en": {
+    "accent": "#8B1E3F",
+    "body": "Merriweather",
+    "contact": "#5A5054",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6E1F2B",
+     "family": "Inter",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#1B1517",
+     "family": "Merriweather",
+     "tracking": 0,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1B1517",
+    "title": "#6E1F2B"
+   }
+  },
+  "ats-t21": {
+   "ar": {
+    "accent": "#06B6D4",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4A5A63",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0E7490",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#0F1A20",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#0F1A20",
+    "title": "#0E7490"
+   },
+   "en": {
+    "accent": "#06B6D4",
+    "body": "Inter",
+    "contact": "#4A5A63",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0E7490",
+     "family": "IBM Plex Mono",
+     "weight": 600
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#0F1A20",
+     "family": "IBM Plex Mono",
+     "tracking": -1,
+     "weight": 600
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#0F1A20",
+    "title": "#0E7490"
+   }
+  },
+  "ats-t22": {
+   "ar": {
+    "accent": "#DC2626",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#9B1B30",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#171215",
+     "family": "CVT Tajawal",
+     "tracking": -1.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#171215",
+    "title": "#FFFFFF"
+   },
+   "en": {
+    "accent": "#DC2626",
+    "body": "Archivo",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#9B1B30",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#171215",
+     "family": "Archivo",
+     "tracking": -1.6,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#171215",
+    "title": "#FFFFFF"
+   }
+  },
+  "ats-t23": {
+   "ar": {
+    "accent": "#0F6E63",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#57635F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0F6E63",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#13201E",
+     "family": "CVT Tajawal",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#13201E",
+    "title": "#0F6E63"
+   },
+   "en": {
+    "accent": "#0F6E63",
+    "body": "Poppins",
+    "contact": "#57635F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0F6E63",
+     "family": "Poppins",
+     "weight": 600
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#13201E",
+     "family": "Poppins",
+     "tracking": -0.8,
+     "weight": 600
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#13201E",
+    "title": "#0F6E63"
+   }
+  },
+  "ats-t24": {
+   "ar": {
+    "accent": "#4D7C0F",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#575A4C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#5A6B23",
+     "family": "CVT Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#191A12",
+     "family": "CVT Tajawal",
+     "tracking": -0.4,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#191A12",
+    "title": "#5A6B23"
+   },
+   "en": {
+    "accent": "#4D7C0F",
+    "body": "Archivo Narrow",
+    "contact": "#575A4C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#5A6B23",
+     "family": "Archivo Narrow",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#191A12",
+     "family": "Archivo Narrow",
+     "tracking": -0.4,
+     "weight": 400
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#191A12",
+    "title": "#5A6B23"
+   }
+  },
+  "ats-t25": {
+   "ar": {
+    "accent": "#3B6EA5",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4F585E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#2A5A78",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#15191C",
+     "family": "CVT Tajawal",
+     "tracking": -0.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#15191C",
+    "title": "#2A5A78"
+   },
+   "en": {
+    "accent": "#3B6EA5",
+    "body": "Open Sans",
+    "contact": "#4F585E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#2A5A78",
+     "family": "Montserrat",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#15191C",
+     "family": "Montserrat",
+     "tracking": -0.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#15191C",
+    "title": "#2A5A78"
+   }
+  },
+  "ats-t3": {
+   "ar": {
+    "accent": "#334155",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#555555",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "tracking": 0,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111111",
+    "title": "#111111"
+   },
+   "en": {
+    "accent": "#334155",
+    "body": "Archivo",
+    "contact": "#555555",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "Archivo",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "Archivo",
+     "tracking": 0,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111111",
+    "title": "#111111"
+   }
+  },
+  "ats-t4": {
+   "ar": {
+    "accent": "#D8F035",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#5C5C66",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "tracking": -1.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#5C5C66"
+   },
+   "en": {
+    "accent": "#D8F035",
+    "body": "Source Sans 3",
+    "contact": "#5C5C66",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#16161A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "Archivo",
+     "tracking": -1.8,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#5C5C66"
+   }
+  },
+  "ats-t5": {
+   "ar": {
+    "accent": "#7C3AED",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#54545E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1B1B22",
+     "family": "CVT Tajawal",
+     "tracking": -1.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#1B1B22",
+    "title": "#6B2A5A"
+   },
+   "en": {
+    "accent": "#7C3AED",
+    "body": "Inter",
+    "contact": "#54545E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1B1B22",
+     "family": "Archivo",
+     "tracking": -1.8,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#1B1B22",
+    "title": "#6B2A5A"
+   }
+  },
+  "ats-t6": {
+   "ar": {
+    "accent": "#475569",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#54585F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#1F4E79",
+     "family": "CVT Tajawal",
+     "weight": 800
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111318",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111318",
+    "title": "#1F4E79"
+   },
+   "en": {
+    "accent": "#475569",
+    "body": "Source Sans 3",
+    "contact": "#54585F",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#1F4E79",
+     "family": "Archivo",
+     "weight": 800
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111318",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111318",
+    "title": "#1F4E79"
+   }
+  },
+  "ats-t7": {
+   "ar": {
+    "accent": "#1E3A5F",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#D3DEEB",
+    "head": {
+     "bg": "#0E2D55",
+     "kind": "band"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#0E2D55",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#151A22",
+    "title": "#9FB8D4"
+   },
+   "en": {
+    "accent": "#1E3A5F",
+    "body": "Open Sans",
+    "contact": "#D3DEEB",
+    "head": {
+     "bg": "#0E2D55",
+     "kind": "band"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#0E2D55",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#151A22",
+    "title": "#9FB8D4"
+   }
+  },
+  "ats-t8": {
+   "ar": {
+    "accent": "#C0392B",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#55565A",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#C0392B",
+     "family": "CVT Cairo",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#17181A",
+     "family": "CVT Tajawal",
+     "tracking": 0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#17181A",
+    "title": "#C0392B"
+   },
+   "en": {
+    "accent": "#C0392B",
+    "body": "Source Sans 3",
+    "contact": "#55565A",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#C0392B",
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#17181A",
+     "family": "Anton",
+     "tracking": 0.5,
+     "weight": 400
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#17181A",
+    "title": "#C0392B"
+   }
+  },
+  "ats-t9": {
+   "ar": {
+    "accent": "#1A1A1A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#525252",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1A1A",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "CVT Tajawal",
+     "tracking": -0.4,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#7A5C1E"
+   },
+   "en": {
+    "accent": "#1A1A1A",
+    "body": "Source Sans 3",
+    "contact": "#525252",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1A1A",
+     "family": "Merriweather",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "Merriweather",
+     "tracking": -0.4,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#7A5C1E"
+   }
+  },
+  "modern-t1": {
+   "ar": {
+    "accent": "#D8F035",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#3A3A42",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "CVT Tajawal",
+     "tracking": -2.2,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#16161A"
+   },
+   "en": {
+    "accent": "#D8F035",
+    "body": "Source Sans 3",
+    "contact": "#3A3A42",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#16161A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#16161A",
+     "family": "Archivo",
+     "tracking": -2.2,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#16161A",
+    "title": "#16161A"
+   }
+  },
+  "modern-t10": {
+   "ar": {
+    "accent": "#A93005",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#FFFFFF",
+    "head": {
+     "bg": "#A93005",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#A93005"
+    },
+    "taj": true,
+    "text": "#111111",
+    "title": "#FFFFFF"
+   },
+   "en": {
+    "accent": "#A93005",
+    "body": "DM Sans",
+    "contact": "#FFFFFF",
+    "head": {
+     "bg": "#A93005",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#A93005"
+    },
+    "taj": true,
+    "text": "#111111",
+    "title": "#FFFFFF"
+   }
+  },
+  "modern-t11": {
+   "ar": {
+    "accent": "#2F855A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#08211C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#08211C",
+     "family": "CVT Tajawal",
+     "tracking": -1.2,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#0F1B2B"
+    },
+    "taj": true,
+    "text": "#22262E",
+    "title": "#08211C"
+   },
+   "en": {
+    "accent": "#2F855A",
+    "body": "Open Sans",
+    "contact": "#08211C",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#08211C",
+     "family": "Archivo",
+     "tracking": -1.2,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#0F1B2B"
+    },
+    "taj": true,
+    "text": "#22262E",
+    "title": "#08211C"
+   }
+  },
+  "modern-t12": {
+   "ar": {
+    "accent": "#111111",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#222222",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "CVT Cairo",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "tracking": 0.5,
+     "weight": 800
+    },
+    "page": "#F7F7F5",
+    "side": null,
+    "taj": false,
+    "text": "#111111",
+    "title": "#111111"
+   },
+   "en": {
+    "accent": "#111111",
+    "body": "Inter",
+    "contact": "#222222",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "Anton",
+     "tracking": 0.5,
+     "weight": 400
+    },
+    "page": "#F7F7F5",
+    "side": null,
+    "taj": false,
+    "text": "#111111",
+    "title": "#111111"
+   }
+  },
+  "modern-t13": {
+   "ar": {
+    "accent": "#2B6CB0",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#C7D4E4",
+    "head": {
+     "bg": "#0E2D55",
+     "kind": "band"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0E2D55",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": -1.2,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#22293A",
+    "title": "#D8C79A"
+   },
+   "en": {
+    "accent": "#2B6CB0",
+    "body": "Inter",
+    "contact": "#C7D4E4",
+    "head": {
+     "bg": "#0E2D55",
+     "kind": "band"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#0E2D55",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "tracking": -1.2,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#22293A",
+    "title": "#D8C79A"
+   }
+  },
+  "modern-t14": {
+   "ar": {
+    "accent": "#B83280",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#2E2C28",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#FFFFFF",
+     "family": "CVT Cairo",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": 5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#F7F4EC"
+    },
+    "taj": false,
+    "text": "#2E2C28",
+    "title": "#F6DDD3"
+   },
+   "en": {
+    "accent": "#B83280",
+    "body": "Source Sans 3",
+    "contact": "#2E2C28",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#FFFFFF",
+     "family": "Anton",
+     "weight": 400
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "Anton",
+     "tracking": 5,
+     "weight": 400
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#F7F4EC"
+    },
+    "taj": false,
+    "text": "#2E2C28",
+    "title": "#F6DDD3"
+   }
+  },
+  "modern-t15": {
+   "ar": {
+    "accent": "#2F855A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#F2EFE4",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#D99201",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A3F22",
+     "family": "CVT Tajawal",
+     "tracking": 0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#1A3F22"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#3F2C02"
+   },
+   "en": {
+    "accent": "#2F855A",
+    "body": "Archivo",
+    "contact": "#F2EFE4",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#D99201",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A3F22",
+     "family": "Archivo",
+     "tracking": 0.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#1A3F22"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#3F2C02"
+   }
+  },
+  "modern-t16": {
+   "ar": {
+    "accent": "#A32638",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#DDDDE2",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1C1C20",
+     "family": "CVT Cairo",
+     "weight": 800
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1C1C20",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#1C1C20"
+    },
+    "taj": false,
+    "text": "#26262C",
+    "title": "#A32638"
+   },
+   "en": {
+    "accent": "#A32638",
+    "body": "Open Sans",
+    "contact": "#DDDDE2",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1C1C20",
+     "family": "Montserrat",
+     "weight": 800
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1C1C20",
+     "family": "Montserrat",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#1C1C20"
+    },
+    "taj": false,
+    "text": "#26262C",
+    "title": "#A32638"
+   }
+  },
+  "modern-t17": {
+   "ar": {
+    "accent": "#003366",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#111111",
+    "head": {
+     "bg": "#003366",
+     "kind": "side"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": 2,
+     "weight": 800
+    },
+    "page": "#F4F2EC",
+    "side": {
+     "at": "start",
+     "bg": "#E5E8F5"
+    },
+    "taj": false,
+    "text": "#000000",
+    "title": "#FFFFFF"
+   },
+   "en": {
+    "accent": "#003366",
+    "body": "Montserrat",
+    "contact": "#111111",
+    "head": {
+     "bg": "#003366",
+     "kind": "side"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "Montserrat",
+     "tracking": 2,
+     "weight": 900
+    },
+    "page": "#F4F2EC",
+    "side": {
+     "at": "start",
+     "bg": "#E5E8F5"
+    },
+    "taj": false,
+    "text": "#000000",
+    "title": "#FFFFFF"
+   }
+  },
+  "modern-t18": {
+   "ar": {
+    "accent": "#002B66",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#E3E9F2",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#002B66"
+    },
+    "taj": true,
+    "text": "#26303C",
+    "title": "#C08A2E"
+   },
+   "en": {
+    "accent": "#002B66",
+    "body": "Open Sans",
+    "contact": "#E3E9F2",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#002B66"
+    },
+    "taj": true,
+    "text": "#26303C",
+    "title": "#C08A2E"
+   }
+  },
+  "modern-t19": {
+   "ar": {
+    "accent": "#6B2A5A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#54545E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1B1B22",
+     "family": "CVT Tajawal",
+     "tracking": -1.6,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#1B1B22",
+    "title": "#6B2A5A"
+   },
+   "en": {
+    "accent": "#6B2A5A",
+    "body": "Inter",
+    "contact": "#54545E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#6B2A5A",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1B1B22",
+     "family": "Archivo",
+     "tracking": -1.6,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#1B1B22",
+    "title": "#6B2A5A"
+   }
+  },
+  "modern-t2": {
+   "ar": {
+    "accent": "#C8A24A",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#20242E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#002366",
+     "family": "CVT Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#002366",
+     "family": "CVT Tajawal",
+     "tracking": 1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#002366"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#002366"
+   },
+   "en": {
+    "accent": "#C8A24A",
+    "body": "Archivo",
+    "contact": "#20242E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#002366",
+     "family": "Archivo",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#002366",
+     "family": "Archivo",
+     "tracking": 1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#002366"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#002366"
+   }
+  },
+  "modern-t20": {
+   "ar": {
+    "accent": "#810100",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#1B1717",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#1B1717",
+     "family": "CVT Tajawal",
+     "weight": 400
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1B1717",
+     "family": "CVT Tajawal",
+     "tracking": 0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#EDEBDD"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#810100"
+   },
+   "en": {
+    "accent": "#810100",
+    "body": "Archivo",
+    "contact": "#1B1717",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#1B1717",
+     "family": "Archivo",
+     "weight": 400
+    },
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#1B1717",
+     "family": "Archivo",
+     "tracking": 0.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#EDEBDD"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#810100"
+   }
+  },
+  "modern-t21": {
+   "ar": {
+    "accent": "#013F32",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#FDFDFD",
+    "head": {
+     "bg": "#E1F04A",
+     "kind": "band"
+    },
+    "heading": null,
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#013F32",
+     "family": "CVT Tajawal",
+     "tracking": 0,
+     "weight": 800
+    },
+    "page": "#FDFDFD",
+    "side": {
+     "at": "start",
+     "bg": "#013F32"
+    },
+    "taj": false,
+    "text": "#161616",
+    "title": "#013F32"
+   },
+   "en": {
+    "accent": "#013F32",
+    "body": "Source Sans 3",
+    "contact": "#FDFDFD",
+    "head": {
+     "bg": "#E1F04A",
+     "kind": "band"
+    },
+    "heading": null,
+    "name": {
+     "caps": false,
+     "centred": false,
+     "color": "#013F32",
+     "family": "Montserrat",
+     "tracking": 0,
+     "weight": 800
+    },
+    "page": "#FDFDFD",
+    "side": {
+     "at": "start",
+     "bg": "#013F32"
+    },
+    "taj": false,
+    "text": "#161616",
+    "title": "#013F32"
+   }
+  },
+  "modern-t22": {
+   "ar": {
+    "accent": "#CB3500",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#444444",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "CVT Tajawal",
+     "tracking": -2,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111111",
+    "title": "#111111"
+   },
+   "en": {
+    "accent": "#CB3500",
+    "body": "Montserrat",
+    "contact": "#444444",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#111111",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#111111",
+     "family": "Archivo",
+     "tracking": -2,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#111111",
+    "title": "#111111"
+   }
+  },
+  "modern-t23": {
+   "ar": {
+    "accent": "#3182CE",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#3C3C40",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#151517",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#151517",
+     "family": "CVT Tajawal",
+     "tracking": -0.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#EFEFEF"
+    },
+    "taj": true,
+    "text": "#151517",
+    "title": "#FFFFFF"
+   },
+   "en": {
+    "accent": "#3182CE",
+    "body": "Inter",
+    "contact": "#3C3C40",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#151517",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#151517",
+     "family": "Archivo",
+     "tracking": -0.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#EFEFEF"
+    },
+    "taj": true,
+    "text": "#151517",
+    "title": "#FFFFFF"
+   }
+  },
+  "modern-t24": {
+   "ar": {
+    "accent": "#FFD633",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#F2F2F2",
+    "side": {
+     "at": "start",
+     "bg": "#4A4C4A"
+    },
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#333333"
+   },
+   "en": {
+    "accent": "#FFD633",
+    "body": "Open Sans",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#F2F2F2",
+    "side": {
+     "at": "start",
+     "bg": "#4A4C4A"
+    },
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#333333"
+   }
+  },
+  "modern-t3": {
+   "ar": {
+    "accent": "#F2C200",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#000000",
+    "head": {
+     "bg": "#FFDE00",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#000000",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#000000",
+     "family": "CVT Tajawal",
+     "tracking": -0.8,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#FFDE00"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#000000"
+   },
+   "en": {
+    "accent": "#F2C200",
+    "body": "Archivo",
+    "contact": "#000000",
+    "head": {
+     "bg": "#FFDE00",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#000000",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#000000",
+     "family": "Archivo",
+     "tracking": -0.8,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#FFDE00"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#000000"
+   }
+  },
+  "modern-t4": {
+   "ar": {
+    "accent": "#3A6B5C",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#E3E5EF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#14343B",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#14343B",
+     "family": "CVT Tajawal",
+     "tracking": -1.5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#000034"
+    },
+    "taj": true,
+    "text": "#37474C",
+    "title": "#37474C"
+   },
+   "en": {
+    "accent": "#3A6B5C",
+    "body": "Source Sans 3",
+    "contact": "#E3E5EF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#14343B",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#14343B",
+     "family": "Archivo",
+     "tracking": -1.5,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#000034"
+    },
+    "taj": true,
+    "text": "#37474C",
+    "title": "#37474C"
+   }
+  },
+  "modern-t5": {
+   "ar": {
+    "accent": "#FF6F5E",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#F2F2F2",
+    "side": {
+     "at": "start",
+     "bg": "#003366"
+    },
+    "taj": false,
+    "text": "#000000",
+    "title": "#333333"
+   },
+   "en": {
+    "accent": "#FF6F5E",
+    "body": "Open Sans",
+    "contact": "#FFFFFF",
+    "head": {
+     "kind": "open"
+    },
+    "heading": null,
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#1A1A1A",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#F2F2F2",
+    "side": {
+     "at": "start",
+     "bg": "#003366"
+    },
+    "taj": false,
+    "text": "#000000",
+    "title": "#333333"
+   }
+  },
+  "modern-t6": {
+   "ar": {
+    "accent": "#2B6CB0",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#4A4A4A",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1A1A",
+     "family": "CVT Cairo",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#1A1A1A",
+     "family": "CVT Tajawal",
+     "tracking": 5,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#9C5A2A"
+   },
+   "en": {
+    "accent": "#2B6CB0",
+    "body": "Source Sans 3",
+    "contact": "#4A4A4A",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#1A1A1A",
+     "family": "Poppins",
+     "weight": 700
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#1A1A1A",
+     "family": "Poppins",
+     "tracking": 5,
+     "weight": 700
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": false,
+    "text": "#1A1A1A",
+    "title": "#9C5A2A"
+   }
+  },
+  "modern-t7": {
+   "ar": {
+    "accent": "#E4572E",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#DFDEDD",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#001D3D",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#001D3D",
+     "family": "CVT Tajawal",
+     "tracking": 1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "end",
+     "bg": "#001D3D"
+    },
+    "taj": true,
+    "text": "#4A4C4A",
+    "title": "#4A4C4A"
+   },
+   "en": {
+    "accent": "#E4572E",
+    "body": "Poppins",
+    "contact": "#DFDEDD",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#001D3D",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": false,
+     "color": "#001D3D",
+     "family": "Anton",
+     "tracking": 1,
+     "weight": 400
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "end",
+     "bg": "#001D3D"
+    },
+    "taj": true,
+    "text": "#4A4C4A",
+    "title": "#4A4C4A"
+   }
+  },
+  "modern-t8": {
+   "ar": {
+    "accent": "#003366",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#20242E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#003366",
+     "family": "CVT Tajawal",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#FFFFFF",
+     "family": "CVT Tajawal",
+     "tracking": 3,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#000000",
+    "title": "#FFFFFF"
+   },
+   "en": {
+    "accent": "#003366",
+    "body": "Archivo",
+    "contact": "#20242E",
+    "head": {
+     "kind": "open"
+    },
+    "heading": {
+     "caps": false,
+     "color": "#003366",
+     "family": "Archivo",
+     "weight": 700
+    },
+    "name": {
+     "caps": false,
+     "centred": true,
+     "color": "#FFFFFF",
+     "family": "Archivo",
+     "tracking": 3,
+     "weight": 300
+    },
+    "page": "#FFFFFF",
+    "side": null,
+    "taj": true,
+    "text": "#000000",
+    "title": "#FFFFFF"
+   }
+  },
+  "modern-t9": {
+   "ar": {
+    "accent": "#F2C200",
+    "body": "CVT IBM Plex Sans Arabic",
+    "contact": "#000000",
+    "head": {
+     "bg": "#FFDE00",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#000000",
+     "family": "CVT Tajawal",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#000000",
+     "family": "CVT Tajawal",
+     "tracking": -1,
+     "weight": 800
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#FFDE00"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#000000"
+   },
+   "en": {
+    "accent": "#F2C200",
+    "body": "Archivo",
+    "contact": "#000000",
+    "head": {
+     "bg": "#FFDE00",
+     "kind": "side"
+    },
+    "heading": {
+     "caps": true,
+     "color": "#000000",
+     "family": "Archivo",
+     "weight": 900
+    },
+    "name": {
+     "caps": true,
+     "centred": true,
+     "color": "#000000",
+     "family": "Archivo",
+     "tracking": -1,
+     "weight": 900
+    },
+    "page": "#FFFFFF",
+    "side": {
+     "at": "start",
+     "bg": "#FFDE00"
+    },
+    "taj": true,
+    "text": "#000000",
+    "title": "#000000"
+   }
+  }
+ }
+}

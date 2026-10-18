@@ -32,6 +32,14 @@
     <div class="dl-wrap">
       <button type="button" class="btn btn-primary btn-sm" id="dl-toggle">{{ t('Download') }} ▾</button>
       <div class="dl-menu" id="dl-menu">
+        {# With a cover letter, PDF and Word each offer the CV, the letter, or
+           both in one file. Hidden (and "CV") while there is no letter, so
+           the menu is what it always was. #}
+        <div class="dl-parts" id="dl-parts" role="radiogroup" aria-label="{{ t('What to download') }}" hidden>
+          <button type="button" role="radio" aria-checked="true" data-part="cv">{{ t('CV') }}</button>
+          <button type="button" role="radio" aria-checked="false" data-part="letter">{{ t('Cover letter') }}</button>
+          <button type="button" role="radio" aria-checked="false" data-part="both">{{ t('CV + cover letter') }}</button>
+        </div>
         <a href="{{ url_for('main.export_pdf') }}" id="dl-pdf">{{ t('PDF') }}<small>{{ t('Pixel-accurate, for sending') }}</small></a>
         <a href="{{ url_for('main.export_docx') }}" id="dl-docx">{{ t('Word (.docx)') }}<small>{{ t('Editable, for job portals') }}</small></a>
         <p class="dl-note" id="dl-note">{{ t('Word: editable version · PDF: exact design') }}</p>
@@ -43,6 +51,14 @@
     <p class="form-intro">{{ t('Fill in what applies. Empty sections are hidden from the résumé automatically.') }}</p>
     <div class="form-errors" id="form-errors"></div>
     <div class="form-notice" id="form-notice" role="status" hidden></div>
+    {# Above the form sections (2026-10-18): the cover letter's switch, off
+       by default, and Import my CV. #}
+    <div class="form-tools" id="form-tools">
+      <label class="cl-toggle" for="cl-toggle">
+        <input type="checkbox" id="cl-toggle">
+        <span>{{ t('Add a cover letter') }}</span>
+      </label>
+    </div>
     <!-- sections injected by builder.js -->
   </form>
 
@@ -73,6 +89,12 @@
     </section>
     <div class="preview-toolbar">
       <span style="font-size:12.5px;font-weight:600;color:var(--muted)">{{ t('Live preview') }}</span>
+      {# CV / Cover letter: shown only while the letter is on. The letter is
+         its own page after the CV; the switch brings either into view. #}
+      <div class="doc-switch" id="doc-switch" role="tablist" aria-label="{{ t('Live preview') }}" hidden>
+        <button type="button" role="tab" aria-selected="true" data-doc="cv" aria-controls="preview-stage">{{ t('CV') }}</button>
+        <button type="button" role="tab" aria-selected="false" data-doc="letter" aria-controls="letter-stage">{{ t('Cover letter') }}</button>
+      </div>
       <div class="zoom">
         <button type="button" data-zoom="out" aria-label="{{ t('Zoom out') }}">−</button>
         <span class="lvl" id="zoom-lvl">{{ t('Fit') }}</span>
@@ -84,6 +106,10 @@
       <div class="preview-stage" id="preview-stage">
         <iframe id="preview-frame" title="{{ t('Résumé preview') }}"></iframe>
         <div class="page-warn" id="page-warn" hidden>{{ t('Content runs past one page — trim to fit, or pick a denser layout.') }}</div>
+      </div>
+      <div class="preview-stage" id="letter-stage" hidden>
+        <iframe id="letter-frame" title="{{ t('Cover letter preview') }}"></iframe>
+        <div class="page-warn" id="letter-warn" hidden></div>
       </div>
     </div>
   </div>
@@ -105,6 +131,7 @@
 <script id="catalogue-data" type="application/json">{{ catalogue | tojson }}</script>
 <script id="i18n-data" type="application/json">{{ i18n | tojson }}</script>
 <script id="typography-data" type="application/json">{{ typography | tojson }}</script>
+<script id="letter-data" type="application/json">{{ letter | tojson }}</script>
 <script>
   window.__STATE__ = {
     templateKey: {{ meta.template_key | tojson }},

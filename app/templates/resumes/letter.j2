@@ -1,0 +1,53 @@
+{# THE COVER LETTER - one layout for all 49 templates (app/letter.py).
+   It wears the selected template's identity, read from letter_themes.json:
+   th.head_bg  the surface the template's name sits on (band / side column),
+               none for an open header
+   th.rail     a full-height side column -> a rail on the same (logical) side
+   th.stripe   accent stripe under a band; th.accent rule under an open header
+   Role hooks are the CV's own: .cv-name (name, signature), .cv-section (the
+   subject line) and body text under .tpl - so the font ribbon, the Arabic
+   policy faces and auto-fit reach the letter exactly as they reach the CV.
+   Logical properties only: Arabic mirrors on dir="rtl" alone. #}
+{% set align = 'center' if th.centred else 'start' %}
+<div class="tpl cv-letter{% if th.taj %} cv-sections-taj{% endif %}" style="box-sizing:border-box; width:850px; height:1100px; background:{{ th.page }}; display:flex; font-family:'{{ th.body_font }}',sans-serif; color:{{ th.text }};">
+  {% if th.rail %}
+  <div class="cl-rail" style="width:40px; flex-shrink:0; background:{{ th.rail.bg }}; order:{{ 0 if th.rail.at == 'start' else 2 }};"></div>
+  {% endif %}
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column; order:1;">
+    <div class="cl-head" style="padding-block:{{ '46px 34px' if th.head_bg else '56px 26px' }}; padding-inline:68px;{% if th.head_bg %} background:{{ th.head_bg }};{% endif %} text-align:{{ align }};">
+      <div class="cv-name" style="font-family:'{{ th.name_font }}',sans-serif; font-weight:{{ th.name_weight }}; font-size:36px; line-height:1.1; color:{{ th.name }};{% if th.name_caps %} text-transform:uppercase;{% endif %}{% if th.name_tracking %} letter-spacing:{{ th.name_tracking }}px;{% endif %}">{{ r.name }}</div>
+      {% if r.title %}
+      <div style="margin-top:9px; font-size:{{ '12.5px' if th.heading_caps else '15px' }}; font-weight:600; line-height:1.3; color:{{ th.title }};{% if th.heading_caps %} text-transform:uppercase; letter-spacing:1.6px;{% endif %}">{{ r.title }}</div>
+      {% endif %}
+      {% if contact %}
+      <div class="cl-contact" style="margin-top:14px; display:flex; flex-wrap:wrap; gap:4px 18px; justify-content:{{ 'center' if th.centred else 'flex-start' }}; font-size:11.5px; line-height:1.45; color:{{ th.contact }}; overflow-wrap:anywhere;">
+        {% for item in contact %}<span>{{ item }}</span>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% if th.head_bg %}
+    <div style="height:5px; background:{{ th.stripe }};"></div>
+    {% else %}
+    <div style="padding-inline:68px; display:flex; justify-content:{{ 'center' if th.centred else 'flex-start' }};"><div style="width:56px; height:3px; background:{{ th.accent }};"></div></div>
+    {% endif %}
+    <div class="cl-body" style="padding-block:34px 56px; padding-inline:68px; font-size:{{ body_px }}px; line-height:1.62;">
+      {% if L.date %}<div style="text-align:end;">{{ L.date }}</div>{% endif %}
+      {% if recipient %}
+      <div style="margin-top:{{ '18px' if L.date else '0' }};">
+        {% for line in recipient %}<div{% if loop.first %} style="font-weight:700;"{% endif %}>{{ line }}</div>{% endfor %}
+      </div>
+      {% endif %}
+      {% if L.subject %}
+      <div class="cv-section" style="margin-top:26px; display:flex; align-items:center; gap:10px; font-family:'{{ th.heading_font }}',sans-serif; font-weight:{{ th.heading_weight }}; font-size:14px; line-height:1.35; color:{{ th.heading }};{% if th.heading_caps %} text-transform:uppercase; letter-spacing:1.2px;{% endif %}"><span style="width:9px; height:9px; flex-shrink:0; background:{{ th.accent }};"></span><span>{{ L.subject }}</span></div>
+      {% endif %}
+      {% if L.greeting %}<p style="margin:22px 0 0;">{{ L.greeting }}</p>{% endif %}
+      {% for para in L.paragraphs %}
+      <p style="margin:{{ '12px' if L.greeting or not loop.first else '22px' }} 0 0; white-space:pre-line;">{{ para }}</p>
+      {% endfor %}
+      {% if L.closing %}<p style="margin:24px 0 0;">{{ L.closing }}</p>{% endif %}
+      {% if L.signature %}
+      <div class="cv-name cl-sign" style="margin-top:{{ '8px' if L.closing else '24px' }}; font-family:'{{ th.name_font }}',sans-serif; font-weight:{{ th.name_weight }}; font-size:21px; line-height:1.2; color:{{ th.heading }};">{{ L.signature }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>

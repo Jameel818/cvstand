@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "recipient_name": "Amara Quinlan",
+  "recipient_title": "Director of Brand",
+  "company": "Northfield & Co.",
+  "company_address": "12 Harbour Street, Portside",
+  "date": "",
+  "subject": "Application for Head of Brand Design",
+  "greeting": "Dear Ms Quinlan,",
+  "paragraphs": [
+    "I am writing to apply for the Head of Brand Design role at Northfield & Co. For the past eight years I have built brand systems that keep working after the launch party: the kind a team of fourteen designers can use on a Monday morning without asking me first.",
+    "At Halden & Row I led the rebrand that took four product lines onto one identity, wrote the rules that kept it consistent across 200 assets, and cut the time from brief to approved artwork by a third. At Bellrock Studio I built the studio's first design system and trained the team to own it.",
+    "Northfield's move into new markets needs a brand that travels without losing its voice. I would welcome the chance to show how I would approach it, and I have attached my CV with more detail on the work above."
+  ],
+  "closing": "Kind regards,",
+  "signature": ""
+}
