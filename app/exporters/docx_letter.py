@@ -38,6 +38,23 @@ MARGIN_PX = 68
 RAIL_PX = 40
 
 
+#: Word has no auto-fit, and its lines for the Latin body faces run taller
+#: than the PDF's (each face's own single line - docx_design.true_lines), so
+#: a long ENGLISH letter takes its body a step smaller in Word than in the
+#: PDF. Measured in real Word (run 10): at the PDF's sizes the longest letter
+#: the form allows spilled 38-151pt onto a second page in all 10 templates
+#: checked, while Arabic, whose faces wrap fewer characters per line, ended
+#: ~60pt clear. (characters of greeting + paragraphs + closing, body px)
+WORD_BODY_SIZES_EN = ((1400, 13.0), (1800, 12.0), (2200, 11.0), (2600, 10.5), (10 ** 9, 10.0))
+
+
+def word_body_px(letter: dict, lang: str) -> float:
+    if lang == "ar":
+        return letter_mod.body_px(letter)
+    n = len(letter["greeting"]) + len(letter["closing"]) + sum(len(p) for p in letter["paragraphs"])
+    return next(px for limit, px in WORD_BODY_SIZES_EN if n <= limit)
+
+
 def _hex(c: str | None) -> str | None:
     return c.lstrip("#").upper() if c else None
 
@@ -88,7 +105,8 @@ def _build(doc, data: dict, key: str, resolved: dict, *, new_section: bool) -> N
     L = letter_mod.letter_of(data)
     r = normalize(data)
     body = doc.element.body
-    before = len(body)
+    existing = set(body)            # held, so lxml keeps the same proxies
+    band = []
     _, start, end = _section(doc, new=new_section, rtl=rtl, th=th)
     token = set_lang(lang)
     try:
@@ -114,6 +132,7 @@ def _build(doc, data: dict, key: str, resolved: dict, *, new_section: bool) -> N
         if head_bg:
             band_w = D.PAGE_W_PX - (RAIL_PX if th["rail"] else 0)
             tbl = page.table([D.tw(band_w)], rows=2, ind=-D.tw(MARGIN_PX))
+            band.append(tbl._tbl)
             cell = D.fmt_cell(ctx, tbl.rows[0].cells[0], fill=head_bg,
                               pad=(0, MARGIN_PX, 0, MARGIN_PX))
             box = D.Box(ctx, cell, D.tw(band_w - 2 * MARGIN_PX), pad_top=46, pad_bottom=34)
@@ -134,7 +153,7 @@ def _build(doc, data: dict, key: str, resolved: dict, *, new_section: bool) -> N
                 sp = prev.find(qn("w:pPr")).find(qn("w:spacing"))
                 sp.set(qn("w:after"), str(int(round(D.pt(26) * 20))))
 
-        size = letter_mod.body_px(L)
+        size = word_body_px(L, lang)
         text = _hex(th["text"])
         gap = 34
         if L["date"]:
@@ -169,11 +188,21 @@ def _build(doc, data: dict, key: str, resolved: dict, *, new_section: bool) -> N
         reset_lang(token)
     D.end_paragraph(doc)
     if rtl:
-        # only what the letter added: the CV before it is already finished
-        for el in list(body)[before:]:
+        # Only what the letter added - the CV before it is already finished.
+        # Told apart by IDENTITY, not position: new content goes in BEFORE the
+        # body's closing sectPr, so "everything after the old length" skipped
+        # the letter's first element (its band, or its name line), which then
+        # kept left-to-right properties (found in real Word, run 10).
+        for el in [e for e in body if e not in existing]:
             for p in el.iter(qn("w:p")):
                 _put(D._ppr(p), _w("bidi"), PPR_ORDER)
             for tbl in el.iter(qn("w:tbl")):
+                if tbl in band:
+                    # One cell, nothing to mirror - and Word applies the band's
+                    # negative indent from the wrong side in a bidiVisual
+                    # table: the band slid 49pt off the right edge, cutting
+                    # the name (measured in Word, run 10).
+                    continue
                 _put(tbl.find(qn("w:tblPr")), _w("bidiVisual"), TBLPR_ORDER)
         _section_bidi(doc.sections[-1]._sectPr)
 

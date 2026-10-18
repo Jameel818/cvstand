@@ -267,6 +267,25 @@ def test_word_cv_plus_letter_puts_the_letter_in_its_own_section(key, lang):
     assert _text(_xml(cv_only)) in _text(root)          # the CV is all there, first
 
 
+@pytest.mark.parametrize("key", ["modern-t13", "modern-t4", "modern-t3", "ats-t1"])
+@pytest.mark.parametrize("part", ["letter", "both"])
+def test_every_arabic_letter_paragraph_is_right_to_left(key, part):
+    """Found in real Word (run 10): the letter's FIRST element missed its RTL
+    properties, and a bidiVisual band slid off the page. Every paragraph of
+    the letter is bidi; the one-cell band is not a mirrored table; the rest
+    (the accent rule) are."""
+    root = _xml(render_docx(LS.with_letter("ar"), key, part))
+    kids = list(root.find(f"{W}body"))
+    start = max((i + 1 for i, e in enumerate(kids)
+                 if e.tag == f"{W}p" and e.find(f".//{W}sectPr") is not None), default=0)
+    paras = [p for e in kids[start:] for p in e.iter(f"{W}p")]
+    assert paras and all(p.find(f"{W}pPr/{W}bidi") is not None for p in paras)
+    th = letter.theme(key, "ar")
+    tables = [t for e in kids[start:] for t in e.iter(f"{W}tbl")]
+    mirrored = [t.find(f"{W}tblPr/{W}bidiVisual") is not None for t in tables]
+    assert mirrored == ([False] if th["head_bg"] else [True])
+
+
 @pytest.mark.parametrize("lang", ["en", "ar"])
 def test_word_letter_embeds_the_faces_it_draws(lang):
     z = zipfile.ZipFile(io.BytesIO(render_docx(LS.with_letter(lang), "modern-t4", "letter")))

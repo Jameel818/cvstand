@@ -85,11 +85,17 @@ def ai(monkeypatch):
 @pytest.fixture(scope="module")
 def files():
     """Real CVStand exports of the demo CVs (PDF via Chromium, once)."""
+    from concurrent.futures import ThreadPoolExecutor
+
     from app.exporters.pdf import render_pdf
     out = {}
     for lang in ("en", "ar"):
         d = LS.resume(lang)
-        out[(lang, "pdf")] = render_pdf(d, "modern-t13")
+        # In a worker thread: under --e2e the browser suite's event loop may
+        # already run in this thread, and Playwright's sync API refuses to
+        # start inside one.
+        with ThreadPoolExecutor(1) as pool:
+            out[(lang, "pdf")] = pool.submit(render_pdf, d, "modern-t13").result()
         out[(lang, "docx")] = render_docx(d, "ats-t1")
         out[(lang, "txt")] = importer.extract_text("cv.docx", out[(lang, "docx")]).encode("utf-8")
     return out
