@@ -1,5 +1,10 @@
 # AI writing assistant — plan and locked decisions
 
+> **2026-10-18: the current plan is `docs/AI_ASSISTANT_PLAN.md`** (Claude
+> Haiku 5.5, phases Improve / Tailor / Cover letter, costs, limits, privacy).
+> The model choice below (Claude Opus 5) is superseded; the product rules
+> below still hold.
+
 **Planned 2026-09-10/11. PHASE 1 BUILT 2026-09-11.** Phases 2-5 not started.
 Decisions below were settled in discussion. §7's two open questions are both
 ANSWERED — see §7. The next thing that happens is Phase 2, and Phase 2 is not
