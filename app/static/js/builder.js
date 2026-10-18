@@ -568,6 +568,10 @@
   document.addEventListener("keydown", (e) => {
     if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey) return;
     if (e.key !== "z" && e.key !== "Z") return;
+    /* Not while Import my CV is open: there Ctrl+Z belongs to its paste box,
+       and the résumé behind the dialog must not change unseen. */
+    const dlg = document.getElementById("import-dlg");
+    if (dlg && dlg.open) return;
     e.preventDefault();
     undo();
   });
@@ -1272,6 +1276,195 @@
     const mid = scroll.getBoundingClientRect().top + scroll.clientHeight / 2;
     setDoc(letterStage.getBoundingClientRect().top < mid ? "letter" : "cv", false);
   }, { passive: true });
+
+  /* ---------- import my CV (2026-10-18) ----------
+     A file or pasted text goes to /api/import, which reads it (the AI step
+     only where the server has a key) and answers with the fields it found,
+     every one checked word for word against the CV. They are SHOWN first;
+     nothing in the résumé changes until the user picks Replace or Add, and
+     that choice is one undo step like any other edit. */
+  const importDlg = $("#import-dlg");
+  const IMPORT_MAX = 5 * 1024 * 1024;
+  let imported = null;
+  /* The server's reasons, in the reader's language. Its own English message
+     is the fallback for anything not listed. */
+  const IMPORT_REASON = {
+    empty: T("There is no CV text to read."),
+    size: T("The file is larger than 5 MB."),
+    type: T("Please choose a PDF, a Word (.docx) or a text (.txt) file."),
+    macro: T("Word files with macros are not accepted. Save it as .docx first."),
+    scanned: T("This PDF has no readable text - it looks like a scan or a picture. Try the Word file, or paste the text."),
+    encrypted: T("This PDF is password-protected."),
+    broken: T("This file could not be read - it may be damaged."),
+    long: T("This is longer than a CV. Paste the CV part only."),
+    pages: T("This is longer than a CV. Paste the CV part only."),
+    encoding: T("This text file's encoding is not recognised. Save it as UTF-8."),
+    daily_limit: T("You have used today's imports. More tomorrow."),
+    budget: T("The AI assistant is resting until next month."),
+    not_configured: T("Import my CV is coming soon."),
+    ai_failed: T("The CV could not be read this time. Nothing in your CV changed - try again in a minute."),
+  };
+  function importStep(which) {
+    $("#import-pick").hidden = which !== "pick";
+    $("#import-review").hidden = which !== "review";
+  }
+  function importError(msg) {
+    const box = $("#import-error");
+    box.textContent = msg || "";
+    box.hidden = !msg;
+  }
+  function importBusy(on) {
+    const b = $("#import-read");
+    b.disabled = on;
+    b.textContent = on ? T("Reading…") : T("Read my CV");
+  }
+  $("#import-btn").addEventListener("click", () => {
+    imported = null;
+    $("#import-file").value = "";
+    $("#import-text").value = "";
+    importError(null);
+    importBusy(false);
+    importStep("pick");
+    importDlg.showModal();
+  });
+  importDlg.addEventListener("click", (e) => {
+    if (e.target.closest('[data-import="cancel"]')) importDlg.close();
+  });
+
+  $("#import-read").addEventListener("click", async () => {
+    const file = $("#import-file").files[0];
+    const text = $("#import-text").value.trim();
+    importError(null);
+    if (!file && !text) { importError(T("Choose a file or paste your CV text.")); return; }
+    if (file && file.size > IMPORT_MAX) { importError(IMPORT_REASON.size); return; }
+    importBusy(true);
+    let res, j = null;
+    try {
+      if (file) {
+        const fd = new FormData();
+        fd.append("file", file);
+        res = await fetch(EP.importCv, { method: "POST", body: fd });
+      } else {
+        res = await fetch(EP.importCv, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+      }
+      try { j = await res.json(); } catch (_) { j = null; }
+    } catch (_) {
+      importBusy(false);
+      importError(T("The server did not answer. Nothing in your CV changed."));
+      return;
+    }
+    importBusy(false);
+    if (!res.ok || !j || !j.ok) {
+      importError((j && IMPORT_REASON[j.reason]) || (j && j.error) ||
+        T("The CV could not be read (error ") + res.status + ").");
+      return;
+    }
+    imported = j;
+    showImportReview(j);
+  });
+
+  function importCount(R) {
+    return ["experience", "education", "skills", "tools", "languages", "recognition", "references"]
+      .reduce((n, k) => n + (R[k] || []).length, 0) +
+      ["name", "title", "summary"].filter((k) => R[k]).length +
+      ["email", "phone", "address", "site"].filter((k) => R.contact && R.contact[k]).length;
+  }
+
+  function showImportReview(j) {
+    const R = j.resume;
+    const rows = [];
+    const group = (title, items) => {
+      const shown = items.filter((x) => x);
+      if (shown.length) rows.push(`<section class="imp-group"><h4>${esc(title)}</h4>${shown.join("")}</section>`);
+    };
+    const line = (label, v) => (v ? `<div class="imp-row"><span class="imp-k">${esc(label)}</span><span class="imp-v">${esc(v)}</span></div>` : "");
+    const join = (...xs) => xs.filter((x) => x).join(" · ");
+    const range = (a, b) => (a || b ? [a, b].filter((x) => x).join(" – ") : "");
+    const bullets = (bl) => (bl && bl.length ? `<ul>${bl.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : "");
+    const entry = (head, meta, bl) => `<div class="imp-entry"><b>${esc(head)}</b>${meta ? `<small>${esc(meta)}</small>` : ""}${bullets(bl)}</div>`;
+    const chips = (xs) => (xs.length ? `<div class="imp-chips">${xs.map((x) => `<span>${esc(x)}</span>`).join("")}</div>` : "");
+    const c = R.contact || {};
+    group(T("Basics"), [line(T("Full name"), R.name), line(T("Headline / role"), R.title),
+      line(T("Professional summary"), R.summary)]);
+    group(T("Contact"), [line(T("Email"), c.email), line(T("Phone"), c.phone), line(T("Location"), c.address),
+      line(T("Website"), c.site)].concat((c.social || []).map((s) => line(s.label || T("Social link"), s.url))));
+    group(T("Experience"), (R.experience || []).map((e) => entry(join(e.role, e.company), join(range(e.start, e.end), e.location), e.bullets)));
+    group(T("Education"), (R.education || []).map((e) => entry(join(e.degree, e.school), join(range(e.start, e.end), e.gpa), e.bullets)));
+    group(T("Skills"), [chips((R.skills || []).map((s) => (s.level ? `${s.name} — ${s.level}` : s.name)))]);
+    group(T("Tools"), [chips(R.tools || [])]);
+    group(T("Languages"), [chips((R.languages || []).map((s) => (s.level ? `${s.name} — ${s.level}` : s.name)))]);
+    group(T("Recognition"), (R.recognition || []).map((e) => entry(e.title, e.detail, null)));
+    group(T("References"), (R.references || []).map((e) => entry(e.name, join(e.title, e.phone, e.email), null)));
+    $("#import-fields").innerHTML = rows.join("") ||
+      `<p class="imp-none">${esc(T("Nothing that belongs on a CV was found in this text."))}</p>`;
+
+    const other = j.lang !== docLang;
+    const n = importCount(R);
+    let summary;
+    if (other) {
+      summary = j.lang === "ar"
+        ? T("This CV is written in Arabic. Switch the builder to العربية, then import it there.")
+        : T("This CV is written in English. Switch the builder to English, then import it there.");
+    } else {
+      summary = T("Found %(n)s items. Nothing changes in your CV until you choose.").replace("%(n)s", n);
+      if (j.dropped) summary += " " + T("%(n)s more were left out because they are not word for word in your CV.").replace("%(n)s", j.dropped);
+    }
+    $("#import-summary").textContent = summary;
+    $("#import-replace").disabled = $("#import-add").disabled = other || n === 0;
+    importStep("review");
+  }
+
+  const CV_LISTS = ["experience", "education", "skills", "tools", "languages", "recognition", "references"];
+  function applyImport(mode) {
+    if (!imported) return;
+    const R = JSON.parse(JSON.stringify(imported.resume));
+    recordUndo();
+    if (mode === "replace") {
+      /* The CV's CONTENT is replaced; its design is not: the template, the
+         fonts, the language, the photo and the cover letter stay. Stat chips
+         and the highlighted phrase belonged to the old text, so they go. */
+      ["name", "title", "summary"].forEach((k) => { data[k] = R[k] || ""; });
+      data.contact = R.contact || {};
+      CV_LISTS.forEach((k) => { data[k] = R[k] || []; });
+      data.achievements = [];
+      data.summary_highlight = "";
+    } else {
+      /* Add: fill what is empty, append every list - nothing is overwritten. */
+      ["name", "title", "summary"].forEach((k) => {
+        if (!(data[k] || "").trim() && R[k]) data[k] = R[k];
+      });
+      const c = (data.contact = data.contact || {});
+      ["email", "phone", "address", "site"].forEach((k) => {
+        if (!(c[k] || "").trim() && R.contact && R.contact[k]) c[k] = R.contact[k];
+      });
+      c.social = (Array.isArray(c.social) ? c.social : []).concat((R.contact && R.contact.social) || []);
+      CV_LISTS.forEach((k) => { data[k] = (Array.isArray(data[k]) ? data[k] : []).concat(R[k] || []); });
+    }
+    importDlg.close();
+    imported = null;
+    renderForm();
+    syncLetterUI();
+    clearTimeout(renderTimer);
+    doRender();
+    scheduleSave();
+    const box = $("#form-notice");
+    box.textContent = "";
+    const msg = document.createElement("span");
+    msg.textContent = mode === "replace"
+      ? T("Your CV was replaced with the imported one. Undo (Ctrl+Z) brings the old one back.")
+      : T("The imported details were added to your CV. Undo (Ctrl+Z) takes them out again.");
+    const close = document.createElement("button");
+    close.type = "button";
+    close.textContent = T("Dismiss");
+    close.addEventListener("click", () => { box.hidden = true; });
+    box.append(msg, close);
+    box.hidden = false;
+  }
+  $("#import-replace").addEventListener("click", () => applyImport("replace"));
+  $("#import-add").addEventListener("click", () => applyImport("add"));
 
   /* ---------- boot ---------- */
   /* ADOPT THE CHOSEN LANGUAGE.

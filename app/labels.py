@@ -773,6 +773,56 @@ _UI_AR: dict[str, str] = {
     "Signature name": "الاسم في التوقيع",
     "Empty: your name from Basics": "إن تُرك فارغاً: اسمك من الأساسيات",
     "The letter runs past one page — shorten it.": "الخطاب أطول من صفحة واحدة — اختصره.",
+    # Import my CV (2026-10-18)
+    "Import my CV": "استيراد سيرتي الذاتية",
+    "Cancel": "إلغاء",
+    "Upload a PDF, Word (.docx) or text file, up to %(n)s MB, or paste your CV below.":
+        "ارفع ملف PDF أو Word ‏(.docx) أو ملفاً نصياً، حتى %(n)s ميغابايت، أو الصق سيرتك الذاتية في الأسفل.",
+    "CV file": "ملف السيرة الذاتية",
+    "…or paste the text of your CV": "…أو الصق نص سيرتك الذاتية",
+    "Your CV text is sent to Anthropic to read it; files are not stored.":
+        "يُرسَل نص سيرتك الذاتية إلى Anthropic لقراءته؛ ولا تُحفَظ الملفات.",
+    "Read my CV": "اقرأ سيرتي الذاتية",
+    "Reading…": "جارٍ القراءة…",
+    "Check what was found": "راجع ما عُثر عليه",
+    "Add to my CV": "أضِف إلى سيرتي",
+    "Replace my CV": "استبدل سيرتي",
+    "Choose a file or paste your CV text.": "اختر ملفاً أو الصق نص سيرتك الذاتية.",
+    "The server did not answer. Nothing in your CV changed.":
+        "لم يستجب الخادم. لم يتغيّر شيء في سيرتك الذاتية.",
+    "The CV could not be read (error ": "تعذّرت قراءة السيرة الذاتية (خطأ ",
+    "Nothing that belongs on a CV was found in this text.":
+        "لم يُعثر في هذا النص على شيء يخص السيرة الذاتية.",
+    "This CV is written in Arabic. Switch the builder to العربية, then import it there.":
+        "هذه السيرة الذاتية مكتوبة بالعربية. حوّل المنشئ إلى العربية، ثم استوردها هناك.",
+    "This CV is written in English. Switch the builder to English, then import it there.":
+        "هذه السيرة الذاتية مكتوبة بالإنجليزية. حوّل المنشئ إلى English، ثم استوردها هناك.",
+    "Found %(n)s items. Nothing changes in your CV until you choose.":
+        "عُثر على %(n)s عنصراً. لن يتغيّر شيء في سيرتك حتى تختار.",
+    "%(n)s more were left out because they are not word for word in your CV.":
+        "واستُبعد %(n)s غيرها لأنها لا ترد حرفياً في سيرتك الذاتية.",
+    "There is no CV text to read.": "لا يوجد نص سيرة ذاتية لقراءته.",
+    "The file is larger than 5 MB.": "حجم الملف أكبر من 5 ميغابايت.",
+    "Please choose a PDF, a Word (.docx) or a text (.txt) file.":
+        "يُرجى اختيار ملف PDF أو Word ‏(.docx) أو ملف نصي (.txt).",
+    "Word files with macros are not accepted. Save it as .docx first.":
+        "لا تُقبل ملفات Word التي تحتوي على وحدات ماكرو. احفظه بصيغة ‎.docx أولاً.",
+    "This PDF has no readable text - it looks like a scan or a picture. Try the Word file, or paste the text.":
+        "لا يحتوي ملف PDF هذا على نص قابل للقراءة — يبدو صورة أو مستنداً ممسوحاً. جرّب ملف Word، أو الصق النص.",
+    "This PDF is password-protected.": "ملف PDF هذا محمي بكلمة مرور.",
+    "This file could not be read - it may be damaged.": "تعذّرت قراءة هذا الملف — ربما يكون تالفاً.",
+    "This is longer than a CV. Paste the CV part only.": "هذا أطول من سيرة ذاتية. الصق جزء السيرة الذاتية فقط.",
+    "This text file's encoding is not recognised. Save it as UTF-8.":
+        "لم يُتعرَّف على ترميز هذا الملف النصي. احفظه بترميز UTF-8.",
+    "You have used today's imports. More tomorrow.": "استنفدت عمليات الاستيراد لهذا اليوم. المزيد غداً.",
+    "The AI assistant is resting until next month.": "المساعد الذكي متوقف حتى الشهر القادم.",
+    "Import my CV is coming soon.": "استيراد السيرة الذاتية قريباً.",
+    "The CV could not be read this time. Nothing in your CV changed - try again in a minute.":
+        "تعذّرت قراءة السيرة الذاتية هذه المرة. لم يتغيّر شيء في سيرتك — حاول مرة أخرى بعد دقيقة.",
+    "Your CV was replaced with the imported one. Undo (Ctrl+Z) brings the old one back.":
+        "استُبدلت سيرتك الذاتية بالمستوردة. التراجع (Ctrl+Z) يعيد القديمة.",
+    "The imported details were added to your CV. Undo (Ctrl+Z) takes them out again.":
+        "أُضيفت التفاصيل المستوردة إلى سيرتك الذاتية. التراجع (Ctrl+Z) يزيلها.",
     # font groups (registry.GROUP_LABEL)
     "Sans": "بلا زوائد",
     "Serif": "بزوائد",

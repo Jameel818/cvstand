@@ -71,6 +71,24 @@ _SCHEMA: tuple[str, ...] = (
     # the UNIQUE constraint above is enough — but the index makes the lookup
     # on every sign-in an index seek rather than a scan.
     "CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)",
+    # AI use (app/ai_quota.py, 2026-10-18): counts and dollars only - never
+    # what was sent. Unlike `users`, these fill for ANONYMOUS visitors too:
+    # a daily limit that forgets on restart is not a limit.
+    """
+    CREATE TABLE IF NOT EXISTS ai_usage (
+        day     TEXT    NOT NULL,
+        who     TEXT    NOT NULL,
+        action  TEXT    NOT NULL,
+        count   INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (day, who, action)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS ai_spend (
+        month   TEXT    PRIMARY KEY,
+        usd     REAL    NOT NULL DEFAULT 0
+    )
+    """,
 )
 
 _init_lock = threading.Lock()
@@ -195,6 +213,7 @@ def reset_for_tests() -> None:
     if _test_conn is None:
         init()
         _test_conn = _connect()
-    _test_conn.execute("DELETE FROM users")
+    for table in ("users", "ai_usage", "ai_spend"):
+        _test_conn.execute(f"DELETE FROM {table}")
     _test_conn.commit()
     _dirty = False

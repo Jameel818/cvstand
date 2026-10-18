@@ -40,6 +40,7 @@ from flask import (
     send_file,
     url_for,
 )
+from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
 from . import i18n as i18n_mod
@@ -56,6 +57,7 @@ from .assist import (
     AssistNotEntitled,
     AssistUnavailable,
     configured as assist_configured,
+    has_ai_access,
 )
 from . import brand
 from .limits import RenderBusy, rate_limited, render_slot
@@ -63,6 +65,7 @@ from .labels import all_levels, levels_for, ui_catalogue, ui_t
 from .exporters import DocxExportError, PdfExportError, render_docx, render_pdf
 from .rendering import UnknownTemplate, canvas_html, document_html
 from . import letter as letter_mod
+from . import ai_quota, importer
 from .schema import (
     SUPPORTED_LANGS, ResumeValidationError, typography_migrations, typography_of, validate,
 )
@@ -248,6 +251,10 @@ def builder():
         # The cover letter: the demo letter a first tick fills in (the
         # DOCUMENT's language) and the schema's caps for the form's maxlength.
         letter={"demo": letter_mod.demo(doc_lang), "limits": letter_mod.limits()},
+        # Import my CV: its AI step runs only when the server has a key; the
+        # button says "Coming soon" otherwise. Never the key itself.
+        import_ready=assist_configured(),
+        import_max_mb=importer.MAX_FILE_BYTES // (1024 * 1024),
     )
 
 
@@ -713,6 +720,85 @@ def api_assist():
         mimetype="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
     )
+
+
+# ------------------------------------------------------------------- import my CV
+
+def _import_error(message: str, code: int, reason: str):
+    return jsonify({"ok": False, "error": message, "reason": reason}), code
+
+
+@bp.post("/api/import")
+@rate_limited("import")
+def api_import():
+    """Import my CV: a file (multipart `file`) or pasted text (JSON `text`)
+    -> CVStand's résumé fields for the builder's REVIEW screen. Nothing here
+    writes a résumé: the user chooses Replace / Add / Cancel in the browser,
+    and what they keep goes through the ordinary validated path.
+
+    The upload never touches the disk: werkzeug spools a multipart file over
+    500 KB to a temporary FILE by default, so this request's file stream is
+    swapped for memory, read once, and dropped. Its text goes to Anthropic
+    only after every check below has passed. Nothing is logged but sizes and
+    counts (app/importer.py).
+    """
+    if not assist_configured():
+        return _import_error("Import my CV is coming soon.", 503, "not_configured")
+    if not has_ai_access():
+        return _import_error("Import is part of the paid pass.", 402, "not_entitled")
+    try:
+        ai_quota.check_budget()
+    except ai_quota.BudgetReached:
+        return _import_error("The AI assistant is resting until next month.", 503, "budget")
+
+    request.max_content_length = importer.MAX_FILE_BYTES + 256 * 1024
+    request._get_file_stream = lambda *a, **k: io.BytesIO()   # never a temp file
+    try:
+        if request.mimetype == "multipart/form-data":
+            f = request.files.get("file")
+            if f is None or not f.filename:
+                return _import_error("No file was chosen.", 400, "empty")
+            blob, name = f.read(importer.MAX_FILE_BYTES + 1), f.filename
+            f.close()
+            text = importer.extract_text(name, blob)
+            del blob
+        else:
+            body = request.get_json(silent=True) or {}
+            raw = body.get("text")
+            text = importer.check_text(raw if isinstance(raw, str) else "")
+    except RequestEntityTooLarge:
+        return _import_error("The file is larger than 5 MB.", 413, "size")
+    except importer.CVImportError as exc:
+        return _import_error(str(exc), exc.status, exc.code)
+
+    try:
+        left = ai_quota.reserve("import")
+    except ai_quota.LimitReached:
+        return _import_error(
+            f"You have used today's {ai_quota.DAILY_LIMITS['import']} imports. More tomorrow.",
+            429, "daily_limit")
+    try:
+        client = importer.client()
+        fields, usage = importer.read_cv(text, client=client)
+    except AssistUnavailable:
+        ai_quota.refund("import")
+        return _import_error("Import my CV is coming soon.", 503, "not_configured")
+    except importer.ImportUnavailable as exc:
+        billed = str(exc) in ("refusal", "malformed", "max_tokens")
+        if not billed:
+            ai_quota.refund("import")
+        current_app.logger.warning("import: AI step failed (%s), %d chars", exc, len(text))
+        msg = ("This CV could not be read. Please check it and try again." if billed else
+               "The reader didn't answer. Nothing in your CV changed - try again in a minute.")
+        return _import_error(msg, 502, "ai_failed")
+    ai_quota.add_spend(importer.cost_usd(usage))
+    clean, dropped = importer.verbatim_guard(fields, text)
+    lang = clean.pop("lang")
+    current_app.logger.info("import: %d chars -> %s, %d dropped, tokens in %s out %s",
+                            len(text), lang, dropped, usage.get("input_tokens"),
+                            usage.get("output_tokens"))
+    return jsonify({"ok": True, "resume": clean, "lang": lang, "dropped": dropped,
+                    "left_today": left})
 
 
 # ---------------------------------------------------------------- accounts

@@ -129,7 +129,7 @@ def test_undo_covers_the_letter(page, deployed_server):
     page.check("#cl-toggle")
     page.fill('[name="cover_letter.subject"]', "Changed")
     page.wait_for_timeout(1100)                      # a new undo step
-    page.locator("body").click(position={"x": 5, "y": 300})
+    page.click("#resume-form .form-intro")
     page.keyboard.press("Control+z")                 # the typing
     expect(page.locator('[name="cover_letter.subject"]')).to_have_value(LS.demo_letter("en")["subject"])
     page.keyboard.press("Control+z")                 # the tick

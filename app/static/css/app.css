@@ -495,6 +495,55 @@ body.builder-body { overflow: hidden; }
 .bullet-row textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100); }
 .add:disabled { opacity: .5; cursor: not-allowed; }
 
+.import-btn { margin-inline-start: auto; gap: 6px; }
+.import-btn .soon {
+  font-size: 11px; font-weight: 600; color: var(--warn); background: #fff7ed;
+  border-radius: var(--r-pill); padding: 1px 8px;
+}
+.import-btn[disabled] { opacity: .75; }
+
+/* Import my CV: the dialog (pick -> review) */
+.import-dlg {
+  inline-size: min(640px, calc(100vw - 32px)); max-block-size: min(86vh, 900px);
+  padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg);
+}
+.import-dlg::backdrop { background: rgba(20, 22, 26, .45); }
+.import-step { display: flex; flex-direction: column; gap: 10px; padding: 22px 24px; max-block-size: inherit; }
+.import-step[hidden] { display: none; }
+.import-step h3 { margin: 0; font-size: 18px; }
+.import-lead { margin: 0; color: var(--ink-2); font-size: 13.5px; line-height: 1.5; }
+.import-file input { font: inherit; font-size: 13.5px; }
+.import-paste-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-block-start: 4px; }
+.import-dlg textarea {
+  font: inherit; font-size: 13.5px; line-height: 1.5; padding: 9px 11px; resize: vertical;
+  border: 1px solid var(--line-strong); border-radius: var(--r-xs); inline-size: 100%;
+}
+.import-dlg textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-100); }
+.import-privacy {
+  margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45;
+  padding: 8px 10px; background: var(--bg-alt); border-radius: var(--r-xs);
+}
+.import-error {
+  margin: 0; font-size: 12.5px; color: #991b1b; background: #fef2f2;
+  border: 1px solid #fca5a5; border-radius: var(--r-xs); padding: 8px 10px;
+}
+.import-error[hidden] { display: none; }
+.import-actions { display: flex; justify-content: flex-end; gap: 8px; margin-block-start: 6px; flex-wrap: wrap; }
+.import-fields { overflow-y: auto; min-block-size: 0; flex: 1; border-block: 1px solid var(--line); padding-block: 4px; }
+.imp-group { padding-block: 10px; }
+.imp-group + .imp-group { border-block-start: 1px dashed var(--line); }
+.imp-group h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.imp-row { display: grid; grid-template-columns: minmax(110px, 30%) 1fr; gap: 10px; font-size: 13.5px; padding-block: 2px; }
+.imp-k { color: var(--muted); }
+.imp-v { white-space: pre-line; overflow-wrap: anywhere; }
+.imp-entry { font-size: 13.5px; padding-block: 4px; }
+.imp-entry small { display: block; color: var(--muted); font-size: 12px; }
+.imp-entry ul { margin: 4px 0 0; padding-inline-start: 18px; }
+.imp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.imp-chips span { font-size: 12.5px; background: var(--bg-alt); border-radius: var(--r-pill); padding: 3px 10px; }
+.imp-none { color: var(--muted); font-size: 13.5px; }
+
 /* CV / Cover letter, above the preview; and the same choice in Download */
 .doc-switch, .dl-parts {
   display: inline-flex; padding: 2px; gap: 2px; border-radius: var(--r-pill);

@@ -159,6 +159,9 @@ LIMITS = {
     # daily fair-use ceiling that Phase 4 adds is a different guard for a
     # different question (this one bounds a burst, that one bounds a pass).
     "assist": RateLimit("assist", _env_int("CVSTAND_LIMIT_ASSIST", 15), 60),
+    # Import my CV: parses an untrusted file AND costs money. A burst guard
+    # only - the real ceiling is the per-day count in app/ai_quota.py.
+    "import": RateLimit("import", _env_int("CVSTAND_LIMIT_IMPORT", 5), 60),
     # Sign-in. Not about machine cost at all — this one bounds GUESSES.
     # scrypt makes each attempt expensive for us as well as for an attacker,
     # so the bucket protects the box and the password equally. Deliberately
