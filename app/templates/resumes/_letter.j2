@@ -40,10 +40,13 @@
       {% if L.subject %}
       <div class="cv-section" style="margin-top:26px; display:flex; align-items:center; gap:10px; font-family:'{{ th.heading_font }}',sans-serif; font-weight:{{ th.heading_weight }}; font-size:14px; line-height:1.35; color:{{ th.heading }};{% if th.heading_caps %} text-transform:uppercase; letter-spacing:1.2px;{% endif %}"><span style="width:9px; height:9px; flex-shrink:0; background:{{ th.accent }};"></span><span>{{ L.subject }}</span></div>
       {% endif %}
-      {% if L.greeting %}<p style="margin:22px 0 0;">{{ L.greeting }}</p>{% endif %}
-      {% for para in L.paragraphs %}
-      <p style="margin:{{ '12px' if L.greeting or not loop.first else '22px' }} 0 0; white-space:pre-line;">{{ para }}</p>
-      {% endfor %}
+      {# greeting and paragraphs are true siblings: one container, one gap #}
+      {% if L.greeting or L.paragraphs %}
+      <div class="cl-text" style="margin-top:22px; display:flex; flex-direction:column; row-gap:12px;">
+        {% if L.greeting %}<p style="margin:0;">{{ L.greeting }}</p>{% endif %}
+        {% for para in L.paragraphs %}<p style="margin:0; white-space:pre-line;">{{ para }}</p>{% endfor %}
+      </div>
+      {% endif %}
       {% if L.closing %}<p style="margin:24px 0 0;">{{ L.closing }}</p>{% endif %}
       {% if L.signature %}
       <div class="cv-name cl-sign" style="margin-top:{{ '8px' if L.closing else '24px' }}; font-family:'{{ th.name_font }}',sans-serif; font-weight:{{ th.name_weight }}; font-size:21px; line-height:1.2; color:{{ th.heading }};">{{ L.signature }}</div>

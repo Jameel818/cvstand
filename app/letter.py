@@ -111,6 +111,24 @@ def _first(*pairs: tuple[str | None, str], minimum: float) -> str:
     return pairs[-1][0] or "#000000"
 
 
+def readable(colour: str, on: str, minimum: float = 4.5) -> str:
+    """`colour`, darkened (or lightened, on a dark surface) just far enough
+    to reach `minimum` contrast on `on`: the template's HUE survives - a gold
+    headline stays gold, only deeper - where swapping in another colour
+    would lose the identity the letter is meant to carry."""
+    if contrast(colour, on) >= minimum:
+        return colour
+    target = (255, 255, 255) if _lum(on) < 0.2 else (0, 0, 0)
+    h = colour.lstrip("#")
+    rgb = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+    for step in range(1, 21):
+        t = step / 20
+        mixed = "#" + "".join(f"{round(c + (g - c) * t):02X}" for c, g in zip(rgb, target))
+        if contrast(mixed, on) >= minimum:
+            return mixed
+    return _ink_on(on)
+
+
 def _ink_on(bg: str) -> str:
     return "#FFFFFF" if contrast("#FFFFFF", bg) >= contrast("#14161A", bg) else "#14161A"
 
@@ -126,11 +144,16 @@ def theme(template_key: str, lang: str) -> dict[str, Any]:
     head_bg = m["head"].get("bg") if m["head"]["kind"] != "open" else None
     surface = head_bg or page
     name = _first((m["name"]["color"], surface), (_ink_on(surface), surface), minimum=3)
-    title = _first((m["title"], surface), (accent, surface), (name, surface), minimum=3)
+    # The headline (12.5-15px) and the subject line (14px) are bold but not
+    # LARGE text (18.7px bold), so they need 4.5:1 - reached by deepening the
+    # template's own colour (`readable`), not by replacing it.
+    title = readable(_first((m["title"], surface), (accent, surface), (name, surface), minimum=3),
+                     surface)
     contact = _first((m["contact"], surface), (text if not head_bg else None, surface),
                      (name, surface), minimum=4.5)
     heading = m["heading"] or {}
-    head_colour = _first((heading.get("color"), page), (accent, page), (text, page), minimum=3)
+    head_colour = readable(_first((heading.get("color"), page), (accent, page), (text, page),
+                                  minimum=3), page)
     # A name that sat IN a coloured side column gets a band in that colour
     # (head_kind "side"), and the rail still marks the column's side.
     side = m["side"]

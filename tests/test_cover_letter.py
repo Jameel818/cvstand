@@ -141,7 +141,8 @@ def test_letter_colours_read_on_their_surface(key, lang):
     surface = th["head_bg"] or th["page"]
     assert letter.contrast(th["name"], surface) >= 3
     assert letter.contrast(th["contact"], surface) >= 4.5
-    assert letter.contrast(th["heading"], th["page"]) >= 3
+    assert letter.contrast(th["heading"], th["page"]) >= 4.5      # 14px bold: not large text
+    assert letter.contrast(th["title"], surface) >= 4.5
     assert letter.contrast(th["text"], th["page"]) >= 4.5
 
 
