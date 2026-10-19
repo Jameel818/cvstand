@@ -53,10 +53,12 @@ from . import db
 from .assist import (
     JOBS,
     AssistBadRequest,
+    AssistDisabled,
     AssistError,
     AssistNotEntitled,
     AssistUnavailable,
     configured as assist_configured,
+    enabled as assist_enabled,
     has_ai_access,
 )
 from . import brand
@@ -671,6 +673,11 @@ def api_assist():
     mid-stream (the only kind left) is reported as an `error` frame inside a
     stream that has honestly already begun.
     """
+    # Its own switch, checked first: a key on the server turns on Import my
+    # CV, never this (app/assist.py ENABLED). Refused before anything else -
+    # no client, no call, no bill.
+    if not assist_enabled():
+        return _assist_error("AI writing help is not switched on.", 404)
     body = request.get_json(silent=True) or {}
     job = body.get("job") or "adapt"
     if job not in JOBS:
@@ -688,6 +695,8 @@ def api_assist():
             context=context if isinstance(context, dict) else None,
         )
         first = next(stream)
+    except AssistDisabled as exc:
+        return _assist_error(str(exc), 404)
     except AssistNotEntitled as exc:
         return _assist_error(str(exc), 402)
     except AssistUnavailable as exc:

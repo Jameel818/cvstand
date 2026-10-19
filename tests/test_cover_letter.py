@@ -298,3 +298,56 @@ def test_word_letter_follows_the_chosen_fonts():
     d["font_heading"] = "Montserrat"
     styles = zipfile.ZipFile(io.BytesIO(render_docx(d, "ats-t1", "letter"))).read("word/styles.xml")
     assert b"Montserrat" in styles
+
+
+# ---- the letter is always its OWN page (run 11) ------------------------------------
+
+def _bullet(lang: str) -> str:
+    """Text only the CV carries: its first experience bullet."""
+    return LS.resume(lang)["experience"][0]["bullets"][0]
+
+
+@pytest.mark.parametrize("key", KEYS)
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_word_cv_plus_letter_starts_the_letter_on_a_new_page(key, lang):
+    """"CV + cover letter" in Word: everything of the letter comes after the
+    CV's last section break, and the letter's section starts on a NEW page
+    (w:type absent = nextPage, or nextPage itself - never continuous, which
+    would let the letter run on under the CV)."""
+    d = LS.with_letter(lang)
+    subject = d["cover_letter"]["subject"]
+    root = _xml(render_docx(d, key, "both"))
+    kids = list(root.find(f"{W}body"))
+    breaks = [i for i, e in enumerate(kids)
+              if e.tag == f"{W}p" and e.find(f"{W}pPr/{W}sectPr") is not None]
+    assert breaks, f"{key} {lang}: no section break between the CV and the letter"
+    cut = breaks[-1]
+    cv_text = "".join(_text(e) for e in kids[:cut + 1])
+    letter_text = "".join(_text(e) for e in kids[cut + 1:])
+    assert _bullet(lang) in cv_text and _bullet(lang) not in letter_text
+    assert subject in letter_text and subject not in cv_text
+    start = kids[-1].find(f"{W}type")
+    assert kids[-1].tag == f"{W}sectPr"
+    assert start is None or start.get(f"{W}val") == "nextPage", f"{key} {lang}"
+
+
+@pytest.mark.parametrize("key", ["ats-t1", "modern-t3", "modern-t4", "modern-t13"])
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_word_letter_alone_carries_no_cv(key, lang):
+    d = LS.with_letter(lang)
+    root = _xml(render_docx(d, key, "letter"))
+    assert len(root.findall(f".//{W}sectPr")) == 1
+    assert d["cover_letter"]["subject"] in _text(root)
+    assert _bullet(lang) not in _text(root)
+
+
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_the_preview_draws_the_letter_as_its_own_page(lang):
+    """The preview's letter is a separate document (its own iframe, /api/render
+    doc=letter): one `.tpl` page holding no CV, while the CV's page holds
+    none of the letter."""
+    d = LS.with_letter(lang)
+    lhtml = letter.canvas_html(d, "modern-t4")
+    assert lhtml.count('class="tpl ') == 1
+    assert d["cover_letter"]["subject"] in lhtml and _bullet(lang) not in lhtml
+    assert d["cover_letter"]["subject"] not in canvas_html(d, "modern-t4")

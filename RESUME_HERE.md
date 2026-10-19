@@ -1,3 +1,16 @@
+# RESUME HERE - 2026-10-19 (run 11 on `feature/builder-ui`, from da5b0e2; NOT merged; main untouched)
+- The September writing assistant (`/api/assist`, EN<->AR adaptation, no UI) got its OWN
+  switch: app/assist.py `ENABLED = False` (code constant, NOT an env var). A key now turns
+  on Import my CV only; with the switch off /api/assist is 404 before any client/call.
+  Model moved claude-opus-5 -> claude-haiku-5-5 (adaptive thinking, effort low).
+  tools/assist_samples.py refuses while off. Flip ENABLED only after the user approves
+  docs/AI_ASSISTANT_PLAN.md. Tests: tests/test_assist.py (switched-off section).
+- Cover letter is always its own page: tests/test_cover_letter.py (Word: letter after the
+  CV's last section break, section type nextPage, all 49 x EN/AR; letter alone has no CV)
+  + tests/e2e/test_letter_own_page_builder.py (PDF: both = CV pages + 1, CV pages
+  unchanged, letter only on the last page, also for 2-page CVs; preview: separate frame
+  below the CV, no overlap).
+
 # RESUME HERE - 2026-10-19 (run 10 on `feature/builder-ui`, from ee25bc0; NOT merged; main untouched)
 1. Ribbon keeps the INTERFACE font (labels, buttons, selects, menu options = the
    form fields' face, Inter / IBM Plex Sans Arabic) whatever font is chosen; the

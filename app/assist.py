@@ -24,6 +24,13 @@ request. Usage counters are safe to surface (they are numbers); the text is not.
 **The key is server-side.** It is read from the environment here and never
 reaches `builder.js`.
 
+**It is OFF until the owner switches it on** (`ENABLED` below). A key on the
+server is not consent to this feature: adding ANTHROPIC_API_KEY turns on
+"Import my CV" (app/importer.py) and nothing else. With ENABLED False the
+route refuses before any client is built, so no call is made and nothing is
+billed (tests/test_assist.py). Turning it on is a reviewed code change, made
+only after the owner has read and approved docs/AI_ASSISTANT_PLAN.md.
+
 The entitlement gate (`has_ai_access`) returns True today. AI is a paid feature
 and there is no payment and no accounts yet — those are Stage 3 — so the gate
 exists, is called on every request, and is testable, with nothing yet to check
@@ -37,18 +44,22 @@ from typing import Any, Iterator
 
 from .schema import SUPPORTED_LANGS
 
-# Decided in `AI_ASSISTANT_PLAN.md` §4, re-verified against the `claude-api`
-# skill on 2026-09-11. Opus 5 is $5/$25 per MTok; Sonnet 5 ($2/$10) and Haiku
-# 4.5 ($1/$5) exist if the economics ever demand it. They do not today: one
-# adaptation costs a few cents against a SAR 29 (~$7.30 net) pass, and Arabic
-# that reads as written rather than translated is the entire paid proposition.
-# Changing this model is a Phase 2 decision made against the quality gate, not
-# a cost tweak.
-MODEL = "claude-opus-5"
+#: The assistant's own on/off switch. OFF by default and independent of the
+#: API key: the key switches on Import my CV only. A code constant, not an
+#: environment variable, on purpose - switching it on is a reviewed commit the
+#: owner approves after reading docs/AI_ASSISTANT_PLAN.md, never a side effect
+#: of adding a key on Railway.
+ENABLED = False
+
+# Claude Haiku 5.5 ($0.10 / $0.50 per MTok), the model docs/AI_ASSISTANT_PLAN.md
+# (run 10) picks for every AI job, replacing the September choice of Opus 5.
+# Whether its Arabic is good enough is still the Phase 2 quality gate
+# (tools/assist_samples.py), which the owner runs as part of switching it on.
+MODEL = "claude-haiku-5-5"
 
 # These are short rewrites, not reasoning problems. Effort is the main spend
-# lever; thinking stays adaptive (on by default on Opus 5) because disabling it
-# has two documented failure modes and lowering effort is the cheaper knob.
+# lever; thinking stays adaptive (Haiku 5.5's default) and low effort keeps it
+# short.
 EFFORT = "low"
 
 # A CV bullet is a sentence or two and a summary is a paragraph. This is a
@@ -68,6 +79,10 @@ class AssistError(RuntimeError):
     """Base for everything this module refuses or fails to do."""
 
 
+class AssistDisabled(AssistError):
+    """The owner has not switched the assistant on (ENABLED). Not a key matter."""
+
+
 class AssistUnavailable(AssistError):
     """No API key is configured. The feature is off, not broken."""
 
@@ -78,6 +93,12 @@ class AssistNotEntitled(AssistError):
 
 class AssistBadRequest(AssistError):
     """The caller asked for something this module cannot do."""
+
+
+def enabled() -> bool:
+    """Has the owner switched the writing assistant on? Separate from
+    `configured()`: a key alone never turns this feature on."""
+    return ENABLED
 
 
 def configured() -> bool:
@@ -272,6 +293,8 @@ def adapt(
     injectable so the tests never touch the network — the suite must stay
     offline and free.
     """
+    if not enabled():
+        raise AssistDisabled("AI writing help is not switched on.")
     if not has_ai_access():
         raise AssistNotEntitled("AI writing help is part of the paid pass.")
     if not isinstance(text, str) or not text.strip():

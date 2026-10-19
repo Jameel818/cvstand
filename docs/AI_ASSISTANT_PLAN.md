@@ -11,6 +11,13 @@ accepts it; nothing logs the user's text; Arabic is judged as Arabic, not as
 translated English. What changes here: the model (Claude Haiku 5.5, the
 user's choice), the three phases below, and the money controls.
 
+**The September assistant has its own switch, OFF** (run 11, 2026-10-19):
+`app/assist.py` `ENABLED = False`, a code constant, not an environment
+variable. Adding ANTHROPIC_API_KEY turns on Import my CV and nothing else;
+`/api/assist` answers 404 and builds no client while the switch is off
+(tests/test_assist.py). Its model is now Claude Haiku 5.5. Switching it on is
+a reviewed commit, made only after the owner approves this plan.
+
 Related, built in the same run: **Import my CV** (`app/importer.py`), which
 uses the same key, the same model, the same daily-limit store and the same
 spending cap described here. It is the first thing that will spend money once

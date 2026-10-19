@@ -329,6 +329,12 @@ def main() -> int:
               f"source, NOT model output.")
         return 0
 
+    if not assist.enabled():
+        print("The writing assistant is switched off (app/assist.py ENABLED).\n"
+              "It stays off until the owner approves docs/AI_ASSISTANT_PLAN.md;\n"
+              "--dry-run and --preview work without it.", file=sys.stderr)
+        return 2
+
     if not assist.configured():
         print(
             "ANTHROPIC_API_KEY is not set, so no call can be made.\n\n"

@@ -104,8 +104,13 @@ def _sse(body):
 
 @pytest.fixture(autouse=True)
 def _no_real_client(monkeypatch):
-    """A key, so `configured()` is true, and never a real client behind it."""
+    """A key, so `configured()` is true, and never a real client behind it.
+
+    The tests below describe the assistant as it behaves once the owner has
+    switched it ON, so they switch it on; the OFF state - the shipped one -
+    has its own tests at the end of this file."""
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-not-a-real-key")
+    monkeypatch.setattr(assist, "ENABLED", True)
     assist.reset_client()
     yield
     assist.reset_client()
@@ -180,7 +185,7 @@ def test_cache_control_is_on_the_system_prompt(fake):
 def test_model_and_effort_are_the_decided_ones(fake):
     _drain(assist.adapt("Project manager", target_lang="ar", client=fake))
     call = fake.calls[0]
-    assert call["model"] == "claude-opus-5"
+    assert call["model"] == "claude-haiku-5-5"
     assert call["output_config"] == {"effort": "low"}
     assert call["thinking"]["type"] == "adaptive"
 
@@ -489,3 +494,71 @@ def test_harness_cost_maths(tmp_path):
     # A realistic single assist lands in the cents, not the dollars.
     one = h.cost_of({"input_tokens": 1400, "output_tokens": 150})
     assert 0.005 < one < 0.05
+
+
+# ------------------------------------------------- the owner's switch: OFF
+
+def test_the_assistant_ships_switched_off():
+    """The shipped default. Adding ANTHROPIC_API_KEY on Railway is meant to
+    turn on Import my CV and NOTHING else; the writing assistant waits for
+    the owner's approval of docs/AI_ASSISTANT_PLAN.md. Flipping this is that
+    approval, made in a reviewed commit."""
+    import importlib
+    fresh = importlib.reload(assist)
+    try:
+        assert fresh.ENABLED is False
+        assert fresh.enabled() is False
+    finally:
+        importlib.reload(assist)
+
+
+class _Tripwire:
+    """A client that fails the test if anything at all is asked of it."""
+
+    def __getattr__(self, name):  # pragma: no cover - the point is that it is not hit
+        raise AssertionError(f"the switched-off assistant touched the client ({name})")
+
+
+def test_off_with_key_present_makes_no_api_call(monkeypatch):
+    monkeypatch.setattr(assist, "ENABLED", False)
+    assert assist.configured()                    # the key IS there
+    built = []
+    monkeypatch.setattr(assist, "_get_client", lambda: built.append(1) or _Tripwire())
+    with pytest.raises(assist.AssistDisabled):
+        _drain(assist.adapt("Project manager", target_lang="ar", client=_Tripwire()))
+    with pytest.raises(assist.AssistDisabled):
+        _drain(assist.adapt("Project manager", target_lang="ar"))
+    assert built == []
+
+
+def test_off_with_key_present_the_route_refuses_before_any_call(client, monkeypatch):
+    monkeypatch.setattr(assist, "ENABLED", False)
+    import app.routes as routes
+    calls = []
+
+    def _job(*a, **k):  # pragma: no cover - the point is that it is not hit
+        calls.append(1)
+        raise AssertionError("the job ran with the assistant switched off")
+
+    monkeypatch.setitem(routes.JOBS, "adapt", _job)
+    monkeypatch.setattr(assist, "_get_client", lambda: calls.append(1) or _Tripwire())
+    res = client.post("/api/assist", json={"text": "Project manager", "target_lang": "ar"})
+    assert res.status_code == 404
+    assert res.mimetype == "application/json"
+    assert res.get_json()["ok"] is False
+    assert calls == []
+
+
+@pytest.mark.parametrize("lang", ["en", "ar"])
+def test_off_with_key_present_the_builder_shows_no_assistant(client, monkeypatch, lang):
+    """Nothing on the page offers it or calls it - while Import my CV, the
+    one thing the key is for, is offered."""
+    monkeypatch.setattr(assist, "ENABLED", False)
+    client.get(f"/lang/{lang}")
+    page = client.get("/builder").get_data(as_text=True)
+    js = client.get("/static/js/builder.js").get_data(as_text=True)
+    for text in (page, js):
+        assert "/api/assist" not in text
+    import re
+    btn = re.search(r'<button[^>]*id="import-btn"[^>]*>', page).group(0)
+    assert "disabled" not in btn                    # the key's one job: import is on
