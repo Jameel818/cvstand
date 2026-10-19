@@ -1,3 +1,27 @@
+# RESUME HERE - 2026-10-19 (MERGE + DEPLOY run 12: feature/builder-ui MERGED into main and LIVE)
+- main = cf85458 (fast-forward from e56240d; carries feature/word-fidelity). Live on Railway
+  as deployment 228d898a-f27e-4d24-b4c0-e620cc88d9fa (built from cf85458, SUCCESS).
+- ROLLBACK: tag pre-merge-2026-10-19 (pushed) = old main e56240d; previous live deployment
+  78d1c5ed-a201-4afe-8ad9-621d67fe6564 (now REMOVED in Railway's list - redeploy by id
+  from the dashboard, or `git revert` on main + push).
+- Gates before the push: fast 4889 passed / 0 failed; browser 6 batches = 44 files, 1462
+  passed / 0 failed (77, 113, 419, 596 typography, 247 batch 5, 10 Word-builder); real Word
+  tools/verify_word_embedding.py 98/98 (46 flow to 2 pages, allowed) + letters 6/6
+  (letter 1 page, both = CV + 1); verify_docker_context OK (586 files); fresh venv from
+  requirements.txt alone imports all 13 third-party packages + create_app(); secrets
+  audit clean; root Fonts/ untracked + in .dockerignore.
+- Live: smoke_deploy 25/25; live checks 46/46 (EN/AR pages + language sticks; PDF + Word
+  for modern-t4 / modern-t13 / ats-t1 x EN/AR with non-default fonts, chosen fonts
+  embedded in both; cover letter box, own-page preview, cv/letter/both downloads;
+  Import "Coming soon"; no assistant UI, POST /api/assist 404); HTTP logs 0 x 5xx.
+- This note is committed on feature/builder-ui ONLY (pushing main again = a second,
+  unapproved deploy). main is 1 doc commit behind the branch - harmless.
+- Seen, NOT changed (pre-existing on old main too): download filename keeps ASCII only
+  (`[^\w\-]` in builder.js), so an Arabic name downloads as `_.pdf` / `_cover_letter.pdf`.
+- Still for the user: ANTHROPIC_API_KEY on Railway to switch Import on; step 7 OFF.
+
+---
+
 # RESUME HERE - 2026-10-19 (run 11 on `feature/builder-ui`, from da5b0e2; NOT merged; main untouched)
 - The September writing assistant (`/api/assist`, EN<->AR adaptation, no UI) got its OWN
   switch: app/assist.py `ENABLED = False` (code constant, NOT an env var). A key now turns
