@@ -45,6 +45,7 @@ from werkzeug.utils import secure_filename
 
 from . import i18n as i18n_mod
 from . import registry
+from . import filenames
 from .config import ROOT, SERVER_STORE, UPLOADS_DIR
 
 ROOT_STATIC = ROOT / "app" / "static"
@@ -93,10 +94,12 @@ def _store_disabled(message: str, *, allow: str | None = None):
     return jsonify({"ok": False, "error": message}), status, headers
 
 
-def _slug(data: dict, part: str = "cv") -> str:
-    base = secure_filename((data.get("name") or "resume").strip()) or "resume"
-    return {"cv": base, "letter": base + "_cover_letter",
-            "both": base + "_cv_and_cover_letter"}[part]
+def _attachment(resp, data: dict, part: str, ext: str):
+    """The download carries the person's real name, in any script
+    (app/filenames.py: an Arabic name is no longer "_.pdf")."""
+    resp.headers["Content-Disposition"] = filenames.content_disposition(
+        data.get("name"), part, ext)
+    return resp
 
 
 class _BadPart(ValueError):
@@ -451,12 +454,7 @@ def export_pdf():
     except PdfExportError as exc:
         current_app.logger.exception("PDF export failed")
         abort(500, str(exc))
-    return send_file(
-        io.BytesIO(pdf),
-        mimetype="application/pdf",
-        as_attachment=True,
-        download_name=f"{_slug(data, part)}.pdf",
-    )
+    return _attachment(send_file(io.BytesIO(pdf), mimetype="application/pdf"), data, part, "pdf")
 
 
 @bp.route("/export/docx", methods=["GET", "POST"])
@@ -480,12 +478,10 @@ def export_docx():
     except DocxExportError as exc:
         current_app.logger.warning("DOCX export unavailable: %s", exc)
         abort(501, str(exc))
-    return send_file(
+    return _attachment(send_file(
         io.BytesIO(blob),
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        as_attachment=True,
-        download_name=f"{_slug(data, part)}.docx",
-    )
+    ), data, part, "docx")
 
 
 # ---------------------------------------------------------------- PWA

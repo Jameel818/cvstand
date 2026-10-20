@@ -322,12 +322,34 @@ def faces_drawn(document, resolved: dict) -> set[tuple[str, int]]:
     nothing. Text in no role style is Normal, the body face."""
     by_id = {name.replace(" ", ""): role for name, role in _STYLE_ROLE.items()}
     roles: set[str] = set()
+    direct: set[tuple[str, int]] = set()
+    named = _faces_by_word_name()
     for run in document.element.body.iter(qn("w:r")):
         text = "".join(t.text or "" for t in run.iter(qn("w:t")))
         if not text.strip():
             continue
         rpr = run.find(qn("w:rPr"))
+        fonts = rpr.find(qn("w:rFonts")) if rpr is not None else None
+        if fonts is not None and fonts.get(qn("w:ascii")) in {n for n, _ in named}:
+            # a run that names its face draws THAT face (the ATS designs,
+            # docx_ats); Arial (dot glyphs) is no built face and falls through
+            b = rpr.find(qn("w:b"))
+            bold = b is not None and b.get(qn("w:val"), "1") not in ("0", "false")
+            hit = named.get((fonts.get(qn("w:ascii")), bold))
+            if hit:
+                direct.add(hit)
+                continue
         rstyle = rpr.find(qn("w:rStyle")) if rpr is not None else None
         roles.add(by_id.get(rstyle.get(qn("w:val")), "body") if rstyle is not None else "body")
     faces = resolved["faces"]
-    return {(faces[r]["family"], faces[r]["weight"]) for r in roles}
+    return {(faces[r]["family"], faces[r]["weight"]) for r in roles} | direct
+
+
+@lru_cache(maxsize=1)
+def _faces_by_word_name() -> dict[tuple[str, bool], tuple[str, int]]:
+    """(Word family name, bold flag) -> the built (family, weight) it names."""
+    from ..typography.faces import built_faces
+    out: dict = {}
+    for (fam, w), f in sorted(built_faces().items()):
+        out.setdefault((f["word_family_name"], bool(f["word_bold"])), (fam, w))
+    return out

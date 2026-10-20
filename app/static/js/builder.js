@@ -1174,6 +1174,26 @@
     dlPart = b.dataset.part;
     paintParts();
   });
+  /* The file name: the person's real name in any script ("ليلى_خليل.pdf"),
+     as the server names it (app/filenames.py, Content-Disposition filename*).
+     The old [^\w\-] rule kept ASCII only, so an Arabic name saved as "_.pdf".
+     Lower case, as the builder always saved (Arabic has no case). The local
+     rule below is the server's, for a response that carries no header. */
+  function savedName(res, part, ext) {
+    const cd = res.headers.get("Content-Disposition") || "";
+    const star = /filename\*=UTF-8''([^;]+)/i.exec(cd);
+    if (star) {
+      try { return decodeURIComponent(star[1]).toLowerCase(); } catch (_) { /* fall through */ }
+    }
+    const plain = /filename="?([^";]+)"?/i.exec(cd);
+    if (plain) return plain[1].toLowerCase();   // no filename*: the real name IS this ASCII one
+    let stem = (data.name || "").normalize("NFC")
+      .replace(/[<>:"\/\\|?*\u0000-\u001f\u007f‎‏‪-‮⁦-⁩]/g, " ")
+      .trim().split(/\s+/).join("_").replace(/^[._]+|[._]+$/g, "").slice(0, 80)
+      .replace(/[._]+$/, "").toLowerCase();
+    if (!stem || /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i.test(stem)) stem = "resume";
+    return stem + ({ cv: "", letter: "_cover_letter", both: "_cv_and_cover_letter" })[part] + ext;
+  }
   async function download(kind, url) {
     dlMenu.classList.remove("is-open");
     const part = letterOn() ? dlPart : "cv";
@@ -1197,9 +1217,7 @@
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = (data.name || "resume").replace(/[^\w\-]+/g, "_").toLowerCase() +
-        ({ cv: "", letter: "_cover_letter", both: "_cv_and_cover_letter" })[part] +
-        (kind === "PDF" ? ".pdf" : ".docx");
+      a.download = savedName(res, part, kind === "PDF" ? ".pdf" : ".docx");
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     } catch (_) {

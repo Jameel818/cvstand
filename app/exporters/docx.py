@@ -171,6 +171,11 @@ def render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
     if part == "letter":
         from . import docx_letter
         return docx_letter.render(data, template_key)
+    from . import docx_ats
+    if docx_ats.handles(template_key):
+        # an ATS template is written from its own markup, as body text only
+        # (docx_ats: the ATS rules come before looks)
+        return docx_ats.render(data, template_key, part)
     master_name = _master_for(tpl, data)
     if not master_name:
         raise DocxExportError(f"No Word master mapped for {template_key!r}.")

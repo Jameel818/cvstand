@@ -153,6 +153,14 @@ def test_word_leaves_no_dangling_dash(app_ctx, key, lang, sample):
     # every paragraph, table cells included: a Modern template's Word LAYOUT
     # puts its whole résumé in table cells (docs/WORD_LAYOUTS_PLAN.md)
     paras = [Paragraph(p, doc).text for p in doc.element.body.iter(qn("w:p"))]
+    from app.exporters import docx_ats
+    if docx_ats.handles(key):
+        # the ATS template's own row: the name, then the level column, which
+        # an unrated skill leaves empty (no dash, no dots)
+        assert any(p.rstrip("	 ") == "Ceramics" for p in paras), paras
+        assert not [p for p in paras if p.rstrip().endswith("—")], "dangling em-dash"
+        assert any(p.startswith(sample["skills"][0]["name"]) for p in paras)
+        return
     assert "Ceramics" in paras, f"expected a bare name, got: {paras}"
     assert "Dutch" in paras
     assert not [p for p in paras if p.rstrip().endswith("—")], "dangling em-dash"

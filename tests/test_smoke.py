@@ -157,9 +157,13 @@ def _all_paras(doc):
 
 
 def _expected_heads(key: str, lang: str = "en") -> tuple[str, ...]:
-    """ATS: its canonical headings. A Word LAYOUT: exactly the headings its
+    """ATS: the headings its own template prints (app/exporters/docx_ats.py
+    writes the template's words). A Word LAYOUT: exactly the headings its
     template's PDF shows, as measured (app/word_layouts.json)."""
     from app.exporters import docx_layout
+    if key == "ats-t1":
+        return ("SUMMARY", "KEY ACHIEVEMENTS", "EXPERIENCE", "SKILLS", "TECHNICAL STACK",
+                "EDUCATION AND CERTIFICATIONS")
     if docx_layout.spec_for(key):
         cells = docx_layout.layouts()[key][lang]["cells"]
         return tuple(docx_layout._item(i, lang)["text"] for c in cells.values()
@@ -175,15 +179,17 @@ def test_docx_master_fills_every_section(key):
     body = "\n".join(paras)
     # no unrendered docxtpl tags survived
     assert "{{" not in body and "{%" not in body
+    from app.exporters import docx_ats
     from app.exporters.docx_design import has_design
+    designed = has_design(key) or docx_ats.handles(key)
     # a design types the template's words and shows them in caps (w:caps), as
     # the PDF does with text-transform
-    seen = {p.upper() for p in paras} if has_design(key) else set(paras)
+    seen = {p.strip().upper() for p in paras} if designed else set(paras)
     for head in _expected_heads(key):
-        assert (head.upper() if has_design(key) else head) in seen, f"{key}: missing section {head!r}"
+        assert (head.upper() if designed else head) in seen, f"{key}: missing section {head!r}"
     # every experience entry and bullet made it through the loops
     assert sum(1 for p in paras if p.startswith("Halden & Row")) == 1, "'&' must survive"
-    if has_design(key):
+    if designed:
         # a per-template Word DESIGN: text bullets ("•" + tab), the skill's
         # level word as text beside it, its dot row an inline drawing
         assert len([p for p in paras if p.startswith("•	")]) == 6
@@ -199,8 +205,13 @@ def test_docx_master_fills_every_section(key):
 def test_docx_unmapped_level_gets_no_dots():
     """"Native" is off the LEVEL_DOTS scale — it must render as text only, never
     as five empty circles contradicting the word beside it."""
-    langs = [p.text for p in _docx("ats-t1").paragraphs if p.text.startswith(("English", "German"))]
-    assert langs and all("○" not in t and "●" not in t for t in langs)
+    doc = _docx("ats-t1")
+    # ats-t1 prints no Languages section; ats-t3 does ("English — Native · ...")
+    for key in ("ats-t1", "ats-t3", "modern-t1"):
+        doc = _docx(key)
+        langs = [p for p in _all_paras(doc) if "Native" in p.text]
+        assert all("○" not in p.text and "●" not in p.text for p in langs)
+        assert all("cvstand_dots_" not in p._p.xml for p in langs), "a dot row beside Native"
 
 
 @pytest.mark.parametrize("key", ["modern-t1", "ats-t1"])
@@ -259,7 +270,8 @@ def test_docx_chip_hides_metric_and_caption_together():
     """A chip past the filled count must lose its caption too — never a caption
     floating with no number."""
     data = {"name": "Dana Ortiz", "contact": {"email": "d@example.com"},
-            "achievements": [{"metric": "9", "label": "Teams"}]}
-    cells = [[q.text for q in c.paragraphs] for c in _docx("ats-t1", data).tables[0].row_cells(0)]
-    assert cells[0] == ["9", "Teams"]
-    assert all(all(t == "" for t in cell) for cell in cells[1:])
+            "achievements": [{"metric": "9", "label": "Teams"}, {"metric": "", "label": "Ghost"}]}
+    # ATS: one "metric — label" line per achievement, as the PDF prints them
+    paras = [p.text for p in _all_paras(_docx("ats-t1", data))]
+    assert "9 — Teams" in paras
+    assert not [p for p in paras if "Ghost" in p], "a caption with no number"

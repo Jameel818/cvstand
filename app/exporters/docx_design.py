@@ -1022,9 +1022,9 @@ def true_lines(ctx: Ctx) -> None:
     the face its largest run draws. Below single only as far as no glyph
     collides (MIN_MULT; Arabic marks need MIN_MULT_AR) - never Exactly."""
     from .docx_measure import Measure
-    m = Measure(ctx.resolved)
+    m = Measure(ctx.resolved, direct_faces=getattr(ctx, "direct_faces", False))
     for p, css in ctx.css_lines.items():
-        best, size = _largest_run(m, p)
+        best, size = _largest_run(m, p, tallest=m.direct)
         if size == 0:
             continue
         single = m._metrics(best)["line"]
@@ -1059,10 +1059,10 @@ def half_leading(ctx: Ctx) -> None:
     half-leading as space before and loses it from space after (or from the
     next paragraph's space before): same height, the PDF's baselines."""
     from .docx_measure import Measure
-    m = Measure(ctx.resolved)
+    m = Measure(ctx.resolved, direct_faces=getattr(ctx, "direct_faces", False))
     carry_to = {}
     for p, css in ctx.css_lines.items():
-        best, size = _largest_run(m, p)
+        best, size = _largest_run(m, p, tallest=m.direct)
         if not size:
             continue
         single = m._metrics(best)["line"]
@@ -1119,15 +1119,20 @@ def _next_below(p):
     return next(nrow.iter(qn("w:p")), None)
 
 
-def _largest_run(m, p):
-    best, size = None, 0.0
+def _largest_run(m, p, tallest: bool = False):
+    """The run that sets the line: the largest size; with `tallest`, the
+    largest size x face single line - Word sizes a line by its TALLEST face,
+    so a line mixing two faces at one size (an ATS "14 - Designers led": a
+    black Archivo metric in Source Sans text) is set by the taller of them."""
+    best, size, key = None, 0.0, 0.0
     for r in p.iter(qn("w:r")):
         if not "".join(t.text or "" for t in r.iter(qn("w:t"))).strip():
             continue
         rpr = r.find(qn("w:rPr"))
         sz = m._size(rpr)
-        if sz > size:
-            best, size = rpr, sz
+        k = sz * m._metrics(rpr)["line"] if tallest else sz
+        if k > key:
+            best, size, key = rpr, sz, k
     return best, size
 
 

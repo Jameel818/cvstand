@@ -57,6 +57,18 @@ def _face_file(family: str, weight: int) -> str | None:
     return f["ttf"] if f else None
 
 
+@lru_cache(maxsize=1)
+def _by_word_name() -> dict[tuple[str, bool], str]:
+    """(Word family name, bold flag) -> TTF of the built face Word will draw:
+    how a run that names its face directly (the ATS designs, docx_ats) is
+    measured in that face rather than in its role's."""
+    from ..typography.faces import built_faces
+    out: dict = {}
+    for f in built_faces().values():
+        out.setdefault((f["word_family_name"], bool(f["word_bold"])), f["ttf"])
+    return out
+
+
 def _lift(rpr) -> float:
     if rpr is None:
         return 0.0
@@ -104,9 +116,12 @@ def _w(m, ch: str) -> float:
 class Measure:
     """Height estimates (pt) for elements of a document built with `resolved`."""
 
-    def __init__(self, resolved: dict, base_size_pt: float = 10.0):
+    def __init__(self, resolved: dict, base_size_pt: float = 10.0, direct_faces: bool = False):
+        """`direct_faces`: a run's own w:rFonts names the face it is measured in
+        (the ATS designs set every run's face; the Modern ones go by role)."""
         self.faces = resolved["faces"]
         self.base = base_size_pt
+        self.direct = direct_faces
 
     # ---- fonts
     def _metrics(self, rpr):
@@ -119,6 +134,11 @@ class Measure:
             if fonts is not None and (fonts.get(qn("w:ascii")) or "").lower() == "arial":
                 return _ARIAL
             b = rpr.find(qn("w:b"))
+            if self.direct and fonts is not None and fonts.get(qn("w:ascii")):
+                bold = b is not None and b.get(qn("w:val"), "1") not in ("0", "false")
+                rel = _by_word_name().get((fonts.get(qn("w:ascii")), bold))
+                if rel:
+                    return _font(rel)
             if role == "body" and b is not None and b.get(qn("w:val"), "1") not in ("0", "false"):
                 role = "body_bold"
         f = self.faces[role]

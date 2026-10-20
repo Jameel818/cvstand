@@ -1,0 +1,23 @@
+{# The cover letter's BODY, set into the CV's own page (app/letter.py,
+   letterhead_canvas): date, recipient, subject, greeting, paragraphs,
+   closing, signature. Plain on purpose (user, 2026-10-20): the TOP of the
+   letter is the CV's own header block; the body is text in the template's
+   body face and colour, inherited from the column it stands in.
+   The signature is a .cv-name so the name font follows the ribbon. #}
+<div class="cl-body" style="box-sizing:border-box; padding-top:{{ top_px }}px; font-size:{{ body_px }}px; line-height:1.62; text-align:start; text-transform:none; letter-spacing:0;">
+  {% if L.date %}<div style="text-align:end;">{{ L.date }}</div>{% endif %}
+  {% if recipient %}
+  <div style="margin-top:{{ '18px' if L.date else '0' }};">
+    {% for line in recipient %}<div{% if loop.first %} style="font-weight:700;"{% endif %}>{{ line }}</div>{% endfor %}
+  </div>
+  {% endif %}
+  {% if L.subject %}<div style="margin-top:24px; font-weight:700;">{{ L.subject }}</div>{% endif %}
+  {% if L.greeting or L.paragraphs %}
+  <div class="cl-text" style="margin-top:20px; display:flex; flex-direction:column; row-gap:12px;">
+    {% if L.greeting %}<p style="margin:0;">{{ L.greeting }}</p>{% endif %}
+    {% for para in L.paragraphs %}<p style="margin:0; white-space:pre-line;">{{ para }}</p>{% endfor %}
+  </div>
+  {% endif %}
+  {% if L.closing %}<p style="margin:22px 0 0;">{{ L.closing }}</p>{% endif %}
+  {% if L.signature %}<div class="cv-name cl-sign" style="margin-top:{{ '6px' if L.closing else '22px' }}; font-size:{{ (body_px * 1.45) | round(1) }}px; line-height:1.2; text-transform:none; letter-spacing:0;">{{ L.signature }}</div>{% endif %}
+</div>

@@ -249,7 +249,28 @@ def test_themed_styles_follow_schema_order(base, key, keys, _):
         assert pos == sorted(pos), seen
 
 
-@pytest.mark.parametrize("key", ["modern-t1", "ats-t1"])
+@pytest.mark.parametrize("key", ["ats-t1", "ats-t22"])
+@pytest.mark.parametrize("data", [ENGLISH, ARABIC], ids=["en", "ar"])
+def test_ats_runs_draw_the_chosen_faces(key, data):
+    """The ATS Word files (app/exporters/docx_ats.py) write each run's face
+    directly - the template's exact faces - so the guarantee the test below
+    gives the role styles is made here run by run: with fonts chosen, every
+    run of a role draws the CHOSEN face, never the template's."""
+    chosen = dict(data, font_name="Montserrat", font_heading="Poppins", font_body="Inter")
+    faces = T.resolve(chosen, key)["faces"]
+    allowed = {T.word_font(f["family"], f["weight"])[0] for f in faces.values()} | {"Arial"}
+    doc, _ = _parts(render_docx(chosen, key))
+    seen = set()
+    for r in doc.iter(f"{W}r"):
+        if not "".join(t.text or "" for t in r.iter(f"{W}t")).strip():
+            continue
+        fonts = r.find(f"{W}rPr/{W}rFonts")
+        assert fonts is not None, "a run without its face"
+        seen.add(fonts.get(f"{W}ascii"))
+    assert seen and seen <= allowed, f"not a chosen face: {seen - allowed}"
+
+
+@pytest.mark.parametrize("key", ["modern-t1"])
 @pytest.mark.parametrize("data", [ENGLISH, ARABIC], ids=["en", "ar"])
 def test_no_themed_run_overrides_its_style(key, data):
     """Direct formatting beats a style: a styled run with its own face, bold
