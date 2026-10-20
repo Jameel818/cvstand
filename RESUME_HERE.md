@@ -1,3 +1,41 @@
+# RESUME HERE - 2026-10-20 (run 13 on `feature/ats-word`, from main cf85458; NOT merged; main untouched)
+A. ATS WORD FILES built from each template's OWN markup: app/exporters/docx_ats.py reads the
+   rendered template's inline styles into Word BODY paragraphs (shading for bands, right tab
+   stops for dates, tab-stop columns, paragraph borders for rules, a raised underscore tab
+   leader for "LABEL ----", inline drawings for dots/bars beside the real level word). No
+   tables, text boxes, floating shapes or header/footer text. Real Word, demo CV: before
+   5.1-21.2% strict, 42/50 two pages -> after 4.2-9.9% strict, 50/50 one page (table in
+   Desktop "CVStand ATS Word review"/README.md). tests/test_ats_word.py = the ATS rules
+   (601 checks: body-flow only, plain text == the template's text in order, headings real
+   text kept-with-next, Auto spacing, fonts embedded). Measured facts: docs in the module
+   (mixed-face CSS line boxes, Chromium rounds ascent/descent, Word gives a drawn border no
+   height, English PDF autofit never scales type -> English Word fits by gaps only).
+B. LETTERHEAD = the CV's own header: letter.letterhead_canvas() = the CV canvas with the CV
+   content taken out (sections, summary, stats, entries; contact kept) and the plain body
+   (_letter_body.j2) set where the main column's first section stood. Word: ATS via
+   docx_ats on that page; Modern = the template's own Word design with the CV emptied, body
+   in the column that held the jobs (docx_letter.design_letter_doc), stepped down until the
+   column estimate reads -15pt. CV+letter = letter copied into its own section
+   (docx_letter.append_document). Body size by measured room: tools/build_letter_capacity.py
+   -> app/letter_capacity.json (--check test). Longest letter 1 page in all 49 x EN/AR,
+   PDF and real Word; demo letters 98/98 one page in Word.
+C. ARABIC FILE NAMES: app/filenames.py (Content-Disposition filename*=UTF-8, ASCII fallback,
+   Windows/Mac-forbidden characters stripped); builder.js reads the header. English header
+   byte-identical to before ("Wren_Ashworth.pdf"; builder lower-cases as it did).
+Suites: fast 5527 passed / 242 skipped / 0 failed; browser 6 batches (45 files) 1465
+passed / 0 failed; real Word: ATS CVs 50/50, letters 98/98 demo + 98/98 longest, CV+letter
+8/8 (= CV + 1 page). Pushed feature/ats-word only (§9 form). Local server: run.py live-like.
+Unchanged (proved): Modern CV Word files 96/96 vs main (ids masked); CV document HTML
+196/196 vs main (= PDF/website). No golden touched. Step 7 OFF.
+Known, not changed: modern-t12 EN Word CV clips its name's top (pre-existing; the letter
+shows the same); ats-t18 Word draws its side rule continuous where the PDF breaks it per
+section; modern-t13's letter band is shorter than the CV's (the CV band holds the stats).
+Scratch tools (this session's scratchpad): gen_docx.py, word_pdf.ps1 (+word_all.ps1: one
+Start-Job per batch - a direct child powershell stalls Word COM here), cmp.py, dy.py,
+pitch.py, lcmp.py, letter_sheet.py, thumbs.py, make_review.py.
+
+---
+
 # RESUME HERE - 2026-10-19 (MERGE + DEPLOY run 12: feature/builder-ui MERGED into main and LIVE)
 - main = cf85458 (fast-forward from e56240d; carries feature/word-fidelity). Live on Railway
   as deployment 228d898a-f27e-4d24-b4c0-e620cc88d9fa (built from cf85458, SUCCESS).
