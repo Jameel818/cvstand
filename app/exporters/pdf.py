@@ -53,13 +53,16 @@ def render_pdf(data: dict, template_id: str, part: str = "cv") -> bytes:
     # for_pdf embeds the fonts as data: URIs. set_content()'s base URL is
     # about:blank, so a linked /static/fonts/... URL would resolve to nothing
     # and Chromium would silently fall back to a default face.
-    docs = []
-    if part in ("cv", "both"):
-        docs.append(document_html(data, template_id, for_pdf=True))
-    if part in ("letter", "both"):
-        docs.append(letter_mod.document_html(data, template_id, for_pdf=True))
-    if not docs:
+    if part not in ("cv", "letter", "both"):
         raise PdfExportError(f"unknown export part {part!r}")
+    # (html, or a function of the previous page's auto-fit; print it?)
+    docs: list = [(document_html(data, template_id, for_pdf=True), part != "letter")]
+    if part != "cv":
+        # the letter's letterhead takes the CV's own fit, so it sits exactly
+        # where the CV's header does; for "letter" the CV is laid out (to read
+        # its fit) but not printed
+        docs.append((lambda fit: letter_mod.document_html(data, template_id, for_pdf=True,
+                                                          header_fit=fit), True))
     pdfs = _print(docs, chosen_faces(data))
     if len(pdfs) == 1:
         return pdfs[0]
@@ -88,11 +91,15 @@ def _print(docs: list[str], faces: list[str]) -> list[bytes]:
         ) from exc
 
     out = []
+    fit = None
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(args=["--no-sandbox"])
             try:
-                for html in docs:
+                for item in docs:
+                    html, printed = item if isinstance(item, tuple) else (item, True)
+                    if callable(html):
+                        html = html(fit)
                     page = browser.new_page()
                     page.set_content(html, wait_until="networkidle")
                     # Fonts must be loaded before layout is measured for pagination.
@@ -109,9 +116,13 @@ def _print(docs: list[str], faces: list[str]) -> list[bytes]:
                     # SAME fitted layout the user approved in the preview. Without
                     # this await, page.pdf() can race the fit and print the
                     # unfitted, overflowing layout.
-                    page.evaluate(
+                    r = page.evaluate(
                         "window.ResumeAutofit ? window.ResumeAutofit.ready : null"
                     )
+                    fit = (r["density"], r["typeScale"]) if isinstance(r, dict) else None
+                    if not printed:
+                        page.close()
+                        continue
                     page.emulate_media(media="print")
                     pdf = page.pdf(
                         width="850px",

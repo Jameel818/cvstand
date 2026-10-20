@@ -244,12 +244,65 @@ CV_CONTENT = ("summary", "summary_highlight", "achievements", "experience", "rec
               "education", "skills", "tools", "languages", "references")
 
 
-def _emptied(data: dict) -> dict:
+def _emptied(data: dict, keep: frozenset = frozenset()) -> dict:
     import copy
     d = copy.deepcopy(data)
     for k in CV_CONTENT:
+        if k in keep or (k == "summary_highlight" and "summary" in keep):
+            continue
         d[k] = "" if k.startswith("summary") else []
     return d
+
+
+def _band_box(doc):
+    """The cell the name stands in, or the shaded cell around it (modern-t13
+    puts its name in a nested cell inside the navy band cell)."""
+    box, name = _name_box(doc)
+    if box is None or box.tag != qn("w:tc"):
+        return None
+    for tc in [box] + [a for a in box.iterancestors() if a.tag == qn("w:tc")]:
+        shd = tc.find(qn("w:tcPr") + "/" + qn("w:shd"))
+        if shd is not None and (shd.get(qn("w:fill")) or "auto").upper() not in ("AUTO", "FFFFFF"):
+            return tc
+    return box
+
+
+def _band_content(full, data: dict) -> frozenset:
+    """The CV content that shares the NAME'S CELL in the full CV design (the
+    summary or the stat chips inside the band the name stands on - modern-t8,
+    t13, t14, t17): the letter keeps it as blank lines so the band keeps the
+    CV's height, as the PDF hides it in place (app/letter.py)."""
+    box = _band_box(full)
+    if box is None:
+        return frozenset()
+    text = "".join(t.text or "" for t in box.iter(qn("w:t")))
+    r = normalize(data)
+    out = set()
+    if r.get("summary") and r["summary"][:30] in text:
+        out.add("summary")
+    if any(a.get("label") and a["label"] in text for a in r.get("achievements") or []):
+        out.add("achievements")
+    return frozenset(out)
+
+
+def _blank(doc, data: dict, keep: frozenset) -> None:
+    """The kept band content as blank lines: every run of it in the name's
+    cell keeps its size (so its line keeps its height) and loses its words."""
+    box = _band_box(doc)
+    if box is None:
+        return
+    r = normalize(data)
+    words = []
+    if "summary" in keep:
+        words.append(r.get("summary") or "")
+    if "achievements" in keep:
+        for a in r.get("achievements") or []:
+            words += [a.get("metric") or "", a.get("label") or ""]
+    words = [w for w in words if w]
+    for t in box.iter(qn("w:t")):
+        v = (t.text or "").strip()
+        if v and any(v in w for w in words):
+            t.text = " "
 
 
 def _run_colour(doc, text: str) -> str | None:
@@ -396,8 +449,11 @@ def design_letter_doc(data: dict, template_key: str):
                         or jobs[0].get("company") or "")
     L = letter_mod.letter_of(data)
     size = word_body_px(L, lang, template_key)
+    fit = getattr(full, "cvstand_fit", None) or (1.0, 1.0)
+    keep = _band_content(full, data)
     while True:
-        doc, resolved = _design_letter(data, template_key, photo, where, colour, L, size)
+        doc, resolved = _design_letter(data, template_key, photo, where, colour, L, size, fit, full,
+                                       keep)
         side, main, page = D._overflows(doc, resolved)
         over = main if main is not None else page
         # measured in real Word (2026-10-20, the longest letter, 48 files):
@@ -414,11 +470,63 @@ LETTER_FIT_PT = -15.0
 LETTER_MIN_PX = 7.5
 
 
-def _design_letter(data, template_key, photo, where, colour, L, size):
+def _name_box(doc):
+    """(the box - cell or body - holding the name's paragraph, that paragraph)."""
+    for p in doc.element.body.iter(qn("w:p")):
+        if (any(s.get(qn("w:val")) == "CVName" for s in p.iter(qn("w:rStyle")))
+                and "".join(t.text or "" for t in p.iter(qn("w:t"))).strip()):
+            return p.getparent(), p
+    return None, None
+
+
+def _place_like_cv(doc, full) -> None:
+    """Space the letterhead exactly as the CV spaced it. A design that
+    places the name from its column's contents (modern-t9 centres the name
+    block with a space-before worked out from everything in the side column)
+    would put it 170pt lower on the letter, whose column holds less: the
+    name's paragraph, the ones above it in its box, and the letterhead lines
+    after it (matched by their text) take the CV's own spacing."""
+    import copy
+    lt_box, lt_name = _name_box(doc)
+    cv_box, cv_name = _name_box(full)
+    if lt_box is None or cv_box is None:
+        return
+
+    def paras(box):
+        return [p for p in box if p.tag == qn("w:p")]
+
+    def text(p):
+        return "".join(t.text or "" for t in p.iter(qn("w:t"))).strip()
+
+    def copy_spacing(dst, src):
+        sp = src.find(qn("w:pPr") + "/" + qn("w:spacing"))
+        if sp is None:
+            return
+        _put(D._ppr(dst), copy.deepcopy(sp), PPR_ORDER)
+    lt_p, cv_p = paras(lt_box), paras(cv_box)
+    if lt_name not in lt_p or cv_name not in cv_p:
+        return
+    li, ci = lt_p.index(lt_name), cv_p.index(cv_name)
+    if li == ci:
+        for a, b in zip(lt_p[:li + 1], cv_p[:ci + 1]):
+            copy_spacing(a, b)
+    by_text = {text(p): p for p in cv_p[ci + 1:] if text(p)}
+    for p in lt_p[li + 1:]:
+        if text(p) in by_text:
+            copy_spacing(p, by_text[text(p)])
+
+
+def _design_letter(data, template_key, photo, where, colour, L, size, fit, full=None,
+                   keep: frozenset = frozenset()):
     from ..labels import reset_lang, set_lang, t
     lang = lang_of(data)
-    doc, resolved = D.render(_emptied(data), template_key, photo)
+    # drawn with the CV's own fit (an Arabic CV that took a type step to fit
+    # its page drew its name smaller - the letter's must match it)
+    doc, resolved = D._render(_emptied(data, keep), template_key, photo, *fit)
+    _blank(doc, data, keep)
     _drop_orphan_labels(doc)
+    if full is not None:
+        _place_like_cv(doc, full)
     cell, width = _main_cell(doc, where)
     body = doc.element.body
     token = set_lang(lang)
@@ -486,16 +594,28 @@ def append_document(cv_doc, letter_doc) -> None:
     pairs = [(sec.header, src.header), (sec.footer, src.footer)]
     if src.different_first_page_header_footer:
         pairs.append((sec.first_page_header, src.first_page_header))
+    from docx.text.paragraph import Paragraph
     for dst, s in pairs:
+        own = not s.is_linked_to_previous       # read BEFORE s._element creates one
         dst.is_linked_to_previous = False
         for el in list(dst._element):
             dst._element.remove(el)
-        for el in s._element:
-            c = copy.deepcopy(el)
-            _copy_images(c, s.part, dst.part)
-            dst._element.append(c)
-        if not len(dst._element):
-            dst._element.append(OxmlElement("w:p"))
+        if own:
+            # the letter's own header (a Modern design's page shapes): exactly
+            # as it is - it is the header its CV page has too
+            for el in s._element:
+                c = copy.deepcopy(el)
+                _copy_images(c, s.part, dst.part)
+                dst._element.append(c)
+        else:
+            # no header of its own (an ATS letter): Word's DEFAULT header
+            # paragraph is a line tall, and at header distance 0 over a ~0 top
+            # margin it pushed the letter page 13.4pt down - the white strip
+            # over the letterhead (user's review, 2026-10-20; real Word,
+            # ats-t7). It takes no room.
+            p = OxmlElement("w:p")
+            dst._element.append(p)
+            D.tiny(Paragraph(p, dst))
     body = cv_doc.element.body
     end = body[-1]                          # the document's closing sectPr
     for el in letter_doc.element.body:

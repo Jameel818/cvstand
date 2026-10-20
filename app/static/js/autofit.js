@@ -233,21 +233,38 @@
     return shrunk;
   }
 
+  /* THE COVER LETTER'S LETTERHEAD. The letter page is the CV's own page with
+   * the CV content taken out (app/letter.py), and its header must sit exactly
+   * where the CV's does. When the CV needed a fit, its header was fitted with
+   * it - so the letter is given the CV's result (`data-header-fit="d f"`,
+   * written by the PDF export) and applies exactly that to everything outside
+   * its body; only the body (.cl-body) is fitted on the letter's own terms.
+   * A CV page never carries the attribute. */
+  function pinned() {
+    var t = tplEl();
+    var v = t && t.getAttribute("data-header-fit");
+    if (!v) return null;
+    var p = v.split(/\s+/).map(parseFloat);
+    return (p.length === 2 && isFinite(p[0]) && isFinite(p[1])) ? { d: p[0], f: p[1] } : null;
+  }
+
   function apply(d, f) {
-    var els = elements(), i, k, o, el, s;
+    var els = elements(), i, k, o, el, s, dd, ff, pin = pinned();
     for (i = 0; i < els.length; i++) capture(els[i]);
     for (i = 0; i < els.length; i++) {
       el = els[i];
       o = origins.get(el);
       s = typeScale(el) * nameScale(el);
+      dd = d; ff = f;
+      if (pin && !el.closest(".cl-body")) { dd = pin.d; ff = pin.f; }
       for (k in o) {
         if (k === "fontSize") {
-          if (s === 1) el.style.fontSize = (o[k] * f) + "px";
-          else el.style.setProperty("font-size", (o[k] * f * s) + "px", "important");
+          if (s === 1) el.style.fontSize = (o[k] * ff) + "px";
+          else el.style.setProperty("font-size", (o[k] * ff * s) + "px", "important");
         } else if (k === "lineHeight") {
-          if (s === 1) el.style.lineHeight = (o[k] * d * f) + "px";
-          else el.style.setProperty("line-height", (o[k] * d * f * s) + "px", "important");
-        } else el.style[k] = (o[k] * d) + "px";
+          if (s === 1) el.style.lineHeight = (o[k] * dd * ff) + "px";
+          else el.style.setProperty("line-height", (o[k] * dd * ff * s) + "px", "important");
+        } else el.style[k] = (o[k] * dd) + "px";
       }
     }
   }
@@ -328,7 +345,8 @@
     // A chosen size is part of the design, not a compression: apply it
     // before measuring, and keep it even when nothing needs fitting.
     var scaled = !!(window.CVTypography && window.CVTypography.active);
-    if (scaled) apply(1, 1);
+    var pin = pinned();
+    if (scaled || pin) apply(1, 1);       // a pinned letterhead takes the CV's fit first
     // Then the name's width, before any height is measured: a shrunk name is
     // also a shorter one.
     nameK = new WeakMap();
@@ -347,7 +365,7 @@
       h = measure();
     }
 
-    if (d === 1 && f === 1 && !scaled && !names) reset();   // nothing was needed; leave the DOM clean
+    if (d === 1 && f === 1 && !scaled && !names && !pin) reset();   // nothing was needed; leave the DOM clean
     lastResult = {
       natural: natural,
       height: h,

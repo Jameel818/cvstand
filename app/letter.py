@@ -270,13 +270,32 @@ def _text(el) -> str:
     return re.sub(r"\s+", " ", "".join(el.itertext())).strip()
 
 
+def _seen(el) -> str:
+    """An element's text without what the letter has hidden in place."""
+    import re
+    out = []
+
+    def walk(e):
+        if isinstance(e.tag, str) and e.get(_HIDDEN) is not None:
+            return
+        if e.text:
+            out.append(e.text)
+        for k in e:
+            walk(k)
+            if k.tail:
+                out.append(k.tail)
+    walk(el)
+    return re.sub(r"\s+", " ", "".join(out)).strip()
+
+
 def _norm(s: str) -> str:
     import re
     return re.sub(r"\s+", " ", s.replace(rendering._LRI, "").replace(rendering._PDI, "")).strip()
 
 
 def letterhead_canvas(data: dict[str, Any], template_key: str,
-                      body_px: float | None = None) -> str:
+                      body_px: float | None = None,
+                      header_fit: tuple[float, float] | None = None) -> str:
     """The letter page: the CV's canvas for this template - its bands, side
     columns, photo, name, headline, contact, colours, fonts and sizes, the
     template's OWN markup - with the CV's content taken out (every section,
@@ -317,6 +336,8 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
                 return g
             if name_el is not None and (p is name_el or any(a is p for a in name_el.iterancestors())):
                 return g
+            if _chrome(p) and _structural(p, tpl):
+                return g         # never a whole column (modern-t23's main panel holds one heading)
             g = p
 
     removed = []
@@ -372,11 +393,44 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
         first.addprevious(body)
     else:
         tpl.append(body)
-    for g in removed:
+    # CV content goes from the BODY'S column; in every other column it is
+    # hidden in place, so those columns keep the CV's exact geometry - a side
+    # column that spaces its blocks out (modern-t9) would otherwise slide the
+    # name down once the sections under it were gone (user, 2026-10-20: "the
+    # letter's header sits exactly like the CV's")
+    def column_of(el):
+        c = el.getparent()
+        while c is not tpl and not (_chrome(c) and _structural(c, tpl)):
+            c = c.getparent()
+        return c
+    col = column_of(body)
+    # what the letterhead's geometry depends on: the column the name stands
+    # in (when the body is elsewhere) and the band the name stands on
+    name_col = column_of(name_el) if name_el is not None else tpl
+    band = next((a for a in ([name_el] + list(name_el.iterancestors()) if name_el is not None
+                             else []) if a is not tpl and _filled(a)), None)
+    if band is not None and any(a is band for a in body.iterancestors()):
+        band = None              # the body's own box: its content goes, as any column's
+    if name_col is not tpl and (name_col is col or any(a is name_col for a in col.iterancestors())
+                                or any(a is name_col for a in body.iterancestors())):
+        name_col = tpl           # the body is in the name's column: what follows the name may go
+    keep_place = [x for x in (band, None if name_col is tpl else name_col) if x is not None]
+
+    def take_out(g) -> None:
         p = g.getparent()
-        if p is not None:
+        if p is None:
+            return
+        if any(a is k for k in keep_place for a in g.iterancestors()):
+            # hidden in place: the band keeps the CV's height, the name's
+            # column its spacing (modern-t9 spaces its blocks out - the name
+            # slid 265px down once the sections under it were gone)
+            g.set(_HIDDEN, "1")
+            g.set("style", (g.get("style") or "").rstrip("; ") + "; visibility:hidden;")
+        else:
             p.remove(g)
-    _sweep(tpl, body, r)
+    for g in removed:
+        take_out(g)
+    _sweep(tpl, body, r, take_out)
     # a CV divider left below the body (modern-t13's hairline between two
     # sections): empty, small, after the body in reading order
     after = False
@@ -385,9 +439,9 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
             after = True
             continue
         if (after and isinstance(el.tag, str) and len(el) == 0 and not _text(el)
-                and not any(a is body for a in el.iterancestors())
+                and not _gone(el) and not any(a is body for a in el.iterancestors())
                 and not _structural(el, tpl) and not _has_media(el)):
-            el.getparent().remove(el)
+            take_out(el)
     if name_el is not None:
         sign = next((e for e in body.iter() if "cl-sign" in _classes(e)), None)
         if sign is not None:
@@ -399,13 +453,29 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
             keep = [d for d in st.split(";") if re.match(r"\s*(font-family|font-weight)\s*:", d)]
             sign.set("style", (sign.get("style") or "") + " " + ";".join(keep) + ";")
     tpl.set("class", " ".join(_classes(tpl) + ["cv-letter"]))
+    # the letterhead is ALWAYS pinned (static/js/autofit.js pinned()): to the
+    # CV's own auto-fit when the export knows it, else unfitted - a letter
+    # whose body needs a fit tightens its body, never its header
+    d, f = header_fit or (1.0, 1.0)
+    tpl.set("data-header-fit", f"{d:g} {f:g}")
     from lxml import etree
     return etree.tostring(tpl, encoding="unicode", method="html")
+
+
+def _filled(el) -> bool:
+    """A box with a background of its own (a band, a panel)."""
+    for decl in (el.get("style") or "").split(";"):
+        k, _, v = decl.partition(":")
+        if k.strip().lower() in ("background", "background-color") and v.strip().lower() not in (
+                "none", "transparent", "#fff", "#ffffff", "white"):
+            return True
+    return False
 
 
 def _chrome(el) -> bool:
     """A structural box of the page: a fill, a border, a fixed size, a
     positioned or flexible column. Its content may go; the box stays."""
+    import re
     for decl in (el.get("style") or "").split(";"):
         k, _, v = decl.partition(":")
         k, v = k.strip().lower(), v.strip().lower()
@@ -415,8 +485,10 @@ def _chrome(el) -> bool:
             return True
         if k in ("width", "height") and v not in ("auto",):
             return True
-        if (k, v) in (("position", "absolute"), ("flex", "1")):
+        if (k, v) == ("position", "absolute"):
             return True
+        if k == "flex" and re.fullmatch(r"[\d.]+", v) and float(v) > 0:
+            return True                    # a flexible column (flex:1, flex:1.6 - modern-t22)
     return False
 
 
@@ -498,7 +570,16 @@ def _content_values(r: dict[str, Any]) -> list[str]:
     return [_norm(v) for v in out if v and len(_norm(v)) >= 2]
 
 
-def _sweep(tpl, body, r: dict[str, Any]) -> None:
+_HIDDEN = "data-letter-hidden"
+
+
+def _gone(el) -> bool:
+    """Hidden in place by the letter (see letterhead_canvas take_out)."""
+    return el.get(_HIDDEN) is not None or any(a.get(_HIDDEN) is not None
+                                               for a in el.iterancestors())
+
+
+def _sweep(tpl, body, r: dict[str, Any], take_out) -> None:
     """Take out what is left of the CV's content: entries without a section
     heading of their own, a combined trailing block. An element holding a
     content value goes, climbing as far as - never into - a structural box
@@ -513,22 +594,23 @@ def _sweep(tpl, body, r: dict[str, Any]) -> None:
     # carry the same words - "Creative Lead" - further down)
     title = _norm(r.get("title") or "")
     headline = next((e for e in tpl.iter() if isinstance(e.tag, str) and title
-                     and _norm(_text(e)) == title), None)
+                     and not _gone(e) and _norm(_seen(e)) == title), None)
     head_set = {headline} | set(headline.iterancestors()) if headline is not None else set()
 
     def keeps(el) -> bool:
         """Holds the letterhead or the body: never removed."""
         if el is tpl or el is body or el in head_set or any(a is el for a in body.iterancestors()):
             return True
-        t = _norm(_text(el))
+        t = _norm(_seen(el))
         return any(m in t.replace(" ", "") for m in marks) or t in exact
 
     chrome = _chrome
 
     for v in _content_values(r):
         while True:
-            hits = [e for e in tpl.iter() if isinstance(e.tag, str) and v in _norm(_text(e))
-                    and not any(isinstance(k.tag, str) and v in _norm(_text(k)) for k in e)
+            hits = [e for e in tpl.iter() if isinstance(e.tag, str) and not _gone(e)
+                    and v in _norm(_seen(e))
+                    and not any(isinstance(k.tag, str) and v in _norm(_seen(k)) for k in e)
                     and not any(a is body for a in e.iterancestors()) and not keeps(e)]
             if not hits:
                 break
@@ -536,38 +618,40 @@ def _sweep(tpl, body, r: dict[str, Any]) -> None:
             while (g.getparent() is not None and not keeps(g.getparent())
                    and not chrome(g.getparent())):
                 g = g.getparent()
-            g.getparent().remove(g)
+            take_out(g)
     # what the content leaves behind: a skill's dots or bar in a row whose
     # words are gone, and a section heading over nothing
     changed = True
     while changed:
         changed = False
         for el in list(tpl.iter()):
-            if not isinstance(el.tag, str) or keeps(el) or el.getparent() is None:
+            if not isinstance(el.tag, str) or keeps(el) or el.getparent() is None or _gone(el):
                 continue
             if any(a is body for a in el.iterancestors()):
                 continue
-            kids = [k for k in el if isinstance(k.tag, str)]
-            if kids and not _text(el) and not _has_media(el):
+            kids = [k for k in el if isinstance(k.tag, str) and not _gone(k)]
+            if kids and not _seen(el) and not _has_media(el):
                 # a text-less graphic (dots, a bar) - or an emptied bordered
                 # box that only held one
                 if not chrome(el) or (not _structural(el, tpl)
-                                      and all(chrome(k) or not _text(k) for k in kids)):
-                    el.getparent().remove(el)
+                                      and all(chrome(k) or not _seen(k) for k in kids)):
+                    take_out(el)
                     changed = True
                     break
-            if "cv-section" in _classes(el) or _is_label(_text(el)):
+            if "cv-section" in _classes(el) or _is_label(_seen(el)):
                 # the heading with its own decoration (a ribbon, a pill);
                 # some templates mark theirs only by its words (modern-t4)
                 g = el
                 while (g.getparent() is not None and not keeps(g.getparent())
-                       and _text(g.getparent()) == _text(el) and not _has_media(g.getparent())):
+                       and _seen(g.getparent()) == _seen(el) and not _has_media(g.getparent())):
                     g = g.getparent()
                 nxt = g.getnext()
-                orphan = nxt is None or not _text(nxt) or _is_label(_text(nxt)) or any(
+                while nxt is not None and isinstance(nxt.tag, str) and _gone(nxt):
+                    nxt = nxt.getnext()
+                orphan = nxt is None or not _seen(nxt) or _is_label(_seen(nxt)) or any(
                     "cv-section" in _classes(x) for x in nxt.iter() if isinstance(x.tag, str))
-                if _text(g) == _text(el) and orphan:
-                    g.getparent().remove(g)
+                if _seen(g) == _seen(el) and orphan:
+                    take_out(g)
                     changed = True
                     break
 
@@ -612,8 +696,11 @@ def _body_anchor(tpl, r: dict[str, Any], removed: list, fallback):
     nearest structural box) holding the first job, its first child that holds
     CV content - a removed section, a section heading, the job itself."""
     title = _norm(r.get("title") or "")
-    vals = [_norm(v) for v in ((r.get("experience") or [{}])[0].get("company"),
-                                (r.get("experience") or [{}])[0].get("role")) if v]
+    # by the first BULLET first: a company can recur elsewhere (a reference's
+    # "CEO, Halden & Row" in modern-t20's side column)
+    j0 = (r.get("experience") or [{}])[0]
+    vals = [_norm(v) for v in (((j0.get("bullets") or [""])[0])[:40], j0.get("company"),
+                               j0.get("role")) if v]
     job = None
     for v in vals:
         hits = [e for e in tpl.iter() if isinstance(e.tag, str) and v in _norm(_text(e))
@@ -689,8 +776,12 @@ def _letter_body(data: dict[str, Any], template_key: str, lang: str,
 
 
 def document_html(data: dict[str, Any], template_key: str, *, for_pdf: bool = False,
-                  body_px: float | None = None) -> str:
+                  body_px: float | None = None,
+                  header_fit: tuple[float, float] | None = None) -> str:
+    """`header_fit`: the CV's auto-fit (density, type scale) for the same
+    résumé - the PDF export measures it and passes it here."""
     name = (data.get("name") or "").strip()
     return rendering.document_html(data, template_key, for_pdf=for_pdf,
-                                   canvas=letterhead_canvas(data, template_key, body_px=body_px),
+                                   canvas=letterhead_canvas(data, template_key, body_px=body_px,
+                                                            header_fit=header_fit),
                                    title=f"{name} — cover letter" if name else "Cover letter")

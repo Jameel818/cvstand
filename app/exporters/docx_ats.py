@@ -868,11 +868,14 @@ def overflow_pt(doc, resolved, width_pt: float) -> float:
     return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else 0.0)
 
 
-def fitted(data: dict, template_key: str, html: str | None = None):
+def fitted(data: dict, template_key: str, html: str | None = None, base=None):
     """(document, faces used): built, then fitted with the PDF's ladder when it
-    runs a little past one page."""
-    doc, resolved, used, width = build(data, template_key, html=html)
-    doc.cvstand_fit = None
+    runs a little past one page. `base` = a (gaps, type) fit to start from -
+    the CV's own, for its cover letter: the letterhead is the CV's header
+    exactly as the CV drew it (user, 2026-10-20)."""
+    g0, t0 = base or (1.0, 1.0)
+    doc, resolved, used, width = build(data, template_key, g0, t0, html=html)
+    doc.cvstand_fit = base
     over = overflow_pt(doc, resolved, width)
     if D.TYPE_FIT_TRIGGER_PT < over <= D.TYPE_FIT_PAGE_MAX_PT:
         # the PDF's autofit ladder (gaps, then type), as the Modern designs do;
@@ -882,6 +885,9 @@ def fitted(data: dict, template_key: str, html: str | None = None):
         # Word than in the PDF, so it may also take the type steps
         steps = (D.TYPE_FIT_STEPS if resolved["lang"] == "ar"
                  else tuple(s for s in D.TYPE_FIT_STEPS if s[1] == 1.0))
+        if base:
+            # only the steps tighter than the one the page starts from
+            steps = tuple(s for s in steps if s[0] <= g0 and s[1] <= t0 and s != (g0, t0))
         for gaps, type_k in steps:
             d2, r2, u2, w2 = build(data, template_key, gaps, type_k, html=html)
             o2 = overflow_pt(d2, r2, w2)
@@ -901,8 +907,17 @@ def letter_doc(data: dict, template_key: str):
     from ..schema import lang_of
     from .docx_letter import word_body_px
     px = word_body_px(letter_mod.letter_of(data), lang_of(data), template_key)
+    # the CV's own fit: an Arabic CV that took a type step to fit its page
+    # drew its name 3-11% smaller than an unfitted letter would (user's
+    # review, 2026-10-20). The body is sized so that after the same type step
+    # it is still the size chosen for it.
+    cv, _ = fitted(data, template_key)
+    base = cv.cvstand_fit
+    if base:
+        px = px / base[1]
     return fitted(data, template_key, html=letter_mod.letterhead_canvas(data, template_key,
-                                                                         body_px=px))
+                                                                         body_px=px),
+                  base=base)
 
 
 def render(data: dict, template_key: str, part: str = "cv") -> bytes:

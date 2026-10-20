@@ -1,3 +1,30 @@
+# RESUME HERE - 2026-10-21 (run 13b on `feature/ats-word`: letterhead = CV header in Word + PDF; NOT merged)
+User's review fixes, all in the shared letter code:
+1. TOP GAP (Word, "CV + letter"): the letter section got Word's DEFAULT header paragraph
+   (a line tall) -> with header distance 0 over a ~0 top margin the letter page sat 13.4pt
+   lower (ats-t7, measured on the old build). docx_letter.append_document: a letter with
+   its own header (Modern) copies it EXACTLY; one with none (ATS) gets a zero-height one.
+2. ARABIC NAME SIZE: the Arabic CV takes a fit step (Word type 0.90-0.96; PDF density
+   0.91-0.97) that the letter did not. Word: ATS letters build with the CV's fit
+   (docx_ats.fitted base=, body pre-divided), Modern letters draw the emptied design with
+   the CV's fit + _place_like_cv (the CV's spacing on the name and its letterhead lines -
+   modern-t9 centred its name block from the column's contents). PDF: the export lays the
+   CV out first and passes its fit (pdf._print); the letter's .tpl data-header-fit pins
+   the letterhead (autofit.js pinned(), opt-in; CV pages pixel-identical 196/196) and only
+   .cl-body is fitted; builder preview does the same client-side (builder.js pinLetterhead).
+3. Band height / name column kept: CV content inside the name's band or the name's own
+   column (when the body is elsewhere) is HIDDEN IN PLACE (visibility:hidden,
+   data-letter-hidden); Word blanks the same lines (docx_letter._band_content/_blank).
+Proof: tests/e2e/test_letterhead_matches_cv.py (PDF, 98 + export check) and
+tests/test_letterhead_word.py (Word structure, 442) - all within 1pt; real Word 98/98:
+name position <= 0.24pt, band 0, size 0 (standalone and CV + letter). Letters 98/98 and
+longest 98/98 one page in Word; longest letter fits all 49 x EN/AR in PDF.
+Unchanged: Modern CV Word 96/96 vs main, ATS CV Word 50/50 vs run 13, CV pages 196/196
+pixel-identical vs main. Suites: fast 5969 passed / 242 skipped / 0 failed; browser all
+batches 1564 passed / 0 failed. Review: Desktop "CVStand ATS Word review"/4 Letterhead top.
+
+---
+
 # RESUME HERE - 2026-10-20 (run 13 on `feature/ats-word`, from main cf85458; NOT merged; main untouched)
 A. ATS WORD FILES built from each template's OWN markup: app/exporters/docx_ats.py reads the
    rendered template's inline styles into Word BODY paragraphs (shading for bands, right tab

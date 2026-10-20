@@ -914,9 +914,28 @@
       if (!res.ok) return;
       const j = await res.json();
       letterFrame.srcdoc = j.doc;
-      letterFrame.onload = () => checkFit(letterFrame, $("#letter-warn"),
-        T("The letter runs past one page — shorten it."));
+      letterFrame.onload = async () => {
+        await pinLetterhead();
+        checkFit(letterFrame, $("#letter-warn"), T("The letter runs past one page — shorten it."));
+      };
     } catch (_) { /* the CV's render reports the connection */ }
+  }
+
+  /* The letter's letterhead sits exactly where the CV's header does: when the
+     CV needed a fit, the letter takes the CV's result for everything outside
+     its body (autofit.js pinned(); the PDF export does the same server-side). */
+  async function pinLetterhead() {
+    try {
+      const cw = frame.contentWindow, lw = letterFrame.contentWindow;
+      if (!cw || !cw.ResumeAutofit || !lw || !lw.ResumeAutofit) return;
+      const r = await cw.ResumeAutofit.ready;
+      await lw.ResumeAutofit.ready;
+      const t = lw.document.querySelector(".tpl");
+      if (t && r && (r.density !== 1 || r.typeScale !== 1)) {
+        t.setAttribute("data-header-fit", r.density + " " + r.typeScale);
+        lw.ResumeAutofit.fit();
+      }
+    } catch (_) { /* the letter shows unpinned; the CV's check reports problems */ }
   }
 
   /* The document auto-fits itself (app/static/js/autofit.js) once its fonts
