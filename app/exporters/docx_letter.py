@@ -220,6 +220,257 @@ def _section_bidi(sect) -> None:
     sect.append(el)
 
 
+# ---- a Modern template's letter: its own Word DESIGN, the CV content out ------------
+
+#: what the letter takes out of the CV (the letterhead - name, headline,
+#: contact, photo - stays, drawn by the template's own design)
+CV_CONTENT = ("summary", "summary_highlight", "achievements", "experience", "recognition",
+              "education", "skills", "tools", "languages", "references")
+
+
+def _emptied(data: dict) -> dict:
+    import copy
+    d = copy.deepcopy(data)
+    for k in CV_CONTENT:
+        d[k] = "" if k.startswith("summary") else []
+    return d
+
+
+def _run_colour(doc, text: str) -> str | None:
+    """The colour of the run that draws `text` (the CV's first bullet)."""
+    if not text:
+        return None
+    probe = text[:30]
+    for r in doc.element.body.iter(qn("w:r")):
+        if probe in "".join(t.text or "" for t in r.iter(qn("w:t"))):
+            c = r.find(qn("w:rPr") + "/" + qn("w:color"))
+            return c.get(qn("w:val")) if c is not None else None
+    return None
+
+
+def _grid_cells(tr):
+    """[(first grid column, tc)] of a row (gridSpan counted)."""
+    out, col = [], 0
+    for tc in tr.findall(qn("w:tc")):
+        out.append((col, tc))
+        pr = tc.find(qn("w:tcPr"))
+        span = pr.find(qn("w:gridSpan")) if pr is not None else None
+        col += int(span.get(qn("w:val"))) if span is not None else 1
+    return out
+
+
+def _job_column(full, text: str):
+    """(table index, grid column) of the cell drawing `text` (the CV's first
+    company) in the full CV design, or None."""
+    if not text:
+        return None
+    tbls = [el for el in full.element.body if el.tag == qn("w:tbl")]
+    for ti, tbl in enumerate(tbls):
+        for tr in tbl.findall(qn("w:tr")):
+            for col, tc in _grid_cells(tr):
+                if text in "".join(t.text or "" for t in tc.iter(qn("w:t"))):
+                    return ti, col
+    return None
+
+
+def _main_cell(doc, where=None):
+    """(python-docx cell or None, text width in twips): the design's main
+    column. `where` = (table, grid column) of the CV's jobs in the full
+    design: the same column here - its merged first cell when the column runs
+    down the page (modern-t14's main column IS the merged one), else its last
+    row's cell. Without it: the widest cell of the layout table's last row
+    that is not the merged side column. None for a full-width page."""
+    from docx.table import Table, _Cell
+    tbls = [el for el in doc.element.body if el.tag == qn("w:tbl")]
+    if not tbls:
+        return None, None
+    if where is not None and where[0] < len(tbls):
+        tbl = tbls[where[0]]
+        rows = tbl.findall(qn("w:tr"))
+        for tr in [rows[0]] + rows[::-1]:
+            for col, tc in _grid_cells(tr):
+                pr = tc.find(qn("w:tcPr"))
+                vm = pr.find(qn("w:vMerge")) if pr is not None else None
+                if col != where[1]:
+                    continue
+                if vm is not None and vm.get(qn("w:val")) != "restart":
+                    continue                          # a continued merge: its first cell holds it
+                if tr is rows[0] and vm is None and len(rows) > 1:
+                    continue                          # not merged: take the last row's
+                return _Cell(tc, Table(tbl, doc._body)), int(D._cell_w(pr) * 20)
+    # the page's layout table: the one with the merged side column, else the
+    # last (modern-t21 draws its header card as a table of its own first)
+    sided = [t for t in tbls if t.find(".//" + qn("w:vMerge")) is not None]
+    tbl = sided[0] if sided else tbls[-1]
+    best = None
+    for tc in tbl.findall(qn("w:tr"))[-1].findall(qn("w:tc")):
+        pr = tc.find(qn("w:tcPr"))
+        if pr is not None and pr.find(qn("w:vMerge")) is not None:
+            continue
+        w = D._cell_w(pr) if pr is not None else 0
+        if best is None or w > best[1]:
+            best = (tc, w)
+    if best is None:
+        return None, None
+    return _Cell(best[0], Table(tbl, doc._body)), int(best[1] * 20)
+
+
+def _drop_orphan_labels(doc) -> None:
+    """A design that prints a section heading even over nothing (modern-t12's
+    "WORK EXPERIENCE"): the letter has no sections, so no section names."""
+    from .. import letter as letter_mod
+    for p in list(doc.element.body.iter(qn("w:p"))):
+        text = "".join(t.text or "" for t in p.iter(qn("w:t"))).strip()
+        if text and letter_mod._is_label(text) and not letter_mod._is_label_contact(text):
+            # the whole line: its words and the rule drawn after them (a tab
+            # leader, modern-t12); the empty paragraph keeps the layout
+            for r in p.findall(qn("w:r")):
+                p.remove(r)
+
+
+def _write_body(ctx, box, L: dict, lang: str, colour: str | None) -> None:
+    """The plain letter body: date, recipient, subject, greeting,
+    paragraphs, closing, signature - in the body face and colour."""
+    size = word_body_px(L, lang)
+    gap = 30
+    if L["date"]:
+        D.run(ctx, box.p(align="end", before=gap, line=1.62), L["date"], "body", size=size,
+              color=colour)
+        gap = 18
+    for i, line in enumerate(letter_mod.recipient_lines(L)):
+        D.run(ctx, box.p(before=gap if i == 0 else 0, line=1.62), line, "body", size=size,
+              color=colour, bold=True if i == 0 else None)
+        gap = 24
+    if L["subject"]:
+        D.run(ctx, box.p(before=gap, line=1.4, keep=True), L["subject"], "body", size=size,
+              color=colour, bold=True)
+        gap = 20
+    if L["greeting"]:
+        D.run(ctx, box.p(before=gap, line=1.62), L["greeting"], "body", size=size, color=colour)
+        gap = 12
+    for para in L["paragraphs"]:
+        p = box.p(before=gap, line=1.62)
+        for k, line in enumerate(para.split("\n")):
+            if k:
+                p.add_run().add_break()
+            D.run(ctx, p, line, "body", size=size, color=colour)
+        gap = 12
+    if L["closing"]:
+        D.run(ctx, box.p(before=22, line=1.62, keep=True), L["closing"], "body", size=size,
+              color=colour)
+    if L["signature"]:
+        D.run(ctx, box.p(before=6 if L["closing"] else 22, line=1.2), L["signature"], "name",
+              size=round(size * 1.45, 1), color=colour)
+
+
+def design_letter_doc(data: dict, template_key: str):
+    """(document, faces) of a Modern template's cover letter: the template's
+    OWN Word design drawn with the CV content taken out - its bands, side
+    column, photo, name, headline and contact exactly as on the CV - and the
+    plain letter body set in its main column (user, 2026-10-20: "the
+    letter's header is the CV's own header block, not an approximation")."""
+    from ..labels import reset_lang, set_lang, t
+    from .docx import _photo_path
+    lang = lang_of(data)
+    photo = _photo_path(normalize(data).get("photo_url", ""))
+    full, _ = D.render(data, template_key, photo)
+    jobs = normalize(data).get("experience") or [{}]
+    colour = _run_colour(full, ((jobs[0].get("bullets") or [""])[0]) or "")
+    # by the first BULLET: a company name can recur (a reference's "CEO,
+    # Halden & Row" in modern-t20's side column)
+    where = _job_column(full, ((jobs[0].get("bullets") or [""])[0])[:30]
+                        or jobs[0].get("company") or "")
+    doc, resolved = D.render(_emptied(data), template_key, photo)
+    _drop_orphan_labels(doc)
+    cell, width = _main_cell(doc, where)
+    body = doc.element.body
+    token = set_lang(lang)
+    try:
+        ctx = D.Ctx(doc=doc, r=normalize(data), lang=lang, resolved=resolved, photo=None, t=t)
+        if cell is None:
+            sec = doc.sections[0]
+            width = int((sec.page_width - sec.left_margin - sec.right_margin) / 635)
+            box = D.Box(ctx, doc, width)
+        else:
+            box = D.Box(ctx, cell, width)
+        _write_body(ctx, box, letter_mod.letter_of(data), lang, colour)
+        D.true_lines(ctx)
+        D.half_leading(ctx)
+    finally:
+        reset_lang(token)
+    if lang == "ar":
+        # every paragraph: the letter's own, and the shape-carrying spacer the
+        # design inserts after its RTL pass (docx_design.body_page_shapes)
+        for p in body.iter(qn("w:p")):
+            _put(D._ppr(p), _w("bidi"), PPR_ORDER)
+    return doc, D.faces_drawn(doc, resolved)
+
+
+_R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+
+
+def _copy_images(el, src_part, dst_part) -> None:
+    """Re-point every picture in `el` (copied from `src_part`) at the same image
+    added to `dst_part` - a relationship id means nothing in another part."""
+    for node in el.iter():
+        for attr in (f"{_R}embed", f"{_R}id"):
+            rid = node.get(attr)
+            if not rid or rid not in src_part.rels:
+                continue
+            rel = src_part.rels[rid]
+            if "image" not in rel.reltype:
+                continue
+            new_rid, _ = dst_part.get_or_add_image(io.BytesIO(rel.target_part.blob))
+            node.set(attr, new_rid)
+
+
+def append_document(cv_doc, letter_doc) -> None:
+    """"CV + cover letter" in one file: the finished letter document copied
+    into its OWN SECTION after the CV - a new page with the letter's page
+    size, margins and header (its page shapes: a side column's fill, a
+    band), so none of the CV's reach the letter and the letter's reach only
+    its page. Built as a document of its own first, the letter keeps exactly
+    its own fit and chosen sizes (they apply to the letter alone)."""
+    import copy
+    rtl = letter_doc.sections[0]._sectPr.find(qn("w:bidi")) is not None
+    sec = cv_doc.add_section(WD_SECTION.NEW_PAGE)
+    # the paragraph that now ends the CV's section must add nothing (see _section)
+    ppr = D._ppr(cv_doc.element.body.findall(qn("w:p"))[-1])
+    rpr = OxmlElement("w:rPr")
+    rpr.append(_w("sz", val=2))
+    rpr.append(_w("szCs", val=2))
+    _put(ppr, rpr, PPR_ORDER)
+    _put(ppr, _w("spacing", before=0, after=0, line=60, lineRule="auto"), PPR_ORDER)
+    src = letter_doc.sections[0]
+    for attr in ("page_width", "page_height", "left_margin", "right_margin", "top_margin",
+                 "bottom_margin", "header_distance", "footer_distance"):
+        setattr(sec, attr, getattr(src, attr))
+    sec.different_first_page_header_footer = src.different_first_page_header_footer
+    pairs = [(sec.header, src.header), (sec.footer, src.footer)]
+    if src.different_first_page_header_footer:
+        pairs.append((sec.first_page_header, src.first_page_header))
+    for dst, s in pairs:
+        dst.is_linked_to_previous = False
+        for el in list(dst._element):
+            dst._element.remove(el)
+        for el in s._element:
+            c = copy.deepcopy(el)
+            _copy_images(c, s.part, dst.part)
+            dst._element.append(c)
+        if not len(dst._element):
+            dst._element.append(OxmlElement("w:p"))
+    body = cv_doc.element.body
+    end = body[-1]                          # the document's closing sectPr
+    for el in letter_doc.element.body:
+        if el.tag == qn("w:sectPr"):
+            continue
+        c = copy.deepcopy(el)
+        _copy_images(c, letter_doc.part, cv_doc.part)
+        end.addprevious(c)
+    if rtl:
+        _section_bidi(cv_doc.sections[-1]._sectPr)
+
+
 def render(data: dict, template_key: str) -> bytes:
     """The cover letter alone: a one-page, editable Word document."""
     rtl = lang_of(data) == "ar"

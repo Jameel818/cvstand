@@ -624,6 +624,14 @@ def _collapse(items: list) -> list:
         if it.kind != "text":
             out.append(it)
             continue
+        if it.st.get("white-space") in ("pre-line", "pre-wrap") and "\n" in it.text:
+            # a letter paragraph's own line breaks (white-space:pre-line)
+            for k, line in enumerate(it.text.split("\n")):
+                if k:
+                    out.append(Item("br", st=it.st))
+                out.append(Item("text", _BIDI_MARKS.sub("", _WS.sub(" ", line)), it.st,
+                                it.role, it.extra))
+            continue
         text = _BIDI_MARKS.sub("", _WS.sub(" ", it.text))
         out.append(Item("text", text, it.st, it.role, it.extra))
     prev_space = True
@@ -754,8 +762,11 @@ def _mode(values: list[float]) -> float:
     return Counter(round(v, 1) for v in values).most_common(1)[0][0]
 
 
-def build(data: dict, template_key: str, gaps: float = 1.0, type_k: float = 1.0):
-    """(document, resolved theme, faces used, text width pt)."""
+def build(data: dict, template_key: str, gaps: float = 1.0, type_k: float = 1.0,
+          html: str | None = None):
+    """(document, resolved theme, faces used, text width pt). `html`: another
+    page in this template's identity to write instead of the CV - the cover
+    letter (app/letter.py letterhead_canvas)."""
     from lxml import html as LH
 
     from ..labels import reset_lang, set_lang, t
@@ -768,7 +779,7 @@ def build(data: dict, template_key: str, gaps: float = 1.0, type_k: float = 1.0)
     resolved = docx_theme.resolve(data, template_key)
     doc = D.new_document(rtl)
     docx_theme.apply(doc, resolved)
-    frag = LH.fragment_fromstring(canvas_html(data, template_key), create_parent="div")
+    frag = LH.fragment_fromstring(html or canvas_html(data, template_key), create_parent="div")
     tpl = next(e for e in frag.iter() if "tpl" in (e.get("class") or "").split())
     walk = Walk(rtl)
     root_st = {"font-size": "16px"}
@@ -857,22 +868,22 @@ def overflow_pt(doc, resolved, width_pt: float) -> float:
     return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else 0.0)
 
 
-def render(data: dict, template_key: str, part: str = "cv") -> bytes:
-    """The Word file of an ATS template's CV (or CV + letter, `part="both"`)."""
-    from . import docx_font_embed
-    doc, resolved, used, width = build(data, template_key)
+def fitted(data: dict, template_key: str, html: str | None = None):
+    """(document, faces used): built, then fitted with the PDF's ladder when it
+    runs a little past one page."""
+    doc, resolved, used, width = build(data, template_key, html=html)
     doc.cvstand_fit = None
     over = overflow_pt(doc, resolved, width)
     if D.TYPE_FIT_TRIGGER_PT < over <= D.TYPE_FIT_PAGE_MAX_PT:
         # the PDF's autofit ladder (gaps, then type), as the Modern designs do;
-        # a CV the ladder cannot fit flows on at its own sizes (never squeezed)
+        # a page the ladder cannot fit flows on at its own sizes (never squeezed)
         # English fits by its gaps only, as its PDF does (measured: the PDF's
         # autofit never scaled type on these 50 pages); Arabic runs taller in
         # Word than in the PDF, so it may also take the type steps
         steps = (D.TYPE_FIT_STEPS if resolved["lang"] == "ar"
                  else tuple(s for s in D.TYPE_FIT_STEPS if s[1] == 1.0))
         for gaps, type_k in steps:
-            d2, r2, u2, w2 = build(data, template_key, gaps, type_k)
+            d2, r2, u2, w2 = build(data, template_key, gaps, type_k, html=html)
             o2 = overflow_pt(d2, r2, w2)
             floor = D.TYPE_FIT_FLOOR_OK_PT + (AR_FLOOR_EXTRA_PT if r2["lang"] == "ar" else 0.0)
             if o2 <= D.TYPE_FIT_TARGET_PT or (
@@ -880,9 +891,33 @@ def render(data: dict, template_key: str, part: str = "cv") -> bytes:
                 doc, resolved, used = d2, r2, u2
                 doc.cvstand_fit = (gaps, type_k)
                 break
-    if part == "both":
-        from . import docx_letter
-        used = set(used) | docx_letter.append(doc, data, template_key)
+    return doc, set(used)
+
+
+def letter_doc(data: dict, template_key: str):
+    """(document, faces used) of the cover letter: the CV's own header
+    paragraphs, then the plain body (app/letter.py letterhead_canvas)."""
+    from .. import letter as letter_mod
+    from ..schema import lang_of
+    from .docx_letter import word_body_px
+    px = word_body_px(letter_mod.letter_of(data), lang_of(data))
+    return fitted(data, template_key, html=letter_mod.letterhead_canvas(data, template_key,
+                                                                         body_px=px))
+
+
+def render(data: dict, template_key: str, part: str = "cv") -> bytes:
+    """The Word file of an ATS template's CV, its cover letter ("letter"), or
+    both, the letter in its own section on its own page ("both")."""
+    from . import docx_font_embed
+    if part == "letter":
+        doc, used = letter_doc(data, template_key)
+    else:
+        doc, used = fitted(data, template_key)
+        if part == "both":
+            from . import docx_letter
+            ldoc, lused = letter_doc(data, template_key)
+            docx_letter.append_document(doc, ldoc)
+            used |= lused
     buf = io.BytesIO()
     doc.save(buf)
     return docx_font_embed.embed_fonts(buf.getvalue(), used)

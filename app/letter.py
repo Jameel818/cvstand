@@ -237,7 +237,8 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s.replace(rendering._LRI, "").replace(rendering._PDI, "")).strip()
 
 
-def letterhead_canvas(data: dict[str, Any], template_key: str) -> str:
+def letterhead_canvas(data: dict[str, Any], template_key: str,
+                      body_px: float | None = None) -> str:
     """The letter page: the CV's canvas for this template - its bands, side
     columns, photo, name, headline, contact, colours, fonts and sizes, the
     template's OWN markup - with the CV's content taken out (every section,
@@ -306,7 +307,7 @@ def letterhead_canvas(data: dict[str, Any], template_key: str) -> str:
         elif metrics and all(m in t for m in metrics) and not any(
                 all(m in _norm(_text(k)) for m in metrics) for k in el if isinstance(k.tag, str)):
             removed.append(el)
-    body = LH.fragment_fromstring(_letter_body(data, template_key, lang))
+    body = LH.fragment_fromstring(_letter_body(data, template_key, lang, body_px))
     ink = _text_colour(tpl, r)
     if ink:
         # the colour of the CV text the body replaces: a template that colours
@@ -324,6 +325,12 @@ def letterhead_canvas(data: dict[str, Any], template_key: str) -> str:
             keep = [d for d in st.split(";") if re.match(
                 r"\s*(position|left|right|top|inset[\w-]*|width|padding[\w-]*)\s*:", d)]
             body.set("style", (body.get("style") or "") + " " + ";".join(keep) + ";")
+        else:
+            # the section's own side padding (ats-t22 pads each section
+            # "0 60px" inside an unpadded page): the body keeps the measure
+            side = _side_padding(st)
+            if side:
+                body.set("style", (body.get("style") or "") + " " + side)
         first.addprevious(body)
     else:
         tpl.append(body)
@@ -332,6 +339,17 @@ def letterhead_canvas(data: dict[str, Any], template_key: str) -> str:
         if p is not None:
             p.remove(g)
     _sweep(tpl, body, r)
+    # a CV divider left below the body (modern-t13's hairline between two
+    # sections): empty, small, after the body in reading order
+    after = False
+    for el in list(tpl.iter()):
+        if el is body:
+            after = True
+            continue
+        if (after and isinstance(el.tag, str) and len(el) == 0 and not _text(el)
+                and not any(a is body for a in el.iterancestors())
+                and not _structural(el, tpl) and not _has_media(el)):
+            el.getparent().remove(el)
     if name_el is not None:
         sign = next((e for e in body.iter() if "cl-sign" in _classes(e)), None)
         if sign is not None:
@@ -374,6 +392,19 @@ def _is_label(text: str) -> bool:
     """A fixed template label (a section name), English or Arabic."""
     from . import labels
     return bool(text) and labels._key(text) in _labels()
+
+
+#: labels that belong to the letterhead (the contact block), never dropped
+_CONTACT_LABELS = ("Contact", "Contact Details", "Contact Info", "Personal Information",
+                   "Phone", "Email", "E-mail", "Address", "Web", "Website", "Portfolio",
+                   "Location", "Studio")
+
+
+def _is_label_contact(text: str) -> bool:
+    from . import labels
+    keys = {labels._key(x) for x in _CONTACT_LABELS}
+    keys |= {labels._key(labels._AR[k]) for k in list(keys) if k in labels._AR}
+    return labels._key(text) in keys
 
 
 def _structural(el, tpl) -> bool:
@@ -503,6 +534,23 @@ def _sweep(tpl, body, r: dict[str, Any]) -> None:
                     break
 
 
+def _side_padding(style: str) -> str:
+    """The horizontal padding of an inline style, as declarations."""
+    import re
+    out = []
+    for decl in style.split(";"):
+        k, _, v = decl.partition(":")
+        k, v = k.strip().lower(), v.strip()
+        if k == "padding":
+            vals = v.split()
+            if len(vals) >= 2:
+                left = vals[3] if len(vals) > 3 else vals[1]
+                out.append(f"padding-left:{left}; padding-right:{vals[1]};")
+        elif re.fullmatch(r"padding-(left|right|inline|inline-start|inline-end)", k):
+            out.append(f"{k}:{v};")
+    return " ".join(out)
+
+
 def _text_colour(tpl, r: dict[str, Any]) -> str | None:
     """The colour the CV draws its first job bullet (or summary) in."""
     import re
@@ -589,12 +637,13 @@ def _body_anchor(tpl, r: dict[str, Any], removed: list, fallback):
     return chosen
 
 
-def _letter_body(data: dict[str, Any], template_key: str, lang: str) -> str:
+def _letter_body(data: dict[str, Any], template_key: str, lang: str,
+                 px: float | None = None) -> str:
     tpl = rendering._env().get_template("_letter_body.j2")
     token = set_lang(lang)
     try:
         letter = letter_of(data)
-        return tpl.render(L=letter, body_px=body_px(letter), recipient=recipient_lines(letter),
+        return tpl.render(L=letter, body_px=px or body_px(letter), recipient=recipient_lines(letter),
                           top_px=0)
     finally:
         reset_lang(token)

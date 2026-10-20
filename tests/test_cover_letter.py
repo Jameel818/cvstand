@@ -281,10 +281,14 @@ def test_every_arabic_letter_paragraph_is_right_to_left(key, part):
                  if e.tag == f"{W}p" and e.find(f".//{W}sectPr") is not None), default=0)
     paras = [p for e in kids[start:] for p in e.iter(f"{W}p")]
     assert paras and all(p.find(f"{W}pPr/{W}bidi") is not None for p in paras)
-    th = letter.theme(key, "ar")
     tables = [t for e in kids[start:] for t in e.iter(f"{W}tbl")]
-    mirrored = [t.find(f"{W}tblPr/{W}bidiVisual") is not None for t in tables]
-    assert mirrored == ([False] if th["head_bg"] else [True])
+    if key.startswith("ats-"):
+        # an ATS letter is body text only, as its CV (app/exporters/docx_ats.py)
+        assert not tables
+    else:
+        # a Modern letter is its template's own design (the CV's header block,
+        # docx_letter.design_letter_doc): its tables mirror as the CV's do
+        assert tables and all(t.find(f"{W}tblPr/{W}bidiVisual") is not None for t in tables)
 
 
 @pytest.mark.parametrize("lang", ["en", "ar"])

@@ -168,14 +168,21 @@ def render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
         raise DocxExportError(f"Unknown template {template_key!r}.")
     if part not in ("cv", "letter", "both"):
         raise DocxExportError(f"Unknown export part {part!r}.")
-    if part == "letter":
-        from . import docx_letter
-        return docx_letter.render(data, template_key)
     from . import docx_ats
     if docx_ats.handles(template_key):
         # an ATS template is written from its own markup, as body text only
-        # (docx_ats: the ATS rules come before looks)
+        # (docx_ats: the ATS rules come before looks) - its letter too
         return docx_ats.render(data, template_key, part)
+    if part == "letter":
+        from . import docx_letter
+        if docx_design.has_design(template_key):
+            # the template's own design, its CV content out (docx_letter)
+            from io import BytesIO
+            doc, faces = docx_letter.design_letter_doc(data, template_key)
+            buf = BytesIO()
+            doc.save(buf)
+            return docx_font_embed.embed_fonts(buf.getvalue(), faces)
+        return docx_letter.render(data, template_key)
     master_name = _master_for(tpl, data)
     if not master_name:
         raise DocxExportError(f"No Word master mapped for {template_key!r}.")
@@ -244,7 +251,9 @@ def _render_design(data: dict, template_key: str, part: str = "cv") -> bytes:
     faces = docx_design.faces_drawn(doc, resolved)
     if part == "both":
         from . import docx_letter
-        faces |= docx_letter.append(doc, data, template_key)
+        ldoc, lfaces = docx_letter.design_letter_doc(data, template_key)
+        docx_letter.append_document(doc, ldoc)
+        faces |= lfaces
     buf = io.BytesIO()
     doc.save(buf)
     out = docx_font_embed.embed_fonts(buf.getvalue(), faces)
