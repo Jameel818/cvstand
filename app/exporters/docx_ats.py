@@ -900,7 +900,7 @@ def letter_doc(data: dict, template_key: str):
     from .. import letter as letter_mod
     from ..schema import lang_of
     from .docx_letter import word_body_px
-    px = word_body_px(letter_mod.letter_of(data), lang_of(data))
+    px = word_body_px(letter_mod.letter_of(data), lang_of(data), template_key)
     return fitted(data, template_key, html=letter_mod.letterhead_canvas(data, template_key,
                                                                          body_px=px))
 

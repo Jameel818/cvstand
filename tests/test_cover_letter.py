@@ -184,6 +184,20 @@ def test_letter_themes_json_is_fresh():
     assert r.returncode == 0, r.stdout + r.stderr
 
 
+@pytest.mark.slow
+def test_letter_capacity_json_is_fresh():
+    """The room each letter page leaves for the body is measured too
+    (tools/build_letter_capacity.py): a template whose header or columns
+    changed fails here until it is re-measured."""
+    import subprocess
+    import sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    r = subprocess.run([sys.executable, str(root / "tools" / "build_letter_capacity.py"), "--check"],
+                       capture_output=True, text=True, cwd=root)
+    assert r.returncode == 0, r.stdout + r.stderr
+
+
 # ---- the API --------------------------------------------------------------------
 
 def test_render_route_returns_the_letter_when_asked(client):

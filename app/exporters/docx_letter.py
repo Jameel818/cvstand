@@ -48,11 +48,27 @@ RAIL_PX = 40
 WORD_BODY_SIZES_EN = ((1400, 13.0), (1800, 12.0), (2200, 11.0), (2600, 10.5), (10 ** 9, 10.0))
 
 
-def word_body_px(letter: dict, lang: str) -> float:
-    if lang == "ar":
-        return letter_mod.body_px(letter)
-    n = len(letter["greeting"]) + len(letter["closing"]) + sum(len(p) for p in letter["paragraphs"])
-    return next(px for limit, px in WORD_BODY_SIZES_EN if n <= limit)
+WORD_BODY_SIZES_EN_TIGHT = ((3300, 10.0), (4000, 9.5), (5000, 9.0), (10 ** 9, 8.5))
+
+
+#: Word's lines run taller than the PDF's (run 10), and a narrow column
+#: shows it most: the longest letter spilled in 14 of 98 Word files at the
+#: PDF's room alone (real Word, 2026-10-20) - so Word counts a page with
+#: less than the reference room as this much smaller again.
+WORD_ROOM_SAFETY = 0.8
+
+
+def word_body_px(letter: dict, lang: str, template_key: str | None = None) -> float:
+    """The Word letter's body size; a template with less room for the body
+    (letter.room: a column beside a side panel) counts the letter as longer,
+    as the PDF does, and a little longer again (WORD_ROOM_SAFETY)."""
+    room = letter_mod.room(template_key, lang)
+    if room < 1.0:
+        room *= WORD_ROOM_SAFETY
+    n = letter_mod.letter_chars(letter) / room
+    ladder = (letter_mod.BODY_SIZES[:-1] + letter_mod.BODY_SIZES_TIGHT if lang == "ar"
+              else WORD_BODY_SIZES_EN[:-1] + WORD_BODY_SIZES_EN_TIGHT)
+    return next(px for limit, px in ladder if n <= limit)
 
 
 def _hex(c: str | None) -> str | None:
@@ -328,10 +344,9 @@ def _drop_orphan_labels(doc) -> None:
                 p.remove(r)
 
 
-def _write_body(ctx, box, L: dict, lang: str, colour: str | None) -> None:
+def _write_body(ctx, box, L: dict, lang: str, colour: str | None, size: float) -> None:
     """The plain letter body: date, recipient, subject, greeting,
     paragraphs, closing, signature - in the body face and colour."""
-    size = word_body_px(L, lang)
     gap = 30
     if L["date"]:
         D.run(ctx, box.p(align="end", before=gap, line=1.62), L["date"], "body", size=size,
@@ -369,7 +384,6 @@ def design_letter_doc(data: dict, template_key: str):
     column, photo, name, headline and contact exactly as on the CV - and the
     plain letter body set in its main column (user, 2026-10-20: "the
     letter's header is the CV's own header block, not an approximation")."""
-    from ..labels import reset_lang, set_lang, t
     from .docx import _photo_path
     lang = lang_of(data)
     photo = _photo_path(normalize(data).get("photo_url", ""))
@@ -380,6 +394,29 @@ def design_letter_doc(data: dict, template_key: str):
     # Halden & Row" in modern-t20's side column)
     where = _job_column(full, ((jobs[0].get("bullets") or [""])[0])[:30]
                         or jobs[0].get("company") or "")
+    L = letter_mod.letter_of(data)
+    size = word_body_px(L, lang, template_key)
+    while True:
+        doc, resolved = _design_letter(data, template_key, photo, where, colour, L, size)
+        side, main, page = D._overflows(doc, resolved)
+        over = main if main is not None else page
+        # measured in real Word (2026-10-20, the longest letter, 48 files):
+        # every page the estimate put above +19pt spilled, none at or below
+        # +4pt did - so the body steps down until it reads LETTER_FIT_PT
+        if over <= LETTER_FIT_PT or size <= LETTER_MIN_PX:
+            return doc, D.faces_drawn(doc, resolved)
+        size -= 0.5
+
+
+#: the estimate a Modern Word letter's column must read (pt past one page)
+LETTER_FIT_PT = -15.0
+#: ...and the smallest body it may take for that (px; 7.5px = 5.4pt)
+LETTER_MIN_PX = 7.5
+
+
+def _design_letter(data, template_key, photo, where, colour, L, size):
+    from ..labels import reset_lang, set_lang, t
+    lang = lang_of(data)
     doc, resolved = D.render(_emptied(data), template_key, photo)
     _drop_orphan_labels(doc)
     cell, width = _main_cell(doc, where)
@@ -393,7 +430,7 @@ def design_letter_doc(data: dict, template_key: str):
             box = D.Box(ctx, doc, width)
         else:
             box = D.Box(ctx, cell, width)
-        _write_body(ctx, box, letter_mod.letter_of(data), lang, colour)
+        _write_body(ctx, box, L, lang, colour, size)
         D.true_lines(ctx)
         D.half_leading(ctx)
     finally:
@@ -403,7 +440,7 @@ def design_letter_doc(data: dict, template_key: str):
         # design inserts after its RTL pass (docx_design.body_page_shapes)
         for p in body.iter(qn("w:p")):
             _put(D._ppr(p), _w("bidi"), PPR_ORDER)
-    return doc, D.faces_drawn(doc, resolved)
+    return doc, resolved
 
 
 _R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"

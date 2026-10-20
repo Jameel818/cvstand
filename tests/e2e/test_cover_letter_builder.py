@@ -58,7 +58,8 @@ def test_ticking_fills_the_demo_letter_in_the_documents_language(page, deployed_
     expect(page.locator('.sec[data-sid="basics"] .num')).to_have_text("1")
     subject = LS.demo_letter(lang)["subject"]
     expect(page.locator('[name="cover_letter.subject"]')).to_have_value(subject)
-    expect(_letter(page).locator(".cv-section")).to_contain_text(subject)
+    # the body is plain (2026-10-20): the subject is a line of the body
+    expect(_letter(page).locator(".cl-body")).to_contain_text(subject)
     expect(page.locator("#doc-switch")).to_be_visible()
     if lang == "ar":
         assert page.frame_locator("#letter-frame").locator("html").get_attribute("dir") == "rtl"
@@ -72,7 +73,7 @@ def test_editing_the_form_reaches_the_letter_and_the_switch_moves_between_pages(
     _builder(page, deployed_server)
     page.check("#cl-toggle")
     page.fill('[name="cover_letter.subject"]', "Application for Design Director")
-    expect(_letter(page).locator(".cv-section")).to_contain_text("Application for Design Director")
+    expect(_letter(page).locator(".cl-body")).to_contain_text("Application for Design Director")
     page.click('#doc-switch [data-doc="cv"]')
     expect(page.locator('#doc-switch [data-doc="cv"]')).to_have_attribute("aria-selected", "true")
     page.click('#doc-switch [data-doc="letter"]')

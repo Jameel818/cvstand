@@ -183,11 +183,49 @@ def theme(template_key: str, lang: str) -> dict[str, Any]:
 #: (most characters of greeting + paragraphs + closing, body px). The schema's
 #: caps (schema.LETTER_*) bound the total; auto-fit does the rest.
 BODY_SIZES = ((1400, 13.0), (2000, 12.5), (2600, 12.0), (10 ** 9, 11.5))
+#: ...continued for a page with less room than the reference: the body in a
+#: column beside a side panel, under a tall letterhead (tools/build_letter_capacity.py)
+BODY_SIZES_TIGHT = ((3300, 11.5), (4000, 11.0), (4800, 10.5), (5800, 10.0), (7000, 9.5),
+                    (10 ** 9, 9.0))
+CAPACITY_PATH = Path(__file__).resolve().parent / "letter_capacity.json"
+#: the room (w x h, px) the sizes above were set for: a single-column page
+#: (measured, ats-t3: 706 x 876)
+REF_AREA = 706 * 876
+ROOM_SAFETY = 0.92
 
 
-def body_px(letter: dict[str, Any]) -> float:
-    n = len(letter["greeting"]) + len(letter["closing"]) + sum(len(p) for p in letter["paragraphs"])
-    return next(px for limit, px in BODY_SIZES if n <= limit)
+@lru_cache(maxsize=1)
+def _capacity() -> dict:
+    if not CAPACITY_PATH.exists():          # pragma: no cover - built by the tool
+        return {}
+    return json.loads(CAPACITY_PATH.read_text(encoding="utf-8"))["templates"]
+
+
+def letter_chars(letter: dict[str, Any]) -> int:
+    return len(letter["greeting"]) + len(letter["closing"]) + sum(len(p) for p in letter["paragraphs"])
+
+
+def room(template_key: str | None, lang: str | None) -> float:
+    """The template's room for the body against the reference (1.0 = as much
+    or more; 0.5 = half)."""
+    cap = _capacity().get(template_key or "", {}).get(lang or "en")
+    if not cap:
+        return 1.0
+    r = cap["w"] * cap["h"] / REF_AREA
+    # a narrower column also wraps less efficiently than its area says
+    # (modern-t22's longest letter ran 9px over at the bare ratio)
+    return 1.0 if r >= 1.0 else r * ROOM_SAFETY
+
+
+def body_px(letter: dict[str, Any], template_key: str | None = None,
+            lang: str | None = None) -> float:
+    """The body's size: by the letter's length, as if the page had the
+    reference room - a template with less room counts the letter as longer."""
+    n = letter_chars(letter) / room(template_key, lang)
+    # one ladder: the reference sizes (their open-ended last row aside), then
+    # the tight ones; at the reference room the longest letter (~3200
+    # characters) still lands on 11.5, as before
+    return next(px for limit, px in BODY_SIZES[:-1] + BODY_SIZES_TIGHT if n <= limit)
 
 
 def recipient_lines(letter: dict[str, Any]) -> list[str]:
@@ -643,14 +681,16 @@ def _letter_body(data: dict[str, Any], template_key: str, lang: str,
     token = set_lang(lang)
     try:
         letter = letter_of(data)
-        return tpl.render(L=letter, body_px=px or body_px(letter), recipient=recipient_lines(letter),
+        return tpl.render(L=letter, body_px=px or body_px(letter, template_key, lang),
+                          recipient=recipient_lines(letter),
                           top_px=0)
     finally:
         reset_lang(token)
 
 
-def document_html(data: dict[str, Any], template_key: str, *, for_pdf: bool = False) -> str:
+def document_html(data: dict[str, Any], template_key: str, *, for_pdf: bool = False,
+                  body_px: float | None = None) -> str:
     name = (data.get("name") or "").strip()
     return rendering.document_html(data, template_key, for_pdf=for_pdf,
-                                   canvas=letterhead_canvas(data, template_key),
+                                   canvas=letterhead_canvas(data, template_key, body_px=body_px),
                                    title=f"{name} — cover letter" if name else "Cover letter")
