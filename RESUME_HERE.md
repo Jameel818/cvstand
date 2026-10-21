@@ -1,3 +1,28 @@
+# RESUME HERE - 2026-10-21 (MERGE + DEPLOY run 14: feature/ats-word MERGED into main; DEPLOY NOT YET LIVE)
+- main = 32e10a3 (fast-forward from cf85458), pushed (section 9 form), confirmed by git ls-remote.
+- BACKUP: tag pre-merge-ats-2026-10-21 (pushed; -> cf85458). Live deployment at merge time:
+  228d898a-f27e-4d24-b4c0-e620cc88d9fa (cf85458) = the rollback target.
+- Gates before the push (all on 32e10a3): fast 5969 passed / 0 failed (14m38s); browser
+  batches + real Word NOT re-run (the code was unchanged since run 13b recorded browser
+  1564 / 0 failed and Word 98/98); verify_docker_context OK (588 files); fresh venv from
+  requirements.txt alone imports all 13 third-party packages + create_app() (/ and
+  /builder 200); test_requirements_cover_imports 3/3; secrets audit clean (only the two
+  known placeholders); root Fonts/ untracked + in .dockerignore.
+- PROBLEM: Railway did NOT auto-deploy the push (60+ min: no new deployment, no GitHub
+  deployment record; live still 228d898a). Asked the user to press Deploy in the dashboard
+  and check Settings -> Source (repo/branch/auto-deploy). Live checks 7-11 NOT run on the
+  new build yet.
+- Live-check scripts (scratchpad 162c55b5...): live.py (pages, language sticks, Import
+  "Coming soon", Word EN/AR for ats-t22/t1/t7 + modern-t4/t13, letter/both, file names via
+  filename*), analyze.py (Word-rendered PDFs: pages, both = CV + 1, letter top position =
+  standalone, letter text), word_all.ps1 + word_pdf.ps1 (real Word, own PID only).
+  Baseline on the OLD live build: 38/46 (8 = no filename* header: proves the check bites);
+  Arabic ATS CVs 2 pages there.
+- pip here needs the OS trust store (copy venv's truststore into a fresh venv, then
+  --use-feature=truststore) and a SHORT venv path (playwright hits MAX_PATH in the scratchpad).
+
+---
+
 # RESUME HERE - 2026-10-21 (run 13b on `feature/ats-word`: letterhead = CV header in Word + PDF; NOT merged)
 User's review fixes, all in the shared letter code:
 1. TOP GAP (Word, "CV + letter"): the letter section got Word's DEFAULT header paragraph
