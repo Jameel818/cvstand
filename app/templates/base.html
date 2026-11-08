@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fonts_ar_shell.css') }}">
 {% endif %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M9 8h11l4 4v12H9z' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M12 14h8M12 18h8M12 22h5' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" sizes="any">
 <link rel="manifest" href="{{ url_for('main.manifest') }}">
 <meta name="theme-color" content="#4f46e5">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
@@ -34,9 +34,13 @@
 <body class="{% block body_class %}{% endblock %}">
 {% block chrome %}
 <header class="site-header">
+  {# The full lockup as one image. Its box already carries the letters "CV",
+     so no HTML wordmark sits beside it (that would read "CV CVStand").
+     dir="ltr" on the IMG, not the link: the footer link is a full-width flex row,
+     and ltr there would throw the logo to the left edge of an Arabic page. The link
+     itself keeps its place at the start of the RTL row. #}
   <a class="logo" href="{{ url_for('main.landing') }}">
-    <span class="logo-mark" aria-hidden="true"></span>
-    <span>{{ brand_head }}<b>{{ brand_tail }}</b></span>
+    <img src="{{ url_for('static', filename='icons/cvstand.svg') }}" alt="{{ brand_name }}" width="99" height="32" dir="ltr">
   </a>
   <nav class="site-nav">
     <a href="{{ url_for('main.templates_gallery') }}">{{ t('Templates') }}</a>
@@ -76,8 +80,7 @@
 <footer class="site-footer">
   <div>
     <a class="logo" href="{{ url_for('main.landing') }}">
-      <span class="logo-mark" aria-hidden="true"></span>
-      <span>{{ brand_head }}<b>{{ brand_tail }}</b></span>
+      <img src="{{ url_for('static', filename='icons/cvstand.svg') }}" alt="{{ brand_name }}" width="99" height="32" dir="ltr">
     </a>
     <p class="footer-tagline">{{ t(brand_tagline) }}</p>
     <p>{{ t('Designer résumé layouts, your content, exported to PDF and Word.') }}</p>

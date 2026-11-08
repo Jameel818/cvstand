@@ -49,14 +49,18 @@ def test_the_wordmark_is_actually_visible(page, live_server, path, lang):
     _set_ui_lang(page, live_server, lang)
     page.goto(live_server.url + path)
 
-    marks = page.locator("a.logo span", has_text=brand.HEAD)
+    # The lockup image (feature/logo, 2026-11-08). naturalWidth > 0 means the
+    # SVG actually LOADED -- a broken src still lays out at its width/height.
+    marks = page.locator("a.logo img")
     expect(marks.first).to_be_visible()
 
     box = marks.first.bounding_box()
     assert box and box["width"] > 20 and box["height"] > 8, (
         f"the wordmark occupies no space on {path} ({lang}): {box}"
     )
-    assert brand.NAME in marks.first.inner_text().replace("\n", "")
+    assert marks.first.get_attribute("alt") == brand.NAME
+    assert marks.first.evaluate("i => i.complete && i.naturalWidth > 0"), (
+        f"the logo image did not load on {path} ({lang})")
 
 
 @pytest.mark.parametrize("lang", ["en", "ar"])

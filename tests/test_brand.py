@@ -42,7 +42,10 @@ ALL_PAGES = CHROME_PAGES + ["/builder"]
 # The wordmark AS RENDERED. Written out literally rather than composed from
 # the constants, so that a change to brand.py which breaks the markup fails
 # here instead of silently agreeing with itself.
-WORDMARK = re.compile(r"CV<b>Stand</b>")
+# Since 2026-11-08 (feature/logo) the wordmark is the lockup IMAGE
+# icons/cvstand.svg, not the split `CV<b>Stand</b>` text; its alt text carries
+# the name. tests/test_logo.py holds the rest of the logo's contract.
+WORDMARK = re.compile(r'<img src="/static/icons/cvstand\.svg" alt="CVStand"')
 TITLE = re.compile(r"<title>(.*?)</title>", re.S)
 
 
