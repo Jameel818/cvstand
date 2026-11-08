@@ -1,8 +1,7 @@
 # RESUME HERE - 2026-11-08 (feature/logo from origin/main 32e10a3; NOT merged, NOT deployed - site is offline on purpose)
 - Logo installed from Downloads/static/icons (7 files, unedited) into app/static/icons/.
   Overwritten: apple-touch-icon.png, icon-192.png, icon-512.png. New: favicon.ico, logo-mark.svg,
-  cvstand.svg, cvstand-dark.svg. Kept (OLD artwork, still in the manifest as "maskable"):
-  icon-maskable-512.png. The run-14 merge note (4d5f724) lives on feature/ats-word, not here.
+  cvstand.svg, cvstand-dark.svg (PNGs/ico later replaced by square exports, below). The run-14 merge note (4d5f724) lives on feature/ats-word, not here.
 - base.html: favicon = icons/favicon.ico (inline data: SVG gone); header + footer = the lockup
   <img cvstand.svg alt=brand_name height 32> ALONE (the box already says "CV": no HTML wordmark
   beside it). dir="ltr" sits on the IMG: on the full-width footer link it threw the Arabic logo
@@ -12,16 +11,18 @@
   Header height 66 -> 66 and button rects identical, EN/AR x 1440/390.
 - No dark header/footer exists -> cvstand-dark.svg ships but is unused.
 - Manifest: already listed icon-192/icon-512 exactly as asked; unchanged.
-- OPEN: the supplied PNGs are NOT square (192x183, 512x489, 180x172; favicon.ico frames too)
-  while the manifest declares 192x192/512x512 - Chrome flags that size mismatch on install icons.
-  Needs square exports from the brand source; not edited here (files were declared final).
-- OPEN: icon-maskable-512.png is the old purple mark (test_pwa requires a maskable icon).
+- Follow-up: square exports from Downloads/static/icons-square replaced apple-touch-icon (180),
+  icon-192, icon-512, favicon.ico (16-256, all frames square) and icon-maskable-512 (new CV mark
+  inside the safe zone). SVGs untouched; that folder's preview.png not shipped.
 - Tests: tests/test_logo.py (7 icons 200 + magic bytes; base.html favicon/lockup/no "CV CVStand";
-  manifest sizes); test_brand WORDMARK + e2e test_brand_and_cache now assert the lockup image
+  manifest sizes; every manifest PNG square AND its declared size, apple-touch 180x180, every
+  favicon frame square - the old 192x183 icon fails it); test_brand WORDMARK + e2e test_brand_and_cache now assert the lockup image
   (loaded, alt=CVStand). Mutation: old base.html -> 12 fail.
 - Suites: fast 5981 passed / 0 failed; browser 1564 passed / 0 failed (one F inside a batch cut
   off by the 10-min tool limit did not reproduce: test_letterhead_matches_cv alone 99/99);
   verify_docker_context OK (588); test_requirements_cover_imports 3/3.
+  After the square icons: fast 5983 passed / 0 failed; e2e brand 13/13; browser suite not re-run
+  (only icon files and tests/test_logo.py changed).
 
 ---
 

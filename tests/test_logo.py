@@ -61,6 +61,37 @@ def test_base_html_uses_the_new_favicon_and_lockup(client, path, lang):
     assert not re.search(r"CV\s*CVStand", html)
 
 
+def _image(client, src):
+    from io import BytesIO
+
+    from PIL import Image
+    res = client.get(src)
+    assert res.status_code == 200, src
+    return Image.open(BytesIO(res.data))
+
+
+def test_every_manifest_icon_is_square_and_its_declared_size(client):
+    """The first delivery was 192x183 / 512x489 under a manifest declaring
+    192x192 / 512x512; Chrome rejects an install icon whose real size does
+    not match `sizes`. Read the PNG itself, not the file name."""
+    icons = client.get("/manifest.webmanifest").get_json()["icons"]
+    for i in icons:
+        w, h = (int(n) for n in i["sizes"].split("x"))
+        assert _image(client, i["src"]).size == (w, h), i["src"]
+    # Not in the manifest, but iOS expects 180x180.
+    assert _image(client, "/static/icons/apple-touch-icon.png").size == (180, 180)
+
+
+def test_every_favicon_frame_is_square(client):
+    ico = _image(client, "/static/icons/favicon.ico")
+    sizes = ico.info["sizes"]
+    assert {(16, 16), (32, 32)} <= sizes, "a tab needs the 16 and 32 frames"
+    for s in sizes:
+        ico.size = s
+        ico.load()
+        assert ico.size[0] == ico.size[1] == s[0], s
+
+
 def test_the_manifest_lists_both_install_sizes(client):
     icons = client.get("/manifest.webmanifest").get_json()["icons"]
     plain = [i for i in icons if not i.get("purpose")]
