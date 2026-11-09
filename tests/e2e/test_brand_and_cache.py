@@ -70,10 +70,12 @@ LOCKUP_RATIO = 276.76 / 72.16
 
 
 @pytest.mark.parametrize("lang", ["en", "ar"])
-@pytest.mark.parametrize("width, height", [(1440, 44), (390, 34)])
+@pytest.mark.parametrize("width, height, header_h",
+                         [(1440, 52, 72), (1024, 52, 72), (390, 34, 66)])
 def test_the_header_logo_is_full_size_and_undistorted(page, live_server, lang,
-                                                      width, height):
-    """44px on desktop, 34px on phones (2026-11-09), and never squeezed.
+                                                      width, height, header_h):
+    """52px on desktop in a 72px header, 34px on phones in an unchanged 66px
+    header (2026-11-09), centred, and never squeezed.
 
     The height alone does not prove it: twice on a 390px page the image kept
     height 34 while it was narrowed (old lockup 97.8px wide for 105.2; the
@@ -83,7 +85,11 @@ def test_the_header_logo_is_full_size_and_undistorted(page, live_server, lang,
     _set_ui_lang(page, live_server, lang)
     page.goto(live_server.url + "/")
     box = page.locator(".site-header a.logo img").bounding_box()
+    head = page.locator(".site-header").bounding_box()
     assert box and abs(box["height"] - height) < 0.5, box
+    assert abs(head["height"] - header_h) < 0.5, head
+    assert abs((box["y"] + box["height"] / 2) - (head["y"] + head["height"] / 2)) < 1, (
+        f"the logo is not vertically centred in the header: {box} in {head}")
     assert abs(box["width"] / box["height"] - LOCKUP_RATIO) < 0.02, (
         f"the lockup is distorted at {width}px ({lang}): {box}")
 

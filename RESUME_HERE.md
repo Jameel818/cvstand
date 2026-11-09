@@ -1,3 +1,16 @@
+# RESUME HERE - 2026-11-09c (feature/logo: desktop logo 52px; NOT merged, NOT deployed)
+- Desktop (>=641) header logo 44 -> 52px (<img> 199x52; renders 200x52, ratio 3.846),
+  max-width:none on .logo img. --header-h 66 -> 72px on desktop (10px above/below the image,
+  ~34px of ink = the old lockup's visible height); every item centred at y=35.5, EN/AR x
+  1440/1024, one line each, scrollWidth = viewport.
+- Phones (<=640) untouched: the media block resets --header-h to 66px; 390px rects identical
+  to before (34px logo). Footer unchanged (40px, ink-to-tagline 10px).
+- e2e squeeze test now (1440,52,72) (1024,52,72) (390,34,66): height, header height, centring
+  and ratio, EN/AR. test_logo + test_brand 63/63; e2e brand + mobile layout 54/54;
+  fast suite 5983 passed / 0 failed.
+
+---
+
 # RESUME HERE - 2026-11-09b (feature/logo: FINAL logo installed; NOT merged, NOT deployed)
 - The 8 files from Downloads/static/icons-final copied unedited (byte-identical) over
   app/static/icons/. Checked first: no script/href/foreignObject/image in the SVGs (they carry

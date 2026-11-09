@@ -58,7 +58,7 @@
   --shadow-lg: 0 26px 60px rgba(20, 22, 26, .16), 0 8px 20px rgba(20, 22, 26, .08);
 
   --maxw: 1140px;
-  --header-h: 66px;
+  --header-h: 72px; /* 66 -> 72 for the 52px logo (2026-11-09); phones keep 66 */
 }
 
 * { box-sizing: border-box; }
@@ -146,9 +146,10 @@ p { margin: 0 0 1em; }
    276.76 x 72.16 = 3.835:1) is sized by height only; the <img> width/height
    attributes follow the same ratio. Its transparent margin, measured from the
    render: ~16.5% of the height above the ink, ~19% below, ~16% at each end, so
-   a 44px image draws ~29px of ink. 44px still fits the 66px header, so
-   --header-h is unchanged. */
-.logo img { display: block; height: 44px; width: auto; }
+   a 52px image draws ~34px of ink (the old lockup's visible height at 44px).
+   Desktop header 72px (10px above and below the image); phones keep 66px and
+   34px. max-width:none: the global img max-width:100% must never narrow it. */
+.logo img { display: block; height: 52px; width: auto; max-width: none; }
 /* Footer: 40px. margin-block cancels the measured transparent margin (6.5px
    above, 7.5px below at 40px), so the ink sits on the column top and the
    tagline's own 10px margin is the visible gap under it. */
@@ -761,6 +762,7 @@ body.builder-body { overflow: hidden; }
      (its ~5.5px transparent ends). The 390px ARABIC row is the tight one (its
      button text is the longest): short of that, the flex row shrinks the logo
      link and the lockup runs into the language switch (2026-11-09). */
+  :root { --header-h: 66px; } /* phones: unchanged by the 52px desktop logo */
   .site-header { gap: 5px; padding-inline: 12px; }
   .site-header .logo { font-size: 15px; gap: 8px; min-width: 0; }
   /* max-width:none because the global img max-width:100% resolves against the
