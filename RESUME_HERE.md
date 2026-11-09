@@ -1,3 +1,23 @@
+# RESUME HERE - 2026-11-09b (feature/logo: FINAL logo installed; NOT merged, NOT deployed)
+- The 8 files from Downloads/static/icons-final copied unedited (byte-identical) over
+  app/static/icons/. Checked first: no script/href/foreignObject/image in the SVGs (they carry
+  a C2PA metadata block only); cvstand.svg viewBox 276.76 x 72.16 (3.835; the browser sizes it
+  from width/height 277x72 = 3.847); PNGs 180/192/512/512 square; favicon frames 16-256.
+  apple-touch + maskable are opaque white; icon-192/512 transparent (purpose "any").
+- Sizes kept: header 44px (<img> 169x44), footer 40px (<img> 153x40), phones 34px (no step-down).
+  Header height 66 -> 66; all items centred at y=32.5, EN/AR x 1440/390; scrollWidth = viewport.
+- The new file has MORE transparent margin (measured render, 40px: 6.5 above / 7.5 below /
+  ~6 each end), so 44px = ~29px of ink. Footer margin-block -6.5px -7.5px -> ink-to-tagline 10px.
+- Phones (<=640): logo 130px wide. Paid for by header gap 8->5, side padding 14->12, button
+  padding 10->8, and margin-inline -5px on the img (its transparent ends). max-width:none is
+  REQUIRED: the global img max-width:100% resolves against the link, which the negative margins
+  make 10px narrower -> the lockup squeezed to 120.8 (EN) / 113.8 (AR) at height 34.
+  390 AR: ink-to-language-switch ~5.5px, 14px slack before the button.
+- Tests: squeeze test now on the new ratio; mutation without max-width:none fails [390-34-en/ar].
+  test_logo + test_brand 63/63; e2e brand + mobile layout 52/52; fast suite 5983 passed / 0 failed.
+
+---
+
 # RESUME HERE - 2026-11-09 (feature/logo follow-up: bigger header logo; NOT merged, NOT deployed)
 - Header lockup 32 -> 44px desktop, 27 -> 34px phones (<=640); <img> 136x44. The real
   cvstand.svg ratio is 1379.93:445.72 = 3.096 (the brief's 3.835 / 169x44 is a different

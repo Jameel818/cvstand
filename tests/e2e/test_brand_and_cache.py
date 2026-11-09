@@ -63,8 +63,10 @@ def test_the_wordmark_is_actually_visible(page, live_server, path, lang):
         f"the logo image did not load on {path} ({lang})")
 
 
-# The lockup's own ratio (viewBox 1379.93 x 445.72).
-LOCKUP_RATIO = 1379.93 / 445.72
+# The lockup's own ratio: the final logo (2026-11-09), viewBox 276.76 x 72.16.
+# The browser sizes it from the file's width/height (277 x 72 = 3.847), within
+# the 0.02 tolerance below. The old lockup was 3.096 and fails it.
+LOCKUP_RATIO = 276.76 / 72.16
 
 
 @pytest.mark.parametrize("lang", ["en", "ar"])
@@ -73,9 +75,10 @@ def test_the_header_logo_is_full_size_and_undistorted(page, live_server, lang,
                                                       width, height):
     """44px on desktop, 34px on phones (2026-11-09), and never squeezed.
 
-    The height alone does not prove it: on a 390px Arabic page the first
-    attempt kept height 34 while the row, ~7px short, narrowed the image to
-    97.8px wide (should be 105.2). Only the width/height ratio shows that."""
+    The height alone does not prove it: twice on a 390px page the image kept
+    height 34 while it was narrowed (old lockup 97.8px wide for 105.2; the
+    final lockup 113.8 for 130.4, when the global img max-width:100% met its
+    negative inline margins). Only the width/height ratio shows that."""
     page.set_viewport_size({"width": width, "height": 800})
     _set_ui_lang(page, live_server, lang)
     page.goto(live_server.url + "/")
