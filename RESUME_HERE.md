@@ -1,3 +1,22 @@
+# RESUME HERE - 2026-11-09d (feature/logo: templates guide added; docs only, NO code change)
+- CVSTAND_TEMPLATES_GUIDE.md moved from the repo root to docs/CVSTAND_TEMPLATES_GUIDE.md.
+- Every unverified (magnifier) path checked against the code and marked verified:
+  ATS ids t1..t25 (real key ats-tN / modern-tN); registry app/registry.py (Python, no JSON,
+  no thumbnail field); HTML app/templates/resumes/<group>/<block>.j2; NO per-template CSS
+  (inline styles + app/rendering.py); Word: Modern app/exporters/word_designs/tN.py,
+  ATS app/exporters/docx_ats.py (from the markup, no per-template module); letter themes
+  app/letter_themes.json (generated); golden tests/golden/{html,pixels,normalize};
+  removal: no id mapping exists, store.load_meta() falls back to registry.default_key().
+- Also corrected 4 rows already marked verified that were wrong: font registry (no
+  registry.json; build.json), font files under app/static/fonts/, generated CSS is
+  app/static/fonts/typography.css (not static/css/fonts.css), app/exporters/docx_font_embed.py
+  (not app/export/).
+- Flagged, NOT changed (design guidance, owner's call): §4 Step 2 says A4 and pt sizes, but the
+  templates are an 850x1100px canvas (Letter; docx_ats: 1px = 0.72pt) with px inline styles;
+  §3/§6 mention template thumbnails, which do not exist.
+
+---
+
 # RESUME HERE - 2026-11-09c (feature/logo: desktop logo 52px; NOT merged, NOT deployed)
 - Desktop (>=641) header logo 44 -> 52px (<img> 199x52; renders 200x52, ratio 3.846),
   max-width:none on .logo img. --header-h 66 -> 72px on desktop (10px above/below the image,
