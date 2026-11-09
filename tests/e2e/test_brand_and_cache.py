@@ -63,6 +63,28 @@ def test_the_wordmark_is_actually_visible(page, live_server, path, lang):
         f"the logo image did not load on {path} ({lang})")
 
 
+# The lockup's own ratio (viewBox 1379.93 x 445.72).
+LOCKUP_RATIO = 1379.93 / 445.72
+
+
+@pytest.mark.parametrize("lang", ["en", "ar"])
+@pytest.mark.parametrize("width, height", [(1440, 44), (390, 34)])
+def test_the_header_logo_is_full_size_and_undistorted(page, live_server, lang,
+                                                      width, height):
+    """44px on desktop, 34px on phones (2026-11-09), and never squeezed.
+
+    The height alone does not prove it: on a 390px Arabic page the first
+    attempt kept height 34 while the row, ~7px short, narrowed the image to
+    97.8px wide (should be 105.2). Only the width/height ratio shows that."""
+    page.set_viewport_size({"width": width, "height": 800})
+    _set_ui_lang(page, live_server, lang)
+    page.goto(live_server.url + "/")
+    box = page.locator(".site-header a.logo img").bounding_box()
+    assert box and abs(box["height"] - height) < 0.5, box
+    assert abs(box["width"] / box["height"] - LOCKUP_RATIO) < 0.02, (
+        f"the lockup is distorted at {width}px ({lang}): {box}")
+
+
 @pytest.mark.parametrize("lang", ["en", "ar"])
 def test_the_tagline_is_visible_and_follows_the_interface(page, live_server, lang):
     """It carries a CSS class that did not exist before 2026-09-14. A class

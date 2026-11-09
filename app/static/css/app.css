@@ -142,13 +142,16 @@ p { margin: 0 0 1em; }
   border-bottom: 1px solid var(--line);
 }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
-/* The lockup (icons/cvstand.svg) has a transparent margin of 44/446 of its
-   height on every side, so a 32px image draws a ~26px box: the same ink
-   height as the old 26px gradient mark it replaced. Sized by height only. */
-.logo img { display: block; height: 32px; width: auto; }
-/* The footer's logo line was 27.2px tall; pull the transparent margin back in
-   so the tagline under it does not move. */
-.site-footer .logo img { margin-block: -2.4px; }
+/* The lockup (icons/cvstand.svg, viewBox 1379.93 x 445.72 = 3.096:1) has a
+   transparent margin of 44/446 of its height on every side, so a 44px image
+   draws a ~35px box. Enlarged 2026-11-09 from 32px (~26px ink) at the user's
+   request; still inside the 66px header, so --header-h is unchanged. Sized by
+   height only; the <img> width/height attributes follow the same ratio. */
+.logo img { display: block; height: 44px; width: auto; }
+/* Footer: 40px. margin-block cancels the ~4px transparent margin (40 x 44/446)
+   so the ink box, not the image box, sits on the column top and keeps the
+   tagline's 10px margin as the visible gap under it. */
+.site-footer .logo img { height: 40px; margin-block: -4px; }
 .site-nav { display: flex; gap: 22px; margin-inline-start: 8px; }
 .site-nav a { font-weight: 500; color: var(--muted); font-size: 14px; }
 .site-nav a:hover { color: var(--ink); }
@@ -752,10 +755,12 @@ body.builder-body { overflow: hidden; }
    letter-spacing anywhere here: it does nothing to joined Arabic script and
    would only damage the Latin half. */
 @media (max-width: 640px) {
-  .site-header { gap: 10px; padding-inline: 14px; }
+  /* gap 8 and button padding 10 (were 10 / 12) pay for the 34px logo: the
+     Arabic row ran ~7px short and squeezed the lockup instead (2026-11-09). */
+  .site-header { gap: 8px; padding-inline: 14px; }
   .site-header .logo { font-size: 15px; gap: 8px; min-width: 0; }
-  .site-header .logo img { height: 27px; flex: none; } /* ~22px ink, as the old phone mark */
-  .site-header .btn { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+  .site-header .logo img { height: 34px; flex: none; } /* ~27px ink; never below 34px (2026-11-09) */
+  .site-header .btn { padding: 8px 10px; font-size: 13px; white-space: nowrap; }
   .lang-switch { gap: 2px; font-size: 12px; }
 
   /* The signed-in address is the longest thing in the header and the least

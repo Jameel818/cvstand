@@ -1,3 +1,21 @@
+# RESUME HERE - 2026-11-09 (feature/logo follow-up: bigger header logo; NOT merged, NOT deployed)
+- Header lockup 32 -> 44px desktop, 27 -> 34px phones (<=640); <img> 136x44. The real
+  cvstand.svg ratio is 1379.93:445.72 = 3.096 (the brief's 3.835 / 169x44 is a different
+  file's ratio; using it would have stretched the image). Header height 66 -> 66: the 44px
+  image fits, --header-h unchanged (the builder grid's row is untouched). Every header item
+  centred at y=32.5, EN/AR x 1440/390; no overflow (scrollWidth = viewport).
+- Phones: header gap 10 -> 8, button padding 12 -> 10px. Without that the 390px ARABIC row ran
+  ~7px short and squeezed the logo to 97.8x34 (ratio broken), height looked fine.
+- Arabic: logo stays dir=ltr on the IMG, at the start (right) of the RTL row.
+- Footer logo 32 -> 40px (<img> 124x40); margin-block -2.4 -> -4px cancels its transparent
+  margin, so the tagline gap from the ink stays ~10px (was ~10.8).
+- Builder has no site header (chrome block emptied): pixel-unchanged, as expected.
+- Tests: new e2e test_the_header_logo_is_full_size_and_undistorted (height 44/34 + ratio,
+  EN/AR); mutation with the old phone padding fails exactly [390-34-ar]. e2e brand 17/17, fast suite 5983 passed / 0 failed,
+  mobile layout passes, test_logo + test_brand 63/63.
+
+---
+
 # RESUME HERE - 2026-11-08 (feature/logo from origin/main 32e10a3; NOT merged, NOT deployed - site is offline on purpose)
 - Logo installed from Downloads/static/icons (7 files, unedited) into app/static/icons/.
   Overwritten: apple-touch-icon.png, icon-192.png, icon-512.png. New: favicon.ico, logo-mark.svg,
