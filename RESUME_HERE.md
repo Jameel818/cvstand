@@ -20,7 +20,7 @@ VERIFIED:
 - Fast 5983 passed / 0 failed. e2e (48 files, 6 foreground batches) 1579 passed; one F at
   test_letterhead_matches_cv #70 inside a batch cut by the 10-min limit did NOT reproduce (file alone 99/99,
   same flake as 2026-11-08). --e2e tests in tests/ (golden pixels, bidi, rtl) 274 passed.
-- Screenshots: Desktopeview-site-cairo-2026-11-10\ (before/, after/, compare-*.png).
+- Screenshots: Desktop\review-site-cairo-2026-11-10\ (before/, after/, compare-*.png).
 NOT DONE / NOT VERIFIED:
 - English unchanged (Inter; Fraunces accent) - waits for the user's approval.
 - Real-device check (iOS/Android) not done; only Chromium.
