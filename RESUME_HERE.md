@@ -23,13 +23,15 @@ VERIFIED:
 - Fast suite: 5982 passed + the 1 invariant failure, fixed and re-run (2/2).
 - e2e batches 00-03 (24 files): 718 passed; one unnamed failure in batch 01 did not reproduce
   (55/55 twice). test_pdf_letter_page + test_pdf_fonts: 28 passed.
+- e2e batches 04-07 (24 files, test_new_arabic_fonts_pdf .. test_word_themes_current), run 2026-11-10
+  after memory was freed, FOREGROUND one file at a time with -rf: 881 passed / 0 failed
+  (test_typography_apply 595 needs ~5 min: give it its own call). e2e COMPLETE: 48 files, 1599 passed,
+  0 failed; the one batch-01 failure never reproduced.
 NOT DONE / NOT VERIFIED:
 - WORD page 1 render: Word COM opens the .docx but hangs on SaveAs2/ExportAsFixedFormat to PDF (hidden
   and visible, inside Start-Job); only my own Word PID was ever stopped. No LibreOffice on this PC.
   The .docx files are in the review folder's after/ for a manual check. Word page size is 612x792 by
   code (docx_design PAGE_W 12240 twips / PAGE_H_PT 792).
-- e2e batches 04-07 (24 files, from test_new_arabic_fonts_pdf to test_word_themes_current) NOT run:
-  Claude Code killed the run for low system memory. Re-run them in the foreground.
 
 ---
 
