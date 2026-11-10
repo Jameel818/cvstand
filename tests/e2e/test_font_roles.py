@@ -5,7 +5,8 @@ WHAT THIS PROTECTS
     Two halves, and the second is the one that matters.
 
     In ARABIC the shell must actually use the policy's faces (FONTS.md): body
-    in IBM Plex Sans Arabic, headings in Cairo, hero and CTA in Tajawal. Before
+    and CTA in Cairo (since 2026-11-10; IBM Plex Sans Arabic and Tajawal
+    before), headings in Cairo, the hero in Tajawal. Before
     this, `base.html` linked `fonts.css` (Latin) and nothing else, so an Arabic
     interface fell back to whatever the OS supplied — Segoe UI on Windows,
     Geeza Pro on macOS, anything at all on Android. The faces were vendored;
@@ -81,8 +82,10 @@ def test_english_typography_is_untouched(page, live_server, path):
 def test_arabic_uses_the_policy_faces(page, live_server, path):
     got = _fonts(page, live_server, "ar", path)
     assert got["dir"] == "rtl"
-    assert "IBM Plex Sans Arabic" in got["body"], (
-        f"Arabic body should lead with IBM Plex Sans Arabic, got {got['body']!r}")
+    # Since 2026-11-10 (user) all non-heading interface text is Cairo
+    # (tests/e2e/test_shell_cairo_body.py holds the weights).
+    assert got["body"].startswith('"Cairo"') or got["body"].startswith("Cairo"), (
+        f"Arabic body should lead with Cairo, got {got['body']!r}")
     if got["hero"]:
         # Thmanyah Serif Display per the policy, Tajawal ExtraBold by its own
         # stated fallback — the licence forbids shipping Thmanyah. FONTS.md.
@@ -92,8 +95,8 @@ def test_arabic_uses_the_policy_faces(page, live_server, path):
         assert "Cairo" in got["heading"], (
             f"Arabic headings should lead with Cairo, got {got['heading']!r}")
     if got["cta"]:
-        assert "Tajawal" in got["cta"], (
-            f"Arabic buttons should lead with Tajawal, got {got['cta']!r}")
+        assert got["cta"].lstrip('"').startswith("Cairo"), (
+            f"Arabic buttons should lead with Cairo, got {got['cta']!r}")
 
 
 def test_the_arabic_stylesheet_is_not_sent_to_english_readers(page, live_server):

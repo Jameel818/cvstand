@@ -76,10 +76,21 @@ the shell already used, so the Arabic block is the only thing that moves.
 | role | Arabic | reaches |
 |---|---|---|
 | hero | Tajawal 800 (Thmanyah, outlined) | the landing h1 |
-| heading | Cairo 700 | `h1`-`h4`, `.eyebrow`, `.stat-strip b`, `.num`, `.faq summary` |
-| nav | Cairo | `.site-nav a`, `.footer-cols a`, `.lang-switch a` |
-| body | IBM Plex Sans Arabic | everything else, plus `input`/`select`/`textarea` |
-| CTA | Tajawal 800 | `.btn`, `.tab` |
+| heading | Cairo 600 (500 for `.faq summary`) | `h1`-`h4`, `.eyebrow`, `.stat-strip b`, `.num`, `.faq summary` |
+| title (not `<h*>`) | IBM Plex Sans Arabic 700/800, unchanged | `.sec > summary`, `.drawer .grp-label`, `.drawer .info b` |
+| nav | Cairo 600 | `.site-nav a`, `.footer-cols a`, `.lang-switch a` |
+| body | Cairo 400 | prose, small text, `input`/`select`/`textarea` |
+| CTA | Cairo 600 | every `.btn` variant, `button`, `.tab` |
+
+**Interface text is Cairo 400 / 600 (user, 2026-11-10).** All non-heading
+text of the ARABIC shell is Cairo: prose, small text and form fields at 400;
+buttons, nav links, labels, chips, badges and bullets at 600. This replaced
+IBM Plex Sans Arabic (body) and Tajawal 800/700 (buttons). Headings were not
+changed, including the titles that are not `<h*>` (pinned in the table above,
+or they would have inherited the new body face). Tajawal stays only on the
+hero. English is unchanged: Inter, pending the user's decision. Cairo's file
+is the variable one (wght 200-1000), so both weights are real, not synthesized.
+`tests/e2e/test_shell_cairo_body.py` holds it.
 
 **`--font-nav` exists because the policy names Thmanyah Sans for site
 navigation specifically.** Thmanyah cannot ship as a file, and Cairo is its

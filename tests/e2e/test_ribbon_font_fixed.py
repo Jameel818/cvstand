@@ -3,8 +3,8 @@
 
 Its labels (Section / Font / Weight / Size, القسم / الخط / السماكة / الحجم),
 its buttons, its selects and the options inside their menus stay in the
-face of the form fields beside them - Inter in English, IBM Plex Sans Arabic
-in Arabic. Only the preview, the PDF and the Word file follow the choice.
+face of the form fields beside them - Inter in English, Cairo in Arabic
+(IBM Plex Sans Arabic until the interface moved to Cairo, 2026-11-10). Only the preview, the PDF and the Word file follow the choice.
 
 The bug: the Font select drew its value (and so its options) in the chosen
 face as a sample. Every font in every section's list is tried here, not a
@@ -47,7 +47,7 @@ def test_choosing_any_font_never_changes_the_ribbons_own_font(page, deployed_ser
     page.goto(f"{deployed_server.url}/lang/{lang}?next=/builder")
     expect(page.frame_locator("#preview-frame").locator(".tpl")).to_be_visible()
     field = page.evaluate(FIELD_FACE)
-    assert ("IBM Plex Sans Arabic" if lang == "ar" else "Inter") in field.split(",")[0]
+    assert ("Cairo" if lang == "ar" else "Inter") in field.split(",")[0]
 
     def check(context):
         faces = page.evaluate(RIBBON_FACES)

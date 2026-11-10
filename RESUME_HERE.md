@@ -1,3 +1,33 @@
+# RESUME HERE - 2026-11-10 (feature/site-cairo from feature/logo: Arabic SHELL text -> Cairo; NOT merged, NOT deployed)
+DONE (Arabic only, app/static/css/app.css [dir=rtl] block):
+- --font-body and --font-cta = "Cairo", "IBM Plex Sans Arabic", var(--font-ui). Cairo is the vendored
+  VARIABLE woff2 (wght 200-1000, fsType 0, OFL; fonts_ar_shell.css declares 200 1000) -> 400 and 600 are
+  real weights; nothing fetched or built. Its unicode-range is Arabic only: Latin bits ("EN", digits,
+  e-mail) still fall back to Inter, as before.
+- Cairo 400: prose, small text, .blurb (was 500), inputs/selects/textareas, ribbon. Cairo 600: every .btn
+  variant (was Tajawal 700 primary / 800 outline), button, .tab, nav links (were 400), footer links,
+  lang switch, labels, chips, badges, .hero-trust bullets, inline <b> in prose (was 700).
+- Headings UNCHANGED: h1-h4 Cairo 600, hero Tajawal 800 (outlined), .eyebrow/.stat-strip b/.num Cairo 600,
+  .faq summary Cairo 500. Non-<h*> titles PINNED to their old face (else they inherit Cairo):
+  .sec > summary, .drawer .grp-label, .drawer .info b (drawer card titles) = IBM Plex Sans Arabic 700/800.
+- FONTS.md roles table + note. Tests updated for the new decision: test_font_roles, test_primary_button_weight
+  (ar Cairo 600, outline too), test_ribbon_font_fixed (ar Cairo), test_shell_cairo_weight (docstring).
+  New tests/e2e/test_shell_cairo_body.py (every Arabic text node on /, /templates, /builder + drawer,
+  /account/sign-in: non-heading = Cairo 400|600; headings keep their face). It fails on the old CSS (5 fail).
+VERIFIED:
+- Computed-style audit, English before vs after: byte-identical (Desktop review folder, audit-*.txt).
+- 390px header: Arabic CTA got narrower (122 vs 143px); logo 34px, ratio intact; nothing wraps at 1024.
+- Fast 5983 passed / 0 failed. e2e (48 files, 6 foreground batches) 1579 passed; one F at
+  test_letterhead_matches_cv #70 inside a batch cut by the 10-min limit did NOT reproduce (file alone 99/99,
+  same flake as 2026-11-08). --e2e tests in tests/ (golden pixels, bidi, rtl) 274 passed.
+- Screenshots: Desktopeview-site-cairo-2026-11-10\ (before/, after/, compare-*.png).
+NOT DONE / NOT VERIFIED:
+- English unchanged (Inter; Fraunces accent) - waits for the user's approval.
+- Real-device check (iOS/Android) not done; only Chromium.
+- The 2026-10-07 and 2026-10-18 user rules (nav Cairo 400, blue buttons Tajawal 700) are superseded.
+
+---
+
 # RESUME HERE - 2026-11-10 (feature/logo: templates guide, page size/units fix; docs only)
 - docs/CVSTAND_TEMPLATES_GUIDE.md: A4 and "use pt" removed everywhere. New §3.1 table:
   canvas 850x1100px with px inline styles (@page in app/rendering.py); PDF page.pdf(850px x

@@ -7,6 +7,9 @@ Cairo is collected from each Arabic page, and none may be heavier than 600.
 The CV templates (iframes) and the t22 rail word are out of scope by
 construction - the collector skips iframes - and English, which never
 reaches the `[dir=rtl]` rules, keeps its weights exactly.
+
+Still true after 2026-11-10, when all non-heading interface text moved to
+Cairo 400 / 600 (tests/e2e/test_shell_cairo_body.py): nothing exceeds 600.
 """
 from __future__ import annotations
 

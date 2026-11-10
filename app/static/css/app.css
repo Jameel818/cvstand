@@ -828,8 +828,12 @@ html { overflow-x: hidden; }
 [dir="rtl"] {
   --font-hero: "Tajawal", "IBM Plex Sans Arabic", var(--font-display);
   --font-heading: "Cairo", "Tajawal", var(--font-ui);
-  --font-body: "IBM Plex Sans Arabic", "Tajawal", var(--font-ui);
-  --font-cta: "Tajawal", "IBM Plex Sans Arabic", var(--font-ui);
+  /* Body and CTA moved to Cairo (user, 2026-11-10): every non-heading text in
+     the Arabic interface is Cairo 400 (prose, inputs) or 600 (controls,
+     labels, badges) - see "ARABIC INTERFACE TEXT" below. Cairo is the
+     vendored VARIABLE face (wght 200-1000), so both are real weights. */
+  --font-body: "Cairo", "IBM Plex Sans Arabic", var(--font-ui);
+  --font-cta: "Cairo", "IBM Plex Sans Arabic", var(--font-ui);
   /* The policy asks for Thmanyah Sans on site navigation. It cannot ship as a
      font file (FONTS.md), and Cairo is its recorded stand-in: the two measured
      nearly metric-compatible, 232.5 vs 230.4 wide and 94 vs 99 ink. So the nav
@@ -935,25 +939,18 @@ html { overflow-x: hidden; }
 [dir="rtl"] .num, [dir="rtl"] .sec > summary .num,
 [dir="rtl"] .lang-switch a[aria-current="true"] { font-weight: 600; }
 [dir="rtl"] .faq summary { font-weight: 500; }
-[dir="rtl"] .site-nav a { font-weight: 400; }
+/* (.site-nav a was 400 here; since 2026-11-10 it is 600 with the other
+   controls, in "ARABIC INTERFACE TEXT" below.) */
 
-/* CTA. The policy says Tajawal ExtraBold, and this shipped at 700.
-   Scoped to `.btn` -- the button COMPONENT -- rather than every <button>:
-   `button.x` is a 22px close glyph and `button.rm` a remove control, and
-   ExtraBold on those is weight where no call to action exists. */
-[dir="rtl"] .btn { font-family: var(--font-cta); font-weight: 800; }
+/* CTA. Every button - primary, outline, small - is Cairo 600 since
+   2026-11-10 (user). This replaces Tajawal 800 (policy) and the blue-button
+   700 of 2026-10-18; the weight lives in "ARABIC INTERFACE TEXT" below.
+   tests/e2e/test_primary_button_weight.py */
+[dir="rtl"] .btn { font-family: var(--font-cta); }
 [dir="rtl"] button { font-family: var(--font-cta); }
-/* BLUE BUTTONS ONE STEP LIGHTER, ARABIC ONLY (user, 2026-10-18): the text
-   of every filled primary button 800 -> 700. 700 and not 600: the shell
-   ships Tajawal at 700 and 800 only, so a 600 would be drawn by the 700
-   file anyway and the rule would say something the page does not do.
-   English never reaches this (it stays Inter 600). Outline / ghost buttons
-   keep 800. tests/e2e/test_primary_button_weight.py */
-[dir="rtl"] .btn-primary { font-weight: 700; }
 
-/* The gallery tabs are controls that happen not to be <button>s. They sat on
-   body copy while the buttons beside them were on the CTA face. */
-[dir="rtl"] .tab { font-family: var(--font-cta); font-weight: 700; }
+/* The gallery tabs are controls that happen not to be <button>s. */
+[dir="rtl"] .tab { font-family: var(--font-cta); }
 
 /* CHIPS DECLARE THEIR OWN FACE, because inheritance made them TWO faces.
    `[dir=rtl] button` sets the CTA family on every descendant, so the same
@@ -963,7 +960,7 @@ html { overflow-x: hidden; }
    is body copy wherever it happens to sit. */
 [dir="rtl"] .chip { font-family: var(--font-body); }
 
-[dir="rtl"] table, [dir="rtl"] .tpl-meta { font-family: var(--font-body); font-weight: 500; }
+[dir="rtl"] table, [dir="rtl"] .tpl-meta { font-family: var(--font-body); font-weight: 400; }
 
 /* Form controls inherit nothing from `body` (see the base rule above), so in
    Arabic they need the body face named for them as well. */
@@ -982,6 +979,34 @@ html { overflow-x: hidden; }
 .ribbon, .ribbon label, .ribbon button, .ribbon select,
 .ribbon option, .ribbon optgroup { font-family: var(--font-body); }
 .ribbon option { font-weight: 400; font-style: normal; }
+
+/* ARABIC INTERFACE TEXT = CAIRO 400 / 600 (user, 2026-11-10).
+   Every non-heading text of the Arabic site is Cairo (--font-body/--font-cta
+   above): prose, small text and form fields at 400; buttons, nav links,
+   labels, badges and bullets at 600. Headings are NOT part of this: h1-h4,
+   the hero, .eyebrow, the stat figures and the FAQ questions keep their
+   rules above, and the two section titles that are not <h*> keep the face
+   they had (IBM Plex Sans Arabic) rather than inherit the new body face.
+   English never reaches any of this. tests/e2e/test_shell_cairo_body.py */
+[dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea,
+[dir="rtl"] .blurb { font-weight: 400; }
+[dir="rtl"] .btn, [dir="rtl"] button, [dir="rtl"] .tab,
+[dir="rtl"] .site-nav a, [dir="rtl"] .footer-cols a, [dir="rtl"] .lang-switch a,
+[dir="rtl"] .dl-menu a, [dir="rtl"] .builder-bar .back,
+[dir="rtl"] .field label, [dir="rtl"] .bullets label, [dir="rtl"] .rb-lbl,
+[dir="rtl"] .chip, [dir="rtl"] .family-card .count, [dir="rtl"] .family-card .arrow,
+[dir="rtl"] .import-btn .soon, [dir="rtl"] .hero-trust span, [dir="rtl"] .save-state,
+[dir="rtl"] .tpl-name, [dir="rtl"] .tpl-name span, [dir="rtl"] .cl-toggle,
+[dir="rtl"] .preview-toolbar span, [dir="rtl"] .zoom .lvl, [dir="rtl"] .entry-head b,
+[dir="rtl"] .footer-tagline, [dir="rtl"] .imp-entry b,
+[dir="rtl"] p b, [dir="rtl"] p strong { font-weight: 600; }
+/* Titles that are not <h*>: unchanged (IBM Plex Sans Arabic, their own
+   700 / 800). Without this they would inherit Cairo from body. The builder's
+   section titles, the drawer's group labels, and the template names on the
+   drawer's picker cards (the drawer's counterpart of the gallery's h3). */
+[dir="rtl"] .sec > summary, [dir="rtl"] .drawer .grp-label, [dir="rtl"] .drawer .info b {
+  font-family: "IBM Plex Sans Arabic", "Tajawal", var(--font-ui);
+}
 
 /* ---------------------------------------------------------------------------
    RTL. Every directional rule above is logical, so the interface mirrors on
