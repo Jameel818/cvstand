@@ -44,7 +44,7 @@ Single sources of truth. Never hard-code something in two places.
 
 | Part | Location | Status |
 |---|---|---|
-| Template list / registry (key, block, label, blurb, skill pattern, accent, `ported`) | `app/registry.py`: `_MODERN`, `_ATS`, `_PORTED`, `TEMPLATES`, `get()`. A Python module, not JSON. There is no thumbnail field: gallery cards are rendered from the template itself. | ✅ |
+| Template list / registry (key, block, label, blurb, skill pattern, accent, `ported`) | `app/registry.py`: `_MODERN`, `_ATS`, `_PORTED`, `TEMPLATES`, `get()`. A Python module, not JSON. | ✅ |
 | Template HTML (Jinja) | `app/templates/resumes/<group>/<block>.j2` (e.g. `app/templates/resumes/modern/t1.j2`, `app/templates/resumes/ats/t25.j2`); shared parts `app/templates/resumes/_macros.j2`, `_letter.j2`, `_letter_body.j2` | ✅ |
 | Template CSS | **No per-template CSS file.** Each template's styles are inline `style="…"` attributes in its `.j2`. Shared document CSS (font links/inline faces, Arabic/RTL typography) is emitted by `app/rendering.py` (`document_html()`). `app/static/css/app.css` is the site shell (header, builder, gallery), not the résumés. | ✅ |
 | Per-template **Word design** (python-docx builder) | **Modern:** `app/exporters/word_designs/t1.py` … `t24.py` (one module each, registered in `app/exporters/docx_design.py` `DESIGNS`; shared helpers `word_designs/common.py`, `docx_dml.py`, `docx_layout.py`). **ATS:** no per-template module: `app/exporters/docx_ats.py` builds every ATS .docx from the template's own markup. Entry point `app/exporters/docx.py`; letters `app/exporters/docx_letter.py`. | ✅ |
@@ -71,6 +71,17 @@ CV data (flat JSON, "language": "en" | "ar")
               → save → embed_fonts() post-process ──► .docx
 ```
 
+### 3.1 Page size and units ✅
+
+| Output | Page | Units |
+|---|---|---|
+| Template (preview) | **850×1100px canvas** (US Letter proportions); `@page { size: 850px 1100px; margin: 0 }` in `app/rendering.py` | px, as inline `style="…"` attributes in the `.j2` |
+| PDF | `page.pdf(width="850px", height="1100px", margin 0, prefer_css_page_size=True)` in `app/exporters/pdf.py` → measured **637.92 × 824.88pt (≈ 8.86 × 11.46in)**: Letter proportions, about 4% larger than Letter, never A4 | the same px, at Chromium's 0.75pt per CSS px |
+| Word, Modern | **US Letter, 612×792pt** (`PAGE_W = 12240` twips, `PAGE_H_PT = 792`) | **1px = 0.72pt** (`PX = 0.72` in `app/exporters/docx_design.py`; `pt(px)`, `tw(px)` = twips). The 24 `word_designs/tN.py` modules and `word_designs/common.py` work in template px through these helpers. |
+| Word, ATS | US Letter, 612×792pt | **1px = 0.72pt** (`app/exporters/docx_ats.py` reads each inline style and converts it) |
+
+The PDF and Word therefore have the same proportions but different absolute sizes: an 11px body is 8.25pt in the PDF and 7.92pt in Word. That is by design. Both are the canvas scaled to fit its page.
+
 ---
 
 ## 4. Lifecycle: adding a NEW template (start to finish)
@@ -84,14 +95,14 @@ Follow these steps in order, and finish each one before starting the next.
 
 ### Step 2: HTML + CSS (the master)
 - Use **CSS variables** for fonts and sizes (`--font-heading`, `--font-heading-weight`, `--font-heading-size`, `--font-body`, …).
-- Use **`pt`** sizes, not px, so Word's `Pt()` values can match exactly.
+- Write sizes in **px as inline `style="…"` attributes** on the **850×1100px canvas** (US Letter proportions). Word converts them with **1px = 0.72pt** (see §3.1). Don't use pt in template markup.
 - Put `font-synthesis: none;` on the CV root.
-- Size the page to **A4** and design for **one page** with typical content. Also test a long CV (see §9).
+- Design for the **850×1100px canvas** and for **one page** with typical content. Also test a long CV (see §9).
 - Arabic: `dir="rtl"` on `<html>`, with `flex-direction: row` (**not** `row-reverse`). No `letter-spacing` and no `text-transform` on Arabic text.
 - Phone numbers stay **LTR** inside Arabic CVs (wrap them in an LTR span or use `dir="ltr"`). ✅ This is done for all templates; repeat it in new ones.
 
 ### Step 3: Register the template
-- Add it to the template registry (id, names, group, thumbnail).
+- Add it to the template registry in `app/registry.py` (block, label, blurb, skill pattern, accent) and to `_PORTED`.
 - Add its cover-letter theme (letterhead = **the CV header exactly**, see §10).
 
 ### Step 4: PDF check
@@ -100,7 +111,7 @@ Follow these steps in order, and finish each one before starting the next.
 
 ### Step 5: Word design (the hard part)
 - Write the per-template Word design. Use the techniques in **§8** for each visual element from Step 1.
-- Use the same pt sizes, colours (hex) and margins as the CSS.
+- Use the template's own px sizes, colours (hex) and margins, converted with `docx_design.pt()` / `tw()` (1px = 0.72pt, §3.1).
 - Map fonts with the Word weight rules (§7.3), set the Arabic run attributes (§7.4), and call `embed_fonts()`.
 
 ### Step 6: Compare (see §11)
@@ -127,7 +138,7 @@ Follow these steps in order, and finish each one before starting the next.
 ## 6. Lifecycle: REPLACING or REMOVING a template
 
 - **Replace (same id, new design):** follow §4 Steps 1–7 in full, keeping the id. Saved user CVs that use that id will show the new design. Decide whether that is acceptable before you start.
-- **Remove:** don't delete an id that saved CVs may use. Instead hide it from the picker and map old CVs to a close replacement (agree on the mapping first). ✅ Today there is no per-id mapping table: `app/store.py` `load_meta()` sends any unknown or un-ported key to `registry.default_key()`, and taking a key out of `_PORTED` in `app/registry.py` hides it. A specific replacement mapping would be new code. Remove its Word design, letter theme, thumbnails and golden files in the same change.
+- **Remove:** don't delete an id that saved CVs may use. Instead hide it from the picker and map old CVs to a close replacement (agree on the mapping first). ✅ Today there is no per-id mapping table: `app/store.py` `load_meta()` sends any unknown or un-ported key to `registry.default_key()`, and taking a key out of `_PORTED` in `app/registry.py` hides it. A specific replacement mapping would be new code. Remove its Word design, letter theme and golden files in the same change.
 - **Renumbering ids is not allowed.** Tests, saved CVs and docs all refer to them.
 
 ---
@@ -138,7 +149,7 @@ Follow these steps in order, and finish each one before starting the next.
 - **One registry** holds all fonts, weights, sizes and defaults. UI, validation, CSS, PDF and Word all read from it.
 - **Self-host every font.** Nothing is loaded from `fonts.googleapis.com` at render time.
 - **Real weights only** (`font-synthesis: none`). Never offer a weight the font doesn't have.
-- Sizes are in **pt** everywhere (CSS `pt`, docx `Pt()`).
+- The **user's chosen sizes** (typography controls) are stored in **pt**. On the canvas they become px (`× 4/3`, `PT_TO_PX` in `app/typography/render.py`), and Word applies them as `chosen × 4/3 × 0.72` pt (`docx_design.apply_chosen_sizes`). Template sizes themselves are px (§3.1).
 - Per-font `optical_scale` and `line_height` (from calibration) are applied when rendering. The user's pt value stays as stored.
 - **Step 7 calibration is currently OFF.** ✅ Turning it on changes Jomhuria, Bebas Neue and Lateef (bigger) and Amiri and Scheherazade (smaller). Only turn it on with approval and a full re-comparison.
 
@@ -185,7 +196,7 @@ If Word shows **Calibri** in places, that comes from Microsoft 365 cloud fonts o
 These are the techniques that worked in runs 4–14. Use them for every Modern template.
 
 ### 8.1 Page layout
-- Same A4 size and margins as the CSS. Full-bleed elements (bands, sidebars) use **DrawingML shapes anchored to the page**, not table cells, so they reach the paper edge.
+- Word page is **US Letter, 612×792pt** (12240 twips wide); positions and margins are the template's px × 0.72 (§3.1). Full-bleed elements (bands, sidebars) use **DrawingML shapes anchored to the page**, not table cells, so they reach the paper edge.
 - `tblInd` to flush a table to the edge ✅: **-284 twips (LTR)**, **341 twips (RTL)**.
 
 ### 8.2 Sidebars and columns
@@ -208,7 +219,7 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 - Same shape, size and border as the website. Don't add an extra border. An empty photo slot must not show as a coloured block.
 
 ### 8.8 Sizes and wrapping
-- Sidebar headings and labels in Word must use the **same pt** as the CSS. Longer Arabic headings (e.g. "المعلومات الشخصية") must not wrap. Check the column width (recurring bug #7).
+- Sidebar headings and labels in Word must use the CSS px size **× 0.72pt**. Longer Arabic headings (e.g. "المعلومات الشخصية") must not wrap. Check the column width (recurring bug #7).
 
 ### 8.9 RTL alignment ✅
 - With `w:bidi="1"` on a paragraph, Word mirrors the alignment. RTL paragraphs need **`WD_ALIGN_PARAGRAPH.LEFT`** to appear right-aligned.
@@ -254,7 +265,7 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 | Header band present, correct height | |
 | Timeline line + dots | |
 | Pills rounded | |
-| Same fonts (names) and pt sizes | |
+| Same fonts (names) and sizes (Word pt = CSS px × 0.72) | |
 | No heading wraps that the website doesn't have | |
 | Same page count | |
 | Phone numbers LTR in Arabic | |
@@ -352,8 +363,8 @@ branch (non-interactive form) → git ls-remote → git status clean. Do NOT pus
 | 3 | Timeline has dots but no line | Line not drawn | Add line shape (§8.5) |
 | 4 | Pill is square | Table cell shading | `roundRect` shape (§8.6) |
 | 5 | Header band missing | Band not drawn / wrong anchor | Page-anchored band, exact height (§8.4) |
-| 6 | Extra page | LibreOffice metrics, or spacing too large | Confirm in MS Word; match pt spacing (§9) |
-| 7 | Sidebar heading wraps / bigger | Wrong pt or column width | Match CSS pt and widths (§8.8) |
+| 6 | Extra page | LibreOffice metrics, or spacing too large | Confirm in MS Word; match spacing at px × 0.72 (§9, §3.1) |
+| 7 | Sidebar heading wraps / bigger | Wrong pt or column width | Match CSS px × 0.72 and widths (§8.8) |
 | 8 | Arabic alignment flipped | `w:bidi` mirroring | `WD_ALIGN_PARAGRAPH.LEFT` for RTL (§8.9) |
 | 9 | Arabic shows in wrong font | `w:cs` missing | Set all four `rFonts` + `rtl` + `lang bidi` (§7.4) |
 | 10 | Fonts wrong on another PC | Not embedded | `embed_fonts()`, check fsType (§7.5) |
@@ -365,4 +376,4 @@ branch (non-interactive form) → git ls-remote → git status clean. Do NOT pus
 
 ---
 
-*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-09.*
+*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-10.*

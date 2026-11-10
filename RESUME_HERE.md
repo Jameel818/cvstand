@@ -1,3 +1,15 @@
+# RESUME HERE - 2026-11-10 (feature/logo: templates guide, page size/units fix; docs only)
+- docs/CVSTAND_TEMPLATES_GUIDE.md: A4 and "use pt" removed everywhere. New §3.1 table:
+  canvas 850x1100px with px inline styles (@page in app/rendering.py); PDF page.pdf(850px x
+  1100px) MEASURED 637.92 x 824.88pt (Letter proportions, ~4% larger than Letter);
+  Word Modern = US Letter 612x792pt, 1px = 0.72pt (docx_design PX / pt() / tw(), used by all
+  word_designs/tN.py); Word ATS = same rule in docx_ats. User-chosen sizes are pt ->
+  x4/3 px (typography/render.py PT_TO_PX) -> x0.72 in Word (apply_chosen_sizes).
+  §4 Step 2/3/5, §6, §7.1, §8.1, §8.8, §11 checklist, §16 #6/#7 updated.
+- Thumbnails removed from §3, §4 Step 3, §6 (none exist).
+
+---
+
 # RESUME HERE - 2026-11-09d (feature/logo: templates guide added; docs only, NO code change)
 - CVSTAND_TEMPLATES_GUIDE.md moved from the repo root to docs/CVSTAND_TEMPLATES_GUIDE.md.
 - Every unverified (magnifier) path checked against the code and marked verified:
