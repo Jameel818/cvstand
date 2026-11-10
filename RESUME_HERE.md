@@ -1,3 +1,38 @@
+# RESUME HERE - 2026-11-10b (feature/pdf-letter from feature/site-cairo: PDF page = US Letter; NOT merged, NOT deployed)
+DONE (app/exporters/pdf.py only; rendering.py, templates, preview, Word untouched):
+- PDF printed on US Letter 612x792pt at scale 0.96 (LETTER_PT, CANVAS_PX, CSS_PX_PT=0.75, PDF_SCALE=0.96,
+  assert the height gives the same factor). An @page { size: 8.5in 11in; margin: 0 } is added to the
+  HEADLESS page only, then page.pdf(format=Letter, scale=PDF_SCALE, prefer_css_page_size=True).
+  1px = 0.72pt in the PDF = docx_design.PX. Was 637.92 x 824.88pt (0.75pt/px).
+- MEASURED why not the brief's "Letter + scale 0.96": with prefer_css_page_size OFF Chromium already
+  shrinks the 850px @page to the paper (0.96), so scale on top = 0.9216 (text 4% smaller than Word);
+  with it ON the 850px @page wins and the page stays 637.92. The explicit @page override = V1 output.
+- New tests/e2e/test_pdf_letter_page.py (via POST /export/pdf, never render_pdf in-process: a second
+  sync_playwright breaks the session - tests/test_suite_invariants.py caught a first version): every page
+  612x792 for modern-t1/t22, ats-t1/t22, EN/AR, cv/letter/both; largest text = canvas px x 0.72.
+  Old code: 20/20 fail (size 48pt = 64px x 0.75, the known answer); new: 20/20 pass.
+- docs/CVSTAND_TEMPLATES_GUIDE.md §3.1 updated; pdf.py docstring ("Letter @ 100dpi") corrected.
+VERIFIED:
+- Sweep 49 templates x EN/AR x cv+letter (196) + heavy sample cv (49): 245/245 still 1 page before and
+  after; every page 637.92x824.88 before, 612x792 after.
+- Review set Desktop\review-pdf-letter-2026-11-10\: modern-t1 + ats-t22 CV, modern-t1 letter, EN+AR:
+  1 page each, 612x792, font sets identical before/after, all embedded (Arabic CIDFontType2, Latin
+  Type3 = Chromium's form for the variable faces). compare-*.png = PDF page 1 before | after at the same
+  96dpi (Chromium's own PDF viewer; pypdfium2 install was blocked): after = 0.96 x before.
+- Goldens: test_golden_html + test_golden_pixels 247 passed, no golden file changed.
+- Fast suite: 5982 passed + the 1 invariant failure, fixed and re-run (2/2).
+- e2e batches 00-03 (24 files): 718 passed; one unnamed failure in batch 01 did not reproduce
+  (55/55 twice). test_pdf_letter_page + test_pdf_fonts: 28 passed.
+NOT DONE / NOT VERIFIED:
+- WORD page 1 render: Word COM opens the .docx but hangs on SaveAs2/ExportAsFixedFormat to PDF (hidden
+  and visible, inside Start-Job); only my own Word PID was ever stopped. No LibreOffice on this PC.
+  The .docx files are in the review folder's after/ for a manual check. Word page size is 612x792 by
+  code (docx_design PAGE_W 12240 twips / PAGE_H_PT 792).
+- e2e batches 04-07 (24 files, from test_new_arabic_fonts_pdf to test_word_themes_current) NOT run:
+  Claude Code killed the run for low system memory. Re-run them in the foreground.
+
+---
+
 # RESUME HERE - 2026-11-10 (feature/site-cairo from feature/logo: Arabic SHELL text -> Cairo; NOT merged, NOT deployed)
 DONE (Arabic only, app/static/css/app.css [dir=rtl] block):
 - --font-body and --font-cta = "Cairo", "IBM Plex Sans Arabic", var(--font-ui). Cairo is the vendored

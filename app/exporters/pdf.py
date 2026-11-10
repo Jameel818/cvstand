@@ -5,8 +5,20 @@ Why Chromium and not WeasyPrint: the templates use flex/grid two-column
 layouts and `conic-gradient` skill rings, neither of which WeasyPrint renders.
 Chromium is the same engine the on-screen preview uses, so the PDF matches it.
 
-The page box is exactly 850x1100px (Letter @ 100dpi). We set the PDF `width`
-/`height` to match and `margin: 0` — the template owns its own insets.
+THE PAGE IS EXACTLY US LETTER, 612 x 792pt - the same page as the Word export
+(2026-11-10). The canvas is 850x1100px; Chromium prints a CSS px as 0.75pt, so
+an unscaled print is 637.5 x 825pt (measured 637.92 x 824.88), ~4% larger than
+Letter. It is printed on Letter at scale 612 / 637.5 = 792 / 825 = 0.96, so a
+template px is 0.75 x 0.96 = 0.72pt: exactly docx_design.PX. `margin: 0` - the
+template owns its own insets.
+
+Why the @page override (`_LETTER_PAGE`) and not just `format="Letter"`: the
+document's own `@page { size: 850px 1100px }` (rendering.py, there for the
+preview) decides the paper while `prefer_css_page_size` is on. With it off,
+Chromium instead SHRINKS the 850px page to fit the paper by itself - and a
+`scale` on top of that scales twice (0.9216: text 4% smaller than Word,
+measured). So the paper size and the factor are both stated here, explicitly,
+in the headless page only: the preview's HTML is untouched.
 """
 from __future__ import annotations
 
@@ -28,6 +40,16 @@ _LOAD_AND_CHECK = """async (faces) => {
     await Promise.allSettled(faces.map(f => document.fonts.load(f)));
     return faces.filter(f => !document.fonts.check(f));
 }"""
+
+
+# The paper, the canvas, and the one factor between them (see the docstring).
+LETTER_PT = (612, 792)
+CANVAS_PX = (850, 1100)
+CSS_PX_PT = 0.75                                   # Chromium prints 1 CSS px as 0.75pt
+PDF_SCALE = LETTER_PT[0] / (CANVAS_PX[0] * CSS_PX_PT)   # 0.96
+# The same factor down the page, or the print would be distorted.
+assert abs(LETTER_PT[1] / (CANVAS_PX[1] * CSS_PX_PT) - PDF_SCALE) < 1e-9
+_LETTER_PAGE = "@page { size: 8.5in 11in; margin: 0; }"
 
 
 class PdfExportError(RuntimeError):
@@ -124,9 +146,12 @@ def _print(docs: list[str], faces: list[str]) -> list[bytes]:
                         page.close()
                         continue
                     page.emulate_media(media="print")
+                    # Letter paper, declared in THIS page only (the last @page
+                    # rule wins), and the canvas scaled onto it: 1px = 0.72pt.
+                    page.add_style_tag(content=_LETTER_PAGE)
                     pdf = page.pdf(
-                        width="850px",
-                        height="1100px",
+                        format="Letter",
+                        scale=PDF_SCALE,
                         margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
                         print_background=True,
                         prefer_css_page_size=True,

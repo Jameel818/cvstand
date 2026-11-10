@@ -76,11 +76,11 @@ CV data (flat JSON, "language": "en" | "ar")
 | Output | Page | Units |
 |---|---|---|
 | Template (preview) | **850×1100px canvas** (US Letter proportions); `@page { size: 850px 1100px; margin: 0 }` in `app/rendering.py` | px, as inline `style="…"` attributes in the `.j2` |
-| PDF | `page.pdf(width="850px", height="1100px", margin 0, prefer_css_page_size=True)` in `app/exporters/pdf.py` → measured **637.92 × 824.88pt (≈ 8.86 × 11.46in)**: Letter proportions, about 4% larger than Letter, never A4 | the same px, at Chromium's 0.75pt per CSS px |
+| PDF | **US Letter, 612 × 792pt** (since 2026-11-10): `page.pdf(format="Letter", scale=0.96, margin 0, prefer_css_page_size=True)` after adding `@page { size: 8.5in 11in }` to the headless page only (`app/exporters/pdf.py`, `PDF_SCALE`). Before that it printed 637.92 × 824.88pt, about 4% larger than Letter. | **1px = 0.72pt** (0.75pt per CSS px × 0.96), the same as Word |
 | Word, Modern | **US Letter, 612×792pt** (`PAGE_W = 12240` twips, `PAGE_H_PT = 792`) | **1px = 0.72pt** (`PX = 0.72` in `app/exporters/docx_design.py`; `pt(px)`, `tw(px)` = twips). The 24 `word_designs/tN.py` modules and `word_designs/common.py` work in template px through these helpers. |
 | Word, ATS | US Letter, 612×792pt | **1px = 0.72pt** (`app/exporters/docx_ats.py` reads each inline style and converts it) |
 
-The PDF and Word therefore have the same proportions but different absolute sizes: an 11px body is 8.25pt in the PDF and 7.92pt in Word. That is by design. Both are the canvas scaled to fit its page.
+The PDF and Word therefore have the same page and the same sizes: an 11px body is 7.92pt in both. Don't add a `scale` to `page.pdf()` without the `@page` override: with `prefer_css_page_size` off, Chromium already shrinks the 850px `@page` to fit the paper, and a scale on top shrinks it twice (measured: 0.9216). `tests/e2e/test_pdf_letter_page.py` checks both the page size and the text size.
 
 ---
 
