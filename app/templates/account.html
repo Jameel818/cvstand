@@ -13,6 +13,8 @@
 {% set heading = t('Create your account') if mode == 'signup' else t('Sign in') %}
 {% set submit  = t('Create account') if mode == 'signup' else t('Sign in') %}
 {% block title %}{{ heading }} · {{ brand_name }}{% endblock %}
+{# Never a search result, launched or not (app/seo.py). #}
+{% set page_noindex = true %}
 
 {% block content %}
 <div class="container account-page">

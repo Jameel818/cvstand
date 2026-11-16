@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ t('Templates') }} — {{ brand_name }}{% endblock %}
+{% block title %}{% if active_cat == 'modern' %}{{ t('Modern CV Templates – Designer Layouts') }}{% elif active_cat == 'ats' %}{{ t('ATS CV Templates That Pass Screening') }}{% else %}{{ t('CV Templates – 49 Modern & ATS Designs') }}{% endif %} | {{ brand_name }}{% endblock %}
+{% block meta_description %}{% if active_cat == 'modern' %}{{ t('Designer CV templates with skill graphics and clear hierarchy, in English or Arabic, ready to fill in and export.') }}{% elif active_cat == 'ats' %}{{ t('Single-column CV templates built to be read by applicant tracking systems. Clean structure, real text, PDF and Word export.') }}{% else %}{{ t('Browse 49 ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.') }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="gallery-hero">

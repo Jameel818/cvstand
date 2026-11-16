@@ -227,12 +227,31 @@ _UI_AR: dict[str, str] = {
     # --- header / footer chrome ------------------------------------------
     # "CVStand" is the product name and is NOT translated - a brand does
     # not change script when the interface does.
-    # Page titles read "<Brand> — <this>", so these are title fragments, not
-    # sentences. The brand itself is never translated (see above).
-    "Builder": "المنشئ",
-    "designer résumés, done in minutes": "سير ذاتية بتصاميم احترافية، جاهزة في دقائق",
-    "Build a polished résumé in minutes. 49 designer layouts across Modern and ATS-friendly families. Export to PDF and Word.":
-        "أنشئ سيرة ذاتية أنيقة في دقائق. 49 تصميمًا احترافيًا من عائلتَي مودرن والمتوافقة مع أنظمة التتبع. صدّرها إلى PDF وWord.",
+    # --- search: page titles, meta descriptions (app/seo.py) ---------------
+    # Titles read "<this> | <Brand>". The Arabic is written for what Arabic
+    # searchers type (سيرة ذاتية، نموذج، قوالب), not translated word for word.
+    # Reviewed as a set in docs/SEO_COPY.md - change both together.
+    "CV Maker – Designer & ATS-Friendly Templates":
+        "إنشاء سيرة ذاتية احترافية بالعربي والإنجليزي",
+    "CV Templates – 49 Modern & ATS Designs":
+        "نماذج سيرة ذاتية جاهزة – 49 قالباً",
+    "ATS CV Templates That Pass Screening":
+        "قوالب سيرة ذاتية متوافقة مع ATS",
+    "Modern CV Templates – Designer Layouts":
+        "قوالب سيرة ذاتية حديثة بتصميم احترافي",
+    "CV Builder – Write, Preview, Export PDF & Word":
+        "صانع السيرة الذاتية – PDF و Word",
+    "CV builder": "منشئ السيرة الذاتية",
+    "Build a polished CV in minutes — in English or Arabic. 49 designer and ATS-friendly templates. Free PDF download, Word export too.":
+        "أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. 49 قالباً احترافياً ومتوافقاً مع أنظمة ATS، وتحميل مجاني بصيغة PDF وتصدير إلى Word.",
+    "Browse 49 ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.":
+        "تصفّح 49 نموذج سيرة ذاتية جاهزاً: تصاميم حديثة وقوالب ATS بسيطة. اختر قالباً واملأه مباشرة.",
+    "Single-column CV templates built to be read by applicant tracking systems. Clean structure, real text, PDF and Word export.":
+        "قوالب سيرة ذاتية بعمود واحد تقرأها أنظمة تتبّع المتقدمين (ATS) بسهولة، مع تصدير PDF و Word.",
+    "Designer CV templates with skill graphics and clear hierarchy, in English or Arabic, ready to fill in and export.":
+        "قوالب سيرة ذاتية بتصميم احترافي ورسوم للمهارات، بالعربي أو بالإنجليزي، جاهزة للتعبئة والتصدير.",
+    "Write your CV and cover letter side by side with a live preview, then download as PDF or Word.":
+        "اكتب سيرتك الذاتية ورسالة التغطية مع معاينة فورية، ثم حمّلها بصيغة PDF أو Word.",
     # The tagline. Disambiguates "Stand" -- see app/brand.py. The Arabic is
     # not a literal translation: it says "catches the eye", which carries
     # the stand-out sense with no booth reading available at all.

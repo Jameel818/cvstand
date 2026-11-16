@@ -99,6 +99,13 @@ def _flag(name: str, default: str) -> bool:
 SERVER_STORE = _flag("CVSTAND_SERVER_STORE", "1")
 
 
+# THE LAUNCH SWITCH for search engines (app/seo.py). 0 (default): the whole
+# site answers noindex and robots.txt disallows everything - private until
+# launch. 1: indexable, with a sitemap. Default OFF on purpose: forgetting to
+# set it keeps the site private, never the other way round.
+SITE_INDEXABLE = _flag("CVSTAND_SITE_INDEXABLE", "0")
+
+
 # The shipped placeholder. `app/__init__.py` refuses to start a DEPLOYMENT
 # that still has it, because the session cookie now carries the signed-in
 # user and a known signing key forges accounts. Named rather than repeated as
@@ -108,5 +115,6 @@ DEFAULT_SECRET_KEY = "dev-only-not-secret"
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", DEFAULT_SECRET_KEY)
+    SITE_INDEXABLE = SITE_INDEXABLE
     MAX_CONTENT_LENGTH = MAX_UPLOAD_BYTES
     JSON_SORT_KEYS = False

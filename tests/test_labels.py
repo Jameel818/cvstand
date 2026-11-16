@@ -116,7 +116,9 @@ HUMAN_ATTRS = re.compile(
 # the human-readable one, so they are excluded by the meta they belong
 # to rather than by shape.
 MACHINE_META = re.compile(
-    r"""<meta[^>]*\bname\s*=\s*"(viewport|theme-color|color-scheme|robots)\""""
+    r"""<meta[^>]*\bname\s*=\s*"(viewport|theme-color|color-scheme|robots|twitter:card)\""""
+    # og:type is a fixed vocabulary ("website"), not reader text (app/seo.py)
+    r"""|<meta[^>]*\bproperty\s*=\s*"og:type\""""
 )
 # Two words, at least one of them a real word. Accent-aware ON PURPOSE:
 # `WORDY` above is ASCII-only, so every string containing "résumé" is

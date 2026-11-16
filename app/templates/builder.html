@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ t('Builder') }} — {{ brand_name }}{% endblock %}
+{% block title %}{{ t('CV Builder – Write, Preview, Export PDF & Word') }} | {{ brand_name }}{% endblock %}
+{% block meta_description %}{{ t('Write your CV and cover letter side by side with a live preview, then download as PDF or Word.') }}{% endblock %}
 {% block body_class %}builder-body{% endblock %}
 {# The Fonts section draws a sample line in each chosen face. Declaring all
    the faces costs one small stylesheet; the browser fetches a face only when
@@ -9,6 +10,9 @@
 {% block footer %}{% endblock %}
 
 {% block content %}
+{# The builder blanks the site header, so it had no H1 at all: one for search
+   engines and screen readers, visually hidden so the layout is unchanged. #}
+<h1 class="sr-only">{{ t('CV builder') }}</h1>
 <div class="builder">
   <div class="builder-bar">
     <a class="back" href="{{ url_for('main.templates_gallery') }}"><span class="dir-flip" aria-hidden="true">←</span> {{ t('Templates') }}</a>

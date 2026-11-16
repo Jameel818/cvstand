@@ -207,8 +207,13 @@ def browser(_playwright):
 
 @pytest.fixture()
 def page(browser, request):
+    # An ENGLISH browser, stated. Headless Chromium sends no usable
+    # Accept-Language, and since 2026-11-16 a visitor with no signal gets
+    # ARABIC (i18n.NO_SIGNAL_UI_LANG); every test on this fixture was written
+    # for the English visitor it used to get. The no-signal visitor has its
+    # own tests (test_language_switch, test_selected_language_everywhere).
     ctx = browser.new_context(viewport={"width": 1440, "height": 950},
-                              accept_downloads=True)
+                              accept_downloads=True, locale="en-US")
     ctx.tracing.start(screenshots=True, snapshots=True)
     pg = ctx.new_page()
     pg.set_default_timeout(20_000)

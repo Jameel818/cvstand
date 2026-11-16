@@ -1,5 +1,10 @@
 {% extends "base.html" %}
-{% block title %}{{ brand_name }} — {{ t('designer résumés, done in minutes') }}{% endblock %}
+{% block title %}{{ t('CV Maker – Designer & ATS-Friendly Templates') }} | {{ brand_name }}{% endblock %}
+{# The landing page uses base.html's default description - it IS the
+   site-wide one. All copy: docs/SEO_COPY.md. #}
+{% block structured_data %}
+<script type="application/ld+json">{{ seo_structured_data(self.meta_description()|trim)|tojson }}</script>
+{% endblock %}
 
 {% block content %}
 <section class="hero">

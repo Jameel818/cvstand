@@ -209,7 +209,11 @@ def test_an_unknown_language_falls_back_rather_than_being_trusted(client):
     assert normalise("klingon") == "en"
     assert normalise(None) == "en"
     client.set_cookie(COOKIE, "klingon")
-    assert 'lang="en" dir="ltr"' in client.get("/").get_data(as_text=True)
+    # a bogus cookie is no signal; with no Accept-Language either, the site
+    # falls back to Arabic, its first market (i18n.NO_SIGNAL_UI_LANG, 2026-11-16)
+    assert 'lang="ar" dir="rtl"' in client.get("/").get_data(as_text=True)
+    r = client.get("/", headers={"Accept-Language": "en-US"})
+    assert 'lang="en" dir="ltr"' in r.get_data(as_text=True)
 
 
 @pytest.mark.parametrize("bad", ["https://evil.example.com", "//evil.example.com"])

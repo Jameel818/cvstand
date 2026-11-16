@@ -79,6 +79,10 @@ def create_app(config_object: type = Config) -> Flask:
     # Interface language (cookie-driven) for the app shell. Independent of
     # the resume's own `lang` - see app/i18n.py for why.
     i18n.register(app)
+    # robots.txt, sitemap.xml, canonical/hreflang/OG tags and the ONE launch
+    # switch (CVSTAND_SITE_INDEXABLE) that keeps the site noindex until then.
+    from . import seo
+    seo.register(app)
     app.register_blueprint(bp)
     from .routes import register_error_pages
     register_error_pages(app)

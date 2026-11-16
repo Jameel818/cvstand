@@ -29,6 +29,12 @@ from .labels import ui_catalogue, ui_t
 #: than being trusted - the cookie is user-editable input like any other.
 UI_LANGS = ("en", "ar")
 DEFAULT_UI_LANG = "en"
+#: A visitor (or crawler) who gives no usable signal at all gets Arabic.
+#: DEFAULT_UI_LANG stays English: it is the catalogue's base language and the
+#: fallback for a garbled value, a different job.
+NO_SIGNAL_UI_LANG = "ar"
+#: `?lang=` - the per-language URL search engines index (app/seo.py).
+QUERY = "lang"
 COOKIE = "ui_lang"
 #: A year. The choice is a preference, not a session.
 COOKIE_MAX_AGE = 60 * 60 * 24 * 365
@@ -43,7 +49,7 @@ def normalise(lang: str | None) -> str:
 def current_lang() -> str:
     """The interface language for this request.
 
-    A CHOICE beats a HINT beats English:
+    A CHOICE beats a HINT beats the default:
 
       cookie            the visitor picked a language from the header. That is
                         a decision and it wins outright — including an Arabic
@@ -53,17 +59,29 @@ def current_lang() -> str:
                         they read, and honouring it is the difference between
                         an Arabic reader landing on an Arabic site and landing
                         on an English one they have to go and fix.
-      English           neither says anything useful.
+      Arabic            neither says anything useful (see below).
 
     Adding the middle line means one URL now has two correct responses for two
     visitors with no cookie between them, so every response that depends on
     this has to say `Vary: Accept-Language, Cookie` or a shared cache will
     hand one visitor the other's language. `register` below does that.
+
+    Above all three sits `?lang=ar|en` (app/seo.py): a LINK that names its
+    language, which is what a search engine indexes and what a shared URL
+    means. It is also remembered, exactly like the switcher (see
+    `_keep_the_choice_alive`).
+
+    With no signal at all - no cookie, no Arabic or English in
+    Accept-Language - the answer is ARABIC, the site's first market (user,
+    2026-11-16), not English.
     """
+    asked = request.args.get(QUERY)
+    if asked in UI_LANGS:
+        return asked
     chosen = request.cookies.get(COOKIE)
     if chosen in UI_LANGS:
         return chosen
-    return request.accept_languages.best_match(UI_LANGS) or DEFAULT_UI_LANG
+    return request.accept_languages.best_match(UI_LANGS) or NO_SIGNAL_UI_LANG
 
 
 def dir_for(lang: str) -> str:
@@ -103,7 +121,8 @@ def register(app) -> None:
         stays "until the user selects the other language himself"). Pages
         only: static files and API answers would add a Set-Cookie to every
         font and every keystroke's render for nothing."""
-        chosen = request.cookies.get(COOKIE)
+        asked = request.args.get(QUERY)
+        chosen = asked if asked in UI_LANGS else request.cookies.get(COOKIE)
         if (chosen in UI_LANGS and request.method == "GET"
                 and response.mimetype == "text/html"
                 and not any(h.startswith(COOKIE + "=")
@@ -134,6 +153,10 @@ def set_choice(response, lang: str) -> None:
 def lang_next() -> str:
     """Where the switcher returns to: THIS page, query string included -
     `/templates?family=ats` used to come back as `/templates`, dropping the
-    filter the visitor had chosen along with their language."""
-    qs = request.query_string.decode("utf-8", "replace")
-    return request.path + ("?" + qs if qs else "")
+    filter the visitor had chosen along with their language.
+
+    Minus `?lang=`: it outranks the cookie, so carrying it back would undo
+    the very choice the visitor just made."""
+    from urllib.parse import urlencode
+    kept = [(k, v) for k, v in request.args.items(multi=True) if k != QUERY]
+    return request.path + ("?" + urlencode(kept) if kept else "")

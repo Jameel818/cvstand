@@ -5,6 +5,8 @@
    navigations get it; /api/*, /export/* and files keep their plain answers,
    which the builder reads as text. #}
 {% block title %}{{ t(title) }} — {{ brand_name }}{% endblock %}
+{# Never a search result, launched or not (app/seo.py). #}
+{% set page_noindex = true %}
 {% block content %}
 <section class="container error-page">
   <p class="eyebrow">{{ code }}</p>

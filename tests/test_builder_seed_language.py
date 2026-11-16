@@ -144,10 +144,19 @@ def test_a_leftover_file_on_the_volume_is_ignored(deployment, client):
 
 
 @pytest.mark.parametrize("bogus", ["fr", "", "EN", "../../etc/passwd"])
-def test_an_unknown_language_seeds_english(deployment, client, bogus):
+def test_an_unknown_language_seeds_a_known_one(deployment, client, bogus):
     """The cookie is user-editable, so it must not 500 the builder and must
-    not be able to name a file. Same degrade rule as `load_showcase`."""
-    assert seed_of(client, bogus).get("lang") is None
+    not be able to name a file. Same degrade rule as `load_showcase`.
+
+    A bogus cookie is no signal, so the interface - and its demo résumé -
+    falls back the way a cookie-less visit does: Arabic with no usable
+    Accept-Language (i18n.NO_SIGNAL_UI_LANG, 2026-11-16), English when the
+    browser asks for it. Either way one of the two SHIPPED seeds, never a
+    file the cookie named."""
+    assert seed_of(client, bogus).get("lang") == "ar"
+    client.set_cookie(COOKIE, bogus)
+    body = client.get("/builder", headers={"Accept-Language": "en"}).get_data(as_text=True)
+    assert json.loads(_SEED.search(body).group(1)).get("lang") is None
 
 
 # ------------------------------------------- what must NOT have changed

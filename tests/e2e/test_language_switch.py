@@ -66,10 +66,25 @@ def _switch(page, live_server, to: str):
 
 # ------------------------------------------------------------- the switch
 
-def test_english_is_what_a_visitor_who_chose_nothing_gets(page, live_server):
+def test_an_english_browser_that_chose_nothing_gets_english(page, live_server):
     page.goto(live_server.url + "/builder")
     expect(_preview(page)).to_contain_text("Ashworth")
     assert _doc(page).get_attribute("dir") == "ltr"
+
+
+def test_a_visitor_with_no_language_signal_gets_arabic(browser, live_server):
+    """No cookie, no usable Accept-Language: Arabic, the first market
+    (i18n.NO_SIGNAL_UI_LANG, 2026-11-16). A bare context, because the `page`
+    fixture states an English browser."""
+    ctx = browser.new_context(viewport={"width": 1440, "height": 950})
+    try:
+        pg = ctx.new_page()
+        pg.set_default_timeout(20_000)
+        pg.goto(live_server.url + "/builder")
+        expect(_preview(pg)).to_be_visible()
+        assert _doc(pg).get_attribute("dir") == "rtl"
+    finally:
+        ctx.close()
 
 
 def test_switching_to_arabic_turns_the_document_round(page, live_server):

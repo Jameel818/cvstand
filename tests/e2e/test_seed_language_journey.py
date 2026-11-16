@@ -56,7 +56,10 @@ AR_LINK = '.lang-switch a[lang="ar"]'
 
 
 def _open_page(browser):
-    pg = browser.new_context(viewport={"width": 1440, "height": 950}).new_page()
+    # English browsers: with no language signal the site now answers Arabic
+    # (i18n.NO_SIGNAL_UI_LANG), and visitor A below "arrives in English".
+    pg = browser.new_context(viewport={"width": 1440, "height": 950},
+                             locale="en-US").new_page()
     pg.set_default_timeout(20_000)
     return pg
 

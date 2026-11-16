@@ -1,3 +1,59 @@
+# RESUME HERE - 2026-11-16 (feature/seo from feature/pdf-letter: SEO, private until launch; NOT merged, NOT deployed)
+DONE:
+- THE LAUNCH SWITCH: CVSTAND_SITE_INDEXABLE (app/config.py, default 0; documented in .env.example).
+  Read only in app/seo.py, from app.config at request time. While 0: X-Robots-Tag noindex,nofollow on
+  EVERY response (pages, PDFs, fonts, /preview), <meta robots noindex,nofollow>, robots.txt
+  "Disallow: /", /sitemap.xml 404. While 1: robots.txt allows the site, disallows
+  /api/ /export/ /preview /account/ /dev/ /uploads/ /lang/, names the sitemap; the sitemap lists
+  5 pages x ar/en with xhtml:link alternates. Sign-in/up and error pages set `page_noindex` = noindex for good.
+  LAUNCH = set CVSTAND_SITE_INDEXABLE=1 on Railway. Nothing else.
+- Per-language URLs: ?lang=ar|en (app/i18n.py) beats cookie + Accept-Language and is remembered like the
+  switcher. lang_next() drops ?lang= (else the EN switch would bounce straight back to Arabic).
+- USER CHANGE 2026-11-16: no cookie + no ar/en Accept-Language => ARABIC (i18n.NO_SIGNAL_UI_LANG).
+  DEFAULT_UI_LANG stays "en" (catalogue base, normalise()). Tests that assumed the no-signal visitor was
+  English were changed to state their visitor: e2e `page` fixture now locale="en-US";
+  test_seed_language_journey._open_page en-US; fr-FR now expects Arabic; test_pwa footer test,
+  test_ui_language unknown-cookie test and test_builder_seed_language bogus-cookie test updated.
+- base.html head: per-page meta_description block, canonical (https://cvstand.com from brand.DOMAIN, never
+  the request host), hreflang ar/en/x-default (x-default = ?lang=ar, user), og:* + twitter:* with
+  absolute images (static/icons/og-image.png 1200x630, twitter-card.png 1200x600, copied from
+  brand-kits/cvstand-aligned-sw12-gap24_6-r14-11/social/). Landing: JSON-LD WebApplication + Organization
+  built in seo.structured_data() (template literals trip the label gates).
+- New titles/descriptions for landing, gallery x3 cats, builder, AR+EN; sr-only H1 on the builder
+  ("CV builder"/"منشئ السيرة الذاتية"). All copy listed in docs/SEO_COPY.md for the user's Arabic review.
+  Visible headings unchanged. Old rows "Builder", "designer résumés, done in minutes" and the old
+  sitewide description removed from _UI_AR (dead).
+- test_labels MACHINE_META now also exempts og:type and twitter:card (fixed vocabulary, not reader text).
+- brand-kits/ added to .git/info/exclude (local only, not committed).
+- NOT DONE ON PURPOSE: font preload (planned step E). Lighthouse perf was already 99-100 and the faces
+  are hashed, multi-weight files; a preload would gain nothing measurable and risks "preloaded but unused".
+VERIFIED:
+- tests/test_seo.py (new, 54 cases, all pass): switch off on the default app, switch on, ?lang, Arabic fallback,
+  one H1 per public page.
+- Fast suite: 6035 passed, 2 failed (test_pwa footer, Arabic fallback) -> fixed and re-run
+  (test_pwa + test_seo + test_labels 139 passed). The full fast suite was NOT re-run after that fix.
+- e2e: brand_and_cache, mobile_layout, offline, language_choice_sticks, language_consistency,
+  language_switch, resume_per_language, seed_language_journey, selected_language_everywhere:
+  110 passed + the 1 failure fixed and re-run (3 language files, 22 passed).
+- roier-seo audit.js (Lighthouse, localhost only; audit-api.js never run). Scores are
+  perf / a11y / best practices / SEO.
+  - Before (EN): home 99/93/100/100, gallery 100/93/100/100, builder 99/96/96/100.
+  - After, switch OFF: SEO 69 (EN and AR home). Expected: "blocked from indexing" = the private lock.
+  - After, switch ON: /?lang=en 99/93/100/100, /?lang=ar 96/98/100/100,
+    /templates?cat=ats&lang=ar 91/98/100/100, /builder?lang=en 99/96/96/100.
+    SEO 100 everywhere, so the hreflang and canonical checks pass.
+NOT DONE / NOT VERIFIED:
+- e2e files that open their OWN browser context without a locale (so they now get Arabic): browser_store,
+  autofit_gate, heading_clipping, name_fit, overflow_gate, ribbon, typography_apply,
+  word_follows_the_builder, void_gate. The run was stopped by the system for LOW MEMORY with no
+  output. Run them one file at a time in the foreground.
+- Keyword priorities are judgment, not measured volume (no keyword tool). Check them in Search Console
+  and Keyword Planner after launch. Cover letter has no page of its own yet: a gap for
+  "cover letter" / "رسالة تغطية".
+- Arabic copy awaits the user's review in docs/SEO_COPY.md.
+
+---
+
 # RESUME HERE - 2026-11-10b (feature/pdf-letter from feature/site-cairo: PDF page = US Letter; NOT merged, NOT deployed)
 DONE (app/exporters/pdf.py only; rendering.py, templates, preview, Word untouched):
 - PDF printed on US Letter 612x792pt at scale 0.96 (LETTER_PT, CANVAS_PX, CSS_PX_PT=0.75, PDF_SCALE=0.96,

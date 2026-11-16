@@ -152,7 +152,9 @@ def test_the_footer_says_where_the_resume_actually_lives(server_store, expected,
     app = create_app()
     # A request context, so `request.path` and the i18n globals the shell uses
     # (`t`, `ui_lang`, `ui_dir`) resolve the way they do on a real page.
-    with app.test_request_context("/"):
+    # English explicitly: the strings below are English, and a request with no
+    # language signal is now served Arabic (i18n.NO_SIGNAL_UI_LANG).
+    with app.test_request_context("/", headers={"Accept-Language": "en"}):
         # `render_template`, not `jinja_env.get_template(...).render()`: the
         # shell's `t`, `ui_lang` and `ui_dir` come from context processors,
         # which only run on this path. Explicit kwargs beat a processor's

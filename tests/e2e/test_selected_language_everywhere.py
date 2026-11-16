@@ -168,7 +168,9 @@ def test_what_the_visitor_wrote_survives_the_switch(
 @pytest.mark.parametrize("locale,expect_dir,marker", [
     ("ar-SA", "rtl", "ar"),
     ("en-GB", "ltr", "en"),
-    ("fr-FR", "ltr", "en"),
+    # a language the app does not have is no signal: Arabic, the first
+    # market (i18n.NO_SIGNAL_UI_LANG, 2026-11-16) - it was English before
+    ("fr-FR", "rtl", "ar"),
 ])
 def test_a_browser_that_states_its_language_is_believed(
         browser, deployed_server, locale, expect_dir, marker):
@@ -177,8 +179,9 @@ def test_a_browser_that_states_its_language_is_believed(
     A visitor who has chosen nothing still has a browser that says what they
     read. Honouring it is the difference between an Arabic speaker landing on
     an Arabic site and landing on an English one they have to go and fix. A
-    language the app does not have (fr) degrades to English rather than
-    failing, because this is a header any client can send.
+    language the app does not have (fr) degrades to Arabic, the no-signal
+    default, rather than failing, because this is a header any client can
+    send.
 
     Playwright's `locale` sets `Accept-Language` on every request, so this is
     a real browser stating a real preference, not a header glued on by hand.
