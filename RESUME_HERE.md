@@ -1,4 +1,4 @@
-# RESUME HERE - 2026-11-16 (feature/seo from feature/pdf-letter: SEO, private until launch; NOT merged, NOT deployed)
+# RESUME HERE - 2026-11-16 (feature/seo from feature/pdf-letter: SEO, private until launch; VERIFICATION COMPLETE; NOT merged, NOT deployed)
 DONE:
 - THE LAUNCH SWITCH: CVSTAND_SITE_INDEXABLE (app/config.py, default 0; documented in .env.example).
   Read only in app/seo.py, from app.config at request time. While 0: X-Robots-Tag noindex,nofollow on
@@ -31,7 +31,14 @@ VERIFIED:
 - tests/test_seo.py (new, 54 cases, all pass): switch off on the default app, switch on, ?lang, Arabic fallback,
   one H1 per public page.
 - Fast suite: 6035 passed, 2 failed (test_pwa footer, Arabic fallback) -> fixed and re-run
-  (test_pwa + test_seo + test_labels 139 passed). The full fast suite was NOT re-run after that fix.
+  (test_pwa + test_seo + test_labels 139 passed). Full fast suite re-run after that fix (2026-11-16b):
+  6037 passed, 1842 skipped, 0 failed (15 min).
+- e2e, the 9 own-context files, FOREGROUND one file at a time with -rf (2026-11-16b): browser_store 9,
+  autofit_gate 98, heading_clipping 5, name_fit 296, overflow_gate 99, ribbon 18, typography_apply 595,
+  word_follows_the_builder 2, void_gate 50 = 1172 passed / 0 failed. One failure on the way, a TEST
+  assumption, not a product bug: browser_store's two-visitor test built contexts with no locale, got
+  Arabic and waited for the English "Saved"; both contexts now state locale="en-US", file re-run 9/9.
+  The other 8 files needed no change (their checks do not read UI text).
 - e2e: brand_and_cache, mobile_layout, offline, language_choice_sticks, language_consistency,
   language_switch, resume_per_language, seed_language_journey, selected_language_everywhere:
   110 passed + the 1 failure fixed and re-run (3 language files, 22 passed).
@@ -43,10 +50,6 @@ VERIFIED:
     /templates?cat=ats&lang=ar 91/98/100/100, /builder?lang=en 99/96/96/100.
     SEO 100 everywhere, so the hreflang and canonical checks pass.
 NOT DONE / NOT VERIFIED:
-- e2e files that open their OWN browser context without a locale (so they now get Arabic): browser_store,
-  autofit_gate, heading_clipping, name_fit, overflow_gate, ribbon, typography_apply,
-  word_follows_the_builder, void_gate. The run was stopped by the system for LOW MEMORY with no
-  output. Run them one file at a time in the foreground.
 - Keyword priorities are judgment, not measured volume (no keyword tool). Check them in Search Console
   and Keyword Planner after launch. Cover letter has no page of its own yet: a gap for
   "cover letter" / "رسالة تغطية".

@@ -76,8 +76,12 @@ def test_a_second_visitor_does_not_see_the_first_ones_resume(browser, deployed_s
     `CVSTAND_SERVER_STORE=0` is a deployment requirement and not a
     preference. See `tests/e2e/conftest.py::deployed_server`.
     """
-    first = browser.new_context(viewport={"width": 1440, "height": 950})
-    second = browser.new_context(viewport={"width": 1440, "height": 950})
+    # English browsers, stated: since 2026-11-16 a visitor with no language
+    # signal gets ARABIC, and `_type_name` waits for the English "Saved".
+    first = browser.new_context(viewport={"width": 1440, "height": 950},
+                                locale="en-US")
+    second = browser.new_context(viewport={"width": 1440, "height": 950},
+                                 locale="en-US")
     try:
         p1 = first.new_page()
         p1.set_default_timeout(20_000)
