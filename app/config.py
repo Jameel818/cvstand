@@ -106,6 +106,14 @@ SERVER_STORE = _flag("CVSTAND_SERVER_STORE", "1")
 SITE_INDEXABLE = _flag("CVSTAND_SITE_INDEXABLE", "0")
 
 
+# THE PAYMENTS SWITCH (app/pricing.py). 0 (default): no price, pass or
+# pricing page anywhere on the site, and neutral copy. 1: the pricing copy and
+# /pricing. It gates COPY only: no payment code exists yet, and downloads are
+# never blocked by it. Default OFF, so forgetting it never advertises a
+# product that cannot be bought.
+PAYMENTS_LIVE = _flag("CVSTAND_PAYMENTS_LIVE", "0")
+
+
 # The shipped placeholder. `app/__init__.py` refuses to start a DEPLOYMENT
 # that still has it, because the session cookie now carries the signed-in
 # user and a known signing key forges accounts. Named rather than repeated as
@@ -116,5 +124,6 @@ DEFAULT_SECRET_KEY = "dev-only-not-secret"
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", DEFAULT_SECRET_KEY)
     SITE_INDEXABLE = SITE_INDEXABLE
+    PAYMENTS_LIVE = PAYMENTS_LIVE
     MAX_CONTENT_LENGTH = MAX_UPLOAD_BYTES
     JSON_SORT_KEYS = False

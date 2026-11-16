@@ -29,7 +29,7 @@ from urllib.parse import urlencode
 
 from flask import Response, abort, current_app, has_request_context, request
 
-from . import brand
+from . import brand, pricing
 from .i18n import UI_LANGS, current_lang
 
 ORIGIN = f"https://{brand.DOMAIN}"
@@ -104,7 +104,7 @@ def structured_data(description: str) -> dict:
     ("WebApplication", "Web"), not reader text, and the label gates in
     tests/test_labels.py rightly flag English literals in templates. No
     `sameAs` (there are no social accounts yet) and no SearchAction (there
-    is no site search)."""
+    is no site search). Offers appear only while PAYMENTS_LIVE is on."""
     url = ORIGIN + "/"
     return {
         "@context": "https://schema.org",
@@ -117,8 +117,10 @@ def structured_data(description: str) -> dict:
                 "applicationCategory": "BusinessApplication",
                 "operatingSystem": "Web",
                 "inLanguage": list(UI_LANGS),
-                # building and downloading a PDF are free (account.html)
-                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+                # The passes, from app/pricing.py, and only while
+                # PAYMENTS_LIVE is on. Never a price of 0: that would tell
+                # search engines the product is free.
+                **({"offers": pricing.offers()} if pricing.payments_live() else {}),
             },
             {
                 "@type": "Organization",
@@ -140,9 +142,17 @@ def robots_txt() -> str:
     return "\n".join(lines)
 
 
+#: Listed only while PAYMENTS_LIVE is on; /pricing is a 404 otherwise.
+PRICING_PAGE = ("/pricing", {})
+
+
+def sitemap_pages() -> tuple:
+    return SITEMAP_PAGES + ((PRICING_PAGE,) if pricing.payments_live() else ())
+
+
 def sitemap_xml() -> str:
     urls = []
-    for path, params in SITEMAP_PAGES:
+    for path, params in sitemap_pages():
         links = "".join(
             f'\n    <xhtml:link rel="alternate" hreflang="{hl}" href="{_xml(href)}"/>'
             for hl, href in _alternates(path, params)

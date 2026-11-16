@@ -198,9 +198,13 @@ p { margin: 0 0 1em; }
 .hero h1 .accent { font-family: var(--font-display); font-weight: 600; font-style: italic; color: var(--brand); }
 .hero-sub { font-size: 1.15rem; color: var(--ink-2); max-width: 42ch; }
 .hero-cta { display: flex; gap: 12px; margin: 26px 0 20px; flex-wrap: wrap; }
-.hero-trust { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 13.5px; font-weight: 500; }
-.hero-trust span { display: inline-flex; align-items: center; gap: 7px; }
-.hero-trust span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+/* The hook points under the sub-line (replaced the .hero-trust chips,
+   2026-11-16). The tick is an inline SVG in the markup, not CSS content. */
+.hero-checks { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px;
+  color: var(--ink-2); font-size: 15px; font-weight: 500; max-width: 52ch; }
+.hero-checks li { display: flex; align-items: flex-start; gap: 10px; }
+.hero-checks .tick { flex: none; display: grid; place-items: center; width: 22px; height: 22px;
+  margin-top: 1px; border-radius: 50%; background: var(--brand-50); color: var(--brand); }
 
 /* floating preview stack */
 .hero-art { position: relative; height: 460px; }
@@ -291,6 +295,27 @@ p { margin: 0 0 1em; }
 .cta-band h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; }
 .cta-band p { color: rgba(255, 255, 255, .85); max-width: 46ch; margin: 0 auto 22px; }
 .cta-band .btn { background: #fff; color: var(--brand-700); border-color: #fff; }
+
+/* pricing (only rendered while PAYMENTS_LIVE is on; app/pricing.py) */
+.price-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
+.price-card {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: 30px 26px 26px; background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.price-card.is-popular { border: 2px solid var(--brand); box-shadow: var(--shadow); }
+.price-badge {
+  position: absolute; top: -13px; inset-inline-start: 24px;
+  padding: 4px 12px; border-radius: 999px; background: var(--brand); color: #fff;
+  font-size: 12.5px; font-weight: 700; white-space: nowrap;
+}
+.price-name { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.price-amount { font-size: 2.6rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin: 6px 0 0; }
+.price-duration { font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 0; }
+.price-per-day { font-size: 14px; color: var(--muted); margin: 0; }
+.price-includes { font-size: 14px; color: var(--ink-2); margin: 10px 0 18px; padding-top: 12px; border-top: 1px solid var(--line); }
+.price-buy { margin-top: auto; width: 100%; justify-content: center; }
+.pricing-page .section-head h1 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 800; }
 
 /* faq */
 .faq { display: grid; gap: 12px; max-width: 760px; }
@@ -716,6 +741,7 @@ body.builder-body { overflow: hidden; }
   .hero-inner { grid-template-columns: 1fr; }
   .hero-art { display: none; }
   .family-grid, .feature-grid, .steps { grid-template-columns: 1fr; }
+  .price-grid { grid-template-columns: 1fr; gap: 26px; max-width: 460px; }
   .stat-strip ul { grid-template-columns: 1fr 1fr; }
   .site-footer { grid-template-columns: 1fr; }
 }
@@ -918,7 +944,8 @@ html { overflow-x: hidden; }
 [dir="rtl"] .eyebrow,
 [dir="rtl"] .stat-strip b,
 [dir="rtl"] .num,
-[dir="rtl"] .faq summary { font-family: var(--font-heading); }
+[dir="rtl"] .faq summary,
+[dir="rtl"] .price-amount { font-family: var(--font-heading); }
 
 /* NAVIGATION. Its own role in the policy, and it was falling through to body. */
 [dir="rtl"] .site-nav a,
@@ -989,13 +1016,14 @@ html { overflow-x: hidden; }
    they had (IBM Plex Sans Arabic) rather than inherit the new body face.
    English never reaches any of this. tests/e2e/test_shell_cairo_body.py */
 [dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea,
-[dir="rtl"] .blurb { font-weight: 400; }
+[dir="rtl"] .blurb, [dir="rtl"] .price-per-day, [dir="rtl"] .price-includes { font-weight: 400; }
 [dir="rtl"] .btn, [dir="rtl"] button, [dir="rtl"] .tab,
 [dir="rtl"] .site-nav a, [dir="rtl"] .footer-cols a, [dir="rtl"] .lang-switch a,
 [dir="rtl"] .dl-menu a, [dir="rtl"] .builder-bar .back,
 [dir="rtl"] .field label, [dir="rtl"] .bullets label, [dir="rtl"] .rb-lbl,
 [dir="rtl"] .chip, [dir="rtl"] .family-card .count, [dir="rtl"] .family-card .arrow,
-[dir="rtl"] .import-btn .soon, [dir="rtl"] .hero-trust span, [dir="rtl"] .save-state,
+[dir="rtl"] .import-btn .soon, [dir="rtl"] .hero-checks li, [dir="rtl"] .save-state,
+[dir="rtl"] .price-badge, [dir="rtl"] .price-duration, [dir="rtl"] .price-amount,
 [dir="rtl"] .tpl-name, [dir="rtl"] .tpl-name span, [dir="rtl"] .cl-toggle,
 [dir="rtl"] .preview-toolbar span, [dir="rtl"] .zoom .lvl, [dir="rtl"] .entry-head b,
 [dir="rtl"] .footer-tagline, [dir="rtl"] .imp-entry b,

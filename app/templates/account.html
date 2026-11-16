@@ -21,7 +21,9 @@
   <h1>{{ heading }}</h1>
 
   <p class="account-intro">
-    {{ t('You only need an account for the paid features. Building a résumé and downloading a PDF stays free, with no sign-up.') }}
+    {# Neutral while PAYMENTS_LIVE is off: no price, no pass, and no promise
+       about what is free (app/pricing.py). #}
+    {% if payments_live %}{{ t('Building and previewing your CV is free and needs no account. Your account holds your pass.') }}{% else %}{{ t('Use your email address and a password.') }}{% endif %}
   </p>
 
   {% if error %}

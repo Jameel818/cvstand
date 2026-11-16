@@ -83,6 +83,9 @@ def create_app(config_object: type = Config) -> Flask:
     # switch (CVSTAND_SITE_INDEXABLE) that keeps the site noindex until then.
     from . import seo
     seo.register(app)
+    # Prices, plans, the `fill` filter and the PAYMENTS_LIVE switch.
+    from . import pricing
+    pricing.register(app)
     app.register_blueprint(bp)
     from .routes import register_error_pages
     register_error_pages(app)

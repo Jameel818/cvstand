@@ -1,0 +1,17 @@
+{# The three pass cards. Every number comes from app/pricing.py (PLANS) and
+   the template count from app/registry.py; this file states none of them.
+   Included only while PAYMENTS_LIVE is on. The buy button is inert either way:
+   there is no checkout yet, so it is a disabled <button>, never a link. #}
+<div class="price-grid">
+  {% for p in plans %}
+  <article class="price-card{% if p.popular %} is-popular{% endif %}" data-plan="{{ p.id }}">
+    {% if p.popular %}<span class="price-badge">{{ t('Most popular') }}</span>{% endif %}
+    <h3 class="price-name">{% if p.id == 'day' %}{{ t('Day pass') }}{% elif p.id == 'week' %}{{ t('Week pass') }}{% else %}{{ t('Month pass') }}{% endif %}</h3>
+    <p class="price-amount"><bdi dir="ltr">{{ plan_price(p) }}</bdi></p>
+    <p class="price-duration">{{ plan_duration(p) }}</p>
+    <p class="price-per-day">{{ t('{per_day} per day')|fill({'per_day': plan_per_day(p)}) }}</p>
+    <p class="price-includes">{{ t('All {total} templates · PDF + Word · Arabic & English')|fill(copy_vals) }}</p>
+    <button class="btn btn-primary price-buy" type="button" disabled aria-disabled="true">{{ t('Coming soon') }}</button>
+  </article>
+  {% endfor %}
+</div>

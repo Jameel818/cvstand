@@ -1,3 +1,56 @@
+# RESUME HERE - 2026-11-16b (feature/pricing from feature/seo 95f5cc6: pricing copy + hook points behind PAYMENTS_LIVE; NOT merged, NOT deployed)
+DONE (copy + UI only; NO payment code, no gateway, no external script; nothing gates a download):
+- ONE SOURCE: app/pricing.py. PLANS day $1/1 day, week $3/7 days (popular), month $7/30 days; AUTO_RENEW False;
+  fmt_usd ("$0.43", Arabic "0.43$" inside <bdi dir=ltr>); ar_count = Arabic number agreement incl. the adjective
+  (24 قالباً عصرياً, 7 أيام, 30 يوماً, 24 ساعة, دولار واحد); copy_values(lang) + the `fill` Jinja filter put
+  {modern} {ats} {total} {price} (+ {modern_ar} {ats_ar} {total_ar} {price_words}) into copy AFTER t().
+  Counts: registry.counts() (24/25/49), used by the landing route, hero, cards, gallery title/description, meta.
+- THE SWITCH: CVSTAND_PAYMENTS_LIVE (app/config.py strict _flag, default 0, .env.example), read only via
+  pricing.payments_live() per request. Per the user's change after the plan:
+  OFF = no price, no pass wording, no "from $1", no Pricing nav/footer link, /pricing 404 (and not in the sitemap),
+  no pass FAQ, no JSON-LD offers, SEO descriptions without prices, AND no "free download"/"no sign-up" promise
+  (neutral copy). Old EN hero h1 + old outlined _hero_ar.html are kept for OFF.
+  ON = hero "Your professional CV — starting at just $1" (AR outlined _hero_ar_pricing.html), 4th bullet "Pay once…",
+  #pricing section on landing + /pricing page (3 cards: price, duration, per day, "All 49 templates · PDF + Word ·
+  Arabic & English", week badge "Most popular"/«الأكثر طلباً»), 5 pass FAQ items, cta-band "from $1",
+  account intro, JSON-LD offers (3 x USD, eligibleDuration days), /pricing in the sitemap.
+  Both states: user's sub-line with registry counts, bullets Two styles / PDF+Word / AR-EN, CTA "Start now".
+- BUY BUTTONS: a disabled <button> "Coming soon"/«قريباً» even when ON. DEVIATION from the plan ("Buy", inert):
+  a clickable button that does nothing is worse; switch the label when checkout exists.
+- Removed claims: "Start building — it's free", "No sign-up" chip, "No sign-up, no paywall", account "downloading a PDF
+  stays free, with no sign-up", meta "Free PDF download", JSON-LD price 0, "No account, no upload". 13 dead _UI_AR rows
+  deleted (test_labels dead-row gate). docs/SEO_COPY.md rewritten (placeholders, two states, offers rule).
+- STORAGE FAQ fixed (AR+EN), split on SERVER_STORE like the footer. Deployed: CV saved in this browser only,
+  the account keeps no copy (db.py has no résumé table), download = browser sends it, server builds the file and
+  keeps nothing (test_stateless), clearing browser data deletes it. Local: this browser + the app's data file.
+  "Which family should I use?" replaced by the user's "Modern or ATS — which should I pick?".
+- Arabic hero (ON): rebuilt with tools/outline_text.py --build-hero; price words come from pricing at build time.
+  The dash is joined to the previous word by U+00A0 and the tool now splits runs on ASCII spaces only, so a line
+  never starts with "—". The 4 existing outlined partials are byte-identical.
+- CSS: .hero-checks (inline SVG tick, no CSS content) replaces .hero-trust; .price-grid/.price-card (logical
+  properties, 3 cols, 1 col <=1024px). Arabic: per-day/includes Cairo 400; badge, duration, amount, hero bullets 600;
+  headings unchanged.
+VERIFIED:
+- tests/test_pricing.py (new, 64): plans, ar_count 1..111, price grep over app/ (mutation: a planted "$1" fails it),
+  monkeypatched PLANS/counts change every page, OFF: 7 pages x AR/EN no price/pass/free promise (mutation: against
+  a live app 12/14 fail; /builder has no pricing copy either way), /pricing 404, no offers, sitemap; ON: cards,
+  inert buttons, hero, FAQ, offers, sitemap, no free-download claim; storage FAQ; SEO_COPY.md.
+- Fast suite: 6108 passed, 1842 skipped, 0 failed.
+- e2e foreground one file at a time, switch OFF: brand_and_cache 19, mobile_layout 35, shell_cairo_body 9,
+  shell_rtl_geometry 12. Switch ON (CVSTAND_PAYMENTS_LIVE=1): shell_cairo_body + mobile_layout 44. All passed.
+- Screenshots Desktop\review-pricing-2026-11-16\: before\, after-switch-off\, after-switch-on\ (landing + /pricing,
+  EN/AR, 1440/390; /pricing is 404 before and OFF), crops\, compare-hero-*.png (before | off | on). Measured rects:
+  0 elements outside the viewport in all 24 captures.
+NOT DONE / NOT VERIFIED:
+- No checkout, no entitlement: downloads stay free whatever the switch says. Do NOT turn PAYMENTS_LIVE on in
+  production before checkout exists: the ON copy says a pass unlocks downloads.
+- Arabic copy (hero, cards, FAQ, storage answer) awaits the user's review. Pass = «باقة».
+- Changing a price = edit PLANS + run venv/Scripts/python tools/outline_text.py --build-hero (test_hero_outline fails
+  until then).
+- Lighthouse not re-run; real devices not checked (Chromium only).
+
+---
+
 # RESUME HERE - 2026-11-16 (feature/seo from feature/pdf-letter: SEO, private until launch; VERIFICATION COMPLETE; NOT merged, NOT deployed)
 DONE:
 - THE LAUNCH SWITCH: CVSTAND_SITE_INDEXABLE (app/config.py, default 0; documented in .env.example).

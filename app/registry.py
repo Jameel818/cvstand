@@ -150,6 +150,14 @@ def by_category(category: str | None = None) -> list[Template]:
     return sorted(vals, key=lambda t: (0 if t.ported else 1, t.category, int(t.block[1:])))
 
 
+def counts() -> dict[str, int]:
+    """How many templates each family has. The ONLY place copy gets a count
+    from: the hero, the pricing cards and the meta descriptions all read it."""
+    modern = len(by_category("modern"))
+    ats = len(by_category("ats"))
+    return {"modern": modern, "ats": ats, "total": modern + ats}
+
+
 def default_key() -> str:
     pk = ported_keys()
     return pk[0] if pk else "modern-t1"

@@ -16,22 +16,28 @@
          at build time (tools/outline_text.py --build-hero). Its licence
          forbids serving the font file; geometry is not a font. The partial
          carries the real string in an .sr-only span, so nothing is lost to
-         assistive technology. English is unchanged — same markup as before. #}
+         assistive technology.
+         Two headlines: with PAYMENTS_LIVE on it names the lowest price (from
+         app/pricing.py); with it off it makes no price claim at all. #}
       {% if ui_lang == 'ar' %}
-      <h1 class="hero-ar">{% include "_hero_ar.html" %}</h1>
+      <h1 class="hero-ar">{% if payments_live %}{% include "_hero_ar_pricing.html" %}{% else %}{% include "_hero_ar.html" %}{% endif %}</h1>
+      {% elif payments_live %}
+      <h1>{{ t('Your professional CV —') }} <span class="accent">{{ t('starting at just {price}')|fill(copy_vals) }}</span></h1>
       {% else %}
       <h1>{{ t('Your résumé,') }} <span class="accent">{{ t('designed') }}</span> {{ t('and done in minutes.') }}</h1>
       {% endif %}
-      <p class="hero-sub">{{ t('Fill in your details once. Switch between') }} {{ counts.modern + counts.ats }} {{ t('designer layouts, preview live, and export a pixel-perfect PDF or an editable Word file.') }}</p>
+      <p class="hero-sub">{{ t('Create standout CVs in minutes — {modern} Modern designer templates and {ats} ATS templates built to pass applicant tracking systems.')|fill(copy_vals) }}</p>
+      <ul class="hero-checks">
+        <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ t("Two styles: eye-catching Modern designs, or clean ATS formats that recruiters' software can read") }}</li>
+        <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ t('Download as PDF and Word (.docx)') }}</li>
+        <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ t('Write in Arabic, English, or both') }}</li>
+        {% if payments_live %}
+        <li><span class="tick" aria-hidden="true"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ t('Pay once — no subscription, no auto-renewal, no hidden fees') }}</li>
+        {% endif %}
+      </ul>
       <div class="hero-cta">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('main.builder') }}">{{ t("Start building — it's free") }}</a>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.builder') }}">{{ t('Start now') }}</a>
         <a class="btn btn-lg" href="{{ url_for('main.templates_gallery') }}">{{ t('Browse templates') }}</a>
-      </div>
-      <div class="hero-trust">
-        <span>{{ counts.modern }} {{ t('Modern designs') }}</span>
-        <span>{{ counts.ats }} {{ t('ATS-safe designs') }}</span>
-        <span>{{ t('PDF + Word export') }}</span>
-        <span>{{ t('No sign-up') }}</span>
       </div>
     </div>
     <div class="hero-art" aria-hidden="true">
@@ -86,7 +92,7 @@
     <div class="feature"><div class="ic">✓</div><h3>{{ t('ATS-safe option') }}</h3><p>{{ t('The ATS family is single-column with parse-safe headings and selectable skill levels.') }}</p></div>
     <div class="feature"><div class="ic">⤓</div><h3>{{ t('PDF & Word') }}</h3><p>{{ t('Pixel-accurate PDF from a real browser engine, plus an editable .docx.') }}</p></div>
     <div class="feature"><div class="ic">◎</div><h3>{{ t('Photo support') }}</h3><p>{{ t("Drop in a headshot — it's cropped square and placed cleanly where the design expects it.") }}</p></div>
-    <div class="feature"><div class="ic">↺</div><h3>{{ t('Nothing to lose') }}</h3><p>{{ t('Your résumé is saved locally and reloads where you left off. No account, no upload.') }}</p></div>
+    <div class="feature"><div class="ic">↺</div><h3>{{ t('Nothing to lose') }}</h3><p>{{ t('Your résumé is saved in this browser and reloads where you left off.') }}</p></div>
   </div>
 </section>
 
@@ -102,20 +108,29 @@
   </div>
 </section>
 
+{% if payments_live %}
+<section class="section" id="pricing" style="padding-top:0">
+  <div class="section-head">
+    <div class="eyebrow">{{ t('Pricing') }}</div>
+    <h2>{{ t('One payment. No subscription.') }}</h2>
+    <p>{{ t('Build and preview for free. Buy a pass when you are ready to download.') }}</p>
+  </div>
+  {% include "_pricing_cards.html" %}
+</section>
+{% endif %}
+
 <section class="section" id="faq" style="padding-top:0">
   <div class="section-head"><div class="eyebrow">{{ t('Questions') }}</div><h2>{{ t('Good to know.') }}</h2></div>
   <div class="faq">
-    <details><summary>{{ t('Which family should I use?') }}</summary><p>{{ t('Send a') }} <b>{{ t('Modern') }}</b> {{ t('layout as a PDF when a human will read it first — recruiters, referrals, portfolios. Use an') }} <b>{{ t('ATS-Friendly') }}</b> {{ t("layout when you're pasting into a job portal or know the résumé is machine-screened before anyone sees it.") }}</p></details>
-    <details><summary>{{ t('Is the Word export the same as the PDF?') }}</summary><p>{{ t("It preserves the palette, type pairing, section order and skill levels, but Word can't reproduce every visual detail (gradient rings become dot grids, some spacing shifts). The PDF is the pixel-accurate version.") }}</p></details>
-    <details><summary>{{ t('Do you store my résumé?') }}</summary><p>{{ t("No. It's a single-user tool — your data is a JSON file on this machine and never leaves it.") }}</p></details>
-    <details><summary>{{ t('Can I use my own photo?') }}</summary><p>{{ t("Yes, on the Modern layouts that include a photo. It's cropped to a square and resized on upload.") }}</p></details>
+    {% include "_faq_common.html" %}
+    {% if payments_live %}{% include "_faq_pass.html" %}{% endif %}
   </div>
 </section>
 
 <div class="cta-band">
   <div class="inner">
     <h2>{{ t('Build your résumé now.') }}</h2>
-    <p>{{ t('No sign-up, no paywall. Open the builder, add your details, and download in minutes.') }}</p>
+    <p>{% if payments_live %}{{ t('Build and preview for free. Download with a pass from {price}.')|fill(copy_vals) }}{% else %}{{ t('Open the builder, add your details, and download your CV as a PDF or Word file.') }}{% endif %}</p>
     <a class="btn btn-lg" href="{{ url_for('main.builder') }}">{{ t('Open the builder') }}</a>
   </div>
 </div>

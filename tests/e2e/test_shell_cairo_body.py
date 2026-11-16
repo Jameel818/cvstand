@@ -96,7 +96,7 @@ def test_arabic_prose_is_400_and_controls_are_600(page, live_server):
     _open(page, live_server, "/")
     read = lambda sel: page.evaluate(FACE, sel)
     assert set(map(tuple, read(".hero-sub, .section-head p, .feature p"))) == {("Cairo", "400")}
-    assert set(map(tuple, read(".site-nav a, .btn, .chip, .hero-trust span"))) == {("Cairo", "600")}
+    assert set(map(tuple, read(".site-nav a, .btn, .chip, .hero-checks li"))) == {("Cairo", "600")}
 
     _open(page, live_server, "/builder")
     assert set(map(tuple, read(".field label"))) == {("Cairo", "600")}

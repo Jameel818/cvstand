@@ -233,8 +233,11 @@ _UI_AR: dict[str, str] = {
     # Reviewed as a set in docs/SEO_COPY.md - change both together.
     "CV Maker – Designer & ATS-Friendly Templates":
         "إنشاء سيرة ذاتية احترافية بالعربي والإنجليزي",
-    "CV Templates – 49 Modern & ATS Designs":
-        "نماذج سيرة ذاتية جاهزة – 49 قالباً",
+    # `{name}` placeholders are filled AFTER translation by the `fill` filter
+    # (app/pricing.py): counts from app/registry.py, prices from PLANS. The
+    # Arabic uses the *_ar values, which carry number agreement (ar_count).
+    "CV Templates – {total} Modern & ATS Designs":
+        "نماذج سيرة ذاتية جاهزة – {total_ar}",
     "ATS CV Templates That Pass Screening":
         "قوالب سيرة ذاتية متوافقة مع ATS",
     "Modern CV Templates – Designer Layouts":
@@ -242,10 +245,18 @@ _UI_AR: dict[str, str] = {
     "CV Builder – Write, Preview, Export PDF & Word":
         "صانع السيرة الذاتية – PDF و Word",
     "CV builder": "منشئ السيرة الذاتية",
-    "Build a polished CV in minutes — in English or Arabic. 49 designer and ATS-friendly templates. Free PDF download, Word export too.":
-        "أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. 49 قالباً احترافياً ومتوافقاً مع أنظمة ATS، وتحميل مجاني بصيغة PDF وتصدير إلى Word.",
-    "Browse 49 ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.":
-        "تصفّح 49 نموذج سيرة ذاتية جاهزاً: تصاميم حديثة وقوالب ATS بسيطة. اختر قالباً واملأه مباشرة.",
+    # The site-wide description has two forms: PAYMENTS_LIVE off says nothing
+    # about price or "free"; on, it names the lowest price.
+    "Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates, with PDF and Word download.":
+        "أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. {total_ar} بين تصاميم احترافية وقوالب متوافقة مع أنظمة ATS، مع التحميل بصيغتي PDF و Word.",
+    "Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates. Download PDF and Word from {price}.":
+        "أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. {total_ar} بين تصاميم احترافية وقوالب متوافقة مع أنظمة ATS، وتحميل PDF و Word ابتداءً من {price}.",
+    "Browse {total} ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.":
+        "تصفّح {total_ar} للسيرة الذاتية: تصاميم حديثة وقوالب ATS بسيطة. اختر قالباً واملأه مباشرة.",
+    "CV Maker Pricing – Passes from {price}":
+        "أسعار إنشاء السيرة الذاتية – باقات تبدأ من {price}",
+    "Day, week or month pass. All {total} CV templates, PDF and Word downloads, Arabic and English. No subscription, no auto-renewal.":
+        "باقة يوم أو أسبوع أو شهر: جميع القوالب الـ{total}، وتحميل PDF و Word، بالعربية والإنجليزية. بلا اشتراك ولا تجديد تلقائي.",
     "Single-column CV templates built to be read by applicant tracking systems. Clean structure, real text, PDF and Word export.":
         "قوالب سيرة ذاتية بعمود واحد تقرأها أنظمة تتبّع المتقدمين (ATS) بسهولة، مع تصدير PDF و Word.",
     "Designer CV templates with skill graphics and clear hierarchy, in English or Arabic, ready to fill in and export.":
@@ -278,19 +289,72 @@ _UI_AR: dict[str, str] = {
     "Your résumé,": "سيرتك الذاتية،",
     "designed": "بتصميم احترافي",
     "and done in minutes.": "وجاهزة خلال دقائق.",
-    "Fill in your details once. Switch between": "أدخل بياناتك مرة واحدة. تنقّل بين",
-    "designer layouts, preview live, and export a pixel-perfect PDF or an editable Word file.":
-        "تصميماً احترافياً، وشاهد المعاينة مباشرة، وصدّر ملف PDF بدقة تامة أو ملف Word قابلاً للتحرير.",
-    "Start building — it's free": "ابدأ الآن — مجاناً",
     "Browse templates": "تصفّح القوالب",
     "Modern designs": "تصاميم مودرن",
-    "ATS-safe designs": "تصاميم متوافقة مع أنظمة التوظيف",
-    "PDF + Word export": "تصدير PDF وWord",
-    "No sign-up": "بدون تسجيل",
     "Modern layouts": "تصاميم مودرن",
     "ATS-friendly layouts": "تصاميم متوافقة مع أنظمة التوظيف",
     "Export formats": "صيغ التصدير",
     "Content model, every design": "محتوى واحد لكل التصاميم",
+
+    # --- landing: hero (2026-11-16 hook points) ----------------------------
+    # Shown in BOTH PAYMENTS_LIVE states: no price, no "free".
+    "Create standout CVs in minutes — {modern} Modern designer templates and {ats} ATS templates built to pass applicant tracking systems.":
+        "أنشئ سيراً ذاتية مميزة خلال دقائق: {modern_ar} بتصميم احترافي، و{ats_ar} مع أنظمة التوظيف الإلكترونية (ATS).",
+    "Two styles: eye-catching Modern designs, or clean ATS formats that recruiters' software can read":
+        "نوعان من القوالب: تصاميم عصرية لافتة، أو قوالب ATS بسيطة تقرؤها برامج التوظيف",
+    "Download as PDF and Word (.docx)": "تحميل بصيغتي PDF و Word",
+    "Write in Arabic, English, or both": "اكتب سيرتك بالعربية أو الإنجليزية أو كليهما",
+    "Start now": "ابدأ الآن",
+    "Open the builder, add your details, and download your CV as a PDF or Word file.":
+        "افتح المنشئ، وأضف بياناتك، ونزّل سيرتك الذاتية بصيغة PDF أو Word.",
+    "Your résumé is saved in this browser and reloads where you left off.":
+        "تُحفظ سيرتك الذاتية في هذا المتصفح، وتعود إليها من حيث توقفت.",
+    "Modern or ATS — which should I pick?": "مودرن أم ATS — أيّهما أختار؟",
+    "Modern for roles where people and design matter; ATS when you apply through online job portals.":
+        "مودرن للوظائف التي يقرأ فيها الناس سيرتك ويهمّ فيها التصميم، و ATS عند التقديم عبر بوابات التوظيف الإلكترونية.",
+    # Where the CV is stored. Two true answers: the local tool and a
+    # deployment (SERVER_STORE), the same split as the footer line.
+    "It stays on this computer: in this browser and in the app’s data file on this machine. It is not sent anywhere else.":
+        "تبقى على هذا الجهاز: في هذا المتصفح وفي ملف بيانات التطبيق على هذا الحاسوب، ولا تُرسَل إلى أي مكان آخر.",
+    "Not on our server. Your CV is saved in this browser, on this device only, and your account does not keep a copy. When you download, your browser sends the CV to our server, which builds the PDF or Word file and keeps nothing. Clearing your browser data deletes the CV, so keep a downloaded copy.":
+        "لا نحفظها على خادمنا. تُحفظ سيرتك الذاتية في هذا المتصفح وعلى هذا الجهاز فقط، ولا يحتفظ حسابك بنسخة منها. عند التحميل يرسل متصفحك السيرة إلى خادمنا ليُنشئ ملف PDF أو Word، ولا يحتفظ بشيء منها. مسح بيانات المتصفح يحذف السيرة، فاحتفظ بنسخة محمّلة.",
+    "Use your email address and a password.": "استخدم بريدك الإلكتروني وكلمة مرور.",
+
+    # --- pricing (only while PAYMENTS_LIVE is on; app/pricing.py) -----------
+    # No row states a price: `{price}` and `{price_words}` are filled from PLANS.
+    # U+00A0 before the dash: it stays on the line it ends (tools/outline_text.py).
+    "Your professional CV —": "سيرتك الذاتية الاحترافية —",
+    "starting at just {price}": "ابتداءً من {price_words} فقط",
+    "Pay once — no subscription, no auto-renewal, no hidden fees":
+        "ادفع مرة واحدة — بلا اشتراك ولا تجديد تلقائي ولا رسوم خفية",
+    "Pricing": "الأسعار",
+    "One payment. No subscription.": "دفعة واحدة. بلا اشتراك.",
+    "Build and preview for free. Buy a pass when you are ready to download.":
+        "أنشئ سيرتك وعاينها مجاناً، واشترِ باقة عندما تكون جاهزاً للتحميل.",
+    "Build and preview for free. Download with a pass from {price}.":
+        "أنشئ سيرتك وعاينها مجاناً، وحمّلها بباقة تبدأ من {price}.",
+    "Most popular": "الأكثر طلباً",
+    "Day pass": "باقة يوم",
+    "Week pass": "باقة أسبوع",
+    "Month pass": "باقة شهر",
+    "{per_day} per day": "{per_day} في اليوم",
+    "All {total} templates · PDF + Word · Arabic & English":
+        "جميع القوالب الـ{total} · PDF و Word · العربية والإنجليزية",
+    "What's free?": "ما المجاني؟",
+    "Building and previewing your CV.": "إنشاء سيرتك الذاتية ومعاينتها.",
+    "What does a pass unlock?": "ماذا تتيح الباقة؟",
+    "Downloads (PDF and Word) for as long as the pass lasts.":
+        "تحميل سيرتك بصيغتي PDF و Word طوال مدة الباقة.",
+    "What happens when it ends?": "ماذا يحدث عند انتهائها؟",
+    "Your CVs stay saved in this browser. Buy a new pass to download again.":
+        "تبقى سيرك الذاتية محفوظة في هذا المتصفح. اشترِ باقة جديدة لتحمّلها مرة أخرى.",
+    "Will I be charged again?": "هل سيُخصم المبلغ مني مرة أخرى؟",
+    "No. There is no subscription and no auto-renewal.": "لا. لا يوجد اشتراك ولا تجديد تلقائي.",
+    "Can I get a refund?": "هل يمكنني استرداد المبلغ؟",
+    "Yes, a full refund if nothing was downloaded with the pass.":
+        "نعم، تستردّ المبلغ كاملاً إذا لم تحمّل أي ملف بالباقة.",
+    "Building and previewing your CV is free and needs no account. Your account holds your pass.":
+        "إنشاء سيرتك الذاتية ومعاينتها مجاني ولا يحتاج إلى حساب. يحفظ حسابك باقتك.",
 
     # --- accounts (Stage 3) -----------------------------------------------
     # An account is only needed for the PAID features; the free tier stays
@@ -304,8 +368,6 @@ _UI_AR: dict[str, str] = {
     "Password": "كلمة المرور",
     "Already have an account?": "لديك حساب بالفعل؟",
     "No account yet?": "ليس لديك حساب؟",
-    "You only need an account for the paid features. Building a résumé and downloading a PDF stays free, with no sign-up.":
-        "لا تحتاج إلى حساب إلا للمزايا المدفوعة. أما إنشاء السيرة الذاتية وتنزيلها بصيغة PDF فيبقى مجاناً وبلا تسجيل.",
     "At least 10 characters. A short phrase you will remember beats a short password.":
         "١٠ أحرف على الأقل. عبارة قصيرة تتذكّرها خير من كلمة مرور قصيرة.",
     "That email and password do not match.":
@@ -365,8 +427,6 @@ _UI_AR: dict[str, str] = {
     "Drop in a headshot — it's cropped square and placed cleanly where the design expects it.":
         "أضف صورتك الشخصية — تُقصّ مربّعة وتوضع بدقة حيث يتوقعها التصميم.",
     "Nothing to lose": "لا شيء يضيع",
-    "Your résumé is saved locally and reloads where you left off. No account, no upload.":
-        "سيرتك الذاتية تُحفظ محلياً وتُفتح من حيث توقفت. بلا حساب وبلا رفع.",
 
     # --- landing: three steps ---------------------------------------------
     "Three steps": "ثلاث خطوات",
@@ -384,24 +444,15 @@ _UI_AR: dict[str, str] = {
     # --- landing: FAQ -----------------------------------------------------
     "Questions": "أسئلة",
     "Good to know.": "معلومات مفيدة.",
-    "Which family should I use?": "أي عائلة أستخدم؟",
     "Send a": "أرسل تصميم",
-    "layout as a PDF when a human will read it first — recruiters, referrals, portfolios. Use an":
-        "بصيغة PDF حين يقرأه إنسان أولاً — مسؤولو التوظيف والترشيحات وملفات الأعمال. واستخدم تصميم",
-    "layout when you're pasting into a job portal or know the résumé is machine-screened before anyone sees it.":
-        "حين تلصق سيرتك في بوابة توظيف أو تعلم أنها ستُفحص آلياً قبل أن يراها أحد.",
     "Is the Word export the same as the PDF?": "هل تصدير Word مطابق لملف PDF؟",
     "It preserves the palette, type pairing, section order and skill levels, but Word can't reproduce every visual detail (gradient rings become dot grids, some spacing shifts). The PDF is the pixel-accurate version.":
         "يحافظ على الألوان واقتران الخطوط وترتيب الأقسام ومستويات المهارات، لكن Word لا يستطيع إعادة إنتاج كل تفصيل بصري (الحلقات المتدرجة تصبح شبكات نقاط، وتتغير بعض المسافات). ملف PDF هو النسخة الدقيقة تماماً.",
     "Do you store my résumé?": "هل تحتفظون بسيرتي الذاتية؟",
-    "No. It's a single-user tool — your data is a JSON file on this machine and never leaves it.":
-        "لا. إنها أداة لمستخدم واحد — بياناتك ملف JSON على هذا الجهاز ولا يغادره أبداً.",
     "Can I use my own photo?": "هل يمكنني استخدام صورتي؟",
     "Yes, on the Modern layouts that include a photo. It's cropped to a square and resized on upload.":
         "نعم، في تصاميم مودرن التي تتضمن صورة. تُقصّ مربّعة ويُعدَّل حجمها عند الرفع.",
     "Build your résumé now.": "أنشئ سيرتك الذاتية الآن.",
-    "No sign-up, no paywall. Open the builder, add your details, and download in minutes.":
-        "بلا تسجيل وبلا اشتراك. افتح المنشئ، وأضف بياناتك، ونزّلها خلال دقائق.",
 
     # --- gallery ----------------------------------------------------------
     "Modern templates": "قوالب مودرن",

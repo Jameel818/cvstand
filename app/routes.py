@@ -185,12 +185,18 @@ def landing():
         "landing.html",
         categories=registry.CATEGORIES,
         featured=featured,
-        counts={
-            "modern": len(registry.by_category("modern")),
-            "ats": len(registry.by_category("ats")),
-            "live": len(registry.ported_keys()),
-        },
+        counts={**registry.counts(), "live": len(registry.ported_keys())},
     )
+
+
+@bp.get("/pricing")
+def pricing_page():
+    """The passes. A 404 while PAYMENTS_LIVE is off, so nothing (not even a
+    guessed URL) advertises a product that cannot be bought yet."""
+    from . import pricing
+    if not pricing.payments_live():
+        abort(404)
+    return render_template("pricing.html")
 
 
 @bp.get("/templates")

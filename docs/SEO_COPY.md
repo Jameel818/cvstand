@@ -9,29 +9,47 @@ Every title ends in `| CVStand` (tests/test_brand.py requires the brand in
 every `<title>`). Arabic is written for what Arabic searchers type
 (سيرة ذاتية، نموذج، قوالب), not translated word for word.
 
+**Numbers are never typed.** `{total}` is the template count from
+`app/registry.py` (`registry.counts()`, 49 on 2026-11-16). `{price}` is the
+lowest pass price from `app/pricing.py`. In Arabic, `{total_ar}` is the count
+with its counted noun in the right form (`pricing.ar_count`: «49 قالباً»). The
+`fill` filter puts the values in after translation. `tests/test_pricing.py`
+fails if a price is written anywhere else.
+
+**Two states.** `CVSTAND_PAYMENTS_LIVE` (`app/config.py`, default 0) decides
+which copy is served. While it is 0, no page names a price or a pass, and no
+page promises a free download or "no sign-up". The copy is neutral.
+
 ## Titles
 
 | Page | URL | English | العربية |
 |---|---|---|---|
 | Landing | `/` | CV Maker – Designer & ATS-Friendly Templates \| CVStand | إنشاء سيرة ذاتية احترافية بالعربي والإنجليزي \| CVStand |
-| Gallery: all | `/templates` | CV Templates – 49 Modern & ATS Designs \| CVStand | نماذج سيرة ذاتية جاهزة – 49 قالباً \| CVStand |
+| Gallery: all | `/templates` | CV Templates – {total} Modern & ATS Designs \| CVStand | نماذج سيرة ذاتية جاهزة – {total_ar} \| CVStand |
 | Gallery: ATS | `/templates?cat=ats` | ATS CV Templates That Pass Screening \| CVStand | قوالب سيرة ذاتية متوافقة مع ATS \| CVStand |
 | Gallery: Modern | `/templates?cat=modern` | Modern CV Templates – Designer Layouts \| CVStand | قوالب سيرة ذاتية حديثة بتصميم احترافي \| CVStand |
 | Builder | `/builder` | CV Builder – Write, Preview, Export PDF & Word \| CVStand | صانع السيرة الذاتية – PDF و Word \| CVStand |
+| Pricing (live only) | `/pricing` | CV Maker Pricing – Passes from {price} \| CVStand | أسعار إنشاء السيرة الذاتية – باقات تبدأ من {price} \| CVStand |
 | Sign in / up | `/account/…` | unchanged (never indexed) | unchanged (never indexed) |
+
+`/pricing` is a 404 and is left out of the sitemap while payments are off.
 
 ## Meta descriptions
 
 The landing description is also the site-wide default (`base.html`); the
 sign-in, sign-up and error pages inherit it but are never indexed.
 
-**Landing**
-- EN: Build a polished CV in minutes — in English or Arabic. 49 designer and ATS-friendly templates. Free PDF download, Word export too.
-- AR: أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. 49 قالباً احترافياً ومتوافقاً مع أنظمة ATS، وتحميل مجاني بصيغة PDF وتصدير إلى Word.
+**Landing / site-wide, payments OFF**
+- EN: Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates, with PDF and Word download.
+- AR: أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. {total_ar} بين تصاميم احترافية وقوالب متوافقة مع أنظمة ATS، مع التحميل بصيغتي PDF و Word.
+
+**Landing / site-wide, payments ON**
+- EN: Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates. Download PDF and Word from {price}.
+- AR: أنشئ سيرتك الذاتية بالعربي أو بالإنجليزي خلال دقائق. {total_ar} بين تصاميم احترافية وقوالب متوافقة مع أنظمة ATS، وتحميل PDF و Word ابتداءً من {price}.
 
 **Gallery: all**
-- EN: Browse 49 ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.
-- AR: تصفّح 49 نموذج سيرة ذاتية جاهزاً: تصاميم حديثة وقوالب ATS بسيطة. اختر قالباً واملأه مباشرة.
+- EN: Browse {total} ready-made CV templates — modern designer layouts and clean ATS formats. Pick one and fill it in online.
+- AR: تصفّح {total_ar} للسيرة الذاتية: تصاميم حديثة وقوالب ATS بسيطة. اختر قالباً واملأه مباشرة.
 
 **Gallery: ATS**
 - EN: Single-column CV templates built to be read by applicant tracking systems. Clean structure, real text, PDF and Word export.
@@ -45,21 +63,36 @@ sign-in, sign-up and error pages inherit it but are never indexed.
 - EN: Write your CV and cover letter side by side with a live preview, then download as PDF or Word.
 - AR: اكتب سيرتك الذاتية ورسالة التغطية مع معاينة فورية، ثم حمّلها بصيغة PDF أو Word.
 
+**Pricing (payments ON only)**
+- EN: Day, week or month pass. All {total} CV templates, PDF and Word downloads, Arabic and English. No subscription, no auto-renewal.
+- AR: باقة يوم أو أسبوع أو شهر: جميع القوالب الـ{total}، وتحميل PDF و Word، بالعربية والإنجليزية. بلا اشتراك ولا تجديد تلقائي.
+
+## Structured data
+
+The landing page's JSON-LD (`seo.structured_data`) carries `offers` only while
+payments are on: the three passes from `pricing.PLANS`, in USD, each with its
+duration. While payments are off there are no offers at all, never a price of 0.
+
 ## Headings
 
-Visible H1/H2s are unchanged: they are the brand voice, and the Arabic hero
-and gallery H1s are outlined artwork. One addition:
+Visible H1/H2s are unchanged except the landing hero while payments are ON
+("Your professional CV — starting at just {price}", «سيرتك الذاتية الاحترافية —
+ابتداءً من دولار واحد فقط»). The Arabic hero is outlined artwork, so its price
+words are rebuilt with `tools/outline_text.py --build-hero` whenever
+`pricing.PLANS` changes; `tests/test_hero_outline.py` fails until then.
 
 | Page | Element | English | العربية |
 |---|---|---|---|
 | Builder | `<h1 class="sr-only">` (visually hidden) | CV builder | منشئ السيرة الذاتية |
+| Pricing | `<h1>` | One payment. No subscription. | دفعة واحدة. بلا اشتراك. |
 
 ## Claims to keep true
 
-- **"49"** = 24 Modern + 25 ATS templates (2026-11-16). It is written into
-  four strings, so update all four if the count changes.
-- **"Free"** applies to building and the PDF download only
-  (`account.html`). The copy never says Word export is free.
+- **Counts** come from the registry; nothing to update by hand.
+- **Prices** come from `app/pricing.py`; nothing to update by hand except
+  re-running `--build-hero` (above).
+- **"Free"** appears only with payments ON, and only as "build and preview for
+  free", which is true. No page says the download is free or needs no sign-up.
 
 ## Social preview
 

@@ -10,7 +10,7 @@
 <title>{% block title %}{{ brand_name }}{% endblock %}</title>
 {# Per-page copy lives in each page's `meta_description` block; the master
    list, AR and EN side by side, is docs/SEO_COPY.md. #}
-<meta name="description" content="{% block meta_description %}{{ t('Build a polished CV in minutes — in English or Arabic. 49 designer and ATS-friendly templates. Free PDF download, Word export too.') }}{% endblock %}">
+<meta name="description" content="{% block meta_description %}{% if payments_live %}{{ t('Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates. Download PDF and Word from {price}.')|fill(copy_vals) }}{% else %}{{ t('Build a polished CV in minutes — in English or Arabic. {total} designer and ATS-friendly templates, with PDF and Word download.')|fill(copy_vals) }}{% endif %}{% endblock %}">
 {% set seo_description = self.meta_description()|trim %}
 {# THE LAUNCH SWITCH (app/seo.py, CVSTAND_SITE_INDEXABLE): noindex until it
    is on. Account and error pages set `page_noindex` and stay out for good. #}
@@ -74,6 +74,7 @@
     <a href="{{ url_for('main.templates_gallery') }}">{{ t('Templates') }}</a>
     <a href="{{ url_for('main.landing') }}#how">{{ t('How it works') }}</a>
     <a href="{{ url_for('main.landing') }}#families">{{ t('Families') }}</a>
+    {% if payments_live %}<a href="{{ url_for('main.pricing_page') }}">{{ t('Pricing') }}</a>{% endif %}
   </nav>
   {# Interface language. A link per language rather than a <select>: it works
      with JavaScript off, it is a real navigation the back button understands,
@@ -86,7 +87,7 @@
        aria-current="{{ 'true' if ui_lang == 'ar' else 'false' }}" lang="ar">العربية</a>
   </div>
   {# The account slot. Shows NOTHING to an anonymous visitor except after they
-     have made an account — the free tier needs no sign-in and a prominent
+     have made an account — building needs no sign-in and a prominent
      "Sign in" invites people to think it does. `current_user` is injected by
      the app factory's context processor. #}
   <div class="site-account">
@@ -124,6 +125,7 @@
     <div>
       <h4>{{ t('About') }}</h4>
       <a href="{{ url_for('main.landing') }}#how">{{ t('How it works') }}</a>
+      {% if payments_live %}<a href="{{ url_for('main.pricing_page') }}">{{ t('Pricing') }}</a>{% endif %}
       <a href="{{ url_for('main.landing') }}#faq">{{ t('FAQ') }}</a>
       <a href="mailto:{{ brand_email }}" dir="ltr">{{ brand_email }}</a>
     </div>

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{# Exists only while PAYMENTS_LIVE is on; the route 404s otherwise. #}
+{% block title %}{{ t('CV Maker Pricing – Passes from {price}')|fill(copy_vals) }} | {{ brand_name }}{% endblock %}
+{% block meta_description %}{{ t('Day, week or month pass. All {total} CV templates, PDF and Word downloads, Arabic and English. No subscription, no auto-renewal.')|fill(copy_vals) }}{% endblock %}
+
+{% block content %}
+<section class="section pricing-page">
+  <div class="section-head">
+    <div class="eyebrow">{{ t('Pricing') }}</div>
+    <h1>{{ t('One payment. No subscription.') }}</h1>
+    <p>{{ t('Build and preview for free. Buy a pass when you are ready to download.') }}</p>
+  </div>
+  {% include "_pricing_cards.html" %}
+</section>
+
+<section class="section" id="faq" style="padding-top:0">
+  <div class="section-head"><div class="eyebrow">{{ t('Questions') }}</div><h2>{{ t('Good to know.') }}</h2></div>
+  <div class="faq">
+    {% include "_faq_pass.html" %}
+    {% include "_faq_common.html" %}
+  </div>
+</section>
+{% endblock %}

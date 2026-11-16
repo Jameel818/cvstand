@@ -41,7 +41,7 @@ PARTIAL = ROOT / "app" / "templates" / "_hero_ar.html"
 #: Every outlined partial and the msgids it was built from. Imported from the
 #: generator so the two cannot describe different things — a test with its own
 #: copy of the list passes happily after someone adds a fourth partial.
-from tools.outline_text import OUTLINED  # noqa: E402
+from tools.outline_text import OUTLINED, arabic_runs  # noqa: E402
 
 HERO_MSGIDS = tuple(t for t, _ in OUTLINED["_hero_ar.html"])
 
@@ -53,7 +53,8 @@ def _partial(name: str = "_hero_ar.html") -> str:
 def _sr_only_text(name: str = "_hero_ar.html") -> str:
     m = re.search(r'<span class="sr-only">(.*?)</span>', _partial(name), re.S)
     assert m, f"{name} has no .sr-only span — the real text is gone"
-    return " ".join(m.group(1).split())
+    # Collapse ASCII whitespace only: a no-break space in the copy is real.
+    return re.sub(r"[ \t\r\n]+", " ", m.group(1)).strip()
 
 
 @pytest.mark.parametrize("name", sorted(OUTLINED))
@@ -79,7 +80,9 @@ def test_no_font_file_is_referenced(name):
 @pytest.mark.parametrize("name", sorted(OUTLINED))
 def test_the_real_text_survives_for_assistive_technology(name):
     sr = _sr_only_text(name)
-    expected = " ".join(str(ui_t(t, "ar")) for t, _ in OUTLINED[name])
+    # Filled from app/pricing.py the way the page fills it, so a price
+    # change that was not rebuilt fails here.
+    expected = " ".join(arabic_runs(OUTLINED[name]))
     assert sr == expected, (
         f"{name}'s .sr-only text no longer matches the label catalogue - the "
         "copy changed and the outlines were not rebuilt, so the page SHOWS one "
@@ -109,7 +112,9 @@ def test_there_is_one_outlined_run_per_word(name):
     Counting WORDS is what makes this a drift test: if the copy gains or loses
     a word and the outlines are not rebuilt, the count stops matching. That is
     the only way anyone would notice a missing word in a wall of path data."""
-    words = sum(len(str(ui_t(t, "ar")).split()) for t, _ in OUTLINED[name])
+    # Split on ASCII spaces as the generator does: a no-break space joins
+    # two words into one run on purpose.
+    words = sum(len([w for w in r.split(" ") if w]) for r in arabic_runs(OUTLINED[name]))
     runs = len(re.findall(r"<svg\b", _partial(name)))
     assert runs == words, (
         f"{name}: {runs} outlined runs for {words} words - the copy and the "

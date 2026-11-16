@@ -1,0 +1,11 @@
+{# FAQ items that are true whatever PAYMENTS_LIVE says. Pass questions are in
+   _faq_pass.html and render only while payments are live. #}
+<details><summary>{{ t('Modern or ATS — which should I pick?') }}</summary><p>{{ t('Modern for roles where people and design matter; ATS when you apply through online job portals.') }}</p></details>
+<details><summary>{{ t('Is the Word export the same as the PDF?') }}</summary><p>{{ t("It preserves the palette, type pairing, section order and skill levels, but Word can't reproduce every visual detail (gradient rings become dot grids, some spacing shifts). The PDF is the pixel-accurate version.") }}</p></details>
+{# Where the CV really lives, which differs between the local tool and a
+   deployment (app/config.py SERVER_STORE), the same split as the footer.
+   Deployed: localStorage only (app/static/js/builder.js); accounts hold no
+   CV (app/db.py has no résumé table); an export POSTs the CV and the server
+   keeps nothing (tests/test_stateless.py). #}
+<details><summary>{{ t('Do you store my résumé?') }}</summary><p>{% if server_store %}{{ t('It stays on this computer: in this browser and in the app’s data file on this machine. It is not sent anywhere else.') }}{% else %}{{ t('Not on our server. Your CV is saved in this browser, on this device only, and your account does not keep a copy. When you download, your browser sends the CV to our server, which builds the PDF or Word file and keeps nothing. Clearing your browser data deletes the CV, so keep a downloaded copy.') }}{% endif %}</p></details>
+<details><summary>{{ t('Can I use my own photo?') }}</summary><p>{{ t("Yes, on the Modern layouts that include a photo. It's cropped to a square and resized on upload.") }}</p></details>
