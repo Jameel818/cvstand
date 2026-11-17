@@ -185,7 +185,8 @@ class SidebarPage:
         below it."""
         from docx.oxml.ns import qn
         h = 0.0
-        width = 612.0
+        from ..docx_design import page_w_pt
+        width = page_w_pt()
         for el in self.ctx.doc.element.body:
             if el is self.tbl._tbl:
                 break
@@ -217,6 +218,13 @@ class SidebarPage:
         from ..docx_measure import Measure, bump_before
         sec = self.ctx.doc.sections[0]
         avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt - pt(bottom_px)
+        # A4 (feature/paper-size): 12pt more held back. Measured in real Word:
+        # modern-t4 EN's References ran ~28pt past the estimate on A4 (22pt on
+        # Letter, 2pt from the margin) and its row, which cannot split, went to
+        # page 2. Letter keeps its 24pt, so a Letter file does not move.
+        from ...paper import current
+        if current().key != "letter":
+            reserve_pt += 12.0
 
         def go():
             m = Measure(self.ctx.resolved)
@@ -424,7 +432,8 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
     first = Paragraph(first_el, inner.c)
 
     def go():
-        h_px = Measure(ctx.resolved).block(tc, pt(width_px)) / 0.72
+        from ..docx_design import px_pt
+        h_px = Measure(ctx.resolved).block(tc, pt(width_px)) / px_pt()
         r = max(1.0, min(radius_px, h_px / 2, width_px / 2))
         k = 100
         x_l, x_r = pt(-pad_left_px), pt(width_px - pad_left_px - r)

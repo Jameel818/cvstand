@@ -1,3 +1,24 @@
+# RESUME HERE - 2026-11-17 RUN 4 PARTIAL - STOPPED FOR THE USER (pre-existing Letter bug found; Run 5 not started)
+STOP REASON: modern-t11 EN Word file is 2 pages in REAL Word on LETTER with the shipped demo CV (data/demo_resume.json):
+  the last side line "German · Fluent" goes to page 2. Same on A4. AR is 1 page on both. Pre-existing (not caused by
+  A4; Letter files are byte-identical to before this branch), and fixing it changes Letter output -> the user decides.
+DONE (Run 4 so far):
+- Real Word (Word 16, Start-Job harness, only my own PID stopped, user's Word PID 1464 untouched): 106 A4 files
+  (49 x EN/AR cv + 4 templates x EN/AR cv+letter) -> 105 correct (cv 1 page, both 2 pages, all 595.3x841.9pt).
+  The 1 exception = modern-t11 EN (above). Files + Word PDFs: Desktop\review-paper-2026-11-17\word-a4\.
+- FIXED (A4 only) modern-t4 EN: References (push_to_bottom, a row that cannot split) went to page 2 on A4. Measured:
+  the estimator ran ~28pt short on A4 vs ~22pt on Letter (Letter ends 2pt from the margin). push_to_bottom now holds
+  12pt more on non-Letter paper. Re-checked in real Word: 1 page.
+- FIXED hidden Letter values in Word designs: common.py _above width 612.0 -> page_w_pt(); pt->px "/ 0.72" in
+  common.py (rounded blocks) and t14 (x2) -> px_pt().
+- letter capacity per paper was done in Run 3 (A4 +102px for every template).
+VERIFIED: Letter Word output still identical (196 files vs the pre-Run-3 HEAD, fonts masked); test_paper +
+  test_docx_designs + test_docx_run8_sidebars 492 passed.
+NOT DONE: real-Word check of the cover letter alone (part=letter) on A4 for all templates (only 'both' x 4 done);
+  Run 5 (e2e one file at a time + full fast suite).
+NEEDS THE USER'S MANUAL WORD CHECK (none hung; listed because automation checks page count/size, not looks):
+  modern-t4 EN A4 (reserve change), modern-t11 EN (both papers, the bug), modern-t22 EN/AR A4 (new rail picture).
+
 # RESUME HERE - 2026-11-17 RUN 3 DONE (feature/paper-size: Word engine on A4; Run 4 real-Word check next)
 DONE (Run 3):
 - docx.render_docx binds paper.use(data) for the whole export (body moved to _render_docx).

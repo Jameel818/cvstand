@@ -15,7 +15,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    page_h_px, Box, Ctx, design, dots_shape, fmt_cell, fmt_p, fmt_table, page_rects, photo_run, pt,
+    page_h_px, px_pt, Box, Ctx, design, dots_shape, fmt_cell, fmt_p, fmt_table, page_rects, photo_run, pt,
     row_height, run, tiny, tw, vmerge, vml_anchored, vml_oval,
 )
 from docx.oxml.ns import qn
@@ -70,7 +70,7 @@ def build(ctx: Ctx) -> None:
     # continuation cells, so it re-tinied this very paragraph (photo at 0px)
     tiny(gap, 40)
     gap._p.find(qn("w:pPr") + "/" + qn("w:spacing")).set(
-        qn("w:line"), str(round(240 * 30 / single_px(ctx, "body", 20 / 0.72))))
+        qn("w:line"), str(round(240 * 30 / single_px(ctx, "body", 20 / px_pt()))))
     # the gap down to the columns (346px main, 360px side): an at-least row
     # measured from the panel's foot is unknown, so the columns start right
     # after the photo (330px) + 16px
@@ -83,7 +83,7 @@ def build(ctx: Ctx) -> None:
         tr = head.rows[2]._tr
         for old in tr.findall(".//" + qn("w:trHeight")):
             old.getparent().remove(old)
-        row_height(head.rows[2], max(16, HEAD_PX - 70 - ph / 0.72))
+        row_height(head.rows[2], max(16, HEAD_PX - 70 - ph / px_pt()))
     ctx.after_lines.append(size_head)
     spacer = ctx.doc.add_paragraph()
     tiny(spacer)
