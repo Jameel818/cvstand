@@ -1,3 +1,22 @@
+# RESUME HERE - 2026-11-17 RUN 2 DONE (feature/paper-size: templates + A4 goldens; Run 3 Word engine next)
+DONE (Run 2):
+- modern-t15: absolute sidebar = {{ page.h }} (done in Run 1) - fills A4, checked by eye.
+- modern-t22 EN: A4-only branch in t22.j2 (Letter line untouched): rail centred at 604.25, width 1145.5, Archivo
+  214->235px, stroke 5.5, kerns x1.0977. Measured ink end gaps A4 39/40 vs Letter 38/39.
+- modern-t22 AR: 222px CLIPPED (ink as thick as the size, 222 > 215px rail - measured), so A4 keeps Letter's 202px and
+  stretches the word along its length only: [data-paper=a4][dir=rtl] .vrail span { scaleX(1.0977) } in RTL_TYPOGRAPHY.
+  Measured: ink x 642-846 (= Letter), end gaps 46/46 (Letter 45/45).
+- NEW GOLDENS (pre-approved): tests/golden/pixels-a4/ (49, 850x1202) + `a4` HTML scenario (tests/golden/html/a4, 49).
+  tools/golden.py --pixels --paper a4; tests/test_golden_pixels.py has the A4 twin; .gitignore un-ignores pixels-a4
+  (the *.PNG rule would otherwise have left them untracked, the same trap as the Letter set).
+- REVIEW FOR THE USER: C:\Users\User\Desktop\review-paper-2026-11-17\before and \after (all 49 x EN/AR x Letter/A4,
+  196 PNGs each + probe json). before = Run 1 state, after = Run 2. Only t22 EN/AR A4 differ.
+VERIFIED: Letter pixel goldens 49/49 unchanged; A4 pixel 49/49; HTML 5 scenarios x 49 (Letter 4 unchanged);
+  before/after: every Letter screenshot pixel-identical; all 49 EN+AR A4 PDFs = 1 page, 594.96x841.92 (98/98);
+  probe: no A4 element ends at 1100 except ats-t21 AR (a content block ending there by chance, looked at).
+  CLAUDE.md compliance pass: diff is page height + rail geometry only; palette/type/structure/skill text unchanged.
+NOT VERIFIED YET: Word (Runs 3-4), letter capacity on A4 (Run 4), full e2e (Run 5).
+
 # RESUME HERE - 2026-11-17 RUN 1 DONE (feature/paper-size: engine + builder switch; Runs 2-5 next, in order)
 USER CONFIRMED: old CVs (no `paper`) stay LETTER; new CV = A4, Letter if browser en-US/en-CA; user can switch.
 DONE (Run 1):
