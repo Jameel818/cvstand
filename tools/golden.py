@@ -49,6 +49,9 @@ from app.rendering import canvas_html, document_html
 GOLDEN = ROOT / "tests" / "golden"
 HTML_DIR = GOLDEN / "html"
 PIXEL_DIR = GOLDEN / "pixels"
+# A4 (feature/paper-size): the same sample on the 850x1202 page. A SEPARATE
+# directory: the Letter goldens above must never move for A4 work.
+PIXEL_A4_DIR = GOLDEN / "pixels-a4"
 
 SAMPLE = json.loads((ROOT / "data" / "sample_resume.json").read_text(encoding="utf-8"))
 
@@ -91,6 +94,9 @@ SCENARIOS = {
     "sparse": SPARSE,
     "gpa": _with_gpa(),
     "partial": _partial_sections(),
+    # A4 (feature/paper-size): `sample` on the 1202px page. The four above
+    # carry no `paper`, so they are Letter and stay byte-identical.
+    "a4": dict(SAMPLE, paper="a4"),
 }
 
 
@@ -98,8 +104,8 @@ def html_path(scenario: str, key: str) -> Path:
     return HTML_DIR / scenario / f"{key}.html"
 
 
-def pixel_path(key: str) -> Path:
-    return PIXEL_DIR / f"{key}.png"
+def pixel_path(key: str, paper: str = "letter") -> Path:
+    return (PIXEL_A4_DIR if paper == "a4" else PIXEL_DIR) / f"{key}.png"
 
 
 def write_html() -> int:
@@ -113,31 +119,33 @@ def write_html() -> int:
     return n
 
 
-def write_pixels() -> int:
+def write_pixels(paper: str = "letter") -> int:
     from playwright.sync_api import sync_playwright
 
-    PIXEL_DIR.mkdir(parents=True, exist_ok=True)
+    data = SAMPLE if paper == "letter" else dict(SAMPLE, paper=paper)
+    height = 1202 if paper == "a4" else 1100
+    pixel_path(registry.ported_keys()[0], paper).parent.mkdir(parents=True, exist_ok=True)
     keys = registry.ported_keys()
     n = 0
     with sync_playwright() as p:
         browser = p.chromium.launch(args=["--no-sandbox"])
         try:
             for key in keys:
-                page = browser.new_page(viewport={"width": 850, "height": 1100})
+                page = browser.new_page(viewport={"width": 850, "height": height})
                 try:
                     # for_pdf=True embeds the font bytes. set_content()'s base
                     # URL is about:blank, so a linked /static/... stylesheet
                     # resolves to nothing and Chromium substitutes a fallback
                     # face WITHOUT error -- every golden would then be captured
                     # in the wrong typeface and the gate would be worthless.
-                    page.set_content(document_html(SAMPLE, key, for_pdf=True),
+                    page.set_content(document_html(data, key, for_pdf=True),
                                      wait_until="networkidle")
                     page.evaluate("document.fonts && document.fonts.ready")
                     # Auto-fit compresses the layout after fonts.ready. Capture
                     # before it settles and the golden is a half-fitted frame,
                     # different on every run -- the classic flaky-baseline trap.
                     page.evaluate("window.ResumeAutofit ? window.ResumeAutofit.ready : null")
-                    page.locator(".tpl").screenshot(path=str(pixel_path(key)))
+                    page.locator(".tpl").screenshot(path=str(pixel_path(key, paper)))
                     n += 1
                 finally:
                     page.close()
@@ -152,6 +160,8 @@ def main() -> int:
     ap.add_argument("--html", action="store_true", help="regenerate the HTML fragment goldens")
     ap.add_argument("--pixels", action="store_true", help="regenerate the rendered-canvas goldens")
     ap.add_argument("--all", action="store_true", help="both")
+    ap.add_argument("--paper", choices=("letter", "a4"), default="letter",
+                    help="which pixel set --pixels writes (default letter)")
     args = ap.parse_args()
 
     if not (args.html or args.pixels or args.all):
@@ -160,7 +170,7 @@ def main() -> int:
     if args.html or args.all:
         print(f"HTML goldens written:  {write_html()}")
     if args.pixels or args.all:
-        print(f"pixel goldens written: {write_pixels()}")
+        print(f"pixel goldens written ({args.paper}): {write_pixels(args.paper)}")
     return 0
 
 

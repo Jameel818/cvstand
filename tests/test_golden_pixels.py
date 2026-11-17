@@ -41,6 +41,7 @@ pytestmark = pytest.mark.e2e
 
 ROOT = Path(__file__).resolve().parent.parent
 GOLDEN = ROOT / "tests" / "golden" / "pixels"
+GOLDEN_A4 = ROOT / "tests" / "golden" / "pixels-a4"     # feature/paper-size
 ARTIFACTS = ROOT / "tests" / "e2e" / "artifacts"
 
 SAMPLE = json.loads((ROOT / "data" / "sample_resume.json").read_text(encoding="utf-8"))
@@ -70,12 +71,13 @@ def browser(_playwright):
         b.close()
 
 
-def _render(browser, key: str, path: Path) -> None:
-    page = browser.new_page(viewport={"width": 850, "height": 1100})
+def _render(browser, key: str, path: Path, paper: str = "letter") -> None:
+    data = SAMPLE if paper == "letter" else dict(SAMPLE, paper=paper)
+    page = browser.new_page(viewport={"width": 850, "height": 1202 if paper == "a4" else 1100})
     try:
         # for_pdf=True embeds the fonts; see tools/golden.py for why a linked
         # stylesheet would silently rasterise every glyph in the wrong face.
-        page.set_content(document_html(SAMPLE, key, for_pdf=True), wait_until="networkidle")
+        page.set_content(document_html(data, key, for_pdf=True), wait_until="networkidle")
         page.evaluate("document.fonts && document.fonts.ready")
         page.evaluate("window.ResumeAutofit ? window.ResumeAutofit.ready : null")
         page.locator(".tpl").screenshot(path=str(path))
@@ -137,3 +139,30 @@ def test_rendered_canvas_matches_golden(browser, key, tmp_path):
 def test_every_ported_template_has_a_pixel_golden():
     missing = [k for k in registry.ported_keys() if not (GOLDEN / f"{k}.png").exists()]
     assert not missing, f"templates with no pixel golden: {missing}"
+
+
+# ---- A4 (feature/paper-size) ------------------------------------------------------
+# The same sample on the 850x1202 page, against its own directory. Created with
+#     venv/Scripts/python tools/golden.py --pixels --paper a4
+# The Letter gate above is untouched by A4 work: if it moves, A4 work is wrong.
+
+@pytest.mark.slow
+@pytest.mark.parametrize("key", registry.ported_keys())
+def test_rendered_a4_canvas_matches_golden(browser, key, tmp_path):
+    golden_path = GOLDEN_A4 / f"{key}.png"
+    if not golden_path.exists():
+        pytest.fail(f"No A4 pixel golden for {key}. Create it with: "
+                    f"venv/Scripts/python tools/golden.py --pixels --paper a4")
+    actual_path = tmp_path / f"{key}.png"
+    _render(browser, key, actual_path, "a4")
+    count, why = _compare(golden_path, actual_path, key + "-a4")
+    assert count == 0, f"{key} (A4) renders differently: {why}"
+
+
+def test_every_ported_template_has_an_a4_pixel_golden():
+    from PIL import Image
+    missing = [k for k in registry.ported_keys() if not (GOLDEN_A4 / f"{k}.png").exists()]
+    assert not missing, f"templates with no A4 pixel golden: {missing}"
+    wrong = [k for k in registry.ported_keys()
+             if Image.open(GOLDEN_A4 / f"{k}.png").size != (850, 1202)]
+    assert not wrong, f"A4 goldens not 850x1202: {wrong}"

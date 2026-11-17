@@ -284,6 +284,14 @@ RTL_TYPOGRAPHY = """<style>
   }
   /* FIXED: no policy face, no font choice reaches the rail word (it outranks
      both the [dir=rtl] .tpl * policy rule (0,2,0) and the typography rules). */
+  /* A4 (feature/paper-size): the rail is 1145.5px long on the 1202px page.
+     The Latin word grows to fill it (t22.j2), but the Arabic word cannot: its
+     ink is as thick as its size, and 222px measured 222px of ink across the
+     215px rail - clipped on both sides. So it keeps Letter's 202px (the
+     thickness approved there) and is stretched along its LENGTH only, by the
+     rail's 1145.5/1043.5, to fill it end to end as on Letter. The span is a
+     flex item (blockified), so the transform applies. A4 only (data-paper). */
+  [data-paper="a4"][dir="rtl"] .tpl .vrail span { transform: scaleX(1.0977) !important; }
   [dir="rtl"] .tpl .vrail,
   [dir="rtl"] .tpl .vrail * {
     font-family: "CVT Cairo", "Cairo", sans-serif !important;
