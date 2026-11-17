@@ -1,3 +1,31 @@
+# RESUME HERE - 2026-11-17 (feature/paper-size from feature/pricing bfc37f4: A4 / US Letter INVESTIGATION ONLY; no product code changed)
+GOAL (user): two paper sizes for every CV + cover letter, A4 default and US Letter, chosen per CV, identical in preview,
+PDF and Word; each a TRUE page the design fills. Full plan: C:\Users\User\.claude\plans\clever-bouncing-pearl.md.
+DECISIONS PROPOSED:
+- A4 canvas 850 x 1202px (width unchanged -> every width-keyed/absolute layout holds). A4 1px = 595.28/850 = 0.70033pt;
+  PDF scale 0.93377 on format A4 (Letter keeps 0.96); Word 11906 x 16838 twips. Cost: A4 type prints 2.7% smaller in pt.
+- New root field `paper: "a4"|"letter"` (schema root is additionalProperties:false). MISSING = LETTER (old CVs keep the page
+  they approved; Letter goldens stay valid). New CV: A4, Letter if navigator.language is en-US/en-CA.
+- Letter output must stay byte-identical: templates get height:{{ page.h }}px, which renders 1100 for Letter.
+ENGINE TOUCH POINTS: app/rendering.py (_DOC_TMPL @page 850x1100, canvas_html), autofit.js MAX_H=1100, exporters/pdf.py
+  (LETTER_PT/CANVAS_PX/PDF_SCALE/_LETTER_PAGE), docx_design PX/PAGE_W/PAGE_H_PT, docx_layout PAGE_W/PAGE_H_PT, docx_ats
+  CANVAS_H, docx_letter Twips(12240/15840)+PAGE_H_PX, word_designs/common.py:46 + literal 1100 rects in t5 t7 t8 t9 t11
+  t12 t14 t15 t18 t22 t23 t24, _letter.j2 height, letter_capacity.json (measured at 1100, rebuild per paper),
+  builder.js:994 + app.css:684/687 preview height, schema.py, builder ribbon switch «حجم الورق».
+49 TEMPLATES MEASURED (scratchpad probe: root height/@page/MAX_H -> 1202, EN+AR samples, bottom-edge pixel row vs Letter,
+  elements still ending at 1100, contact sheets checked by eye):
+- AUTO 47: ATS t1-t25; Modern t1-t14, t16-t21, t23, t24 (flex roots; sidebars stretch; bottom-pinned blocks move down).
+- NEEDS WORK 2: modern-t15 (absolute sidebar height:1100px, t15.j2:22 -> 102px white strip); modern-t22 (rotated RESUME
+  rail positioned for 1100: top:553.25px width:1043.5px; Word rail PNG needs an A4 pair, tools/build_t22_rail.py).
+- Word: all 24 Modern Word designs need an A4 one-page re-check in real Word (avail budgets follow PAGE_H_PT).
+- Note: white single-column templates get ~100px more white below content on A4 (autofit never expands) = page room.
+TESTS/GOLDENS: Letter goldens (html 4 scenarios, pixels 49) must NOT move. NEW for user approval: tests/golden/pixels-a4/
+  (49) + an `a4` HTML scenario. 11 test files hold a literal 1100 (stay Letter or get an A4 twin); new test_paper.py and
+  an A4 PDF page test beside e2e/test_pdf_letter_page.py.
+RUNS: 1 engine+switch 3-4h | 2 t15/t22 + A4 visual pass + A4 goldens for approval 2h | 3 Word engine 3h |
+  4 Word fidelity in real Word + cover letter capacity 3h | 5 e2e one file at a time + fast suite 2h.
+NOT DONE: everything above; this commit is the findings only. main untouched.
+
 # RESUME HERE - 2026-11-16b (feature/pricing from feature/seo 95f5cc6: pricing copy + hook points behind PAYMENTS_LIVE; NOT merged, NOT deployed)
 DONE (copy + UI only; NO payment code, no gateway, no external script; nothing gates a download):
 - ONE SOURCE: app/pricing.py. PLANS day $1/1 day, week $3/7 days (popular), month $7/30 days; AUTO_RENEW False;
