@@ -4,7 +4,7 @@
    body. ATS-safe: whitespace-only structure, inline "name — Level" skill run. #}
 {% set HEAD = "font-family:Anton,sans-serif; font-size:15px; letter-spacing:4px; color:#C0392B; margin-bottom:6px;" %}
 {% set name_parts = r.name.split(" ", 1) %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:42px 64px 32px; display:flex; flex-direction:column; gap:12px; font-family:'Source Sans 3',sans-serif; color:#17181A;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#ffffff; padding:42px 64px 32px; display:flex; flex-direction:column; gap:12px; font-family:'Source Sans 3',sans-serif; color:#17181A;">
 
   <div>
     <div class="cv-name" style="font-family:Anton,sans-serif; font-size:54px; line-height:0.94; letter-spacing:0.5px; text-transform:uppercase;">{{ name_parts[0] }}{% if name_parts|length > 1 %}<br>{{ name_parts[1] }}{% endif %}</div>

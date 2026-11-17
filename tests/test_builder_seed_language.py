@@ -35,7 +35,8 @@ from app import create_app
 from app.i18n import COOKIE
 from app.store import seed_resume
 
-_SEED = re.compile(r'<script id="resume-data" type="application/json">(.*?)</script>', re.S)
+# [^>]* : the tag carries data-new="1" when it is the untouched demo (paper size)
+_SEED = re.compile(r'<script id="resume-data" type="application/json"[^>]*>(.*?)</script>', re.S)
 
 
 @pytest.fixture()

@@ -29,7 +29,7 @@
 {% set RAILCOL = "flex:1; min-width:0; padding-inline-start:22px; border-inline-start:2px solid #111111; display:flex; flex-direction:column; gap:20px;" %}
 {% set NODE = "position:absolute; inset-inline-start:-32px; top:-2px; width:15px; height:15px; border-radius:50%; background:#f7f7f5; border:2px solid #111111; box-sizing:border-box;" %}
 {% set SIDECOL = "width:210px; flex-shrink:0;" %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#f7f7f5; overflow:hidden; padding:44px 46px; display:flex; flex-direction:column; gap:20px; font-family:Inter,sans-serif; color:#111111;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#f7f7f5; overflow:hidden; padding:44px 46px; display:flex; flex-direction:column; gap:20px; font-family:Inter,sans-serif; color:#111111;">
 
   <div style="display:flex; align-items:baseline; justify-content:space-between; gap:20px;">
     <div class="cv-name" style="font-family:Anton,sans-serif; font-weight:400; font-size:66px; color:#111111; letter-spacing:0.5px; line-height:0.9; text-transform:uppercase;">{{ r.name }}</div>

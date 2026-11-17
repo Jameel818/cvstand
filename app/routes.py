@@ -72,7 +72,7 @@ from . import ai_quota, importer
 from .schema import (
     SUPPORTED_LANGS, ResumeValidationError, typography_migrations, typography_of, validate,
 )
-from .store import load_meta, load_resume, load_showcase, save_resume, set_template
+from .store import load_meta, load_resume, load_showcase, save_resume, seed_resume, set_template
 from .typography.ui import builder_payload as typography_payload
 
 bp = Blueprint("main", __name__)
@@ -243,6 +243,11 @@ def builder():
     return render_template(
         "builder.html",
         resume=resume,
+        # Paper size: is #resume-data the untouched demo (a NEW CV, which
+        # builder.js puts on A4 or the browser's Letter) or a CV someone saved
+        # (no `paper` = Letter, the page they approved)? With SERVER_STORE on
+        # it can be either; off, it is always the demo. app/paper.py.
+        resume_is_new=(resume == seed_resume(i18n_mod.current_lang())),
         meta=load_meta(),
         template=registry.get(load_meta()["template_key"]),
         catalogue=[t.__dict__ for t in registry.by_category()],

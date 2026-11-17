@@ -17,9 +17,9 @@
      5. `.tpl` is overflow:hidden with absolutely-placed panels — verified by
         screenshot, not `.tpl` scrollHeight. Sidebar gap 20->13, right gap 20->16. #}
 {% set SIDE_H = "font-size:19px; font-weight:900; color:#D99201; letter-spacing:1px; line-height:1.25; margin-bottom:8px;" %}
-<div class="tpl cv-sections-taj" style="box-sizing:border-box; position:relative; width:850px; height:1100px; background:#ffffff; font-family:Archivo,sans-serif; overflow:hidden;">
+<div class="tpl cv-sections-taj" style="box-sizing:border-box; position:relative; width:850px; height:{{ page.h }}px; background:#ffffff; font-family:Archivo,sans-serif; overflow:hidden;">
 
-  <div style="position:absolute; inset-inline-start:0; top:0; width:340px; height:1100px; background:#1A3F22;"></div>
+  <div style="position:absolute; inset-inline-start:0; top:0; width:340px; height:{{ page.h }}px; background:#1A3F22;"></div>
   <div style="position:absolute; inset-inline-start:0; top:74px; width:850px; height:186px; background:#D99201;"></div>
   <div style="position:absolute; inset-inline-start:30px; top:40px; width:268px; height:268px; border-radius:50%; background:#e8dcc0; overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center; font-size:11px; color:#7a6a3f; letter-spacing:1px; line-height:1.5;">
     {% if r.photo_url %}<img src="{{ r.photo_url }}" alt="" style="width:100%; height:100%; object-fit:cover; display:block;">{% else %}{{ t('PORTRAIT<br>PLACEHOLDER') }}{% endif %}

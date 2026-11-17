@@ -96,7 +96,10 @@ def test_floors_match_the_documented_contract():
     src = AUTOFIT_JS.read_text(encoding="utf-8")
     assert re.search(r"var FLOOR = 0\.85;", src)
     assert re.search(r"var TYPE_FLOOR = 0\.90;", src)
-    assert re.search(r"var MAX_H = 1100;", src)
+    # The page box: 1100 (Letter) unless the document says A4's 1202 on
+    # <html data-page-h> (feature/paper-size, app/paper.py).
+    assert re.search(r'getAttribute\("data-page-h"\)', src)
+    assert re.search(r"return v > 0 \? v : 1100;", src)
 
 
 def test_engine_only_scales_vertical_and_type_properties():

@@ -47,6 +47,12 @@ RESUME_SCHEMA: dict[str, Any] = {
         # back to English layout, which is precisely the class of failure this
         # project keeps finding (a wrong render that raises nothing).
         "lang": {"type": "string", "enum": ["en", "ar"]},
+        # Paper size (feature/paper-size). OPTIONAL and absent-means-LETTER:
+        # every CV saved before A4 existed was approved on Letter and keeps
+        # that page. A new CV is given one by the builder. See app/paper.py.
+        # Deliberately NOT added by normalize(): templates read the page
+        # through the `page` render variable (rendering.canvas_html).
+        "paper": {"type": "string", "enum": ["a4", "letter"]},
         # Typography choices (docs/CVSTAND_FONT_CONTROLS.md §2). OPTIONAL;
         # null or absent means "template default". The schema checks the JSON
         # TYPE only — a wrong type is a 422. Whether a value is on the

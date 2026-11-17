@@ -1,3 +1,26 @@
+# RESUME HERE - 2026-11-17 RUN 1 DONE (feature/paper-size: engine + builder switch; Runs 2-5 next, in order)
+USER CONFIRMED: old CVs (no `paper`) stay LETTER; new CV = A4, Letter if browser en-US/en-CA; user can switch.
+DONE (Run 1):
+- app/paper.py = the one source (LETTER 850x1100 0.72pt/px; A4 850x1202 0.70033pt/px, twips 11906x16838), paper_of,
+  default_for_locale, ContextVar use()/current() for the exporters (Word engine uses it in Run 3).
+- schema: optional root `paper` enum a4|letter. DEVIATION: normalize() does NOT add it (normalize goldens unchanged);
+  templates get `page` as a render variable (rendering.canvas_html, letter.canvas_html).
+- 49 roots + _letter.j2: height:{{ page.h }}px (t15's absolute sidebar too). Letter fragments byte-identical (tested x49).
+- document_html: @page 850px {h}px; A4 docs carry <html data-paper="a4" data-page-h="1202">; Letter docs no attribute.
+- autofit.js MAX_H from data-page-h (default 1100).
+- pdf.py: per paper (page_css, format, scale). MEASURED DEVIATION: Chromium cannot emit ISO A4 595.28x841.89; every
+  @page form (mm/pt/in/px/"A4") gives 594.96x841.92pt (= Chrome's own Save-as-PDF A4; 0.32pt off, inside ISO +-2mm).
+  So A4 PDF = 594.96x841.92, scale 594.96/637.5 = 0.93327 (1px = 0.69996pt vs Word 0.70033: 0.05%). Paper.pdf_pt.
+- builder: ribbon «حجم الورق» / "Paper size" A4|Letter switch (#paper-switch, undo-able, saved in the résumé, sent with
+  every export); --page-h CSS var sizes the stage, iframe, zoom margin and drawer minis.
+  New-CV default ONLY when #resume-data is the untouched demo: routes.builder sets data-new="1" (resume == seed_resume);
+  in local SERVER_STORE mode a saved resume.json without paper therefore stays Letter (e2e tested).
+- labels: Paper size / A4 tooltip / US Letter tooltip / "Letter" (kept Latin in AR per the user; SAME_IN_BOTH_SCRIPTS).
+VERIFIED: tests/test_paper.py 130; e2e test_pdf_a4_page 22 (5 templates EN+AR cv, letter, both, px->pt), e2e
+  test_pdf_letter_page 20 (unchanged), e2e test_paper_builder 8; fast suite 6227 passed / 11 failed -> the 11 were
+  test assumptions (exact `var MAX_H = 1100;` pin; seed regex not allowing data-new) - fixed, those files re-run green.
+NOT VERIFIED YET: pixel goldens (Run 2), all 49 A4 PDFs, Word (Runs 3-4), full e2e (Run 5).
+
 # RESUME HERE - 2026-11-17 (feature/paper-size from feature/pricing bfc37f4: A4 / US Letter INVESTIGATION ONLY; no product code changed)
 GOAL (user): two paper sizes for every CV + cover letter, A4 default and US Letter, chosen per CV, identical in preview,
 PDF and Word; each a TRUE page the design fills. Full plan: C:\Users\User\.claude\plans\clever-bouncing-pearl.md.

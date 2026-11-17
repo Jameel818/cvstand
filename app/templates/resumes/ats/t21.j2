@@ -18,7 +18,7 @@
 {% macro mh(label) %}
 <div class="sec-head cv-section" style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px; letter-spacing:1.2px; text-transform:uppercase; color:#0E7490; margin-bottom:6px;">{{ label }}</div>
 {% endmacro %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:46px 60px; display:flex; flex-direction:column; gap:14px; font-family:Inter,sans-serif; color:#0F1A20;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#ffffff; padding:46px 60px; display:flex; flex-direction:column; gap:14px; font-family:Inter,sans-serif; color:#0F1A20;">
 
   <div style="border-bottom:2px solid #0E7490; padding-bottom:12px;">
     <div class="cv-name" style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:38px; line-height:1.06; letter-spacing:-1px;">{{ r.name }}</div>

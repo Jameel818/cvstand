@@ -822,6 +822,12 @@ _UI_AR: dict[str, str] = {
         "إعادة الاسم وعناوين الأقسام والتفاصيل إلى خطوط هذا القالب الأصلية",
     "Show labels": "إظهار التسميات",
     "Hide labels": "إخفاء التسميات",
+    # paper size (feature/paper-size): the ribbon's A4 / Letter switch
+    "Paper size": "حجم الورق",
+    # The paper's own name, kept Latin like "A4" (user: «حجم الورق: A4 / Letter»)
+    "Letter": "Letter",
+    "A4: the international paper size": "A4: مقاس الورق الدولي",
+    "US Letter: the USA and Canada": "Letter: مقاس الولايات المتحدة وكندا",
     # the cover letter (2026-10-18)
     "Add a cover letter": "أضف خطاب تقديم",
     "Cover letter": "خطاب التقديم",

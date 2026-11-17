@@ -371,7 +371,9 @@ def test_arabic_differs_from_english_for_every_msgid():
 # Strings that are deliberately identical in both scripts. "PDF" is a file
 # format, not a word; Arabic writes it Latin. Anything else here needs a
 # reason written beside it.
-SAME_IN_BOTH_SCRIPTS = {"PDF"}
+# "Letter" is the paper size's name beside "A4" in the ribbon's switch; the
+# user specified it Latin in Arabic: «حجم الورق: A4 / Letter» (2026-11-17).
+SAME_IN_BOTH_SCRIPTS = {"PDF", "Letter"}
 
 
 def test_arabic_differs_from_english_for_every_shell_msgid():

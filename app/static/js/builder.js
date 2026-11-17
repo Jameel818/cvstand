@@ -92,6 +92,20 @@
       return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : seed;
     } catch (_) { return seed; }
   })();
+  /* PAPER SIZE (feature/paper-size). `data.paper` is "a4" or "letter"; a CV
+     with no paper field is LETTER (it was approved on Letter - app/paper.py).
+     A NEW CV - the seed, nothing stored for this language - starts on A4, or on
+     Letter when the browser is en-US / en-CA. Set once here; after that it is
+     the résumé's own value, saved and undone with it and sent with every
+     render and export. */
+  const PAPER_H = { a4: 1202, letter: 1100 };
+  const paperKey = () => (data.paper === "a4" ? "a4" : "letter");
+  const pageH = () => PAPER_H[paperKey()];
+  const seedIsNew = $("#resume-data").dataset.new === "1";
+  if (data === seed && seedIsNew && !data.paper) {
+    const loc = String(navigator.language || "").toLowerCase().replace("_", "-");
+    data = Object.assign({}, seed, { paper: loc === "en-us" || loc === "en-ca" ? "letter" : "a4" });
+  }
   const catalogue = JSON.parse($("#catalogue-data").textContent);
   let templateKey = readStored(TPL_KEY) || S.templateKey;
   /* A key stored by an older build could name a template that no longer
@@ -551,6 +565,7 @@
     renderForm();
     syncLetterUI();
     refreshRibbon();
+    applyPaper();
     paintUndo();
     if (keepName) {
       const el = $(`#resume-form [name="${CSS.escape(keepName)}"]`);
@@ -991,7 +1006,7 @@
     else scale = zoom;
     [stage, letterStage].forEach((st) => {
       st.style.transform = `scale(${scale})`;
-      st.style.marginBottom = `${(scale - 1) * 1100}px`;
+      st.style.marginBottom = `${(scale - 1) * pageH()}px`;
     });
     $("#zoom-lvl").textContent = zoom === "fit" ? T("Fit") : Math.round(scale * 100) + "%";
   }
@@ -1003,6 +1018,25 @@
     applyZoom();
   }));
   window.addEventListener("resize", () => { if (zoom === "fit") applyZoom(); });
+
+  /* The page the preview draws is the CV's paper: one CSS variable sizes the
+     stage, its iframe and the drawer minis (app.css). */
+  function applyPaper() {
+    document.documentElement.style.setProperty("--page-h", pageH() + "px");
+    $$("#paper-switch .rb-seg").forEach((b) => {
+      b.setAttribute("aria-pressed", String(b.dataset.paper === paperKey()));
+    });
+    applyZoom();
+  }
+  $("#paper-switch").addEventListener("click", (e) => {
+    const b = e.target.closest(".rb-seg");
+    if (!b || b.dataset.paper === paperKey()) return;
+    recordUndo();
+    data.paper = b.dataset.paper;
+    applyPaper();
+    scheduleRender();
+    scheduleSave();
+  });
 
   /* ---------- save ---------- */
   function setSaveState(kind) {
@@ -1531,6 +1565,7 @@
   refreshRibbon();
   applyRibbonMode();
   paintUndo();
+  applyPaper();
   applyZoom();
   /* After T() exists and before anything is drawn: the bar is server-rendered
      from the server's meta, which on a deployment is not what `templateKey`

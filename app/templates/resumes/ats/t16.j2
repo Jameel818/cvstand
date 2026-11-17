@@ -19,7 +19,7 @@
 {% macro dh(label) %}
 <div style="border-top:2px solid #1A1714; border-bottom:1px solid #C9BFB6; padding:4px 0; margin-bottom:6px;"><span class="cv-section" style="font-family:Fraunces,serif; font-weight:700; font-size:13px; letter-spacing:1.2px; text-transform:uppercase;">{{ label }}</span></div>
 {% endmacro %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:42px 64px; display:flex; flex-direction:column; gap:10px; font-family:'Source Sans 3',sans-serif; color:#1A1714;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#ffffff; padding:42px 64px; display:flex; flex-direction:column; gap:10px; font-family:'Source Sans 3',sans-serif; color:#1A1714;">
 
   <div>
     <div class="cv-name" style="font-family:Fraunces,serif; font-weight:700; font-size:44px; line-height:1.04;">{{ r.name }}</div>

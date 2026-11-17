@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import Any
 
 from . import rendering
+from .paper import paper_of
 from .labels import reset_lang, set_lang
 from .schema import dir_of, lang_of, normalize
 
@@ -254,7 +255,7 @@ def canvas_html(data: dict[str, Any], template_key: str) -> str:
         letter = letter_of(data)
         return tpl.render(r=r, L=letter, th=theme(template_key, lang), key=template_key,
                           body_px=body_px(letter), recipient=recipient_lines(letter),
-                          contact=contact_items(r))
+                          contact=contact_items(r), page=paper_of(data))
     finally:
         reset_lang(token)
 

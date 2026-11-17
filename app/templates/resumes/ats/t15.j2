@@ -20,7 +20,7 @@
 {% macro head(label) %}
 <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;"><span class="cv-section" style="font-family:Poppins,sans-serif; font-weight:700; font-size:13px; letter-spacing:2.2px; text-transform:uppercase; color:#6B2A5A;">{{ label }}</span><span style="flex:1; height:1px; background:#6B2A5A;"></span></div>
 {% endmacro %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:16px; font-family:'Open Sans',sans-serif; color:#191520;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#ffffff; padding:56px 66px; display:flex; flex-direction:column; gap:16px; font-family:'Open Sans',sans-serif; color:#191520;">
 
   <div>
     <div class="cv-name" style="font-family:Poppins,sans-serif; font-weight:700; font-size:40px; line-height:1.06; letter-spacing:-0.8px;">{{ r.name }}</div>

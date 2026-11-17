@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoes
 from markupsafe import Markup
 
 from . import registry
+from .paper import paper_of
 from .labels import join_labels, reset_lang, set_lang, t
 from .schema import dir_of, lang_of, normalize, typography_of
 from .typography.render import document_blocks
@@ -90,7 +91,7 @@ def canvas_html(data: dict, template_key: str) -> str:
         r = normalize(data)
         if dir_of(data) == "rtl":
             r = _isolate_phones(r)
-        return tpl.render(r=r, meta=registry.get(template_key))
+        return tpl.render(r=r, meta=registry.get(template_key), page=paper_of(data))
     finally:
         reset_lang(token)
 
@@ -438,7 +439,7 @@ def policy_faces(for_pdf: bool) -> str:
 
 
 _DOC_TMPL = """<!DOCTYPE html>
-<html lang="{lang}" dir="{dir}">
+<html lang="{lang}" dir="{dir}"{paper_attr}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -450,7 +451,7 @@ _DOC_TMPL = """<!DOCTYPE html>
   *, *::before, *::after {{ box-sizing: border-box; }}
   .tpl {{ background: #fff; margin: 0 auto; }}
   @media screen {{ .tpl {{ box-shadow: 0 8px 30px rgba(0,0,0,0.12); }} }}
-  @page {{ size: 850px 1100px; margin: 0; }}
+  @page {{ size: 850px {page_h}px; margin: 0; }}
   @media print {{
     html, body {{ background: #fff; }}
     .tpl {{ box-shadow: none; }}
@@ -492,6 +493,7 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
     # for_pdf inlines the chosen faces instead of linking typography.css, for
     # the same reason font_head does (no base URL on the PDF path).
     choices = typography_of(data)[0]
+    page = paper_of(data)
     ty_head, ty_body = document_blocks(choices, lang_of(data), for_pdf=for_pdf)
     # `dir` on <html> is what makes the whole document mirror: it is what the
     # logical CSS properties in the templates resolve against, and what the
@@ -507,4 +509,9 @@ def document_html(data: dict, template_key: str, *, title: str | None = None,
         canvas=canvas,
         typography_body=ty_body,
         autofit=autofit_script(),
+        # A4 only: a Letter document stays byte-for-byte what it always was.
+        # autofit.js reads the page height from this attribute (1100 without).
+        paper_attr=(f' data-paper="{page.key}" data-page-h="{page.h}"'
+                    if page.key != "letter" else ""),
+        page_h=page.h,
     )

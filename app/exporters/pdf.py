@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 
+from ..paper import PAPERS, Paper, paper_of
 from ..rendering import document_html
 from ..schema import lang_of, typography_of
 from ..typography import CSS_FAMILY_PREFIX
@@ -50,6 +51,23 @@ PDF_SCALE = LETTER_PT[0] / (CANVAS_PX[0] * CSS_PX_PT)   # 0.96
 # The same factor down the page, or the print would be distorted.
 assert abs(LETTER_PT[1] / (CANVAS_PX[1] * CSS_PX_PT) - PDF_SCALE) < 1e-9
 _LETTER_PAGE = "@page { size: 8.5in 11in; margin: 0; }"
+
+# A4 (feature/paper-size): the same 850px-wide canvas, 1202px tall, on
+# Chromium's A4 sheet, 594.96 x 841.92pt (it cannot emit ISO's 595.28 x
+# 841.89 exactly - app/paper.py), at 594.96 / 637.5 = 0.93327: 1px =
+# 0.69996pt, Word's 0.70033 to 0.05%. Down the page 1202px is 841.35pt,
+# under the sheet, so a second page is impossible.
+_A4 = PAPERS["a4"]
+assert _A4.w == CANVAS_PX[0]
+assert 0 <= _A4.pdf_pt[1] - _A4.h * 0.75 * _A4.pdf_scale < 1.0
+
+
+def page_css(paper: Paper) -> str:
+    """The headless page's @page rule for this paper (Letter: _LETTER_PAGE)."""
+    return f"@page {{ size: {paper.css_size}; margin: 0; }}"
+
+
+assert page_css(PAPERS["letter"]) == _LETTER_PAGE
 
 
 class PdfExportError(RuntimeError):
@@ -85,7 +103,7 @@ def render_pdf(data: dict, template_id: str, part: str = "cv") -> bytes:
         # its fit) but not printed
         docs.append((lambda fit: letter_mod.document_html(data, template_id, for_pdf=True,
                                                           header_fit=fit), True))
-    pdfs = _print(docs, chosen_faces(data))
+    pdfs = _print(docs, chosen_faces(data), paper_of(data))
     if len(pdfs) == 1:
         return pdfs[0]
     return _join(pdfs)
@@ -104,7 +122,7 @@ def _join(pdfs: list[bytes]) -> bytes:
     return buf.getvalue()
 
 
-def _print(docs: list[str], faces: list[str]) -> list[bytes]:
+def _print(docs: list[str], faces: list[str], paper: Paper = PAPERS["letter"]) -> list[bytes]:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as exc:  # pragma: no cover
@@ -148,10 +166,11 @@ def _print(docs: list[str], faces: list[str]) -> list[bytes]:
                     page.emulate_media(media="print")
                     # Letter paper, declared in THIS page only (the last @page
                     # rule wins), and the canvas scaled onto it: 1px = 0.72pt.
-                    page.add_style_tag(content=_LETTER_PAGE)
+                    # A4 the same way, at its own factor (app/paper.py).
+                    page.add_style_tag(content=page_css(paper))
                     pdf = page.pdf(
-                        format="Letter",
-                        scale=PDF_SCALE,
+                        format=paper.pdf_format,
+                        scale=PDF_SCALE if paper.key == "letter" else paper.pdf_scale,
                         margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
                         print_background=True,
                         prefer_css_page_size=True,

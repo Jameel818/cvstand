@@ -1,4 +1,4 @@
-/* Auto-fit — seat a résumé of any length on one 1100px page.
+/* Auto-fit — seat a résumé of any length on one page (1100px Letter, 1202px A4).
  *
  * WHY NOT A TRANSFORM. Scaling `.tpl` geometrically is the obvious fix and it
  * is wrong here: `transform: scale(k)` shrinks the painted box to 850k wide, so
@@ -35,7 +35,13 @@
 (function () {
   "use strict";
 
-  var MAX_H = 1100;   // the page box
+  /* The page box: 1100 on US Letter, 1202 on A4 (app/paper.py). The document
+   * says which on <html data-page-h> - A4 only, so a Letter document is the
+   * one it always was. */
+  var MAX_H = (function () {
+    var v = Number(document.documentElement.getAttribute("data-page-h"));
+    return v > 0 ? v : 1100;
+  })();
 
   /* Near zero, and deliberately so. Chromium paginates on ANY overflow past the
    * page box: ats-t15 ended at 1100.453 and modern-t13 at 1100.250, and both

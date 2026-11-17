@@ -21,7 +21,7 @@
      5. Left column gap 48->22 and right gap 38->18 to seat the shared dense
         sample on one fixed 1100px page. #}
 {% set SH = "font-family:Poppins,sans-serif; font-weight:700; font-size:14px; letter-spacing:2.6px; text-transform:uppercase; border-bottom:1px solid #1A1A1A; padding-bottom:8px; margin-bottom:13px;" %}
-<div class="tpl" style="box-sizing:border-box; width:850px; height:1100px; background:#ffffff; padding:56px 56px 48px; font-family:'Source Sans 3',sans-serif; color:#1A1A1A; display:flex; flex-direction:column; gap:18px;">
+<div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#ffffff; padding:56px 56px 48px; font-family:'Source Sans 3',sans-serif; color:#1A1A1A; display:flex; flex-direction:column; gap:18px;">
 
   <div style="text-align:center;">
     <div class="cv-name" style="font-family:Poppins,sans-serif; font-weight:700; font-size:46px; line-height:1.05; letter-spacing:5px; text-transform:uppercase;">{{ r.name }}</div>

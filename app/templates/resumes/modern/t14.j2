@@ -19,7 +19,7 @@
         screenshot, not `.tpl` scrollHeight. Left gap 18->13, right gap 26->16. #}
 {% set FLAG = "box-sizing:border-box; width:383px; background:#B93E12; color:#ffffff; font-family:Anton,sans-serif; font-size:22px; letter-spacing:6px; text-transform:uppercase; text-align:center; padding-block: 8px 8px; padding-inline: 22px 0;" %}
 {% set NAVY_H = "font-family:Anton,sans-serif; font-size:25px; letter-spacing:1px; color:#ffffff;" %}
-<div class="tpl" style="box-sizing:border-box; position:relative; width:850px; height:1100px; background:#ffffff; overflow:hidden; font-family:'Source Sans 3',sans-serif; color:#2E2C28;">
+<div class="tpl" style="box-sizing:border-box; position:relative; width:850px; height:{{ page.h }}px; background:#ffffff; overflow:hidden; font-family:'Source Sans 3',sans-serif; color:#2E2C28;">
   <div style="position:absolute; inset-inline-start:0; top:0; width:366px; bottom:0; background:#F7F4EC;"></div>
   <div style="position:absolute; inset-inline-start:366px; top:0; inset-inline-end:0; bottom:0; background:#0E2B53;"></div>
   <div style="position:absolute; inset-inline-start:415px; top:30px; width:346px; height:300px; background:#2A4570; border:5px solid #0E2B53; box-sizing:border-box; overflow:hidden;">

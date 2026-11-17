@@ -9,7 +9,7 @@
    policy faces and auto-fit reach the letter exactly as they reach the CV.
    Logical properties only: Arabic mirrors on the document direction alone. #}
 {% set align = 'center' if th.centred else 'start' %}
-<div class="tpl cv-letter{{ th.split_class }}" style="box-sizing:border-box; width:850px; height:1100px; background:{{ th.page }}; display:flex; font-family:'{{ th.body_font }}',sans-serif; color:{{ th.text }};">
+<div class="tpl cv-letter{{ th.split_class }}" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:{{ th.page }}; display:flex; font-family:'{{ th.body_font }}',sans-serif; color:{{ th.text }};">
   {% if th.rail %}
   <div class="cl-rail" style="width:40px; flex-shrink:0; background:{{ th.rail.bg }}; order:{{ 0 if th.rail.at == 'start' else 2 }};"></div>
   {% endif %}
