@@ -10,7 +10,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, dots_shape, fmt_cell, fmt_p, page_rects, photo_run, pt, row_height, run,
+    page_h_px, Box, Ctx, design, dots_shape, fmt_cell, fmt_p, page_rects, photo_run, pt, row_height, run,
     tiny, tw,
 )
 from .common import SidebarPage, Stack, bullets, date_range, joined
@@ -29,7 +29,7 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(24))
     page = SidebarPage(ctx, SIDE_PX, side_fill=RAIL, side_pad=(0, 32, 24, 28),
                        main_pad_x=(38, 44), full_height_fill=False)
-    page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, RAIL)], [(SIDE_PX, 850 - SIDE_PX, 0, BAND, YELLOW)])
+    page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), RAIL)], [(SIDE_PX, 850 - SIDE_PX, 0, BAND, YELLOW)])
     side = page.side
     W = SIDE_PX - 60
     photo_run(ctx, side.p(line=1.0, ind_start=-32, ind_end=-28), size_px=SIDE_PX,

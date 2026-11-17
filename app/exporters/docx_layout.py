@@ -55,6 +55,23 @@ ARCHETYPES_ON = ("sidebar", "band", "open", "gutter")
 PAGE_W = 12240                  # Letter, twips (8.5in); the canvas is 850 x 1100 px
 PAGE_H_PT = 792
 PAGE_W_PT = 612
+# The constants above are LETTER. The layout uses these, which follow the
+# CV's paper (app/paper.py; bound for the export by docx.render_docx).
+
+
+def _page_w_tw() -> int:
+    from ..paper import current
+    return current().twips[0]
+
+
+def _page_w_pt() -> float:
+    from ..paper import current
+    return current().twips[0] / 20
+
+
+def _page_h_pt() -> float:
+    from ..paper import current
+    return current().twips[1] / 20
 TOP_MARGIN_PT = 28.8            # 0.4in: the layout master's top/bottom margin
 PAD_SIDE = 432                  # 0.3in either side of a side column's text
 PAD_MAIN = 540                  # 0.375in either side of the main column's text
@@ -67,7 +84,7 @@ def side_width(L: dict) -> int:
     """The side column's width in twips: the template's, but never under
     MIN_SIDE (modern-t22's is 24.7%, where Word broke the email address in
     two - the PDF's smaller type fits it)."""
-    return round(max(L["side_w"], MIN_SIDE) * PAGE_W)
+    return round(max(L["side_w"], MIN_SIDE) * _page_w_tw())
 
 
 @lru_cache(maxsize=1)
@@ -422,17 +439,17 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
 
     # ---- widths, fills, margins
     side_w = side_width(L) if has_side else 0
-    main_w = PAGE_W - side_w
+    main_w = _page_w_tw() - side_w
     order = ([side_w, main_w] if spec["side"] != "end" else [main_w, side_w])
-    _grid(tbl, [w for w in order if w] if has_side else [PAGE_W])
+    _grid(tbl, [w for w in order if w] if has_side else [_page_w_tw()])
     tbl_pr = tbl.find(qn("w:tblPr"))
-    _put(tbl_pr, _w("tblW", w=PAGE_W, type="dxa"), TBLPR_ORDER)
+    _put(tbl_pr, _w("tblW", w=_page_w_tw(), type="dxa"), TBLPR_ORDER)
     _put(tbl_pr, _w("tblInd", w=0, type="dxa"), TBLPR_ORDER)
     _put(tbl_pr, _w("tblLayout", type="fixed"), TBLPR_ORDER)
     first_body, last_body = body_rows[0], body_rows[-1]
     for tc, name in cell_of.items():
         span = tc.find(qn("w:tcPr")) is not None and tc.find(qn("w:tcPr")).find(qn("w:gridSpan")) is not None
-        _width(tc, PAGE_W if span else (side_w if name in ("side", "top_side") else main_w))
+        _width(tc, _page_w_tw() if span else (side_w if name in ("side", "top_side") else main_w))
         z = zone[name]
         tr = tc.getparent()
         # the column's padding at its top and bottom only: blocks stack tight
@@ -455,19 +472,19 @@ def apply(document, template_key: str, lang: str, resolved: dict, lay: dict) -> 
     side_pt = side_w / 20
     def x_of(start: bool, w_pt: float) -> float:
         # logical start = left in English, right in Arabic
-        return 0.0 if start != rtl else PAGE_W_PT - w_pt
+        return 0.0 if start != rtl else _page_w_pt() - w_pt
     if has_side and L["side_bg"]:
         # 0.75pt wider than the column, reaching under its neighbour: two fills
         # that only ABUT leave a light hairline between them on screen
         wide = side_pt + SEAM
         x = x_of(spec["side"] != "end", side_pt)
-        rects_all.append((x if x == 0.0 else x - SEAM, wide, 0.0, float(PAGE_H_PT),
+        rects_all.append((x if x == 0.0 else x - SEAM, wide, 0.0, float(_page_h_pt()),
                           L["side_bg"]))
     if band and top_items:
         if band["span"] == "full" or not has_side:
-            rects_first.append((0.0, float(PAGE_W_PT), 0.0, TOP_MARGIN_PT + 0.5, band["bg"]))
+            rects_first.append((0.0, float(_page_w_pt()), 0.0, TOP_MARGIN_PT + 0.5, band["bg"]))
         elif band["span"] == "main":
-            main_pt = PAGE_W_PT - side_pt
+            main_pt = _page_w_pt() - side_pt
             rects_first.append((x_of(spec["side"] == "end", main_pt), main_pt, 0.0,
                                 TOP_MARGIN_PT + 0.5, band["bg"]))
         else:   # over the side column: the side shape is already its colour below

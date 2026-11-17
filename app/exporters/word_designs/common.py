@@ -4,7 +4,7 @@ helpers. Everything in template px (docx_design.PX)."""
 from __future__ import annotations
 
 from ..docx_design import (
-    Box, Ctx, PAGE_W_PX, cant_split, fmt_cell, fmt_table, page_rects, run, tw, vmerge,
+    page_h_px, Box, Ctx, PAGE_W_PX, cant_split, fmt_cell, fmt_table, page_rects, run, tw, vmerge,
 )
 
 
@@ -43,7 +43,7 @@ class SidebarPage:
         self._first = True
         if full_height_fill and side_fill:
             x = PAGE_W_PX - side_px if side_end else 0
-            page_rects(ctx, [(x, side_px + 1, 0, 1100, side_fill)])
+            page_rects(ctx, [(x, side_px + 1, 0, page_h_px(), side_fill)])
 
     def _side_cell(self, row):
         return row.cells[1] if self.side_end else row.cells[0]
@@ -79,10 +79,10 @@ class SidebarPage:
         (flex-shrink) when the column is full: the photo gives up height,
         cropped (object-fit: cover), before anything else moves. Same here,
         measured once the line heights are final."""
-        from ..docx_design import PAGE_H_PT, crop_picture_height, pt
+        from ..docx_design import crop_picture_height, page_h_pt, pt
         from ..docx_measure import Measure
         sec = self.ctx.doc.sections[0]
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - pt(self.side.pad_bottom) - 1
+        avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt - pt(self.side.pad_bottom) - 1
         tc, width = self.side.c._tc, self.side.w / 20
 
         def go():
@@ -101,12 +101,12 @@ class SidebarPage:
         slack goes above its first paragraph (measured once the line heights
         are final); nothing moves when the column is full."""
         from docx.oxml.ns import qn
-        from ..docx_design import PAGE_H_PT, pt, tiny
+        from ..docx_design import page_h_pt, pt, tiny
         from ..docx_measure import Measure, bump_before
         sec = self.ctx.doc.sections[0]
         if self.side.pending is not None:
             tiny(self.side.pending)
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+        avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
         tc, width = self.side.c._tc, self.side.w / 20
         if reserve_pt is None:
             reserve_pt = 30.0 if self.ctx.rtl else 6.0   # the Arabic estimate runs short
@@ -130,12 +130,12 @@ class SidebarPage:
         paragraphs). The page's bottom margin stands in for the column's
         bottom padding, so the side box's own is dropped. Call before
         finish()."""
-        from ..docx_design import PAGE_H_PT, pt, tiny
+        from ..docx_design import page_h_pt, pt, tiny
         from ..docx_measure import Measure, spread
         if reserve_pt is None:
             reserve_pt = 24.0 if self.ctx.rtl else 4.0   # the Arabic estimate runs short
         sec = self.ctx.doc.sections[0]
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+        avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
         if grow:
             self.side.pad_bottom = 0
         else:
@@ -213,10 +213,10 @@ class SidebarPage:
         `box`, so it sits at the foot of the column, `bottom_px` above the
         bottom margin. Nothing moves when the column already fills the page."""
         from docx.oxml.ns import qn
-        from ..docx_design import PAGE_H_PT, pt
+        from ..docx_design import page_h_pt, pt
         from ..docx_measure import Measure, bump_before
         sec = self.ctx.doc.sections[0]
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - pt(bottom_px)
+        avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt - pt(bottom_px)
 
         def go():
             m = Measure(self.ctx.resolved)
@@ -241,7 +241,7 @@ class SidebarPage:
         enough, ALL paragraph spacing in the main column scales down (never
         below 40 %, never the text). A long CV flows to page 2 untouched."""
         from docx.oxml.ns import qn
-        from ..docx_design import PAGE_H_PT
+        from ..docx_design import page_h_pt
         from ..docx_measure import Measure, _before, _set_before
         sec = self.ctx.doc.sections[0]
         if reserve_pt is None:
@@ -250,7 +250,7 @@ class SidebarPage:
             # measured: the Arabic estimate runs 20-50pt short on a full page
             # (joined-form widths under-count Arabic line lengths a little)
             reserve_pt = 50.0 if self.ctx.rtl else 10.0
-        avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt - reserve_pt
+        avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt - reserve_pt
 
         def go():
             m = Measure(self.ctx.resolved)

@@ -11,7 +11,7 @@ from docx.oxml.ns import qn
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, bar, design, fmt_cell, page_rects, pt, rated, run, skill_pct, tw,
+    page_h_px, Box, Ctx, bar, design, fmt_cell, page_rects, pt, rated, run, skill_pct, tw,
 )
 from .common import SidebarPage, Stack, block, bullets, date_range, joined
 
@@ -31,7 +31,7 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(PAD + 26))
     page = SidebarPage(ctx, SIDE_W, side_fill=YELLOW, side_pad=(30, 20, 26, 20),
                        main_pad_x=(30, 12 + PAD), full_height_fill=False, ind_px=PAD)
-    page_rects(ctx, [(PAD, SIDE_W, PAD, 1100 - 2 * PAD, YELLOW)])
+    page_rects(ctx, [(PAD, SIDE_W, PAD, page_h_px() - 2 * PAD, YELLOW)])
     side = page.side
     W = SIDE_W - 40
     H = "role" if ctx.rtl else "heading"     # entry titles: bold body face in Arabic

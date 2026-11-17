@@ -15,7 +15,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, dots_shape, fmt_cell, fmt_p, fmt_table, page_rects, photo_run, pt,
+    page_h_px, Box, Ctx, design, dots_shape, fmt_cell, fmt_p, fmt_table, page_rects, photo_run, pt,
     row_height, run, tiny, tw, vmerge, vml_anchored, vml_oval,
 )
 from docx.oxml.ns import qn
@@ -33,7 +33,7 @@ def build(ctx: Ctx) -> None:
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(0.1)
     sec.bottom_margin = Pt(pt(24))
-    page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, CREAM), (SIDE_PX, 850 - SIDE_PX, 0, 1100, NAVY)])
+    page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), CREAM), (SIDE_PX, 850 - SIDE_PX, 0, page_h_px(), NAVY)])
     H = "role" if ctx.rtl else "body"
 
     # ---- the header table: [cream 70 / orange panel / cream] | [photo, merged]

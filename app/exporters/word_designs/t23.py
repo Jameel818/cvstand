@@ -7,7 +7,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, bar, design, fmt_cell, page_ovals, page_rects, pt, rated, run, skill_pct, tw,
+    page_h_px, Box, Ctx, bar, design, fmt_cell, page_ovals, page_rects, pt, rated, run, skill_pct, tw,
 )
 from .common import SidebarPage, Stack, block, bullets, joined, rounded_block
 
@@ -31,7 +31,7 @@ def build(ctx: Ctx) -> None:
     page = SidebarPage(ctx, SIDE_PX, side_fill=None, side_pad=(56, 30, 34, 24),
                        main_pad_x=(46, 44), full_height_fill=False)
     # the grey rail, the black seam and its three dots, on every page
-    page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, GREY), (SIDE_PX, 2, 0, 1100, INK)])
+    page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), GREY), (SIDE_PX, 2, 0, page_h_px(), INK)])
     page_ovals(ctx, [(SIDE_PX + 1, y, 24, INK) for y in (220, 520, 820)])
     side = page.side
     W = SIDE_PX - 54

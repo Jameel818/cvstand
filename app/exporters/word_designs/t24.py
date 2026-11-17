@@ -11,7 +11,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, fmt_cell, page_rects, photo_run, pt, rated, ring_anchored, run,
+    page_h_px, Box, Ctx, design, fmt_cell, page_rects, photo_run, pt, rated, ring_anchored, run,
     skill_pct, tw, vml_oval,
 )
 from .common import SidebarPage, Stack, block, bullets, joined, single_px, text_px
@@ -29,7 +29,7 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(PAD + 30))
     page = SidebarPage(ctx, SIDE_W, side_fill=RAIL, side_pad=(30, 26, 30, 26),
                        main_pad_x=(GAP, PAD), full_height_fill=False, ind_px=PAD)
-    page_rects(ctx, [(0, 850, 0, 1100, FRAME), (PAD, SIDE_W, PAD, 1100 - 2 * PAD, RAIL)])
+    page_rects(ctx, [(0, 850, 0, page_h_px(), FRAME), (PAD, SIDE_W, PAD, page_h_px() - 2 * PAD, RAIL)])
     side = page.side
     W = SIDE_W - 52
     photo_run(ctx, side.p(align="center"), size_px=150, placeholder="9F9F9E")

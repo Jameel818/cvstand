@@ -8,7 +8,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, bar, design, fmt_cell, page_rects, photo_run, pt, rated, run, skill_pct, tw,
+    page_h_px, Box, Ctx, bar, design, fmt_cell, page_rects, photo_run, pt, rated, run, skill_pct, tw,
 )
 from .common import SidebarPage, Stack, bullets, date_range, joined
 
@@ -25,7 +25,7 @@ def build(ctx: Ctx) -> None:
     page = SidebarPage(ctx, SIDE_PX, side_fill=GREEN, side_pad=(40, 30, 30, 30),
                        main_pad_x=(38, 40), full_height_fill=False)
     # the green column on every page; the amber band across page 1 (in front)
-    page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, GREEN)], [(0, 850, 74, 186, AMBER)])
+    page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), GREEN)], [(0, 850, 74, 186, AMBER)])
     side = page.side
     W = SIDE_PX - 60
     p = side.p(align="start")

@@ -9,7 +9,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, bar, design, fmt_cell, page_rects, photo_run, pt, rated, row_height, run,
+    page_h_px, Box, Ctx, bar, design, fmt_cell, page_rects, photo_run, pt, rated, row_height, run,
     skill_pct, tw,
 )
 from .common import SidebarPage, Stack, bullets, date_range, joined
@@ -28,7 +28,7 @@ def build(ctx: Ctx) -> None:
     page = SidebarPage(ctx, SIDE_PX, side_fill=NAVY, side_pad=(0, 36, 26, 40),
                        main_pad_x=(44, 40), full_height_fill=False, side_end=True)
     # the yellow panel behind the name, page 1 only
-    page_rects(ctx, [(850 - SIDE_PX, SIDE_PX + 1, 0, 1100, NAVY)],
+    page_rects(ctx, [(850 - SIDE_PX, SIDE_PX + 1, 0, page_h_px(), NAVY)],
                [(0, 850 - SIDE_PX, 0, BAND, YELLOW)])
     side = page.side
     W = SIDE_PX - 76

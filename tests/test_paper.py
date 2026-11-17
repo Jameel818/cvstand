@@ -180,3 +180,56 @@ def test_builder_js_new_cv_default_and_storage():
     assert 'data.paper === "a4" ? "a4" : "letter"' in js
     # the preview height follows the paper, never the literal
     assert "(scale - 1) * 1100" not in js
+
+
+# ---- Word (Run 3) ------------------------------------------------------------------
+
+def _docx_xml(data, key, part="cv", name="word/document.xml"):
+    import io
+    import zipfile
+    from app.exporters.docx import render_docx
+    z = zipfile.ZipFile(io.BytesIO(render_docx(data, key, part)))
+    return z, z.read(name).decode("utf-8")
+
+
+@pytest.mark.parametrize("key", ["modern-t1", "modern-t18", "modern-t22", "ats-t1"])
+@pytest.mark.parametrize("part", ["cv", "both"])
+def test_a4_word_sections_are_a4(key, part):
+    _, xml = _docx_xml(_with("a4"), key, part)
+    sizes = re.findall(r"<w:pgSz [^>]*/>", xml)
+    assert sizes and all('w:w="11906"' in s and 'w:h="16838"' in s for s in sizes), sizes
+
+
+@pytest.mark.parametrize("key", ["modern-t1", "ats-t1"])
+def test_letter_word_sections_are_still_letter(key):
+    _, xml = _docx_xml(_with(None), key)
+    sizes = re.findall(r"<w:pgSz [^>]*/>", xml)
+    assert sizes and all('w:w="12240"' in s and 'w:h="15840"' in s for s in sizes), sizes
+
+
+def test_word_page_measures_follow_the_bound_paper():
+    from app.exporters import docx_design as D
+    assert (D.pt(100), D.page_h_px(), D.page_w_tw(), D.page_h_pt()) == (72.0, 1100, 12240, 792.0)
+    with P.use("a4"):
+        assert D.pt(850) == pytest.approx(595.28)
+        assert (D.page_h_px(), D.page_w_tw(), D.page_h_pt()) == (1202, 11906, 841.9)
+    assert D.pt(100) == 72.0                        # restored after the export
+
+
+def test_a4_full_height_rects_reach_the_a4_page():
+    """modern-t18's navy sidebar is a page rect: 1202px tall on A4, so
+    1202 x 0.70033 = 841.8pt, not Letter's 792pt (it would stop 50pt short)."""
+    z, _ = _docx_xml(_with("a4"), "modern-t18")
+    hdr = "".join(z.read(n).decode("utf-8") for n in z.namelist() if n.startswith("word/header"))
+    emu = 1202 * P.A4.pt_per_px * 12700
+    assert re.search(rf'cy="{round(emu)}"|cy="{int(emu)}"|height:841\.\d+pt', hdr), "no A4-high rect"
+
+
+def test_t22_word_uses_the_a4_rail_picture():
+    rails = ROOT / "app" / "static" / "rails"
+    for lang in ("en", "ar"):
+        assert (rails / f"modern-t22-{lang}-a4.png").exists()
+    from PIL import Image
+    a4 = Image.open(rails / "modern-t22-en-a4.png").size
+    lt = Image.open(rails / "modern-t22-en.png").size
+    assert a4 == (lt[0], 1202 * 3) and lt == (645, 3300)

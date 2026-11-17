@@ -159,6 +159,14 @@ def _layout_photo(doc, photo_url: str, template_key: str, lang: str):
 
 
 def render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
+    """The Word file on the CV's paper (app/paper.py): every page measure in
+    the Word engine reads the paper bound here."""
+    from .. import paper as paper_mod
+    with paper_mod.use(data):
+        return _render_docx(data, template_key, part)
+
+
+def _render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
     """The Word file of the CV (`part="cv"`, the default and all an export
     did before the cover letter existed), of the cover letter alone
     ("letter"), or of both in one file, the letter in its own section on the
@@ -213,6 +221,8 @@ def render_docx(data: dict, template_key: str, part: str = "cv") -> bytes:
     # and "<" can corrupt the package.
     ctx = _context(data, doc, template_key)
     doc.render(ctx, autoescape=True)
+    # A4: the page the master was authored on is Letter (Letter: left as is)
+    docx_design.size_sections(doc.docx)
     # The template's accent and fonts, or the user's chosen fonts (step 5):
     # rewrites the master's role styles, so it runs on the filled document.
     resolved = docx_theme.resolve(data, template_key)

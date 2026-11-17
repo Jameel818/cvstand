@@ -17,6 +17,10 @@ layout, so they are MEASURED here in Chromium, never guessed:
     h   the page height left from the body's top to the page's bottom inset
 
 letter.body_px() turns the letter's length and this capacity into the size.
+
+Per paper (feature/paper-size): "templates" is Letter (1100px, unchanged),
+"templates_a4" the 1202px A4 page. letter.room() reads the table of the
+paper bound for the export.
 """
 from __future__ import annotations
 
@@ -44,22 +48,30 @@ _MEASURE = r"""() => {
 
 
 def measure() -> dict:
+    from app.paper import PAPERS
+    return {letter.capacity_key(k): _measure(k, PAPERS[k].h) for k in ("letter", "a4")}
+
+
+def _measure(paper: str, page_h: int) -> dict:
     from playwright.sync_api import sync_playwright
     out: dict = {}
     with sync_playwright() as p:
         b = p.chromium.launch()
-        page = b.new_page(viewport={"width": 850, "height": 1100})
+        page = b.new_page(viewport={"width": 850, "height": page_h})
         for key in registry.ported_keys():
             out[key] = {}
             for lang in ("en", "ar"):
                 # the measurement must not depend on the size it decides: the
                 # body is laid out at the reference size
-                html = letter.document_html(LS.with_letter(lang), key, for_pdf=True,
+                data = LS.with_letter(lang)
+                if paper != "letter":
+                    data["paper"] = paper
+                html = letter.document_html(data, key, for_pdf=True,
                                             body_px=letter.BODY_SIZES[0][1])
                 page.set_content(html, wait_until="networkidle")
                 out[key][lang] = page.evaluate(_MEASURE)
         b.close()
-    return {"templates": out}
+    return out
 
 
 def main(argv: list[str]) -> int:

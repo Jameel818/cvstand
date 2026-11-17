@@ -15,7 +15,7 @@ from pathlib import Path
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, cant_split, design, fmt_cell, header_picture, pt, rated, ring_anchored, rule_heading, run,
+    page_h_px, Box, Ctx, cant_split, design, fmt_cell, header_picture, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
 from .common import ColumnPage, Stack, joined, single_px
@@ -37,8 +37,10 @@ def _rail(ctx: Ctx) -> None:
     # with Shapes.ZOrderPosition - and the page is white anyway)
     lang = "ar" if ctx.rtl else "en"
     x = 850 - RAIL_W if ctx.rtl else 0          # physical: the start edge
-    header_picture(ctx, RAILS / f"modern-t22-{lang}.png", x_pt=pt(x), y_pt=0,
-                   w_pt=pt(RAIL_W), h_pt=pt(1100), name="cvstand_rail")
+    # A4 has its own pair, drawn at the A4 page height (tools/build_t22_rail.py)
+    suffix = "-a4" if page_h_px() != 1100 else ""
+    header_picture(ctx, RAILS / f"modern-t22-{lang}{suffix}.png", x_pt=pt(x), y_pt=0,
+                   w_pt=pt(RAIL_W), h_pt=pt(page_h_px()), name="cvstand_rail")
 
 
 @design("modern-t22")

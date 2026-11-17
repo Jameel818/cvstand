@@ -10,7 +10,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height, run,
+    page_h_px, Box, Ctx, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height, run,
     skill_pct, slider_shape, tw, vml_oval,
 )
 from .common import SidebarPage, Stack, bullets, joined, pill, rounded_block, text_px
@@ -29,7 +29,7 @@ def build(ctx: Ctx) -> None:
     page = SidebarPage(ctx, SIDE_W, side_fill=NAVY, side_pad=(32, 26, 32, 26),
                        main_pad_x=(GAP, PAD), full_height_fill=False, ind_px=PAD)
     # the grey frame and the inset navy column, on every page
-    page_rects(ctx, [(0, 850, 0, 1100, FRAME), (PAD, SIDE_W, PAD, 1100 - 2 * PAD, NAVY)])
+    page_rects(ctx, [(0, 850, 0, page_h_px(), FRAME), (PAD, SIDE_W, PAD, page_h_px() - 2 * PAD, NAVY)])
     side = page.side
     W = SIDE_W - 52
     heads = []

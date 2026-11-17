@@ -1,3 +1,24 @@
+# RESUME HERE - 2026-11-17 RUN 3 DONE (feature/paper-size: Word engine on A4; Run 4 real-Word check next)
+DONE (Run 3):
+- docx.render_docx binds paper.use(data) for the whole export (body moved to _render_docx).
+- docx_design: px_pt(), page_w_tw(), page_w_pt(), page_h_pt(), page_h_px(); pt()/tw() follow the paper. The old
+  PX/PAGE_W/PAGE_H_PT constants stay as LETTER values for callers. size_sections(doc): A4 only, sets 11906x16838;
+  called in new_document() (design/ATS/letter paths) and after docxtpl render (masters are Letter).
+- docx_layout: PAGE_W/PAGE_H_PT/PAGE_W_PT uses -> _page_w_tw/_page_h_pt/_page_w_pt (TEXT_W left: gutter master).
+- docx_ats avail, docx_letter section size + rail height, word_designs/common.py avail + sidebar rect, literal 1100
+  rects in t5 t7 t8 t9 t11 t12 t14 t15 t18 t22 t23 t24 -> page_h_px().
+- t22 Word rail: modern-t22-{en,ar}-a4.png (tools/build_t22_rail.py writes both papers); t22.py picks by page height.
+  The tool re-encoded the Letter AR PNG with identical pixels -> original bytes restored (git checkout).
+- letter capacity per paper (Run 4 item, done here because its --check test needed it): letter_capacity.json gains
+  "templates_a4" (Letter table byte-equal; every template +102px height, same widths); letter.room() reads the
+  table of paper.current(); letter.document_html binds the paper.
+VERIFIED: Letter Word output identical for all 49 x EN/AR x cv/both (196 files; every part except word/fonts/* and
+  fontTable.xml, whose obfuscation key is random per export) vs HEAD in a worktree; A4: 294 files (49 x EN/AR x
+  cv/letter/both) all build and every section is 11906x16838; tests/test_paper.py 143 (Word cases added);
+  fast suite: first run killed by Claude Code for LOW MEMORY at 35% (0 failures by then); re-ran only the rest in
+  7 foreground chunks: all green (1 failure = capacity json not yet rebuilt -> rebuilt -> passes).
+NOT VERIFIED YET: one page in REAL Word on A4 (Run 4), e2e (Run 5).
+
 # RESUME HERE - 2026-11-17 RUN 2 DONE (feature/paper-size: templates + A4 goldens; Run 3 Word engine next)
 DONE (Run 2):
 - modern-t15: absolute sidebar = {{ page.h }} (done in Run 1) - fills A4, checked by eye.

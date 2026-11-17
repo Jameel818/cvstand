@@ -13,7 +13,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, bar_shape, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height,
+    page_h_px, Box, Ctx, bar_shape, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height,
     run, skill_pct, tiny, tw,
 )
 from .common import SidebarPage, Stack, block, bullets, date_range, joined, text_px
@@ -31,7 +31,7 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(24))
     page = SidebarPage(ctx, SIDE_PX, side_fill=NAVY, side_pad=(0, 0, 24, 0),
                        main_pad_x=(40, 40), full_height_fill=False)
-    page_rects(ctx, [(0, SIDE_PX + 1, 0, 1100, NAVY)])
+    page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), NAVY)])
     side = page.side
     H = "role" if ctx.rtl else "bold"
 

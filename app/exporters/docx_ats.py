@@ -863,7 +863,7 @@ def overflow_pt(doc, resolved, width_pt: float) -> float:
     from .docx_measure import Measure
     m = Measure(resolved, direct_faces=True)
     sec = doc.sections[0]
-    avail = D.PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+    avail = D.page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
     over = sum(m.paragraph(p, width_pt) for p in doc.element.body.iter(qn("w:p"))) - avail
     return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else 0.0)
 

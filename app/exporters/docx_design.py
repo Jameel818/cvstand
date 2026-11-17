@@ -38,25 +38,52 @@ from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn
 from docx.shared import Pt
 
+from .. import paper as _paper
 from . import docx_theme
 from .docx_layout import PPR_ORDER, TBLPR_ORDER, TCPR_ORDER, _header_shapes, _put, _w
 from .docx_dml import Sp, anchored_run, inline_group_run
 
+# LETTER values, kept for callers that read them as constants. The export
+# itself goes through the functions below, which follow the CV's paper
+# (app/paper.py, bound for the export by docx.render_docx): A4 is the same
+# 850px canvas at 0.70033pt/px on 595.3 x 841.9pt.
 PX = 0.72                      # pt per template px (850px canvas on a 612pt page)
 PAGE_W_PX = 850
 PAGE_W = 12240                 # twips
 PAGE_H_PT = 792
+
+
+def px_pt() -> float:
+    """pt per template px on the current paper (Letter 0.72, A4 0.70033)."""
+    return _paper.current().pt_per_px
+
+
+def page_w_tw() -> int:
+    return _paper.current().twips[0]
+
+
+def page_w_pt() -> float:
+    return _paper.current().twips[0] / 20
+
+
+def page_h_pt() -> float:
+    return _paper.current().twips[1] / 20
+
+
+def page_h_px() -> int:
+    """The canvas height: 1100 (Letter) or 1202 (A4)."""
+    return _paper.current().h
 AR_GAP = 1.0                   # Arabic vertical gaps, of the template's
 CSS_LINE_AR = 1.75             # the Arabic faces' natural line
 CSS_LINE = 1.2                 # a face's "single" line, as a multiple of its size
 
 
 def pt(px: float) -> float:
-    return px * PX
+    return px * px_pt()
 
 
 def tw(px: float) -> int:
-    return int(round(px * PX * 20))
+    return int(round(px * px_pt() * 20))
 
 
 _ARABIC = re.compile(r"[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]")
@@ -870,7 +897,19 @@ def new_document(rtl: bool):
     for el in list(body):
         if el.tag != qn("w:sectPr"):
             body.remove(el)
+    size_sections(doc)
     return doc
+
+
+def size_sections(doc) -> None:
+    """Every section on the CV's paper. The masters are Letter, so a Letter
+    export is left exactly as it was; A4 is 11906 x 16838 twips."""
+    from docx.shared import Twips
+    p = _paper.current()
+    if p.key == "letter":
+        return
+    for sec in doc.sections:
+        sec.page_width, sec.page_height = Twips(p.twips[0]), Twips(p.twips[1])
 
 
 def finish_rtl(doc) -> None:
@@ -971,7 +1010,7 @@ def apply_chosen_sizes(document, data: dict, is_section, base_hp: int = 20) -> N
             _rpr_put(rpr, "szCs", val=hp)
 
     def target_hp(pt_css):
-        return pt_css * 4 / 3 * PX * 2
+        return pt_css * 4 / 3 * px_pt() * 2
 
     if want["name"] and groups["name"]:
         scale(groups["name"], target_hp(want["name"]) / max(hp_of(x) for x in groups["name"]))
@@ -1295,11 +1334,11 @@ def _overflows(doc, resolved) -> tuple[float | None, float | None, float]:
     from .docx_measure import Measure
     m = Measure(resolved)
     sec = doc.sections[0]
-    avail = PAGE_H_PT - sec.top_margin.pt - sec.bottom_margin.pt
+    avail = page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
     above, side, main = 0.0, None, None
     for el in doc.element.body:
         if el.tag == qn("w:p"):
-            above += m.paragraph(el, PAGE_W_PX * PX)
+            above += m.paragraph(el, PAGE_W_PX * px_pt())
             continue
         if el.tag != qn("w:tbl"):
             continue

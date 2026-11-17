@@ -10,7 +10,7 @@ from __future__ import annotations
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
+    page_h_px, Box, Ctx, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
 from .common import ColumnPage, joined, single_px
@@ -25,7 +25,7 @@ def build(ctx: Ctx) -> None:
     sec = ctx.doc.sections[0]
     sec.top_margin = Pt(pt(PAD - 2))
     sec.bottom_margin = Pt(pt(PAD))
-    page_rects(ctx, [(0, 850, 0, 1100, PAPER)])
+    page_rects(ctx, [(0, 850, 0, page_h_px(), PAPER)])
     page = ColumnPage(ctx, pad_x=(PAD, PAD))
     T = page.main_text_px
     MAIN = T - SIDE - GAP

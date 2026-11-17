@@ -13,7 +13,8 @@ hidden, on a transparent background, at 300 dpi (the page is 850 CSS px =
     venv/Scripts/python tools/build_t22_rail.py           # write the PNGs
     venv/Scripts/python tools/build_t22_rail.py --check   # exit 1 if stale
 
-Output: app/static/rails/modern-t22-{en,ar}.png (app/static/**/*.png ships
+Output: app/static/rails/modern-t22-{en,ar}.png (Letter, 1100px tall) and
+modern-t22-{en,ar}-a4.png (A4, 1202px - feature/paper-size) (app/static/**/*.png ships
 in the image; .dockerignore drops every other PNG).
 """
 from __future__ import annotations
@@ -39,19 +40,24 @@ ONLY_RAIL = """<style>
 </style>"""
 
 
-def render(lang: str) -> bytes:
+def render(lang: str, paper: str = "letter") -> bytes:
     from playwright.sync_api import sync_playwright
     data = json.loads(SAMPLES[lang].read_text(encoding="utf-8"))
+    page_h = PAGE_H
+    if paper != "letter":
+        from app.paper import PAPERS
+        data["paper"] = paper
+        page_h = PAPERS[paper].h
     html = document_html(data, "modern-t22", for_pdf=True).replace("</head>", ONLY_RAIL + "</head>")
     x = PAGE_W - RAIL_W if lang == "ar" else 0
     with sync_playwright() as p:
         b = p.chromium.launch()
-        pg = b.new_page(viewport={"width": PAGE_W, "height": PAGE_H}, device_scale_factor=SCALE)
+        pg = b.new_page(viewport={"width": PAGE_W, "height": page_h}, device_scale_factor=SCALE)
         pg.set_content(html, wait_until="networkidle")
         pg.evaluate("document.fonts.ready")
         pg.evaluate("window.ResumeAutofit ? window.ResumeAutofit.ready : null")
         pg.emulate_media(media="print")
-        png = pg.screenshot(clip={"x": x, "y": 0, "width": RAIL_W, "height": PAGE_H},
+        png = pg.screenshot(clip={"x": x, "y": 0, "width": RAIL_W, "height": page_h},
                             omit_background=True)
         b.close()
     return png
@@ -72,9 +78,9 @@ def main() -> int:
     check = "--check" in sys.argv
     stale = []
     OUT.mkdir(parents=True, exist_ok=True)
-    for lang in ("en", "ar"):
-        png = render(lang)
-        path = OUT / f"modern-t22-{lang}.png"
+    for lang, paper in (("en", "letter"), ("ar", "letter"), ("en", "a4"), ("ar", "a4")):
+        png = render(lang, paper)
+        path = OUT / f"modern-t22-{lang}{'' if paper == 'letter' else '-' + paper}.png"
         if check:
             if not path.exists() or not _same(path.read_bytes(), png):
                 stale.append(path.name)

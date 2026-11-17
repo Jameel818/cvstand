@@ -199,7 +199,13 @@ ROOM_SAFETY = 0.92
 def _capacity() -> dict:
     if not CAPACITY_PATH.exists():          # pragma: no cover - built by the tool
         return {}
-    return json.loads(CAPACITY_PATH.read_text(encoding="utf-8"))["templates"]
+    return json.loads(CAPACITY_PATH.read_text(encoding="utf-8"))
+
+
+def capacity_key(paper_key: str) -> str:
+    """letter_capacity.json's table for a paper: "templates" is Letter (the
+    original, measured at 1100px), "templates_a4" the 1202px page."""
+    return "templates" if paper_key == "letter" else f"templates_{paper_key}"
 
 
 def letter_chars(letter: dict[str, Any]) -> int:
@@ -209,7 +215,9 @@ def letter_chars(letter: dict[str, Any]) -> int:
 def room(template_key: str | None, lang: str | None) -> float:
     """The template's room for the body against the reference (1.0 = as much
     or more; 0.5 = half)."""
-    cap = _capacity().get(template_key or "", {}).get(lang or "en")
+    from .paper import current
+    cap = (_capacity().get(capacity_key(current().key), {})
+           .get(template_key or "", {}).get(lang or "en"))
     if not cap:
         return 1.0
     r = cap["w"] * cap["h"] / REF_AREA
@@ -780,7 +788,17 @@ def document_html(data: dict[str, Any], template_key: str, *, for_pdf: bool = Fa
                   body_px: float | None = None,
                   header_fit: tuple[float, float] | None = None) -> str:
     """`header_fit`: the CV's auto-fit (density, type scale) for the same
-    résumé - the PDF export measures it and passes it here."""
+    résumé - the PDF export measures it and passes it here.
+
+    The paper is bound for the build, so the body's size reads the capacity
+    of the page it is drawn on (letter.room)."""
+    from .paper import use
+    with use(data):
+        return _document_html(data, template_key, for_pdf=for_pdf, body_px=body_px,
+                              header_fit=header_fit)
+
+
+def _document_html(data, template_key, *, for_pdf, body_px, header_fit) -> str:
     name = (data.get("name") or "").strip()
     return rendering.document_html(data, template_key, for_pdf=for_pdf,
                                    canvas=letterhead_canvas(data, template_key, body_px=body_px,

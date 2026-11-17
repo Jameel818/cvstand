@@ -7,7 +7,7 @@ paragraph, and the "ALSO" block. Measured from modern/t8.j2."""
 from __future__ import annotations
 
 from ..docx_design import (
-    Box, Ctx, design, dots_shape, fmt_cell, fmt_p, page_rects, photo_run, pt, run, tw,
+    page_h_px, Box, Ctx, design, dots_shape, fmt_cell, fmt_p, page_rects, photo_run, pt, run, tw,
 )
 from .common import SidebarPage, Stack, date_range, joined
 
@@ -70,7 +70,7 @@ def build(ctx: Ctx) -> None:
     sec.top_margin = Pt(pt(26))
     sec.bottom_margin = Pt(pt(26))
     # the pale-blue strips at the top and bottom of every page
-    page_rects(ctx, [(0, 850, 0, 26, PALE), (0, 850, 1100 - 26, 26, PALE)])
+    page_rects(ctx, [(0, 850, 0, 26, PALE), (0, 850, page_h_px() - 26, 26, PALE)])
     page = SidebarPage(ctx, LEFT_PX, side_fill=None, side_pad=(0, 0, 0, 0),
                        main_pad_x=(0, 0), full_height_fill=False)
     left = page.side

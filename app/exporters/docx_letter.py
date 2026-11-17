@@ -92,7 +92,7 @@ def _section(doc, *, new: bool, rtl: bool, th: dict):
     else:
         sec = doc.sections[0]
     sec.different_first_page_header_footer = False
-    sec.page_width, sec.page_height = Twips(12240), Twips(15840)
+    sec.page_width, sec.page_height = Twips(D.page_w_tw()), Twips(int(D.page_h_pt() * 20))
     rail = th["rail"]
     start = MARGIN_PX + (RAIL_PX if rail and rail["at"] == "start" else 0)
     end = MARGIN_PX + (RAIL_PX if rail and rail["at"] == "end" else 0)
@@ -108,7 +108,7 @@ def _section(doc, *, new: bool, rtl: bool, th: dict):
     if rail:
         at_left = (rail["at"] == "start") != rtl
         x = 0 if at_left else D.PAGE_W_PX - RAIL_PX
-        _header_shapes(sec, [(D.pt(x), D.pt(RAIL_PX), 0, D.pt(PAGE_H_PX), _hex(rail["bg"]))], [])
+        _header_shapes(sec, [(D.pt(x), D.pt(RAIL_PX), 0, D.pt(D.page_h_px()), _hex(rail["bg"]))], [])
     return sec, start, end
 
 
