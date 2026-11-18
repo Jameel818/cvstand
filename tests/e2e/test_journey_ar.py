@@ -382,7 +382,12 @@ def test_the_gallery_ignores_the_documents_language(page, live_server,
     to prevent."""
     page.goto(live_server.url + "/templates?cat=ats")
     src = page.locator(".tpl-thumb iframe").first.get_attribute("src")
-    body = page.request.get(live_server.url + src).text()
+    # The ENGLISH browser, stated (tests/e2e/conftest.py `page`: locale en-US).
+    # page.request is an API call, not a navigation: it does not send the
+    # context's locale as Accept-Language, and since 2026-11-16 a visitor with
+    # no signal gets ARABIC - so say what the real iframe load says.
+    body = page.request.get(live_server.url + src,
+                            headers={"Accept-Language": "en-US"}).text()
     assert 'dir="ltr"' in body
     assert "Ashworth" in body
     assert _surname(arabic_resume["name"]) not in body

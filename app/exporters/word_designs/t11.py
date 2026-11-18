@@ -83,8 +83,14 @@ def build(ctx: Ctx) -> None:
             run(ctx, b.p(line=1.6), joined([lg["name"], lg["level"]], " — "), size=11.5,
                 color=SOFT)
         st.done()
-        # margin-top:auto in the PDF: Language closes the rail
-        page.spread_side([lang_head])
+        # margin-top:auto in the PDF: Language closes the rail. EN reserve 16pt
+        # (2026-11-18, feature/fixes): with the default 4pt the EN estimate ran
+        # short and real Word put the last language line ("German · Fluent",
+        # demo CV) on page 2, on Letter and A4. Measured in real Word, demo CV:
+        # 8pt -> 2 pages, 12pt -> 1 page (both papers); 16 keeps 4pt beyond
+        # that, like t21. AR keeps its default (24, the RTL estimate runs
+        # short), so the Arabic output is unchanged.
+        page.spread_side([lang_head], reserve_pt=None if ctx.rtl else 16.0)
 
     # ---- the yellow band over the main column (a row at least 300px tall)
     top = page.main_row(pad_top=38, fill=YELLOW, pad_x=(38, 40))

@@ -1,3 +1,32 @@
+# RESUME HERE - 2026-11-18 feature/fixes DONE (branched from feature/paper-size c5dbe7a; NOT merged; main untouched)
+DONE:
+1. modern-t11 EN Word was 2 pages in real Word with the demo CV ("German · Fluent" on page 2), Letter AND A4.
+   Cause: t11 pins Language to the rail foot with spread_side(), default reserve 4pt in EN; the EN estimate runs
+   4-8pt short. Fix (t11.py only): reserve 16pt in EN; AR keeps its default 24 (output unchanged).
+   Measured in real Word (demo CV, EN, both papers): reserve 8 -> 2 pages, 12 -> 1 page, 16/20/24 -> 1 page.
+   16 = 4pt beyond the measured threshold, same value t21 uses.
+2. e2e test_journey_ar::test_the_gallery_ignores_the_documents_language: page.request.get() is an API call and
+   sends no Accept-Language, so the server saw a no-signal visitor (Arabic since feature/seo). The request now
+   states "Accept-Language: en-US", like conftest's en-US page. Test change only.
+3. docs/CVSTAND_TEMPLATES_GUIDE.md for two papers: §3 (paper row: app/paper.py single source, page.h,
+   data-paper/data-page-h, autofit MAX_H; A4 goldens), §3.1 rewritten (Letter 850x1100 / 0.72pt, A4 850x1202 /
+   0.70033pt, PDF + Word sheets, which paper a CV is on, Word helpers, no literals), §4 (both-papers rule for
+   every NEW/replaced template; steps 2/4/5/6/7), §11 (screenshots + 2 checklist rows), §15 prompt. Also §8.1's
+   stale "Word page is US Letter" line.
+VERIFIED:
+- Real Word (only my own Word PIDs, Start-Job harness): before = t11 EN 2 pages on Letter + A4, AR 1 + 1;
+  after = all 4 x 1 page (612x792 / 595.3x841.9). Before/after page images (Word's own PDFs, rendered by
+  Windows.Data.Pdf): Desktop\review-fixes-2026-11-18\t11\{before,after}\.
+- Word hash diff, 1176 exports (sample + demo CVs x EN/AR x cv/letter/both x Letter/A4 x 49, fonts masked):
+  exactly 8 differ = modern-t11 EN cv + both, on both papers and both CVs, word/document.xml only. Every other
+  template, all AR, all letter-only files: identical.
+- Letter pixel + HTML goldens: unchanged (fast suite).
+- test_docx_designs + test_docx_sizes + test_stat_chips_word + test_docx_joined_rtl + test_docx_cloud_fonts +
+  test_paper: 481 passed. e2e test_journey_ar.py: 14 passed. Fast suite alone: 6300 passed, 1922 skipped, 0 failed.
+NOT VERIFIED: the full e2e suite was not re-run (only test_journey_ar; the t11 change is Word-only).
+  t11 EN with user content much longer than the demo CV still depends on the estimator (as every template does).
+NEEDS THE USER'S MANUAL WORD CHECK: modern-t11 EN on Letter and A4 (Language now sits ~12pt higher on the rail).
+  Still open from feature/paper-size: modern-t4 EN A4, modern-t22 EN/AR A4.
 # RESUME HERE - 2026-11-18 PAPER SIZE RUNS 1-5 DONE (feature/paper-size, NOT merged; main untouched)
 DONE (Run 5):
 - e2e: all 50 files, ONE AT A TIME in the foreground (stdin from /dev/null, 380s cap per file). 1,629 passed (counting test_ribbon after the fix),

@@ -44,6 +44,7 @@ Single sources of truth. Never hard-code something in two places.
 
 | Part | Location | Status |
 |---|---|---|
+| **Paper size** (A4 / US Letter) | **`app/paper.py` is the single source** for every page dimension: `LETTER`, `A4`, `paper_of(data)` / `paper_key(data)`, `default_for_locale()`. Exporters read the CV's paper through a ContextVar: `paper.use(data)` around an export, `paper.current()` inside it. Templates get it as the **`page`** render variable (`page.h`, `page.key`). An A4 document carries `<html data-paper="a4" data-page-h="1202">` (Letter carries neither), and `app/static/js/autofit.js` reads its `MAX_H` from `data-page-h`. The CV's `paper` field is in `app/schema.py`; the builder's A4 / Letter switch is `#paper-switch` (`builder.html`, `builder.js`). | ✅ |
 | Template list / registry (key, block, label, blurb, skill pattern, accent, `ported`) | `app/registry.py`: `_MODERN`, `_ATS`, `_PORTED`, `TEMPLATES`, `get()`. A Python module, not JSON. | ✅ |
 | Template HTML (Jinja) | `app/templates/resumes/<group>/<block>.j2` (e.g. `app/templates/resumes/modern/t1.j2`, `app/templates/resumes/ats/t25.j2`); shared parts `app/templates/resumes/_macros.j2`, `_letter.j2`, `_letter_body.j2` | ✅ |
 | Template CSS | **No per-template CSS file.** Each template's styles are inline `style="…"` attributes in its `.j2`. Shared document CSS (font links/inline faces, Arabic/RTL typography) is emitted by `app/rendering.py` (`document_html()`). `app/static/css/app.css` is the site shell (header, builder, gallery), not the résumés. | ✅ |
@@ -55,7 +56,7 @@ Single sources of truth. Never hard-code something in two places.
 | Word font embedding | `app/exporters/docx_font_embed.py` → `embed_fonts()` | ✅ |
 | Font build / calibration | `tools/build_fonts.py`, `tools/calibrate_fonts.py`, `/dev/typography` page | ✅ |
 | Letterhead tests | `tests/test_letterhead_word.py`, `tests/e2e/test_letterhead_matches_cv.py` | ✅ |
-| Golden (reference) tests | `tests/golden/`: `html/{sample,sparse,gpa,partial}/<key>.html` checked by `tests/test_golden_html.py` (fast suite); `pixels/<key>.png` checked by `tests/test_golden_pixels.py` (`--e2e` only); `normalize/*.json`. Regenerate (with approval only) via `tools/golden.py --html` / `--pixels`. See `tests/golden/README.md`. | ✅ |
+| Golden (reference) tests | `tests/golden/`: `html/{sample,sparse,gpa,partial,a4}/<key>.html` checked by `tests/test_golden_html.py` (fast suite; `a4` is the sample on A4); `pixels/<key>.png` (Letter) and **`pixels-a4/<key>.png` (A4)** checked by `tests/test_golden_pixels.py` (`--e2e` only); `normalize/*.json`. Regenerate (with approval only, for EITHER paper) via `tools/golden.py --html` / `--pixels` / `--pixels --paper a4`. See `tests/golden/README.md`. | ✅ |
 | Session log | `RESUME_HERE.md` (repo root) | ✅ |
 
 **Rendering pipeline**
@@ -71,10 +72,38 @@ CV data (flat JSON, "language": "en" | "ar")
               → save → embed_fonts() post-process ──► .docx
 ```
 
-### 3.1 Page size and units ✅
+### 3.1 Page size and units: TWO papers ✅
 
-| Output | Page | Units |
+Every CV is on **A4 or US Letter** (since 2026-11-17, `feature/paper-size`). All the numbers below come from `app/paper.py`; never write them as literals in a template, an exporter or a Word design.
+
+**The canvas is always 850px wide; only the height changes.** That is what lets one template serve both papers: every width-keyed and absolutely positioned layout is drawn against 850.
+
+| | **US Letter** | **A4** |
 |---|---|---|
+| Canvas (preview) | **850 × 1100px** | **850 × 1202px** |
+| Template root | `height:{{ page.h }}px` (1100) | `height:{{ page.h }}px` (1202) |
+| `@page` of the document | `850px 1100px` | `850px 1202px` |
+| Printed size of 1px (PDF and Word) | **0.72pt** | **0.70033pt** (595.28 / 850) |
+| PDF sheet | 612 × 792pt: `format="Letter"`, `scale=0.96` (`PDF_SCALE`), `@page { size: 8.5in 11in }` | **594.96 × 841.92pt**: `format="A4"`, `scale=0.93327`, `@page { size: 210mm 297mm }`. Chromium cannot emit ISO's 595.28 × 841.89pt whatever `@page` says; this is the sheet Chrome's own "Save as PDF > A4" makes (0.32pt off, inside ISO 216). |
+| Word section | 12240 × 15840 twips (612 × 792pt) | 11906 × 16838 twips (595.3 × 841.9pt) |
+
+**Which paper a CV is on.**
+- `paper` is an optional root field of the résumé. **Missing means Letter**: every CV saved before the feature keeps the page it was approved on, and every Letter golden stays valid.
+- A **new** CV starts on A4, or on Letter when the browser language is en-US / en-CA. The user can switch, and Undo restores the previous paper.
+- `normalize()` does not add `paper`; templates read `page` instead.
+
+**PDF** (`app/exporters/pdf.py`, `page_css(paper)`). Use `page.pdf(format=paper.pdf_format, scale=…, margin 0, prefer_css_page_size=True)`, after adding the paper's `@page` size to the headless page only. Don't add a `scale` without that `@page` override: with `prefer_css_page_size` off, Chromium already shrinks the 850px `@page` to fit the paper, and a scale on top shrinks it twice (measured: 0.9216). `tests/e2e/test_pdf_letter_page.py` and `tests/e2e/test_pdf_a4_page.py` check the sheet AND the text size.
+
+**Word** (Modern `word_designs/tN.py` + `common.py`, ATS `docx_ats.py`, letters `docx_letter.py`). Work in template px through the helpers in `app/exporters/docx_design.py`, which follow the bound paper:
+- `pt(px)` and `tw(px)` convert template px to points and twips.
+- `px_pt()` gives the points per px for the current paper.
+- `page_h_px()`, `page_w_pt()`, `page_h_pt()` and `page_w_tw()` give the page size.
+
+**Never** write `1100`, `612`, `792`, `12240` or `/ 0.72` in Word code: each one is a place where A4 silently comes out 50pt short. Full-height rails and sidebars are `page_h_px()` tall.
+
+The PDF and Word therefore have the same page and the same sizes on each paper: an 11px body is 7.92pt on Letter and 7.70pt on A4, in both outputs.
+
+---|---|---|
 | Template (preview) | **850×1100px canvas** (US Letter proportions); `@page { size: 850px 1100px; margin: 0 }` in `app/rendering.py` | px, as inline `style="…"` attributes in the `.j2` |
 | PDF | **US Letter, 612 × 792pt** (since 2026-11-10): `page.pdf(format="Letter", scale=0.96, margin 0, prefer_css_page_size=True)` after adding `@page { size: 8.5in 11in }` to the headless page only (`app/exporters/pdf.py`, `PDF_SCALE`). Before that it printed 637.92 × 824.88pt, about 4% larger than Letter. | **1px = 0.72pt** (0.75pt per CSS px × 0.96), the same as Word |
 | Word, Modern | **US Letter, 612×792pt** (`PAGE_W = 12240` twips, `PAGE_H_PT = 792`) | **1px = 0.72pt** (`PX = 0.72` in `app/exporters/docx_design.py`; `pt(px)`, `tw(px)` = twips). The 24 `word_designs/tN.py` modules and `word_designs/common.py` work in template px through these helpers. |
@@ -88,6 +117,8 @@ The PDF and Word therefore have the same page and the same sizes: an 11px body i
 
 Follow these steps in order, and finish each one before starting the next.
 
+> **Two papers, always.** Every NEW or REPLACED template is checked on **BOTH paper sizes, US Letter AND A4**: preview, PDF and Word, in EN and AR. A template that is one page on Letter can still overflow on A4 in Word (A4 is narrower in points). A rail that ends at 1100px leaves a 102px gap on A4.
+
 ### Step 1: Design brief
 - Pick the group (Modern or ATS), a name in **EN and AR**, a colour palette, and fonts from the **font registry only**.
 - Write down every visual element, because each one will need a Word equivalent: bands, sidebars, page tint, timeline, pills, photo frame, skill bars/dots, icons, dividers.
@@ -95,9 +126,9 @@ Follow these steps in order, and finish each one before starting the next.
 
 ### Step 2: HTML + CSS (the master)
 - Use **CSS variables** for fonts and sizes (`--font-heading`, `--font-heading-weight`, `--font-heading-size`, `--font-body`, …).
-- Write sizes in **px as inline `style="…"` attributes** on the **850×1100px canvas** (US Letter proportions). Word converts them with **1px = 0.72pt** (see §3.1). Don't use pt in template markup.
+- Write sizes in **px as inline `style="…"` attributes** on the **850px-wide canvas**. The root's height is **`height:{{ page.h }}px`** (1100 on Letter, 1202 on A4), **never a literal 1100**, and so is anything that runs the full page height (rails, sidebars). Word converts px with the paper's factor (0.72pt Letter, 0.70033pt A4; see §3.1). Don't use pt in template markup.
 - Put `font-synthesis: none;` on the CV root.
-- Design for the **850×1100px canvas** and for **one page** with typical content. Also test a long CV (see §9).
+- Design for **one page** with typical content on **both** canvases (850×1100 and 850×1202). Also test a long CV (see §9).
 - Arabic: `dir="rtl"` on `<html>`, with `flex-direction: row` (**not** `row-reverse`). No `letter-spacing` and no `text-transform` on Arabic text.
 - Phone numbers stay **LTR** inside Arabic CVs (wrap them in an LTR span or use `dir="ltr"`). ✅ This is done for all templates; repeat it in new ones.
 
@@ -106,19 +137,20 @@ Follow these steps in order, and finish each one before starting the next.
 - Add its cover-letter theme (letterhead = **the CV header exactly**, see §10).
 
 ### Step 4: PDF check
-- Export EN and AR PDFs. They should already match the preview, because they use the same HTML.
+- Export EN and AR PDFs on **Letter and A4** (4 files). They should already match the preview, because they use the same HTML. Each one is 1 page, on the paper's sheet.
 - Run the PDF font check: every face is embedded under its exact name and there is no fallback font.
 
 ### Step 5: Word design (the hard part)
 - Write the per-template Word design. Use the techniques in **§8** for each visual element from Step 1.
-- Use the template's own px sizes, colours (hex) and margins, converted with `docx_design.pt()` / `tw()` (1px = 0.72pt, §3.1).
+- Use the template's own px sizes, colours (hex) and margins, converted with `docx_design.pt()` / `tw()`. The factor follows the CV's paper (§3.1). Page sizes come from `page_h_px()` / `page_w_pt()` / `page_h_pt()`, never literals.
+- Build and open the Word file on **Letter and A4**, in EN and AR.
 - Map fonts with the Word weight rules (§7.3), set the Arabic run attributes (§7.4), and call `embed_fonts()`.
 
 ### Step 6: Compare (see §11)
-- Take before/after screenshots, render the Word file in LibreOffice, compute a **diff %** against the PDF, then do the **Microsoft Word check**.
+- Take before/after screenshots, render the Word file in LibreOffice, compute a **diff %** against the PDF, then do the **Microsoft Word check**. Do all of it on **both papers**.
 
 ### Step 7: Tests
-- Add the template to the golden tests (golden files are created or updated **only with approval**).
+- Add the template to the golden tests on **both papers**: `pixels/` and `pixels-a4/`, and the HTML scenarios including `a4`. Golden files are created or updated **only with approval**, and a change to an existing Letter golden needs its own approval.
 - Run the fast suite, the e2e suite, `verify_docker_context`, and `test_requirements_cover_imports`.
 
 ### Step 8: Save and release
@@ -196,7 +228,7 @@ If Word shows **Calibri** in places, that comes from Microsoft 365 cloud fonts o
 These are the techniques that worked in runs 4–14. Use them for every Modern template.
 
 ### 8.1 Page layout
-- Word page is **US Letter, 612×792pt** (12240 twips wide); positions and margins are the template's px × 0.72 (§3.1). Full-bleed elements (bands, sidebars) use **DrawingML shapes anchored to the page**, not table cells, so they reach the paper edge.
+- Word page is the CV's paper: **US Letter 612×792pt or A4 595.3×841.9pt** (§3.1). Positions and margins are the template's px through `pt()` / `tw()` (× 0.72 on Letter, × 0.70033 on A4). Full-bleed elements (bands, sidebars) use **DrawingML shapes anchored to the page**, not table cells, so they reach the paper edge.
 - `tblInd` to flush a table to the edge ✅: **-284 twips (LTR)**, **341 twips (RTL)**.
 
 ### 8.2 Sidebars and columns
@@ -250,7 +282,7 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 
 ## 11. Fidelity verification workflow (required for every visual change)
 
-1. **Before/after screenshots** of the website, PDF and Word (page 1), EN + AR, in a Desktop review folder.
+1. **Before/after screenshots** of the website, PDF and Word (page 1), EN + AR, on **US Letter AND A4**, in a Desktop review folder.
 2. **Automated compare:** render the .docx with LibreOffice to PNG, compare it with the PDF page 1, and record a **diff %** per template.
    - Rough guide from the AR review: under ~10% = close; 10–20% = check; over 20% = something big is missing (band, tint, overflow). These are rules of thumb, not formal thresholds.
 3. **Microsoft Word check (required):** LibreOffice findings are hints only. Confirm each issue in **Microsoft Word** before fixing it.
@@ -259,13 +291,15 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 
 | Check | ✔ |
 |---|---|
+| One page on **Letter AND A4**: preview, PDF and Word (EN + AR) | |
+| Nothing ends at 1100 on A4: full-height rails and sidebars reach 1202px / the sheet's bottom edge | |
 | Same layout and column widths | |
 | Sidebar reaches the page bottom | |
 | Page tint present | |
 | Header band present, correct height | |
 | Timeline line + dots | |
 | Pills rounded | |
-| Same fonts (names) and sizes (Word pt = CSS px × 0.72) | |
+| Same fonts (names) and sizes (Word pt = CSS px × 0.72 on Letter, × 0.70033 on A4) | |
 | No heading wraps that the website doesn't have | |
 | Same page count | |
 | Phone numbers LTR in Arabic | |
@@ -321,10 +355,13 @@ Change: <describe the visual change or the new design>.
 Rules:
 - Website preview is the master. Change HTML/CSS AND the Word design together.
 - Follow §7 (fonts), §8 (Word techniques), §9 (page count), §10 (letterhead).
-- Before/after screenshots (website, PDF, Word page 1; EN + AR) into
+- Check on BOTH paper sizes, US Letter AND A4: preview, PDF and Word, EN + AR.
+  Root height is {{ page.h }}px; Word sizes via pt()/tw()/page_h_px(), no literals.
+- Before/after screenshots (website, PDF, Word page 1; EN + AR; Letter + A4) into
   Desktop\review-<id>-<date>\. Report the LibreOffice diff % per variant.
 - List anything that still needs a Microsoft Word check.
-- No golden updates without my approval. Step 7 calibration stays OFF.
+- No golden updates without my approval: Letter (tests/golden/pixels/) and
+  A4 (tests/golden/pixels-a4/, html/a4/) alike. Step 7 calibration stays OFF.
 - Do not touch env vars, secrets, /data, DNS or root Fonts/.
 - Run: fast suite, e2e suite, verify_docker_context, test_requirements_cover_imports.
 
