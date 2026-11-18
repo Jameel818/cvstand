@@ -1,3 +1,37 @@
+# RESUME HERE - 2026-11-18 feature/logo-v2 DONE (from feature/fixes af859d8; NOT merged; main untouched)
+Logo 10e from brand-kits/cvstand-aligned-sw12-gap24_6-r14-11/ (same kit as the SEO og-image / twitter-card).
+brand-kits/ stays out of git (.git/info/exclude); its files were copied, never edited.
+DONE:
+- SAFETY CHECK (before copying, and again on the copies): all 11 kit SVGs have no <script>, event handlers,
+  javascript:, foreignObject/iframe/embed/object, <image>, href/xlink:href, url(), @import or remote URLs.
+  Elements: svg, path, metadata, c2pa:manifest (content credentials). The only URL besides the SVG namespace is
+  xmlns:c2pa="http://c2pa.org/manifest", a namespace name, never fetched. PASSED.
+- app/static/icons/ replaced byte for byte from the kit (SHA-256 checked), nothing generated (every size exists):
+  cvstand.svg <- logo/svg/cvstand-logo.svg; cvstand-dark.svg <- logo/svg/cvstand-logo-dark.svg;
+  logo-mark.svg <- icons/svg/cvstand-icon.svg; apple-touch-icon.png <- favicon/apple-touch-icon.png (180);
+  icon-192.png <- favicon/android-chrome-192x192.png; icon-512.png <- favicon/android-chrome-512x512.png;
+  icon-maskable-512.png <- favicon/maskable-512x512.png; favicon.ico <- favicon/favicon.ico (16/32/48).
+- Sizes kept (image height): header 52px desktop (72px bar), 34px phones (66px bar), footer 40px.
+  New ratio 1398/443 = 3.156 (was 3.835): base.html img 164x52 (was 199x52) and 126x40 (was 153x40);
+  e2e LOCKUP_RATIO = 1398/443.
+- The new file's transparent margin is 5.42% on every side (measured from the kit raster; old ~16-19%), so the
+  CSS edge cancels changed: footer margin-block -6.5/-7.5 -> -2/-2px, phone margin-inline -5 -> -2px.
+  VISIBLE CHANGE: at the same 52px the framed lockup draws ~46px of ink (old ~34px), so it reads bigger and
+  heavier; it is narrower (164 vs 199px; 107 vs 130px on phones).
+- Before/after: Desktop\review-logo-v2-2026-11-18\{before,after}\ header-{en,ar}-{1440,1024,390}.png,
+  footer-*.png, icons-sheet.png (favicon 16/32 at 1x and 4x, apple-touch, 192, maskable plain + round mask),
+  geometry.json.
+VERIFIED:
+- Geometry EN + AR at 1440/1024/390: header 72/72/66px as before, no overlap between header items, no
+  horizontal scroll; logo 164.1x52 / 107.3x34, footer 126.2x40.
+- test_logo + test_brand 63 passed. e2e one at a time: test_brand_and_cache 19, test_mobile_layout 35,
+  test_ribbon 18 (A4|Letter ribbon), test_paper_builder 8: all passed. Fast suite alone: 6300 passed,
+  1922 skipped, 0 failed.
+NOT VERIFIED / NOT CHANGED:
+- Not seen on a real phone or in an installed PWA (icons checked as files and in the sheet only).
+- theme-color stays #4f46e5 (kit indigo is #3730A3) - not asked; test_logo pins the current value.
+- cvstand-dark.svg and logo-mark.svg are replaced but not referenced by any page (as before).
+- Design hook flagged app/static/css/app.css:471 (side accent border) - predates this branch, left as is.
 # RESUME HERE - 2026-11-18 feature/fixes DONE (branched from feature/paper-size c5dbe7a; NOT merged; main untouched)
 DONE:
 1. modern-t11 EN Word was 2 pages in real Word with the demo CV ("German · Fluent" on page 2), Letter AND A4.

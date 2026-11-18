@@ -142,18 +142,19 @@ p { margin: 0 0 1em; }
   border-bottom: 1px solid var(--line);
 }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; letter-spacing: -.02em; }
-/* The lockup (icons/cvstand.svg, the final logo installed 2026-11-09: viewBox
-   276.76 x 72.16 = 3.835:1) is sized by height only; the <img> width/height
-   attributes follow the same ratio. Its transparent margin, measured from the
-   render: ~16.5% of the height above the ink, ~19% below, ~16% at each end, so
-   a 52px image draws ~34px of ink (the old lockup's visible height at 44px).
+/* The lockup (icons/cvstand.svg, logo 10e from brand-kits/cvstand-aligned-
+   sw12-gap24_6-r14-11, installed 2026-11-18 on feature/logo-v2: viewBox
+   1398 x 443 = 3.156:1) is sized by height only; the <img> width/height
+   attributes follow the same ratio (164x52, 126x40). Its transparent margin,
+   measured from the kit's raster: 5.42% of the height on every side, so a
+   52px image draws ~46px of framed ink (the 2026-11-09 lockup drew ~34px).
    Desktop header 72px (10px above and below the image); phones keep 66px and
    34px. max-width:none: the global img max-width:100% must never narrow it. */
 .logo img { display: block; height: 52px; width: auto; max-width: none; }
-/* Footer: 40px. margin-block cancels the measured transparent margin (6.5px
-   above, 7.5px below at 40px), so the ink sits on the column top and the
+/* Footer: 40px. margin-block cancels the measured transparent margin (2.2px
+   above and below at 40px), so the frame sits on the column top and the
    tagline's own 10px margin is the visible gap under it. */
-.site-footer .logo img { height: 40px; margin-block: -6.5px -7.5px; }
+.site-footer .logo img { height: 40px; margin-block: -2px -2px; }
 .site-nav { display: flex; gap: 22px; margin-inline-start: 8px; }
 .site-nav a { font-weight: 500; color: var(--muted); font-size: 14px; }
 .site-nav a:hover { color: var(--ink); }
@@ -802,17 +803,18 @@ body.builder-body { overflow: hidden; }
    letter-spacing anywhere here: it does nothing to joined Arabic script and
    would only damage the Latin half. */
 @media (max-width: 640px) {
-  /* The final lockup is 130px wide at 34px. Paid for by gap 5, side padding
-     12, button padding 8 (were 10 / 14 / 12) and the img's -5px inline margin
-     (its ~5.5px transparent ends). The 390px ARABIC row is the tight one (its
-     button text is the longest): short of that, the flex row shrinks the logo
-     link and the lockup runs into the language switch (2026-11-09). */
+  /* The lockup is 107px wide at 34px (logo 10e, 2026-11-18; the 2026-11-09
+     one was 130px). Paid for by gap 5, side padding 12, button padding 8
+     (were 10 / 14 / 12) and the img's -2px inline margin (its ~1.8px
+     transparent ends). The 390px ARABIC row is the tight one (its button text
+     is the longest): short of that, the flex row shrinks the logo link and the
+     lockup runs into the language switch (2026-11-09). */
   :root { --header-h: 66px; } /* phones: unchanged by the 52px desktop logo */
   .site-header { gap: 5px; padding-inline: 12px; }
   .site-header .logo { font-size: 15px; gap: 8px; min-width: 0; }
   /* max-width:none because the global img max-width:100% resolves against the
      link, which the negative margins make 10px narrower than the image. */
-  .site-header .logo img { height: 34px; flex: none; margin-inline: -5px; max-width: none; } /* never below 34px (2026-11-09) */
+  .site-header .logo img { height: 34px; flex: none; margin-inline: -2px; max-width: none; } /* never below 34px (2026-11-09) */
   .site-header .btn { padding: 8px; font-size: 13px; white-space: nowrap; }
   .lang-switch { gap: 2px; font-size: 12px; }
 

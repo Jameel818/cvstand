@@ -63,10 +63,11 @@ def test_the_wordmark_is_actually_visible(page, live_server, path, lang):
         f"the logo image did not load on {path} ({lang})")
 
 
-# The lockup's own ratio: the final logo (2026-11-09), viewBox 276.76 x 72.16.
-# The browser sizes it from the file's width/height (277 x 72 = 3.847), within
-# the 0.02 tolerance below. The old lockup was 3.096 and fails it.
-LOCKUP_RATIO = 276.76 / 72.16
+# The lockup's own ratio: logo 10e (feature/logo-v2, 2026-11-18), viewBox
+# 1398 x 443 = 3.156. The <img> attributes are 164 x 52 / 126 x 40 (3.154 /
+# 3.15), within the 0.02 tolerance below. The 2026-11-09 lockup (276.76 x 72.16
+# = 3.835) fails it, so a stale file or stale attributes cannot pass.
+LOCKUP_RATIO = 1398 / 443
 
 
 @pytest.mark.parametrize("lang", ["en", "ar"])
