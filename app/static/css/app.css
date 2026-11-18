@@ -628,7 +628,9 @@ body.builder-body { overflow: hidden; }
 .rb-ico { width: 18px; height: 18px; display: block; flex: none; }
 .rb-ico-t { display: none; font-size: 12px; line-height: 1; color: var(--muted); flex: none; min-width: 18px; text-align: center; }
 .rb-ico-b { font-weight: 800; }
-.rb-groups { flex: 1 1 520px; min-width: 0; }
+/* 480 (was 520 before the paper switch): Undo/Default + the four controls +
+   A4|Letter + the labels toggle stay one line down to a 1280px window. */
+.rb-groups { flex: 1 1 480px; min-width: 0; }
 .ty-group { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; min-width: 0; }
 .rb-ctl { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1 1 0; }
 .rb-section { flex-grow: .9; }
@@ -654,9 +656,14 @@ body.builder-body { overflow: hidden; }
 /* Paper size: a two-button segmented switch (A4 / Letter). */
 .rb-paper { display: flex; align-items: center; gap: 2px; flex: none;
             padding-inline-start: 8px; border-inline-start: 1px solid var(--line); }
-.rb-paper .rb-lbl { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; margin-inline-end: 4px; }
+/* The word "Paper size" is for screen readers (the group's aria-label and
+   tooltip say it too): "A4 | Letter" reads on its own, and the ribbon is one line. */
+.rb-paper .rb-lbl {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 .rb-seg {
-  height: 28px; padding: 0 9px; font: inherit; font-size: 12px; font-weight: 600;
+  height: 28px; padding: 0 8px; font: inherit; font-size: 12px; font-weight: 600;
   color: var(--ink-2); background: var(--surface); border: 1px solid var(--line-strong);
   border-radius: var(--r-xs); cursor: pointer; white-space: nowrap;
 }

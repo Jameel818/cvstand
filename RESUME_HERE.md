@@ -1,3 +1,26 @@
+# RESUME HERE - 2026-11-18 PAPER SIZE RUNS 1-5 DONE (feature/paper-size, NOT merged; main untouched)
+DONE (Run 5):
+- e2e: all 50 files, ONE AT A TIME in the foreground (stdin from /dev/null, 380s cap per file). 1,629 passed (counting test_ribbon after the fix),
+  1 failed = PRE-EXISTING test assumption (below). Per-file log: scratchpad e2e_results.txt (summarised here).
+- FIXED a Run 1 regression found by test_ribbon (3 failures): the A4|Letter switch pushed the labels toggle onto a
+  2nd ribbon row at 1440px (79 cmds + 520 groups + 168 switch + 28 toggle + gaps = 825 > 811px). Now: the word
+  "Paper size" is visually hidden (still the group's aria-label + tooltip; compact mode already hid it), seg
+  padding 9->8px, .rb-groups basis 520->480px. Measured EN+AR: ribbon is one line (43px) at 1280/1366/1440/1600
+  exactly as before the switch; 1100 unchanged (2 lines before and after). TRADE-OFF: 1200-1279px windows now
+  take 2 lines (were 1) - the 98px switch does not fit there without squeezing the selects under their 72px min.
+  Re-ran after the fix: test_ribbon + test_ribbon_font_fixed 21 passed; mobile_layout, paper_builder,
+  fonts_section, font_roles, arabic_builder, journey all passed.
+- Two files stalled mid-run inside my loop (autofit_gate 40 min idle, brand_and_cache 380s); both pass alone
+  (98 in 99s, 19 in 18s). Cause: pytest inherited the loop's stdin; with stdin=/dev/null no further stalls.
+- Fast suite, alone, after the fix: 6300 passed, 1922 skipped (e2e), 0 failed (15:36). Letter pixel + HTML
+  goldens unchanged.
+PRE-EXISTING, NOT FIXED (not caused by paper size; for a later branch):
+- e2e test_journey_ar::test_the_gallery_ignores_the_documents_language fails: also fails at bfc37f4 (this
+  branch's parent), passes at 32e10a3. feature/seo made a no-signal visitor Arabic; the test does not state an
+  English browser. Test assumption, not a product bug.
+- modern-t11 EN Word = 2 pages in real Word on Letter and A4 (user decision 2026-11-18: separate branch).
+NEEDS THE USER'S MANUAL WORD CHECK: modern-t4 EN A4 (reserve change), modern-t11 EN both papers (the bug),
+  modern-t22 EN/AR A4 (new rail picture). Optional look: any A4 cover letter in word-a4-letter\.
 # RESUME HERE - 2026-11-18 RUN 4 DONE (feature/paper-size; Run 5 = e2e one file at a time + fast suite next)
 USER DECISION 2026-11-18: modern-t11 EN 2 pages in real Word (Letter AND A4, demo CV; "German · Fluent" goes to
   page 2) is LEFT for a separate fix on its own branch later. Not caused by A4. Do not fix it on feature/paper-size.
