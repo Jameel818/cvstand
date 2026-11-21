@@ -10,7 +10,8 @@ with its computed family and weight. A heading-role element must keep the
 face it had before this change; everything else must be Cairo at exactly 400
 or 600. Some titles are not <h*> (`.sec > summary` in the builder, the
 drawer's `.grp-label` and its card titles `.drawer .info b`) and would
-silently have inherited the new body face, so they are pinned and checked.
+silently have inherited the new body face, so they are pinned and checked:
+since 2026-11-20 they are Cairo 700 (the user's rule for builder titles).
 
 English is covered elsewhere: test_font_roles.py (body Inter, no Arabic face)
 and test_shell_cairo_weight.py (no Cairo on an English page).
@@ -30,8 +31,10 @@ HEADINGS = {
     ".eyebrow": ("Cairo", "600"),
     ".stat-strip b": ("Cairo", "600"),
     ".faq summary": ("Cairo", "500"),
-    ".sec > summary": ("IBM Plex Sans Arabic", "700"),
-    ".drawer .info b": ("IBM Plex Sans Arabic", "700"),
+    # Builder titles (user, 2026-11-20: Cairo 700, no longer IBM Plex Sans Arabic)
+    ".sec > summary": ("Cairo", "700"),
+    ".drawer .info b": ("Cairo", "700"),
+    ".drawer .grp-label": ("Cairo", "700"),
 }
 HEADING_SEL = ", ".join([*HEADINGS, ".num", ".hero h1 *", ".sec > summary *",
                          ".drawer .grp-label"])

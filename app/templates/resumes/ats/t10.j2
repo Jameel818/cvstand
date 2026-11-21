@@ -30,7 +30,7 @@
     {% for s in c.social %}{% if s.label %}{% set _ = bits.append(s.label) %}{% endif %}{% endfor %}
     {% if bits %}<div style="font-size:12px; color:#5C5C66; margin-top:9px; line-height:1.6;">{{ bits | join(" | ") }}</div>{% endif %}
   </div>
-  <div style="height:1px; background:#16161A;"></div>
+  <div style="height:1px; flex-shrink:0; background:#16161A;"></div>
 
   {% if r.summary %}
   <div>
@@ -69,8 +69,8 @@
         </div>
         {% if job.company or job.location %}<div style="font-size:12px; color:#3E3E48; margin:3px 0 5px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
         {% if job.bullets %}
-        <ul style="margin:0; padding-inline-start:17px; font-size:12px; line-height:1.6;">
-          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        <ul style="list-style:none; margin:0; padding-inline-start:17px; font-size:12px; line-height:1.6;">
+          {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
         </ul>
         {% endif %}
       </div>

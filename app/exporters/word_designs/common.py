@@ -366,6 +366,72 @@ def bullets(ctx: Ctx, box: Box, items, *, size, color, line=1.5, indent=16, bull
         run(ctx, p, b, size=size, color=color)
 
 
+class Timeline:
+    """The nodes of one timeline list, and its line's two ends (user,
+    2026-11-20: each node ON its line and level with its entry's first text
+    line; the line from the first node to the last, no further).
+
+    The template draws the line as a side border on each entry's cell, the
+    gap between entries INSIDE the cell, and leaves the border off the LAST
+    entry's cell. `add()` takes, per entry: the paragraph the shapes anchor in
+    (the first paragraph of the bordered cell, so y = 0 is the cell's top), the
+    title paragraph (its first line is what the node centres on; it starts at
+    the same row top), and the node's x (pt, from the anchor's text column).
+
+    Once the line heights are final (after_lines), each node is placed at
+    the title's space before + half its line (Word's single of the title's
+    face x its multiple: the line Word draws), the line above the FIRST node
+    is masked in the colour behind it, and the last entry gets the line's
+    last stretch as a shape from its top down to its node's centre. A list of
+    one entry has no line. Nodes used to sit at a fixed y: the title's space
+    before (16-20px in t12 / t22) was not counted, so every node after the
+    first sat ~16px above its title, and the line ran on to the foot of the
+    last entry."""
+
+    def __init__(self, ctx: Ctx, *, d_px: float, fill: str, stroke: str | None = None,
+                 weight_px: float = 0.0, line_px: float = 2.0, line: str, bg: str):
+        self.ctx, self.d, self.fill, self.stroke = ctx, d_px, fill, stroke
+        self.weight, self.line_w, self.line, self.bg = weight_px, line_px, line, bg
+        self.items: list = []
+        ctx.after_lines.append(self._place)
+
+    def add(self, anchor, title, x_pt: float) -> None:
+        self.items.append((anchor, title, x_pt))
+
+    def _place(self) -> None:
+        from docx.oxml.ns import qn
+        from ..docx_design import _largest_run, pt, vml_anchored, vml_oval
+        from ..docx_measure import Measure
+        ctx = self.ctx
+        m = Measure(ctx.resolved, direct_faces=getattr(ctx, "direct_faces", False))
+        d = pt(self.d)
+        n = len(self.items)
+        for i, (anchor, title, x) in enumerate(self.items):
+            sp = title._p.find(qn("w:pPr") + "/" + qn("w:spacing"))
+            before = int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0.0
+            mult = (int(sp.get(qn("w:line"), 240)) / 240
+                    if sp is not None and sp.get(qn("w:lineRule"), "auto") == "auto" else 1.0)
+            rpr, size = _largest_run(m, title._p)
+            line = m._metrics(rpr)["line"] * size * mult if size else d
+            yc = before + line / 2
+            # numbered per DOCUMENT (a class-wide count made the same CV's file
+            # differ with what was exported before it - test_cover_letter)
+            ctx.timeline_nodes = getattr(ctx, "timeline_nodes", 0) + 1
+            vml_oval(ctx, anchor, x_pt=x, y_pt=yc - d / 2, d_pt=d, fill=self.fill,
+                     stroke=self.stroke, weight_pt=pt(self.weight) if self.weight else 1.5,
+                     n=900 + ctx.timeline_nodes)
+            lw, lx = pt(self.line_w), x + d / 2
+            if n > 1 and i == 0 and yc - d / 2 > 0.1:
+                # the cell's border above the first node: hidden
+                vml_anchored(anchor, x_pt=lx - lw / 2 - 0.75, y_pt=0, w_pt=lw + 1.5,
+                             h_pt=yc - d / 2 + 0.3, fill=self.bg, z=6)
+            if n > 1 and i == n - 1:
+                # the last entry's cell has no border: its stretch, top -> node
+                vml_anchored(anchor, x_pt=lx - lw / 2, y_pt=0, w_pt=lw, h_pt=yc,
+                             fill=self.line, z=6)
+
+
+
 def node_x(ctx: Ctx, cell_px: float, at: str, d_px: float) -> float:
     """x (pt, from the cell's physical left) that centres a `d_px` node on the
     cell's LOGICAL `at` edge ("start"/"end") - a VML shape is placed physically."""
@@ -444,6 +510,16 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
         # ends in an empty spacer paragraph after a table (its bottom padding,
         # as space before), they hang on THAT paragraph instead: its own
         # spacing is known exactly, nothing above is estimated.
+        #
+        # BOTH PATHS NOW MAKE THE HEIGHT TRUE IN WORD (feature/defects,
+        # 2026-11-20: square corners showed under the masks - modern-t23's
+        # black pill, modern-t21's header card; user's .docx). The spacer's
+        # 0.3pt line is an AUTO multiple Word floors at ~2.5pt, so the masks
+        # sat ~2pt above the real bottom: the spacer now has an EXACT 0.3pt
+        # line (it holds no glyph). A block that ends in text rests on the
+        # estimate, which reads the faces' CSS lines while Word draws their
+        # Windows lines (Archivo Black 1.347-1.51em vs 1.088): the row is now
+        # pinned to EXACTLY that estimate, as the PDF's box is.
         last_el = tc.findall(qn("w:p"))[-1]
         prev = last_el.getprevious()
         bottom_on, y_b = first, pt(h_px - r)
@@ -451,7 +527,13 @@ def round_corners(ctx: Ctx, inner: Box, width_px: float, radius_px: float, bg: s
                 and not "".join(t.text or "" for t in last_el.iter(qn("w:t"))).strip()):
             sp = last_el.find(qn("w:pPr") + "/" + qn("w:spacing"))
             before = int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0.0
-            bottom_on, y_b = Paragraph(last_el, inner.c), max(0.0, before + 0.3 - pt(r))
+            if sp is not None:
+                sp.set(qn("w:line"), "6")
+                sp.set(qn("w:lineRule"), "exact")
+            bottom_on, y_b = Paragraph(last_el, inner.c), before + 0.3 - pt(r)
+        else:
+            from ..docx_design import set_row_height
+            set_row_height(tc.getparent(), pt(h_px), "exact")
         for key, on, x, y in (("tl", first, x_l, 0.0), ("tr", first, x_r, 0.0),
                               ("bl", bottom_on, x_l, y_b), ("br", bottom_on, x_r, y_b)):
             corner_mask(on, key, x_pt=x, y_pt=y, r_pt=pt(r), fill=bg)

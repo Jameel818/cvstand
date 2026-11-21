@@ -4,10 +4,12 @@ two-line caps name, stats between rules, experience with a date column and a
 vertical rule, Recognition + inline Tools, References. From modern/t4.j2."""
 from __future__ import annotations
 
+from docx.oxml.ns import qn
 from docx.shared import Pt
 
 from ..docx_design import (
-    Box, Ctx, design, dots_shape, fmt_cell, photo_run, pt, run, tw, vml_anchored,
+    Box, Ctx, design, dots_shape, fmt_cell, photo_run, pt, run, set_row_height, tw,
+    vml_anchored,
 )
 from .common import SidebarPage, Stack, block, bullets, date_range, joined
 
@@ -26,17 +28,37 @@ def _ribbon(ctx, box, label):
     # true_lines() turns it into Word's multiple of the Arabic face's single
     p = b.p(line=1.088) if ctx.rtl else b.p()
     run(ctx, p, label, "heading", size=19, color="FFFFFF", spacing=0.5)
-    line_px = 19 * 1.088                 # the label's line (Archivo, CSS normal)
-    # x from the text column's physical left: it starts 34px in (LTR) or at
-    # the cell's left edge (RTL: the 34px padding is on the right)
-    x = (SIDE_PX - 34) if not ctx.rtl else -14
-    # y is measured from the paragraph's top INCLUDING its space before
-    # (measured in Word): the ribbon's 10px top padding is that space
-    vml_anchored(p, x_pt=pt(x), y_pt=0, w_pt=pt(14), h_pt=pt(line_px + 20), fill=CLAY)
-    fold = "m0,0 l14,0 l14,8 x e" if ctx.rtl else "m0,0 l14,0 l0,8 x e"
-    vml_anchored(p, x_pt=pt(x), y_pt=pt(line_px + 20), w_pt=pt(14), h_pt=pt(8), fill=FOLD,
-                 path=fold, coords="14,8")
     b.finish()
+    cell_end = b.c.paragraphs[-1]
+    tr = b.c._tc.getparent()
+
+    def shapes():
+        # THE RIBBON ROW IS EXACTLY THE PDF'S HEIGHT (feature/defects,
+        # 2026-11-20; user's modern-t4-en-cv-LETTER.docx). The English label is
+        # at Word's single line, which is the face file's Windows line: 1.51em
+        # for the embedded "Archivo Black" (archivo-900.ttf), 1.347em where
+        # Google's Archivo Black is installed - not the CSS 1.088 the overhang
+        # was cut to. The ribbon came out 46-49px against a 40.7px overhang,
+        # and the fold sat on the ribbon. So: padding + the CSS line + padding,
+        # read from the FINAL paragraph (after the user's chosen heading size,
+        # the type fit and the gap fit), is the row's exact height AND the
+        # overhang's height AND the fold's top - one number, whatever face.
+        def before_pt(par):
+            sp = par._p.find(qn("w:pPr") + "/" + qn("w:spacing"))
+            return int(sp.get(qn("w:before"), 0)) / 20 if sp is not None else 0.0
+        sizes = [int(e.get(qn("w:val"))) / 2 for e in p._p.iter(qn("w:sz"))]
+        h_pt = before_pt(p) + 1.088 * max(sizes or [pt(19)]) + before_pt(cell_end)
+        set_row_height(tr, h_pt, "exact")
+        # x from the text column's physical left: it starts 34px in (LTR) or
+        # at the cell's left edge (RTL: the 34px padding is on the right).
+        # y from the paragraph's top INCLUDING its space before (measured in
+        # Word): the ribbon's top padding is that space.
+        x = (SIDE_PX - 34) if not ctx.rtl else -14
+        vml_anchored(p, x_pt=pt(x), y_pt=0, w_pt=pt(14), h_pt=h_pt, fill=CLAY)
+        fold = "m0,0 l14,0 l14,8 x e" if ctx.rtl else "m0,0 l14,0 l0,8 x e"
+        vml_anchored(p, x_pt=pt(x), y_pt=h_pt, w_pt=pt(14), h_pt=pt(8), fill=FOLD,
+                     path=fold, coords="14,8")
+    ctx.after_lines.append(shapes)
 
 
 def _head(ctx, box, label, after=16):

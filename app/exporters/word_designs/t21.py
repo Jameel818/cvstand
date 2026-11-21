@@ -22,6 +22,12 @@ from .common import (
 LIME, FOREST, PAGE, INK, GREY = "E1F04A", "013F32", "FDFDFD", "161616", "4A4A4A"
 SOFT, MUTED, DOT_OFF, RAIL = "E8EDEA", "A9C0B8", "2A5C4E", "D8D8D8"
 PAD, SIDE_W, GAP = 24, 300, 24
+# What the rounded corners are masked with: Word's page, which is WHITE - the
+# design draws no page fill (full_height_fill=False). The PDF's page is
+# #FDFDFD; masks in that colour showed in Word as faint boxes around every
+# lime pill and the stats card (user's .docx, 2026-11-18). Text that the PDF
+# draws in #FDFDFD (the contact bar) keeps PAGE.
+WORD_PAGE = "FFFFFF"
 
 
 @design("modern-t21")
@@ -91,7 +97,7 @@ def build(ctx: Ctx) -> None:
             ind.set(qn("w:w"), str(tw(18)))
         hb.pad_top = 18
     hb.finish()
-    round_corners(ctx, hb, 850 - 2 * PAD, 18, PAGE, 0)
+    round_corners(ctx, hb, 850 - 2 * PAD, 18, WORD_PAGE, 0)
     spacer = ctx.doc.add_paragraph()
     tiny(spacer, before_px=16)
 
@@ -157,20 +163,25 @@ def build(ctx: Ctx) -> None:
         fp = Paragraph(first_p, side.c)
         left_pad = 24 if ctx.rtl else 26
         for key, x in (("tl", -left_pad), ("tr", SIDE_W - left_pad - 18)):
-            corner_mask(fp, key, x_pt=pt(x), y_pt=0, r_pt=pt(18), fill=PAGE)
+            corner_mask(fp, key, x_pt=pt(x), y_pt=0, r_pt=pt(18), fill=WORD_PAGE)
 
     # ---- main column
     T = page.main_text_px
     gap = [0]
 
     def rpill(box, label):
-        pill(box, label, 15, 7, 22, 14, PAGE)
+        pill(box, label, 15, 7, 22, 14, WORD_PAGE)
 
-    def rail_entry(box, top_line, org, detail, para):
+    def rail_entry(box, top_line, org, detail, para, gap_px=0):
+        # ONE grey rail per group, as the PDF's (one border on the list): the
+        # 14px gap between entries is INSIDE the bordered cell, as its first
+        # paragraph's space before (the t22 pattern). It used to be a spacer
+        # paragraph between the rows, outside any border: the rail broke into
+        # one segment per entry (user's .docx, 2026-11-18).
         tbl = box.table([tw(T)])
         cell = tbl.rows[0].cells[0]
         fmt_cell(ctx, cell, pad=(0, 18, 0, 0), borders={"start": (2, RAIL)})
-        eb = Box(ctx, cell, 0)
+        eb = Box(ctx, cell, 0, pad_top=gap_px)
         if top_line:
             run(ctx, eb.p(), top_line, size=12.5, color=GREY)
         if org:
@@ -183,11 +194,11 @@ def build(ctx: Ctx) -> None:
 
     def group(label, entries, make):
         for j, e in enumerate(entries):
-            box = page.main_row(pad_top=(gap[0] if j == 0 else 14))
+            box = page.main_row(pad_top=(gap[0] if j == 0 else 0))
             if j == 0:
                 rpill(box, label)
                 gap[0] = 18
-            rail_entry(box, *make(e))
+            rail_entry(box, *make(e), gap_px=0 if j == 0 else 14)
 
     group(t("Education"), r["education"], lambda ed: (
         ed["degree"], ed["school"],
@@ -206,7 +217,7 @@ def build(ctx: Ctx) -> None:
         # the foot cards ~18px short of the PDF's; English needs all of it (10
         # spilled the stats card onto page 2) - measured in Word, run 6
         page.push_to_bottom(box, reserve_pt=10.0 if ctx.rtl else 24.0)
-        card = rounded_block(ctx, box, T, fill=FOREST, bg=PAGE, radius=18,
+        card = rounded_block(ctx, box, T, fill=FOREST, bg=WORD_PAGE, radius=18,
                              pad=(16, 26, 16, 26))
         n = len(ach)
         st = card.table([tw(T - 52) // n] * n)

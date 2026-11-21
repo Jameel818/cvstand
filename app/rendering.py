@@ -40,8 +40,73 @@ def _env() -> Environment:
     # version would silently return English inside any macro. See app/labels.py.
     env.globals["t"] = t
     env.globals["join_labels"] = join_labels
+    env.globals["cv_dot"] = cv_dot
+    env.globals["tl_node"] = tl_node
+    env.globals["tl_seg"] = tl_seg
     env.filters["br_join"] = _br_join
     return env
+
+
+#: THE BULLET (user, 2026-11-20: "every bullet must be vertically centred on
+#: the FIRST line of its text"). The browser's own disc sits on the baseline
+#: by its glyph's metrics: measured 1.0-1.5px ABOVE the line's optical centre
+#: in nearly every template, English and Arabic (tools/audit_markers.py). A
+#: real element is placed by CSS instead: `vertical-align: middle` puts its
+#: middle at the baseline + half the x-height of the text's own face - the
+#: optical centre - in any font and size the user picks. The same size and
+#: gap as the disc it replaces (measured: 0.32-0.40em wide, 0.83-0.96em to the
+#: text); its margins sum to zero advance, so the text starts where it did
+#: and wrapped lines hang under it. Empty and aria-hidden: no CSS `content`,
+#: nothing for a screen reader or a copy-paste, and the ATS Word export reads
+#: an empty round span inside a list item as no text (docx_ats.is_dot) and
+#: writes its own Word bullet. Every bulleted <ul> says `list-style:none`.
+CV_DOT = ('<span class="cv-dot" aria-hidden="true" style="display:inline-block; width:0.33em;'
+          ' height:0.33em; border-radius:50%; background:currentColor; vertical-align:middle;'
+          ' margin-inline-start:-1.21em; margin-inline-end:0.88em;"></span>')
+
+
+def cv_dot() -> Markup:
+    return Markup(CV_DOT)
+
+
+# TIMELINES (user, 2026-11-20): each dot centred ON its line and level with its
+# entry's first text line; the line no longer than from the first dot to the
+# last. They used to be a border down the whole list (it ran from the list's
+# top to the last entry's foot - well past the last dot) with dots at a fixed
+# `top`, 1-2px beside the border's centre and 4-6px above the title in one
+# language or the other (tools/audit_markers.py).
+#
+# tl_node(x, d, style): the dot, written as the FIRST thing in the entry's
+#   title. A zero-size inline-block anchor with `vertical-align: middle` sits
+#   exactly on the title's first line at baseline + half its x-height (the
+#   optical centre), in any face and size; the dot is centred on it. `x`: the
+#   dot's inline-start edge from the title's start (px, or a CSS length).
+# tl_seg(x, w, colour, gap, fs, ...): the line, one segment per entry but the
+#   last, from this entry's dot to the next one's. Every segment starts the
+#   same distance below its entry's top, half a title line (0.5lh in the
+#   title's size and face), so it starts and ends INSIDE a dot whatever the
+#   face. `x`: its inline-start (or, `end=True`, inline-end) inset from the
+#   entry's padding box.
+_NODE_ANCHOR = ('<span aria-hidden="true" style="position:relative; display:inline-block;'
+                ' width:0; height:0; vertical-align:middle;">')
+
+
+def tl_node(x, d: float, style: str) -> Markup:
+    xs = f"{x}px" if isinstance(x, (int, float)) else str(x)
+    return Markup(
+        _NODE_ANCHOR + f'<span style="position:absolute; z-index:1; box-sizing:border-box;'
+        f' top:{-d / 2:g}px; inset-inline-start:{xs}; width:{d:g}px; height:{d:g}px;'
+        f' border-radius:50%; {style}"></span></span>')
+
+
+def tl_seg(x: float, w: float, colour: str, gap: float, fs: float, *, lh: str = "normal",
+           family: str | None = None, end: bool = False) -> Markup:
+    side = "inset-inline-end" if end else "inset-inline-start"
+    fam = f" font-family:{family};" if family else ""
+    return Markup(
+        f'<span aria-hidden="true" style="position:absolute; {side}:{x:g}px; width:{w:g}px;'
+        f' font-size:{fs:g}px; line-height:{lh};{fam} top:calc(0.5lh);'
+        f' bottom:calc(-{gap:g}px - 0.5lh); background:{colour};"></span>')
 
 
 def _br_join(items) -> Markup:

@@ -98,13 +98,13 @@
       {% for job in r.experience %}
       <div style="display:flex; gap:16px;">
         <div style="font-size:11.5px; color:#333; flex-shrink:0; width:52px; text-align:end; line-height:1.4;">{{ job.start }}{% if job.start and job.end %}<br>—<br>{% endif %}{{ job.end }}</div>
-        <div style="position:relative; padding-inline-start:16px; border-inline-start:2px solid #1a1a1a; flex:1; min-width:0;">
-          <span style="position:absolute; inset-inline-start:-6px; top:0; width:10px; height:10px; background:#1a1a1a; border-radius:50%;"></span>
-          <div style="font-weight:700; font-size:14px;">{{ job.role }}</div>
+        <div style="position:relative; padding-inline-start:18px; flex:1; min-width:0;">
+          {% if not loop.last %}{{ tl_seg(0, 2, '#1a1a1a', 12, 14) }}{% endif %}
+          <div style="font-weight:700; font-size:14px;">{{ tl_node(-22, 10, 'background:#1a1a1a;') }}{{ job.role }}</div>
           {% if job.company or job.location %}<div style="font-size:12px; color:#555; margin-bottom:4px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>{% endif %}
           {% if job.bullets %}
-          <ul style="margin:0; padding-inline-start:16px; font-size:11.5px; color:#333; line-height:1.5;">
-            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          <ul style="list-style:none; margin:0; padding-inline-start:16px; font-size:11.5px; color:#333; line-height:1.5;">
+            {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
           </ul>
           {% endif %}
         </div>

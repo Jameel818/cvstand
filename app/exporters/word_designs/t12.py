@@ -13,7 +13,7 @@ from ..docx_design import (
     page_h_px, Box, Ctx, design, fmt_cell, page_rects, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
-from .common import ColumnPage, joined, single_px
+from .common import Timeline, ColumnPage, joined, single_px
 
 PAPER, INK, BODY, MUTED, RULE, TRACK = "F7F7F5", "111111", "222222", "555555", "D5D5D2", "B8B8B8"
 PAD, SIDE, GAP = 46, 210, 28
@@ -68,24 +68,28 @@ def build(ctx: Ctx) -> None:
     node = [0]
 
     def rail(cell_box, entries, title_size, text_size):
-        """A 2px rail at the start edge, content 22px in, hollow 15px nodes."""
-        tb = cell_box.table([tw(MAIN)])
-        cell = tb.rows[0].cells[0]
-        fmt_cell(ctx, cell, pad=(0, 22, 0, 0), borders={"start": (2, INK)})
-        eb = Box(ctx, cell, 0)
+        """A 2px rail at the start edge, content 22px in, hollow 15px nodes.
+        One row per entry (2026-11-20): the rail is each row's border but
+        the last's, so it can end at the last node (common.Timeline)."""
+        n = len(entries)
+        tb = cell_box.table([tw(MAIN)], rows=max(1, n))
+        tl = Timeline(ctx, d_px=15, fill=PAPER, stroke=INK, weight_px=2, line=INK, bg=PAPER)
         for i, (title, sub, text) in enumerate(entries):
+            cell = tb.rows[i].cells[0]
+            fmt_cell(ctx, cell, pad=(0, 22, 0, 0),
+                     borders={"start": (2, INK)} if i < n - 1 else None)
+            eb = Box(ctx, cell, 0)
             p = eb.p(before=20 if i else 0)
             node[0] += 1
             cw = MAIN - 22
             x = (cw + 22 + 1 - 7.5) if ctx.rtl else (-22 - 1 - 7.5)
-            vml_oval(ctx, p, x_pt=pt(x), y_pt=pt(-2), d_pt=pt(15), fill=PAPER, stroke=INK,
-                     weight_pt=pt(2), n=600 + node[0])
+            tl.add(p, p, pt(x))
             run(ctx, p, title, H, size=title_size, color=INK)
             if sub:
                 run(ctx, eb.p(before=1), sub, size=11.5, color=MUTED)
             if text:
                 run(ctx, eb.p(before=4, line=1.5), text, size=text_size, color="333333")
-        eb.finish()
+            eb.finish()
 
     def paren(x):
         d = joined([x["start"], x["end"]], "–")

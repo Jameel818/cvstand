@@ -14,6 +14,8 @@ import io
 import re
 import zipfile
 
+import pytest
+
 from app.exporters.docx import render_docx
 from app.rendering import canvas_html
 from tests.samples import ARABIC, ENGLISH
@@ -71,17 +73,46 @@ def test_arabic_ribbon_labels_take_the_english_line():
     assert "line-height:1.088;" not in html_en, "the English ribbon moved"
 
 
-def test_arabic_word_ribbons_set_a_line_the_english_ones_do_not():
-    def ribbon_lines(data):
-        with zipfile.ZipFile(io.BytesIO(render_docx(data, "modern-t4"))) as z:
-            xml = z.read("word/document.xml").decode("utf-8")
-        # each ribbon label paragraph is followed by its fold's VML path
-        out = []
-        for m in re.finditer(r"<w:p>(?:(?!</w:p>).)*?m0,0 l14,0 l(?:0|14),8 x e(?:(?!</w:p>).)*?</w:p>", xml, re.S):
-            sp = re.search(r'<w:spacing [^>]*w:line="(\d+)"', m.group(0))
-            out.append(int(sp.group(1)) if sp else None)
-        return out
-    ar, en = ribbon_lines(ARABIC), ribbon_lines(ENGLISH)
-    assert len(ar) == 4 and len(en) == 4, (ar, en)
-    assert all(v == 240 for v in en), en                  # English: single, as before
-    assert all(v is not None and v < 240 for v in ar), ar   # Arabic: tighter than its face's single
+def _ribbon_paragraphs(data):
+    with zipfile.ZipFile(io.BytesIO(render_docx(data, "modern-t4"))) as z:
+        xml = z.read("word/document.xml").decode("utf-8")
+    # each ribbon label paragraph carries its overhang and its fold (VML path)
+    return xml, [m.group(0) for m in re.finditer(
+        r"<w:p>(?:(?!</w:p>).)*?m0,0 l14,0 l(?:0|14),8 x e(?:(?!</w:p>).)*?</w:p>", xml, re.S)]
+
+
+def test_arabic_word_ribbons_take_the_english_line():
+    """2026-10-08: the Arabic label takes Archivo's 1.088 line (tighter than its
+    face's single), so the Arabic ribbon is as tall as the English one."""
+    _, paras = _ribbon_paragraphs(ARABIC)
+    lines = [int(re.search(r'<w:spacing [^>]*w:line="(\d+)"', p).group(1)) for p in paras]
+    assert len(lines) == 4 and all(v < 240 for v in lines), lines
+
+
+# ---- 2026-11-20: the English Word ribbon taller than its overhang -----------
+# (user's modern-t4-en-cv-LETTER.docx). Word draws the label in "Archivo Black"
+# at Word's single line, which is that file's Windows line: 1.51em for the
+# embedded face (archivo-900.ttf), 1.347em for Google's Archivo Black where it
+# is installed (it is, on the machine that reported it). The overhang and fold
+# were fixed at the CSS 1.088 line, so the ribbon ran 5-8px past the overhang
+# and the fold sat on the ribbon. Now the ribbon ROW is exactly the PDF's
+# height and the overhang and fold are placed from that same number, whatever
+# face Word picks.
+
+@pytest.mark.parametrize("paper", ["letter", "a4"])
+@pytest.mark.parametrize("data", [ENGLISH, ARABIC], ids=["en", "ar"])
+def test_word_ribbon_overhang_and_fold_match_the_ribbon_height(data, paper):
+    """The overhang is exactly as tall as its ribbon and the fold starts at the
+    ribbon's bottom: the ribbon row is pinned to that same height (exact)."""
+    data = dict(data, paper=paper)
+    xml, paras = _ribbon_paragraphs(data)
+    rows = [int(v) / 20 for v in re.findall(r'<w:trHeight w:val="(\d+)" w:hRule="exact"/>', xml)]
+    assert len(paras) == 4 and len(rows) == 4, (len(paras), rows)
+    for p, row_pt in zip(paras, rows):
+        hs = [float(v) for v in re.findall(r"height:([0-9.]+)pt", p)]
+        tops = [float(v) for v in re.findall(r"margin-top:([0-9.]+)pt", p)]
+        assert len(hs) == 2 and len(tops) == 2, (hs, tops)
+        overhang_h, fold_top = hs[0], tops[1]
+        assert abs(overhang_h - row_pt) < 0.06, (overhang_h, row_pt)
+        assert abs(fold_top - row_pt) < 0.06, (fold_top, row_pt)
+        assert tops[0] == 0.0

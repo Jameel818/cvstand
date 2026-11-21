@@ -89,14 +89,38 @@ def test_normal_has_widow_orphan_control(master):
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("data", [ENGLISH, ARABIC], ids=["en", "ar"])
 def test_no_exact_spacing_anywhere(key, data):
+    """No exact height that can clip a glyph.
+
+    NARROW EXCEPTIONS (user decision 2026-11-20, feature/defects - so Word's
+    single-line decorative bands match the PDF: modern-t4's sidebar ribbons,
+    the rounded pill/card rows of t5/t21/t23):
+    - an exact LINE only on a paragraph with no visible text (a spacer);
+    - an exact ROW only when it holds ONE text paragraph whose space-before
+      plus the WORST measured Word line (1.51em, the embedded Archivo Black's
+      Windows line) still fits inside the row."""
     blob = render_docx(data, key)
+    text = lambda el: "".join(t.text or "" for t in el.iter(f"{W}t"))
     for part in ("word/document.xml", "word/styles.xml"):
         root = _xml(blob, part)
         for sp in root.iter(f"{W}spacing"):
-            assert sp.get(f"{W}lineRule") in (None, "auto"), (
-                f"{part}: lineRule={sp.get(f'{W}lineRule')} can clip glyphs")
+            if sp.get(f"{W}lineRule") in (None, "auto"):
+                continue
+            p = sp.getparent().getparent()
+            assert p.tag == f"{W}p" and not text(p).strip(), (
+                f"{part}: lineRule={sp.get(f'{W}lineRule')} on a text line can clip glyphs")
         for h in root.iter(f"{W}trHeight"):
-            assert h.get(f"{W}hRule") != "exact", "an exact row height can clip"
+            if h.get(f"{W}hRule") != "exact":
+                continue
+            tr = h.getparent().getparent()
+            paras = [p for p in tr.iter(f"{W}p") if text(p).strip()]
+            assert len(paras) == 1, f"an exact row holds {len(paras)} text lines: can clip"
+            p = paras[0]
+            sizes = [int(e.get(f"{W}val")) / 2 for e in p.iter(f"{W}sz")] or [11.0]
+            sp = p.find(f"{W}pPr/{W}spacing")
+            before = int(sp.get(f"{W}before", 0)) / 20 if sp is not None else 0.0
+            need = before + 1.51 * max(sizes)
+            assert need <= int(h.get(f"{W}val")) / 20 + 0.05, (
+                f"exact row {int(h.get(f'{W}val')) / 20}pt < {need:.1f}pt for {text(p)!r}")
 
 
 def _row_of(p):

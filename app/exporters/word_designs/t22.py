@@ -18,7 +18,7 @@ from ..docx_design import (
     page_h_px, Box, Ctx, cant_split, design, fmt_cell, header_picture, pt, rated, ring_anchored, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
-from .common import ColumnPage, Stack, joined, single_px
+from .common import Timeline, ColumnPage, Stack, joined, single_px
 
 ORANGE, INK, BODY, GREY, RULE = "CB3500", "111111", "333333", "444444", "D8D8D8"
 RAIL_W, PAD_T, GAP = 215, 40, 34
@@ -92,20 +92,24 @@ def build(ctx: Ctx) -> None:
         # stretch of the 2px rail as its own cell border, gap included, so
         # the rail stays continuous.
         stack = Stack(ctx, box, LEFT)
+        n = len(entries)
+        tl = Timeline(ctx, d_px=14, fill="FFFFFF", stroke=INK, weight_px=2, line=INK, bg="FFFFFF")
         for i, (title, sub, text, lh) in enumerate(entries):
             sb = stack.row()
             if i == 0:
                 head(sb, label, LEFT)
             inner = sb.table([tw(LEFT)])
             cell = inner.rows[0].cells[0]
-            fmt_cell(ctx, cell, pad=(0, 20, 0, 0), borders={"start": (2, INK)})
+            # the rail: this entry's border down to the next; none on the last
+            # (common.Timeline draws its stretch down to the node)
+            fmt_cell(ctx, cell, pad=(0, 20, 0, 0),
+                     borders={"start": (2, INK)} if i < n - 1 else None)
             eb = Box(ctx, cell, 0)
             p = eb.p(before=16 if i else 0)
             node[0] += 1
             cw = LEFT - 20
             x = (cw + 20 + 1 - 7) if ctx.rtl else (-20 - 1 - 7)
-            vml_oval(ctx, p, x_pt=pt(x), y_pt=pt(-2), d_pt=pt(14), fill="FFFFFF", stroke=INK,
-                     weight_pt=pt(2), n=700 + node[0])
+            tl.add(p, p, pt(x))
             run(ctx, p, title, H, size=14, color=INK)
             if sub:
                 run(ctx, eb.p(before=2), sub, size=11.5, color=ORANGE)

@@ -695,6 +695,12 @@ def _rule_tab(ctx, para, it: Item) -> None:
         D._rpr_put(rpr, "spacing", val=int(round(D.pt(max(0.0, gap - size * 0.28)) * 20)))
     r = para.add_run("\t")
     rpr = r._r.get_or_add_rPr()
+    # ARIAL (feature/defects, 2026-11-21): the leader is a row of the run
+    # face's underscores; the Arabic body face's do not meet, so ats-t15's
+    # Arabic rule read as a pale DASHED line against the PDF's solid plum
+    # (measured in real Word). Same fix as docx_design.rule_heading; an Arial
+    # run is also skipped by the type fit, so the rule keeps its weight.
+    D._rpr_put(rpr, "rFonts", ascii="Arial", hAnsi="Arial", eastAsia="Arial", cs="Arial")
     D._rpr_put(rpr, "color", val=it.extra["rule"])
     D._rpr_put(rpr, "position", val=int(round(D.pt(size) * 0.62)))
     D._rpr_put(rpr, "sz", val=8)

@@ -11,7 +11,7 @@ from docx.shared import Pt
 from ..docx_design import (
     Box, Ctx, design, dots_shape, fmt_cell, fmt_p, pt, run, tiny, tw, vml_oval,
 )
-from .common import ColumnPage, bullets, date_range, joined
+from .common import Timeline, ColumnPage, bullets, date_range, joined
 
 NAVY, GOLD, BAND_TEXT, SOFT, LABEL = "0E2D55", "D8C79A", "E9EEF5", "C7D4E4", "AFC0D4"
 INK, BODY, META, DATE, RULE, DOT_OFF = "22293A", "2E3646", "4A5364", "6C7484", "D8DAE0", "C2C6CE"
@@ -90,19 +90,23 @@ def build(ctx: Ctx) -> None:
 
     # ---- timeline: a 2px gold rail at the start edge, content 24px in, nodes on it
     node = [0]
+    n = len(r["experience"])
+    tl = Timeline(ctx, d_px=14, fill=NAVY, line=GOLD, bg="FFFFFF")
     for j, job in enumerate(r["experience"]):
-        box = row() if j == 0 else page.main_row(pad_top=20)
+        # the 20px gap is the title's space before, INSIDE the bordered cell,
+        # so the rail runs on through it (it broke between entries)
+        box = row() if j == 0 else page.main_row(pad_top=0)
         if j == 0:
             head(box, t("Experience"), 16)
         tbl = box.table([tw(T)])
         cell = tbl.rows[0].cells[0]
-        fmt_cell(ctx, cell, pad=(0, 24, 0, 0), borders={"start": (2, GOLD)})
+        fmt_cell(ctx, cell, pad=(0, 24, 0, 0),
+                 borders={"start": (2, GOLD)} if j < n - 1 else None)
         eb = Box(ctx, cell, 0)
-        p = eb.p(tabs=[(T - 24, "end", None)])
+        p = eb.p(before=20 if j else 0, tabs=[(T - 24, "end", None)])
         node[0] += 1
         x = (T - 24 + 24 - 8) if ctx.rtl else (-24 - 8)
-        vml_oval(ctx, p, x_pt=pt(x), y_pt=pt(4), d_pt=pt(14), fill=NAVY, stroke=None,
-                 n=400 + node[0])
+        tl.add(p, p, pt(x))
         run(ctx, p, job["role"], H, size=14.5, color=NAVY)
         dates = date_range(job["start"], job["end"], " — ")
         if dates:

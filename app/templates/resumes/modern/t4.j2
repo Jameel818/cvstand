@@ -128,8 +128,8 @@
             <div style="font-family:Archivo,sans-serif; font-weight:800; font-size:16px; color:#14343B;">{{ job.role }}</div>
             {% if job.company or job.location %}<div style="font-size:13px; color:#37474C; margin:3px 0 7px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>{% endif %}
             {% if job.bullets %}
-            <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.5; color:#37474C;">
-              {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+            <ul style="list-style:none; margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.5; color:#37474C;">
+              {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
             </ul>
             {% endif %}
           </div>

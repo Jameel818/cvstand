@@ -59,8 +59,8 @@
         </div>
         {% if job.company or job.location %}<div style="font-size:11.5px; color:#2A5A78; margin:1px 0 3px;">{{ job.company }}{% if job.company and job.location %}, {% endif %}{{ job.location }}</div>{% endif %}
         {% if job.bullets %}
-        <ul style="margin:0; padding-inline-start:16px; font-size:11.5px; line-height:1.52;">
-          {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+        <ul style="list-style:none; margin:0; padding-inline-start:16px; font-size:11.5px; line-height:1.52;">
+          {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
         </ul>
         {% endif %}
       </div>

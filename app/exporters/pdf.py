@@ -70,6 +70,30 @@ def page_css(paper: Paper) -> str:
 assert page_css(PAPERS["letter"]) == _LETTER_PAGE
 
 
+# PRINT ORIGIN (feature/defects, 2026-11-20). Chromium prints a document
+# whose ROOT is right-to-left anchored to the page as if it were unscaled: with
+# `scale < 1` the right edge of the 850px canvas lands at 850 x scale, so the
+# whole page shifts LEFT by 850 x (1 - scale) - 34px on Letter (0.96), 57px on
+# A4 (0.933) - and its left edge is cut off. Every Arabic PDF did this, on both
+# papers (measured on a bare 850px page: red left-edge marker gone, blue right
+# marker 34px in). Widening html/body does not help; making the ROOT
+# left-to-right does. Only the root's own direction changes: body is set back to
+# rtl, so every element inside inherits exactly the direction it had, logical
+# properties resolve as before and `[dir=rtl]` rules still match the attribute.
+# Gated on the attribute, so an English (dir="ltr") document is untouched.
+#
+# A4: Chromium lays an A4 sheet out a little wider than the 850px canvas, so
+# the document's `.tpl { margin: 0 auto }` centred it 1px in: every A4 PDF, in
+# both languages, printed 0.7pt right of the page and lost its last pixel
+# column. The canvas IS the page, so in print it sits at x = 0 - a physical
+# left margin of 0 in both directions (in RTL the right margin absorbs the
+# rest). On Letter the layout is exactly 850px, so nothing moves.
+# tests/e2e/test_pdf_bounds.py holds every template to the page.
+PRINT_ORIGIN = (' html[dir="rtl"] { direction: ltr; }'
+                  ' html[dir="rtl"] > body { direction: rtl; }'
+                  ' body > .tpl { margin: 0 auto 0 0; }')
+
+
 class PdfExportError(RuntimeError):
     pass
 
@@ -167,7 +191,7 @@ def _print(docs: list[str], faces: list[str], paper: Paper = PAPERS["letter"]) -
                     # Letter paper, declared in THIS page only (the last @page
                     # rule wins), and the canvas scaled onto it: 1px = 0.72pt.
                     # A4 the same way, at its own factor (app/paper.py).
-                    page.add_style_tag(content=page_css(paper))
+                    page.add_style_tag(content=page_css(paper) + PRINT_ORIGIN)
                     pdf = page.pdf(
                         format=paper.pdf_format,
                         scale=PDF_SCALE if paper.key == "letter" else paper.pdf_scale,

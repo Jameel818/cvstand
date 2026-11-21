@@ -105,8 +105,8 @@
           {% if job.start or job.end %}{% set _ = meta.append(job.start ~ (' – ' if job.start and job.end else '') ~ job.end) %}{% endif %}
           {% if meta %}<div style="font-size:11.5px; font-weight:600; letter-spacing:0.4px; text-transform:uppercase; margin:2px 0 5px;">{{ meta | join(" · ") }}</div>{% endif %}
           {% if job.bullets %}
-          <ul style="margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.5;">
-            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          <ul style="list-style:none; margin:0; padding-inline-start:16px; font-size:12.5px; line-height:1.5;">
+            {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
           </ul>
           {% endif %}
         </div>

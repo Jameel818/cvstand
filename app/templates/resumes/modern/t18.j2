@@ -70,8 +70,8 @@
               <div style="font-weight:700; font-size:14px; color:#ffffff; margin-top:2px;">{{ ed.degree }}</div>
               {% if ed.school %}<div style="font-size:12.5px; color:#C4D0E2;">{{ ed.school }}</div>{% endif %}
               {% if ed.bullets %}
-              <ul style="margin:8px 0 0; padding-inline-start:15px; font-size:12px; line-height:1.55; color:#DBE3EE;">
-                {% for b in ed.bullets %}<li>{{ b }}</li>{% endfor %}
+              <ul style="list-style:none; margin:8px 0 0; padding-inline-start:15px; font-size:12px; line-height:1.55; color:#DBE3EE;">
+                {% for b in ed.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
               </ul>
               {% endif %}
             </div>
@@ -120,8 +120,8 @@
               <div style="font-weight:700; font-size:14px; color:#002B66; text-transform:uppercase; letter-spacing:0.3px; margin-top:2px;">{{ job.role }}</div>
               {% if job.company or job.location %}<div style="font-size:12.5px; color:#4C5666;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
               {% if job.bullets %}
-              <ul style="margin:7px 0 0; padding-inline-start:16px; font-size:12px; line-height:1.55; color:#39424E;">
-                {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+              <ul style="list-style:none; margin:7px 0 0; padding-inline-start:16px; font-size:12px; line-height:1.55; color:#39424E;">
+                {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
               </ul>
               {% endif %}
             </div>

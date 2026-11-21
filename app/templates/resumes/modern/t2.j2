@@ -127,13 +127,12 @@
       <div>
         {{ main_head(t("EXPERIENCE")) }}
         <div style="position:relative; padding-inline-start:26px; margin-inline-start:6px;">
-          <span style="position:absolute; inset-inline-start:0; top:8px; bottom:8px; width:2px; background:#FFD700;"></span>
           <div style="display:flex; flex-direction:column; gap:18px;">
             {% for job in r.experience %}
             <div style="position:relative;">
-              <span style="position:absolute; inset-inline-start:-31px; top:2px; width:12px; height:12px; border-radius:50%; background:#ffffff; border:2px solid #FFD700; box-sizing:border-box;"></span>
+              {% if not loop.last %}{{ tl_seg(-26, 2, '#FFD700', 18, 15, family='Archivo,sans-serif') }}{% endif %}
               <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
-                <span style="font-family:Archivo,sans-serif; font-weight:700; font-size:15px; color:#002366;">{{ job.role }}</span>
+                <span style="font-family:Archivo,sans-serif; font-weight:700; font-size:15px; color:#002366;">{{ tl_node(-31, 12, 'background:#ffffff; border:2px solid #FFD700;') }}{{ job.role }}</span>
                 {% if job.start or job.end %}<span style="font-size:12px; color:#667085; font-style:italic; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
               </div>
               {% if job.company or job.location %}<div style="font-size:12px; color:#4a5160; margin-top:3px;">{{ job.company }}{% if job.company and job.location %} · {% endif %}{{ job.location }}</div>{% endif %}

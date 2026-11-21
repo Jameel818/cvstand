@@ -77,11 +77,11 @@
     <div>
       <div class="cv-section" style="{{ NAVY_H }}">{{ t('Education') }}</div>
       <div style="height:1px; background:#8A8A93; margin:9px 0 14px;"></div>
-      <div style="border-inline-start:1px solid #8A8A93; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
+      <div style="padding-inline-start:1px; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
         {% for ed in r.education %}
         <div style="position:relative; padding-inline-start:26px;">
-          <span style="position:absolute; inset-inline-start:-5px; top:6px; width:10px; height:10px; border-radius:50%; background:#ffffff;"></span>
-          <div style="font-size:15px; color:#ffffff; line-height:1.25;">{{ ed.degree }}</div>
+          {% if not loop.last %}{{ tl_seg(-1, 1, '#8A8A93', 13, 15, lh='1.25') }}{% endif %}
+          <div style="font-size:15px; color:#ffffff; line-height:1.25;">{{ tl_node(-31.5, 10, 'background:#ffffff;') }}{{ ed.degree }}</div>
           {% if ed.school or ed.start or ed.end %}
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-top:2px;">
             <span style="font-size:12.5px; color:#C7C7CE;">{{ ed.school }}</span>
@@ -99,11 +99,11 @@
     <div>
       <div class="cv-section" style="{{ NAVY_H }}">{{ t('Experience') }}</div>
       <div style="height:1px; background:#8A8A93; margin:9px 0 14px;"></div>
-      <div style="border-inline-start:1px solid #8A8A93; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
+      <div style="padding-inline-start:1px; margin-inline-start:5px; display:flex; flex-direction:column; gap:13px;">
         {% for job in r.experience %}
         <div style="position:relative; padding-inline-start:26px;">
-          <span style="position:absolute; inset-inline-start:-5px; top:6px; width:10px; height:10px; border-radius:50%; background:#ffffff;"></span>
-          <div style="font-size:15px; color:#ffffff; line-height:1.25;">{{ job.role }}</div>
+          {% if not loop.last %}{{ tl_seg(-1, 1, '#8A8A93', 13, 15, lh='1.25') }}{% endif %}
+          <div style="font-size:15px; color:#ffffff; line-height:1.25;">{{ tl_node(-31.5, 10, 'background:#ffffff;') }}{{ job.role }}</div>
           {% if job.company or job.location or job.start or job.end %}
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:14px; margin-top:2px;">
             <span style="font-size:12.5px; color:#C7C7CE;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</span>

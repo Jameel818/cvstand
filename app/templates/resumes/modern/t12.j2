@@ -26,8 +26,8 @@
 {% import "_macros.j2" as m %}
 {% set AH = "font-family:Anton,sans-serif; font-weight:400; font-size:33px; color:#111111; line-height:1;" %}
 {% set PAIR = "display:flex; gap:28px; align-items:center;" %}
-{% set RAILCOL = "flex:1; min-width:0; padding-inline-start:22px; border-inline-start:2px solid #111111; display:flex; flex-direction:column; gap:20px;" %}
-{% set NODE = "position:absolute; inset-inline-start:-32px; top:-2px; width:15px; height:15px; border-radius:50%; background:#f7f7f5; border:2px solid #111111; box-sizing:border-box;" %}
+{% set RAILCOL = "flex:1; min-width:0; padding-inline-start:24px; display:flex; flex-direction:column; gap:20px;" %}
+{% set NODE = "background:#f7f7f5; border:2px solid #111111;" %}
 {% set SIDECOL = "width:210px; flex-shrink:0;" %}
 <div class="tpl" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; background:#f7f7f5; overflow:hidden; padding:44px 46px; display:flex; flex-direction:column; gap:20px; font-family:Inter,sans-serif; color:#111111;">
 
@@ -70,8 +70,8 @@
     <div style="{{ RAILCOL }}">
       {% for job in r.experience %}
       <div style="position:relative;">
-        <span style="{{ NODE }}"></span>
-        <div style="font-weight:800; font-size:15px; color:#111111;">{{ job.role }}{% if job.start or job.end %} ({{ job.start }}{% if job.start and job.end %}–{% endif %}{{ job.end }}){% endif %}</div>
+        {% if not loop.last %}{{ tl_seg(-24, 2, '#111111', 20, 15) }}{% endif %}
+        <div style="font-weight:800; font-size:15px; color:#111111;">{{ tl_node(-30.5, 15, NODE) }}{{ job.role }}{% if job.start or job.end %} ({{ job.start }}{% if job.start and job.end %}–{% endif %}{{ job.end }}){% endif %}</div>
         {% if job.company or job.location %}<div style="font-size:11.5px; color:#555555; margin-top:1px;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
         {% if job.bullets %}<p style="font-size:11.5px; color:#333333; line-height:1.5; margin:4px 0 0;">{{ job.bullets | join(" ") }}</p>{% endif %}
       </div>
@@ -97,8 +97,8 @@
       <div style="{{ RAILCOL }}">
         {% for ed in r.education %}
         <div style="position:relative;">
-          <span style="{{ NODE }}"></span>
-          <div style="font-weight:800; font-size:14px; color:#111111;">{{ ed.degree }}{% if ed.start or ed.end %} ({{ ed.start }}{% if ed.start and ed.end %}–{% endif %}{{ ed.end }}){% endif %}</div>
+          {% if not loop.last %}{{ tl_seg(-24, 2, '#111111', 20, 14) }}{% endif %}
+          <div style="font-weight:800; font-size:14px; color:#111111;">{{ tl_node(-30.5, 15, NODE) }}{{ ed.degree }}{% if ed.start or ed.end %} ({{ ed.start }}{% if ed.start and ed.end %}–{% endif %}{{ ed.end }}){% endif %}</div>
           {% if ed.school %}<div style="font-size:11.5px; color:#555555; margin-top:1px;">{{ ed.school }}</div>{% endif %}
           {% if ed.bullets %}<p style="font-size:11px; color:#333333; line-height:1.45; margin:4px 0 0;">{{ ed.bullets | join(" ") }}</p>{% endif %}
         </div>

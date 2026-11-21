@@ -9,7 +9,10 @@ construction - the collector skips iframes - and English, which never
 reaches the `[dir=rtl]` rules, keeps its weights exactly.
 
 Still true after 2026-11-10, when all non-heading interface text moved to
-Cairo 400 / 600 (tests/e2e/test_shell_cairo_body.py): nothing exceeds 600.
+Cairo 400 / 600 (tests/e2e/test_shell_cairo_body.py): nothing exceeds 600 -
+EXCEPT the builder titles, which the user moved to Cairo 700 on 2026-11-20
+(`TITLES`: the form's section titles, the drawer's group labels and its card
+titles). They are held at exactly 700; everything else stays at most 600.
 """
 from __future__ import annotations
 
@@ -20,6 +23,8 @@ pytestmark = pytest.mark.e2e
 
 PAGES = ("/", "/templates", "/builder")
 
+TITLES = ".sec > summary, .drawer .grp-label, .drawer .info b"
+
 COLLECT = """() => {
   const out = [];
   for (const el of document.querySelectorAll('body *')) {
@@ -29,7 +34,10 @@ COLLECT = """() => {
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') continue;
     const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
-    out.push({tag: el.tagName.toLowerCase(), cls: String(el.className || ''), fam, w: +cs.fontWeight});
+    out.push({tag: el.tagName.toLowerCase(), cls: String(el.className || ''), fam, w: +cs.fontWeight,
+              title: el.matches('.sec > summary, .drawer .grp-label, .drawer .info b'),
+              // a glyph INSIDE a title (the section caret) inherits its 700
+              inTitle: !!el.closest('.sec > summary, .drawer .grp-label, .drawer .info b')});
   }
   return out;
 }"""
@@ -48,8 +56,12 @@ def _collect(page, server, lang, path):
 def test_no_arabic_interface_text_is_heavier_than_cairo_semibold(page, live_server, path):
     cairo = [e for e in _collect(page, live_server, "ar", path) if e["fam"] == "Cairo"]
     assert cairo, "no Cairo text found - the collector measured nothing"
-    heavy = [e for e in cairo if e["w"] > 600]
+    heavy = [e for e in cairo if e["w"] > 600 and not e["inTitle"]]
     assert not heavy, f"Cairo still heavier than 600: {heavy[:5]}"
+    titles = [e for e in _collect(page, live_server, "ar", path) if e["title"]]
+    if path == "/builder":
+        assert titles, "the builder titles were not found"
+    assert all((e["fam"], e["w"]) == ("Cairo", 700) for e in titles), titles[:5]
 
 
 def test_each_role_moved_exactly_one_step(page, live_server):
@@ -58,7 +70,7 @@ def test_each_role_moved_exactly_one_step(page, live_server):
     got = {}
     for path in ("/", "/builder"):
         for e in _collect(page, live_server, "ar", path):
-            if e["fam"] == "Cairo":
+            if e["fam"] == "Cairo" and not e["title"]:
                 got.setdefault((e["tag"], e["cls"].split(" ")[0] if e["cls"] else ""), set()).add(e["w"])
     assert got[("h2", "")] == {600}
     assert got[("h3", "")] == {600}

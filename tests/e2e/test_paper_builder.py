@@ -41,7 +41,7 @@ def _state(page):
                / (new DOMMatrix(getComputedStyle(document.querySelector('#preview-stage')).transform).a || 1),
         frame: document.querySelector('#preview-frame').offsetHeight,
         pressed: [...document.querySelectorAll('#paper-switch .rb-seg')]
-                 .filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => b.dataset.paper),
+                 .filter((b) => b.getAttribute('aria-checked') === 'true').map((b) => b.dataset.paper),
     })""")
 
 
@@ -105,6 +105,39 @@ def test_the_switch_reads_in_arabic(browser, deployed_server):
         expect(page.locator("#paper-switch")).to_have_attribute("aria-label", "حجم الورق")
         expect(page.locator('#paper-switch .rb-seg[data-paper="letter"]')).to_have_text("Letter")
         assert _state(page)["pressed"] == ["a4"]
+        assert not errors
+    finally:
+        ctx.close()
+
+
+_PILL_PROPS = ["backgroundColor", "borderTopWidth", "borderTopColor", "borderTopLeftRadius",
+               "paddingTop", "paddingLeft", "columnGap", "display"]
+_BTN_PROPS = ["fontSize", "fontWeight", "fontFamily", "paddingTop", "paddingLeft", "paddingRight",
+              "borderTopLeftRadius", "borderTopWidth"]
+_ON_PROPS = ["backgroundColor", "color", "boxShadow"]
+_OFF_PROPS = ["backgroundColor", "color"]
+
+
+@pytest.mark.parametrize("lang,locale", [("en", "en-GB"), ("ar", "ar-SA")])
+def test_the_paper_switch_is_the_same_pill_as_cv_cover_letter(browser, deployed_server, lang, locale):
+    """User, 2026-11-20: A4 / Letter is the same rounded pill segmented control
+    as CV / Cover letter / CV + cover letter - same look, sizes, active state.
+    Compared property by property with the doc switch (shown for the check)."""
+    ctx, page, errors = _open(browser, deployed_server, locale, lang=lang)
+    try:
+        got = page.evaluate("""([pp, bp, on, off]) => {
+            const ds = document.querySelector('#doc-switch'); ds.hidden = false;
+            const pick = (el, ps) => { const c = getComputedStyle(el); return ps.map(p => c[p]); };
+            const btns = (root, sel) => [...root.querySelectorAll('button')].filter(b => b.matches(sel));
+            const paper = document.querySelector('#paper-switch');
+            const pOn = btns(paper, '[aria-checked="true"]')[0], pOff = btns(paper, '[aria-checked="false"]')[0];
+            const dOn = btns(ds, '[aria-selected="true"]')[0], dOff = btns(ds, ':not([aria-selected="true"])')[0];
+            return {paper: [pick(paper, pp), pick(pOn, bp), pick(pOn, on), pick(pOff, off), pOn.offsetHeight],
+                    doc:   [pick(ds, pp),    pick(dOn, bp), pick(dOn, on), pick(dOff, off), dOn.offsetHeight],
+                    roles: [paper.getAttribute('role'), ...[...paper.querySelectorAll('button')].map(b => b.getAttribute('role'))]};
+        }""", [_PILL_PROPS, _BTN_PROPS, _ON_PROPS, _OFF_PROPS])
+        assert got["paper"] == got["doc"], got
+        assert got["roles"] == ["radiogroup", "radio", "radio"]
         assert not errors
     finally:
         ctx.close()

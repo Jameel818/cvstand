@@ -13,7 +13,7 @@ from ..docx_design import (
     page_h_px, Box, Ctx, design, fmt_cell, fmt_p, page_rects, photo_run, pt, rated, row_height, run,
     skill_pct, slider_shape, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, bullets, joined, pill, rounded_block, text_px
+from .common import Timeline, SidebarPage, Stack, bullets, joined, pill, rounded_block, text_px
 
 FRAME, NAVY, CORAL, TRACK, INK = "F2F2F2", "003366", "F26A5F", "F4D0CC", "1A1A1A"
 CARD, MUTED, RULE = "E6E8EC", "555555", "D9D9D9"
@@ -124,10 +124,13 @@ def build(ctx: Ctx) -> None:
 
     H = "role" if ctx.rtl else "bold"
     node = [0]
+    n_jobs = len(r["experience"])
+    tl = Timeline(ctx, d_px=10, fill=INK, line=INK, bg=FRAME)
     for j, job in enumerate(r["experience"]):
         # Arabic entries run ~2px taller each in Word: the gaps between them
         # give it back (measured, run 6)
-        box = page.main_row(pad_top=16 if j == 0 else (9 if ar else 12))
+        gap = 0 if j == 0 else (9 if ar else 12)
+        box = page.main_row(pad_top=16 if j == 0 else 0)
         if j == 0:
             pill(ctx, box, t("PROFESSIONAL EXPERIENCE"), T, fill=INK, color="FFFFFF", size=15,
                  pad_y=12, radius=16, spacing=1, after=16, bg=FRAME)
@@ -135,21 +138,23 @@ def build(ctx: Ctx) -> None:
         tbl = box.table([tw(6 + 52 + 16), tw(T - 74)])
         d, body = tbl.rows[0].cells
         fmt_cell(ctx, d, pad=(0, 6, 0, 16))
-        fmt_cell(ctx, body, pad=(0, 16, 0, 6), borders={"start": (2, INK)})
-        db = Box(ctx, d, 0)
+        # the rail: this entry's border down to the next (the gap is INSIDE the
+        # row, as the title's space before); none on the last (common.Timeline)
+        fmt_cell(ctx, body, pad=(0, 16, 0, 6),
+                 borders={"start": (2, INK)} if j < n_jobs - 1 else None)
+        db = Box(ctx, d, 0, pad_top=gap)
         for x in [x for x in (job["start"], "—" if job["start"] and job["end"] else "",
                               job["end"]) if x]:
             run(ctx, db.p(align="end", line=1.4), x, size=11.5, color="333333")
         db.finish()
         bb = Box(ctx, body, 0)
-        p = bb.p()
+        p = bb.p(before=gap)
         node[0] += 1
         # the 10px black node centred on the 2px rail at the cell's start edge
         # (x from the content column's physical left; the rail is 16px before it)
         col_w = T - 74 - 22
         x = (col_w + 16 - 6) if ctx.rtl else (-16 - 6)
-        vml_oval(ctx, p, x_pt=pt(x), y_pt=0, d_pt=pt(10), fill=INK, stroke=None,
-                 n=100 + node[0])
+        tl.add(p, p, pt(x))
         run(ctx, p, job["role"], H, size=14, color=INK)
         meta = joined([job["company"], job["location"]], " · ")
         if meta:

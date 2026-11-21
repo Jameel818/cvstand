@@ -467,6 +467,26 @@ def row_height(row, px: float, rule: str = "atLeast") -> None:
     pr.append(_w("trHeight", val=tw(px), hRule=rule))
 
 
+#: w:trPr children in schema order (ECMA-376 CT_TrPrBase).
+TRPR_ORDER = ("cnfStyle", "divId", "gridBefore", "gridAfter", "wBefore", "wAfter", "cantSplit",
+              "trHeight", "tblHeader", "tblCellSpacing", "jc", "hidden", "ins", "del",
+              "trPrChange")
+
+
+def set_row_height(tr, height_pt: float, rule: str = "exact") -> None:
+    """Replace a table row's height (a w:tr element), in schema position.
+    `exact` pins it: Word then draws the row exactly that tall, whatever
+    its faces' own line heights say (feature/defects, 2026-11-20: shapes
+    placed from a known height - ribbons, corner masks - meet the row)."""
+    trpr = tr.find(qn("w:trPr"))
+    if trpr is None:
+        trpr = OxmlElement("w:trPr")
+        tr.insert(1 if tr.find(qn("w:tblPrEx")) is not None else 0, trpr)
+    for old in trpr.findall(qn("w:trHeight")):
+        trpr.remove(old)
+    _put(trpr, _w("trHeight", val=int(round(height_pt * 20)), hRule=rule), TRPR_ORDER)
+
+
 def vmerge(cell, val: str) -> None:
     _put(_tcpr(cell._tc), _w("vMerge", val=val) if val == "restart" else _w("vMerge"),
          TCPR_ORDER)
@@ -483,8 +503,15 @@ def rule_heading(ctx: Ctx, box: Box, label: str, *, width_px: float, size, color
     run(ctx, p, label, "heading", size=size, color=color, spacing=spacing, caps=caps)
     run(ctx, p, " " * max(1, round(gap / 4)), "body", size=size)
     # the leader is drawn in the TAB's run: its colour, its size (thickness),
-    # raised so the line sits at the label's middle, not under its baseline
-    run(ctx, p, "\t", "body", size=max(2, rule_px * 5), color=rule, position=size * 0.33)
+    # raised so the line sits at the label's middle, not under its baseline.
+    # ARIAL (feature/defects, 2026-11-20): a leader is a row of the run face's
+    # underscore glyphs, and in the body face they do not meet - the Arabic
+    # body face's left visible gaps, so every Arabic heading rule in t2, t12
+    # and t22 read as a DASHED line (user's .docx). Arial's underscores join
+    # (measured in Word, EN and AR). A run in Arial is also left alone by the
+    # chosen-size pass, as the dot glyphs are: the rule keeps its weight.
+    run(ctx, p, "\t", "body", size=max(2, rule_px * 5), color=rule, position=size * 0.33,
+        font="Arial")
     return p
 
 

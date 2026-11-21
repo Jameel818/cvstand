@@ -60,14 +60,18 @@ def test_the_ribbon_sits_above_the_preview_and_the_form_has_no_fonts_section(pag
     assert abs(ribbon["x"] - preview["x"]) < 2 and abs(ribbon["width"] - preview["width"]) < 2
 
 
+@pytest.mark.parametrize("width", [1280, 1366, 1440, 1600, 1920])
 @pytest.mark.parametrize("lang", ["en", "ar"])
-def test_the_font_controls_are_one_line(page, deployed_server, lang):
+def test_the_font_controls_are_one_line(page, deployed_server, lang, width):
     """2026-10-08 (the user's mockups ribbon-one-line-AR/EN.png): Section ->
     Font -> Weight -> Size in ONE row, with Undo, Default fonts and the labels
-    toggle on the same row - so the template preview starts higher."""
+    toggle on the same row - so the template preview starts higher.
+    2026-11-20: the A4 / Letter pill is on that row too, at every window from
+    1280px up (the user's rule for the paper switch restyle)."""
+    page.set_viewport_size({"width": width, "height": 950})
     _builder(page, deployed_server, lang)
     ids = ["#undo-btn", "#fonts-default", "#ty_section", "#ty_name_font", "#ty_name_weight",
-           "#ty_name_size", "#ribbon-labels"]
+           "#ty_name_size", "#paper-switch", "#ribbon-labels"]
     boxes = [page.locator(i).bounding_box() for i in ids]
     mids = [b["y"] + b["height"] / 2 for b in boxes]
     assert max(mids) - min(mids) < 6, f"not one row: {dict(zip(ids, mids))}"

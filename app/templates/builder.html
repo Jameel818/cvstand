@@ -97,13 +97,15 @@
       {# PAPER SIZE (feature/paper-size): A4 or US Letter, per CV, saved in the
          résumé (`paper`). The preview, the PDF and the Word file all follow it.
          Pressed state and the page height are set by builder.js. #}
-      <div class="rb-paper" id="paper-switch" role="group" aria-label="{{ t('Paper size') }}"
-           title="{{ t('Paper size') }}">
-        <span class="rb-lbl">{{ t('Paper size') }}</span>
-        <button type="button" class="rb-seg" data-paper="a4" aria-pressed="false"
-                title="{{ t('A4: the international paper size') }}">A4</button>
-        <button type="button" class="rb-seg" data-paper="letter" aria-pressed="false"
-                title="{{ t('US Letter: the USA and Canada') }}">{{ t('Letter') }}</button>
+      <div class="rb-paper">
+        <div class="paper-pill" id="paper-switch" role="radiogroup" aria-label="{{ t('Paper size') }}"
+             title="{{ t('Paper size') }}">
+          <span class="rb-lbl">{{ t('Paper size') }}</span>
+          <button type="button" class="rb-seg" role="radio" data-paper="a4" aria-checked="false"
+                  title="{{ t('A4: the international paper size') }}">A4</button>
+          <button type="button" class="rb-seg" role="radio" data-paper="letter" aria-checked="false"
+                  title="{{ t('US Letter: the USA and Canada') }}">{{ t('Letter') }}</button>
+        </div>
       </div>
       <button type="button" class="rb-toggle" id="ribbon-labels" aria-pressed="true"
               title="{{ t('Show labels') }}" aria-label="{{ t('Show labels') }}">

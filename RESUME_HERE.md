@@ -1,3 +1,48 @@
+# RESUME HERE - 2026-11-21 feature/defects DONE (from feature/logo-v2 ae0bd29; pushed; NOT merged; main untouched)
+User's defect list (files in Desktop\defects\). Review folder: Desktop\review-defects-2026-11-20\ (1..8 per item).
+USER DECISIONS 2026-11-20: exact Word heights allowed NARROWLY (single-line decorative bands + empty spacers; the
+  test enforces it); the 43 bullet/timeline goldens updated; ATS collapsing rules fixed in the PDF (flex-shrink:0).
+DONE:
+1. Bullets/timelines: tools/audit_markers.py (proven on known good/bad pages first) - 43 templates failed before
+   (all 25 ATS + modern t2 t3 t4 t5 t7 t10-16 t18-20 t22-24), 196/196 pass after. Dots centred on the line, level
+   with the first title line, line stops at first/last dot. Word: shared Timeline helper in word_designs/common.py
+   for t2 t5 t12 t13 t14 t20 t22 t24 (node y ignored the paragraph's space-before).
+2. Paper switch = the same pill segmented control as dl-parts/doc-switch (radiogroup/aria-checked); .rb-groups
+   basis 470px: ribbon ONE row (46px) at 1280-1920, EN + AR.
+3. modern-t4 Word ribbons: Word sets the label at the face's Windows line (1.51em embedded Archivo Black, 1.347em
+   Google's) not the CSS 1.088 the overhang/fold were cut to -> ribbon 46-49px vs a 40.7px overhang, fold over the
+   ribbon. Now ONE number (padding + CSS line + padding, read from the final paragraph) = exact row height = overhang
+   height = fold top. EN + AR, Letter + A4 checked in real Word.
+4a. PDF shift: app/exporters/pdf.py PRINT_ORIGIN - Chromium printed every RTL document 850x(1-scale)px too far LEFT
+   (34px Letter, 57px A4) and every A4 document 1px right. New e2e tests/e2e/test_pdf_bounds.py + tools/pdf_bounds.py:
+   392 PDFs (49 x EN/AR x Letter/A4 x CV/letter) must stay on the page; proven to fail on the old output.
+4b. Word stray lines: t21 continuous rails, corner masks/tabs (round_corners now makes the height true in Word),
+   rule_heading leaders in Arial (t2 t12 t22 Arabic rules were dashed), t23 pill strip. ATS t3 t6 t10 t13 t14:
+   the header rule collapsed to 0px on the site/PDF -> flex-shrink:0.
+5. Arabic builder fonts: section titles, drawer group labels, card titles Cairo 700; ribbon labels 600; selects 400.
+   (Supersedes "keep IBM Plex for builder titles".)
+6. modern-t11 EN Word = 1 page in real Word (Letter + A4, demo + sample CV). The user's file was the 11-17 "before".
+7. (2026-11-21) ats-t15 Arabic Word rule was a pale DASHED underscore leader vs the PDF's solid plum: docx_ats
+   _rule_tab now draws the leader in Arial (same fix as rule_heading). Also moves ats-t1/t2 rules (now solid).
+   English was already plum #6B2A5A. Word rule stays ~1 device px vs the PDF's 2 (thickness not changed).
+TESTS CHANGED: test_docx_flow::test_no_exact_spacing_anywhere = the narrow exception (exact line only on a no-text
+  paragraph; exact row only with ONE text paragraph whose before + 1.51em fits). test_shell_cairo_weight: a glyph
+  inside a title (the section caret) may inherit the title's 700. test_paper_builder, test_ribbon, cairo_body,
+  test_t4_ribbon_fold updated for items 2/3/5.
+VERIFIED:
+- Goldens: exactly the 43 listed templates changed (HTML Letter + A4, pixel Letter + A4); before/after/diff in
+  review 1-bullets-timelines\goldens\compare\. Pixel gate 100 passed.
+- Fast suite alone: 6304 passed, 1934 skipped, 0 failed.
+- e2e, ALL 51 files one at a time, foreground: all pass (test_pdf_bounds needs ~630s alone: exceeds a 380s cap).
+- Real Word (own PID only): 196 CV files (49 x EN/AR x Letter/A4, demo CV) after the fixes; 12 rule files for item 7
+  all 1 page.
+NOT FIXED / OPEN (pre-existing, same at ae0bd29 in real Word):
+- 4 English LETTER Word CVs (demo CV, part=cv) are 2 pages: ats-t5 (Tools/Certifications/Languages), modern-t19
+  (Certification row), modern-t1 (Education/Languages), modern-t7 (contact email + sidebar fill). A CV alone
+  should be 1 page -> a Word-estimator DEFECT, not CV+letter. A4 versions are 1 page. Images: review 8-en-letter-2-pages\.
+- Design hook flag app/static/css/app.css:471 (side accent border) predates this branch, left as is.
+NEEDS THE USER'S MANUAL CHECK: t4 Word ribbons, t21/t22/t23 Word lines, the builder ribbon at 1280px.
+
 # RESUME HERE - 2026-11-18 feature/logo-v2 DONE (from feature/fixes af859d8; NOT merged; main untouched)
 Logo 10e from brand-kits/cvstand-aligned-sw12-gap24_6-r14-11/ (same kit as the SEO og-image / twitter-card).
 brand-kits/ stays out of git (.git/info/exclude); its files were copied, never edited.

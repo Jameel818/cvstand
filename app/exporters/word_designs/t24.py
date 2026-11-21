@@ -14,7 +14,7 @@ from ..docx_design import (
     page_h_px, Box, Ctx, design, fmt_cell, page_rects, photo_run, pt, rated, ring_anchored, run,
     skill_pct, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, block, bullets, joined, single_px, text_px
+from .common import Timeline, SidebarPage, Stack, block, bullets, joined, single_px, text_px
 
 FRAME, RAIL, YELLOW, INK, CARD = "F2F2F2", "4A4C4A", "FFD633", "1A1A1A", "DFDEDD"
 LEVEL, MUTED, RULE = "EEC300", "555555", "D9D9D9"
@@ -136,26 +136,31 @@ def build(ctx: Ctx) -> None:
 
     H = "role" if ctx.rtl else "bold"
     node = [0]
+    n_jobs = len(r["experience"])
+    tl = Timeline(ctx, d_px=10, fill=INK, line=INK, bg=FRAME)
     for j, job in enumerate(r["experience"]):
-        box = page.main_row(pad_top=10 if j == 0 else 14)
+        gap = 0 if j == 0 else 14
+        box = page.main_row(pad_top=10 if j == 0 else 0)
         if j == 0:
             bar(box, t("Professional Experience"), INK, "FFFFFF", 1, T, after=12)
         tbl = box.table([tw(6 + 52 + 16), tw(T - 74)])
         d, body = tbl.rows[0].cells
         fmt_cell(ctx, d, pad=(0, 6, 0, 16))
-        fmt_cell(ctx, body, pad=(0, 16, 0, 6), borders={"start": (2, INK)})
-        db = Box(ctx, d, 0)
+        # the rail: this entry's border down to the next (the gap is INSIDE the
+        # row, as the title's space before); none on the last (common.Timeline)
+        fmt_cell(ctx, body, pad=(0, 16, 0, 6),
+                 borders={"start": (2, INK)} if j < n_jobs - 1 else None)
+        db = Box(ctx, d, 0, pad_top=gap)
         for x in [x for x in (job["start"], "—" if job["start"] and job["end"] else "",
                               job["end"]) if x]:
             run(ctx, db.p(align="end", line=1.4), x, size=11.5, color="333333")
         db.finish()
         bb = Box(ctx, body, 0)
-        p = bb.p()
+        p = bb.p(before=gap)
         node[0] += 1
         col_w = T - 74 - 22
         x = (col_w + 16 - 6) if ctx.rtl else (-16 - 6)
-        vml_oval(ctx, p, x_pt=pt(x), y_pt=0, d_pt=pt(10), fill=INK, stroke=None,
-                 n=200 + node[0])
+        tl.add(p, p, pt(x))
         run(ctx, p, job["role"], H, size=14, color=INK)
         meta = joined([job["company"], job["location"]], " · ")
         if meta:

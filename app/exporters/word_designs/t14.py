@@ -20,7 +20,7 @@ from ..docx_design import (
 )
 from docx.oxml.ns import qn
 
-from .common import SidebarPage, Stack, block, date_range, joined, single_px
+from .common import Timeline, SidebarPage, Stack, block, date_range, joined, single_px
 
 CREAM, NAVY, ORANGE, PHOTO = "F7F4EC", "0E2B53", "B93E12", "2A4570"
 INK, LVL, DOT_OFF, RULE = "2E2C28", "6F6A5E", "BEB9A6", "8A8A93"
@@ -165,17 +165,19 @@ def build(ctx: Ctx) -> None:
 
     node = [0]
 
-    def entry(box, title, place, dates, text):
+    def entry(box, tl, title, place, dates, text, *, gap, last):
+        # the gap is the title's space before, INSIDE the bordered cell; the
+        # last entry has no border (common.Timeline ends the rail at its node)
         tbl = box.table([tw(T - 5)], ind=tw(5))
         cell = tbl.rows[0].cells[0]
-        fmt_cell(ctx, cell, fill=NAVY, pad=(0, 26, 0, 0), borders={"start": (1, RULE)})
+        fmt_cell(ctx, cell, fill=NAVY, pad=(0, 26, 0, 0),
+                 borders=None if last else {"start": (1, RULE)})
         eb = Box(ctx, cell, 0)
-        p = eb.p(line=1.25)
+        p = eb.p(before=gap, line=1.25)
         node[0] += 1
         cw = T - 5 - 26
         x = (cw + 26 - 5) if ctx.rtl else (-26 - 5)
-        vml_oval(ctx, p, x_pt=pt(x), y_pt=pt(6), d_pt=pt(10), fill="FFFFFF", stroke=None,
-                 n=500 + node[0])
+        tl.add(p, p, pt(x))
         run(ctx, p, title, H, size=15, color="FFFFFF")
         if place or dates:
             q = eb.p(before=2, tabs=[(cw, "end", None)])
@@ -187,18 +189,21 @@ def build(ctx: Ctx) -> None:
             run(ctx, eb.p(before=6, line=1.5, align="both"), text, size=12, color="CFCFD5")
         eb.finish()
 
+    tl = Timeline(ctx, d_px=10, fill="FFFFFF", line_px=1, line=RULE, bg=NAVY)
     for j, ed in enumerate(r["education"]):
-        box = page.main_row(fill=NAVY, pad_top=0 if j == 0 else 13)
+        box = page.main_row(fill=NAVY, pad_top=0)
         if j == 0:
             nhead(box, t("Education"))
-        entry(box, ed["degree"], ed["school"], date_range(ed["start"], ed["end"]),
-              " ".join(ed["bullets"]))
+        entry(box, tl, ed["degree"], ed["school"], date_range(ed["start"], ed["end"]),
+              " ".join(ed["bullets"]), gap=13 if j else 0, last=j == len(r["education"]) - 1)
+    tl = Timeline(ctx, d_px=10, fill="FFFFFF", line_px=1, line=RULE, bg=NAVY)
     for j, job in enumerate(r["experience"]):
-        box = page.main_row(fill=NAVY, pad_top=16 if j == 0 else 13)
+        box = page.main_row(fill=NAVY, pad_top=16 if j == 0 else 0)
         if j == 0:
             nhead(box, t("Experience"))
-        entry(box, job["role"], joined([job["company"], job["location"]], " · "),
-              date_range(job["start"], job["end"]), " ".join(job["bullets"]))
+        entry(box, tl, job["role"], joined([job["company"], job["location"]], " · "),
+              date_range(job["start"], job["end"]), " ".join(job["bullets"]),
+              gap=13 if j else 0, last=j == len(r["experience"]) - 1)
     if r["recognition"] or r["tools"]:
         box = page.main_row(fill=NAVY, pad_top=11)    # 16 sat 5px low (run 6)
         # the label is not a .cv-section in the PDF (Arabic: the body face)

@@ -25,8 +25,8 @@
 {% set SH = "font-size:21px; font-weight:400; color:#1B1717; letter-spacing:3px; margin-bottom:12px;" %}
 {% set KICK = "font-size:9.5px; color:#810100; letter-spacing:1.5px; font-weight:700;" %}
 {% set BH = "text-align:center; font-size:23px; font-weight:400; color:#1B1717; letter-spacing:4px; margin-bottom:22px;" %}
-{% set RAIL = "display:flex; flex-direction:column; gap:22px; padding-inline-end:22px; border-inline-end:2px solid #EDEBDD;" %}
-{% set NODE = "position:absolute; inset-inline-end:-27px; top:4px; width:11px; height:11px; border-radius:50%; background:#810100;" %}
+{% set RAIL = "display:flex; flex-direction:column; gap:22px; padding-inline-end:24px;" %}
+{% set NODE = "background:#810100;" %}
 <div class="tpl cv-sections-taj" style="box-sizing:border-box; width:850px; height:{{ page.h }}px; display:flex; background:#ffffff; font-family:Archivo,sans-serif;">
 
   <div style="width:322px; flex-shrink:0; background:#EDEBDD; padding:32px 30px; display:flex; flex-direction:column; gap:18px; box-sizing:border-box;">
@@ -134,16 +134,16 @@
       <div class="cv-section" style="{{ BH }}">{{ t('WORK EXPERIENCE') }}</div>
       <div style="{{ RAIL }}">
         {% for job in r.experience %}
-        <div style="position:relative;">
-          <span style="{{ NODE }}"></span>
+        <div style="position:relative; container-type:inline-size;">
+          {% if not loop.last %}{{ tl_seg(-24, 2, '#EDEBDD', 22, 14, end=True) }}{% endif %}
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
-            <span style="font-size:14px; font-weight:900; color:#1B1717; letter-spacing:0.5px; text-transform:uppercase;">{{ job.role }}</span>
+            <span style="font-size:14px; font-weight:900; color:#1B1717; letter-spacing:0.5px; text-transform:uppercase;">{{ tl_node('calc(100cqi + 17.5px)', 11, NODE) }}{{ job.role }}</span>
             {% if job.start or job.end %}<span style="font-size:11.5px; font-weight:700; color:#630000; white-space:nowrap;">{{ job.start }}{% if job.start and job.end %} – {% endif %}{{ job.end }}</span>{% endif %}
           </div>
           {% if job.company or job.location %}<div style="font-size:12px; color:#4a453c; margin-top:2px;">{{ job.company }}{% if job.company and job.location %} · {{ job.location }}{% elif job.location %}{{ job.location }}{% endif %}</div>{% endif %}
           {% if job.bullets %}
-          <ul style="margin:6px 0 0; padding-inline-start:16px; font-size:11.5px; color:#33302b; line-height:1.55;">
-            {% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}
+          <ul style="list-style:none; margin:6px 0 0; padding-inline-start:16px; font-size:11.5px; color:#33302b; line-height:1.55;">
+            {% for b in job.bullets %}<li>{{ cv_dot() }}{{ b }}</li>{% endfor %}
           </ul>
           {% endif %}
         </div>
@@ -159,10 +159,10 @@
       <div class="cv-section" style="{{ BH }}">{{ t('EDUCATION') }}</div>
       <div style="{{ RAIL }}">
         {% for ed in r.education %}
-        <div style="position:relative;">
-          <span style="{{ NODE }}"></span>
+        <div style="position:relative; container-type:inline-size;">
+          {% if not loop.last %}{{ tl_seg(-24, 2, '#EDEBDD', 22, 13.5, end=True) }}{% endif %}
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
-            <span style="font-size:13.5px; font-weight:900; color:#1B1717; text-transform:uppercase;">{{ ed.school or ed.degree }}</span>
+            <span style="font-size:13.5px; font-weight:900; color:#1B1717; text-transform:uppercase;">{{ tl_node('calc(100cqi + 17.5px)', 11, NODE) }}{{ ed.school or ed.degree }}</span>
             {% if ed.start or ed.end %}<span style="font-size:11.5px; font-weight:700; color:#630000; white-space:nowrap;">{{ ed.start }}{% if ed.start and ed.end %} – {% endif %}{{ ed.end }}</span>{% endif %}
           </div>
           {% if ed.school %}<div style="font-size:12px; color:#33302b; margin-top:3px;">{{ ed.degree }}</div>{% endif %}

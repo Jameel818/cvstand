@@ -8,7 +8,7 @@ from ..docx_design import (
     Box, Ctx, bar_shape, design, fmt_cell, fmt_p, photo_run, pt, rated, rule_heading, run,
     skill_pct, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, date_range, joined
+from .common import Timeline, SidebarPage, Stack, date_range, joined
 from .common import text_px as width_of
 
 NAVY, GOLD, TRACK = "002366", "FFD700", "E0E0E0"
@@ -152,6 +152,8 @@ def build(ctx: Ctx) -> None:
 
     if r["experience"]:
         node_px, line_x = 32, 7         # the line 6-8px in, the content 32px in
+        tl = Timeline(ctx, d_px=12, fill="FFFFFF", stroke=GOLD, weight_px=2, line=GOLD,
+                      bg="FFFFFF")
         for j, job in enumerate(r["experience"]):
             box = page.main_row(pad_top=first_pad if j == 0 else 0)
             if j == 0:
@@ -160,15 +162,14 @@ def build(ctx: Ctx) -> None:
             last = j == len(r["experience"]) - 1
             tbl = box.table([tw(line_x), tw(node_px - line_x), tw(text_px - node_px)])
             a, b, content = tbl.rows[0].cells
-            fmt_cell(ctx, a, borders={"end": (2, GOLD)})
+            # the rail: none on the last entry (common.Timeline ends it at the node)
+            fmt_cell(ctx, a, borders=None if last else {"end": (2, GOLD)})
             cb = Box(ctx, content, 0)
             fmt_cell(ctx, content, pad=(0, 0, 0 if last else 18, 0))
             p = cb.p(tabs=[(text_px - node_px - 2, "end", None)])
-            # the hollow node, centred on the line
-            vml_oval(ctx, a.paragraphs[0], x_pt=pt(line_x) - pt(12) / 2 + 0.75
-                     if not ctx.rtl else -pt(12) / 2 - 0.75,
-                     y_pt=pt(2), d_pt=pt(12), fill="FFFFFF", stroke=GOLD, weight_pt=pt(2),
-                     n=j + 1)
+            # the hollow node, centred on the line, level with the title
+            tl.add(a.paragraphs[0], p, pt(line_x) - pt(12) / 2 + 0.75
+                   if not ctx.rtl else -pt(12) / 2 - 0.75)
             run(ctx, p, job["role"], "role", size=15, color=NAVY)
             dates = date_range(job["start"], job["end"])
             if dates:

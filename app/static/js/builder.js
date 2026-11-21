@@ -1024,7 +1024,7 @@
   function applyPaper() {
     document.documentElement.style.setProperty("--page-h", pageH() + "px");
     $$("#paper-switch .rb-seg").forEach((b) => {
-      b.setAttribute("aria-pressed", String(b.dataset.paper === paperKey()));
+      b.setAttribute("aria-checked", String(b.dataset.paper === paperKey()));
     });
     applyZoom();
   }

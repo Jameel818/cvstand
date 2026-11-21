@@ -10,7 +10,7 @@ from docx.shared import Pt
 from ..docx_design import (
     Box, Ctx, design, dots_shape, fmt_cell, photo_run, pt, run, tiny, tw, vml_oval,
 )
-from .common import SidebarPage, Stack, bullets, date_range, joined, node_x
+from .common import Timeline, SidebarPage, Stack, bullets, date_range, joined, node_x
 
 BEIGE, INK, MAROON, DARK, MUTED, BODY, RULE = ("EDEBDD", "1B1717", "810100", "630000",
                                               "4A453C", "33302B", "D9D5C4")
@@ -125,6 +125,7 @@ def build(ctx: Ctx) -> None:
     count = [0]
 
     def timeline(label, entries, write, rule_above):
+        tl = Timeline(ctx, d_px=11, fill=MAROON, line=BEIGE, bg="FFFFFF")
         for j, e in enumerate(entries):
             box = page.main_row(pad_top=0 if (j == 0 and rule_above) else (26 if j == 0 else 0))
             if j == 0:
@@ -140,13 +141,13 @@ def build(ctx: Ctx) -> None:
             last = j == len(entries) - 1
             tbl = box.table([tw(T - node), tw(node)])
             body, a = tbl.rows[0].cells
-            fmt_cell(ctx, body, pad=(0, 0, 0, 22), borders={"end": (2, BEIGE)})
+            # the rail: none on the last entry (common.Timeline ends it at the node)
+            fmt_cell(ctx, body, pad=(0, 0, 0, 22), borders=None if last else {"end": (2, BEIGE)})
             bb = Box(ctx, body, 0, pad_bottom=0 if last else 22)
             write(bb, e)
             bb.finish()
             count[0] += 1
-            vml_oval(ctx, a.paragraphs[0], x_pt=node_x(ctx, node, "start", 11), y_pt=pt(4),
-                     d_pt=pt(11), fill=MAROON, stroke=None, n=count[0])
+            tl.add(a.paragraphs[0], body.paragraphs[0], node_x(ctx, node, "start", 11))
             Box(ctx, a, 0).finish()
 
     def job(bb, job):
