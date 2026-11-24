@@ -863,15 +863,24 @@ AR_RESERVE_PT = 45.0
 #: ...and the ladder's last step is taken while the RAW estimate is at most
 #: ~25pt over (in real Word those pages fit: ats-t3/t6/t7/t16 AR, round 7)
 AR_FLOOR_EXTRA_PT = 60.0
+#: English CVs whose estimate runs short in real Word, fitted as if the page
+#: held this much more (pt). ats-t5: the achievement lines mix a black
+#: Archivo metric into Inter text, and its Tools / Certifications / Languages
+#: rows are kept together (inline .cv-section labels); at 0 the demo CV's last
+#: three rows went to a 2nd Letter page. Measured in real Word
+#: (feature/word-pages, demo + sample, Letter): 24 still spilled, 32 and 40
+#: fit. The ladder's floor allows the same amount, or a page the reserve
+#: pushed past it fell back to unfitted (the sample spilled at 32 before that).
+EN_RESERVE_PT = {"ats-t5": 40.0}
 
 
-def overflow_pt(doc, resolved, width_pt: float) -> float:
+def overflow_pt(doc, resolved, width_pt: float, extra_pt: float = 0.0) -> float:
     from .docx_measure import Measure
     m = Measure(resolved, direct_faces=True)
     sec = doc.sections[0]
     avail = D.page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
     over = sum(m.paragraph(p, width_pt) for p in doc.element.body.iter(qn("w:p"))) - avail
-    return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else 0.0)
+    return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else extra_pt)
 
 
 def fitted(data: dict, template_key: str, html: str | None = None, base=None):
@@ -882,7 +891,9 @@ def fitted(data: dict, template_key: str, html: str | None = None, base=None):
     g0, t0 = base or (1.0, 1.0)
     doc, resolved, used, width = build(data, template_key, g0, t0, html=html)
     doc.cvstand_fit = base
-    over = overflow_pt(doc, resolved, width)
+    # the CV only: a letter's page holds the letterhead, not this content
+    extra = EN_RESERVE_PT.get(template_key, 0.0) if html is None else 0.0
+    over = overflow_pt(doc, resolved, width, extra)
     if D.TYPE_FIT_TRIGGER_PT < over <= D.TYPE_FIT_PAGE_MAX_PT:
         # the PDF's autofit ladder (gaps, then type), as the Modern designs do;
         # a page the ladder cannot fit flows on at its own sizes (never squeezed)
@@ -896,8 +907,9 @@ def fitted(data: dict, template_key: str, html: str | None = None, base=None):
             steps = tuple(s for s in steps if s[0] <= g0 and s[1] <= t0 and s != (g0, t0))
         for gaps, type_k in steps:
             d2, r2, u2, w2 = build(data, template_key, gaps, type_k, html=html)
-            o2 = overflow_pt(d2, r2, w2)
-            floor = D.TYPE_FIT_FLOOR_OK_PT + (AR_FLOOR_EXTRA_PT if r2["lang"] == "ar" else 0.0)
+            o2 = overflow_pt(d2, r2, w2, extra)
+            # the floor tests the RAW estimate: a reserve moves the target only
+            floor = D.TYPE_FIT_FLOOR_OK_PT + (AR_FLOOR_EXTRA_PT if r2["lang"] == "ar" else extra)
             if o2 <= D.TYPE_FIT_TARGET_PT or (
                     (gaps, type_k) == steps[-1] and o2 <= floor):
                 doc, resolved, used = d2, r2, u2

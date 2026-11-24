@@ -15,6 +15,16 @@ from .common import SidebarPage, Stack, bullets, date_range, joined
 
 INK, BODY, MUTED, RULE, DOT_OFF, MARK = "16161A", "3A3A42", "5C5C66", "D6D6DA", "B8B8BE", "D8F035"
 PADX, SIDE_TXT = 60, 236
+#: English: what the near-one-page fits keep free below the main column and
+#: the side column (pt). The English estimate runs ~40pt short in real Word:
+#: at the defaults (10 / 12) the demo and sample CVs put the last Education
+#: row and Languages (side, same table row) on a 2nd Letter page. Measured in
+#: real Word (feature/word-pages, demo + sample, Letter): main 45 still
+#: spilled, 60 fit; with main fitted, side 24 still spilled, 36 fit. Both
+#: needed. Taken one step past the first fit. Arabic keeps its own values.
+#: A4: only the sample CV's main column gives up a little space (1 page).
+MAIN_RESERVE_EN_PT = 72.0
+SIDE_RESERVE_EN_PT = 48.0
 
 
 @design("modern-t1")
@@ -142,7 +152,9 @@ def build(ctx: Ctx) -> None:
     if ctx.rtl:
         ctx.side_bias_pt = 20.0
         ctx.squeeze_is_over = True
-    page.fit_side(heads)
+    page.fit_side(heads, reserve_pt=12.0 if ctx.rtl else SIDE_RESERVE_EN_PT)
+    if not ctx.rtl:
+        page.main_reserve_pt = MAIN_RESERVE_EN_PT
 
     # ---- main column
     T = page.main_text_px

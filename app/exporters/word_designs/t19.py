@@ -17,6 +17,14 @@ from .common import ColumnPage, bullets, date_range, joined, text_px
 INK, PLUM, BODY, META, MUTED, RULE, TRACK = ("1B1B22", "6B2A5A", "2E2E38", "3E3E48", "5A5A64",
                                             "D9D7DD", "E4E2E7")
 PAD, GUT, GAP = 56, 124, 22
+LABEL_SLACK_PX = 4.0
+#: English: what the near-one-page fit keeps free below the column (pt). The
+#: English estimate runs ~18pt short here in real Word (the header and stats
+#: draw taller); at the default 10 the Certifications row, which cannot split,
+#: went to a 2nd Letter page, demo and sample CVs; 24, 32 and 40 fit
+#: (feature/word-pages, measured). Arabic keeps the default. A4 English gives
+#: up a little gap space too (1 page in real Word).
+MAIN_RESERVE_EN_PT = 40.0
 
 
 @design("modern-t19")
@@ -26,6 +34,8 @@ def build(ctx: Ctx) -> None:
     sec.top_margin = Pt(pt(52))
     sec.bottom_margin = Pt(pt(44))
     page = ColumnPage(ctx, pad_x=(PAD, PAD))
+    if not ctx.rtl:
+        page.main_reserve_pt = MAIN_RESERVE_EN_PT
     T = page.main_text_px
     C = T - GUT - GAP
     H = "role" if ctx.rtl else "heading"
@@ -76,7 +86,18 @@ def build(ctx: Ctx) -> None:
         gap[0] = 21
         tbl = box.table([tw(GUT + GAP), tw(C)], borders={"top": (1, RULE)} if first else None)
         g, cc = tbl.rows[0].cells
-        fmt_cell(ctx, g, pad=(0, 0, 0, GAP))
+        # the PDF's label is a 124px box that never breaks a word: one wider
+        # than the box ("CERTIFICATIONS", 128px) runs into the gap. Word broke
+        # it at the cell edge ("CERTIFICATION / S"), a line the page estimate
+        # never counted, and the section went to a 2nd Letter page
+        # (feature/word-pages). The cell's end padding gives the widest word
+        # what it needs (+ LABEL_SLACK_PX for Word's own advance widths).
+        pad_end = GAP
+        if first:
+            widest = max((text_px(ctx, "heading", w.upper(), 11.5, 1.4)
+                          for w in label.split()), default=0.0)
+            pad_end = max(0.0, min(GAP, GAP - (widest + LABEL_SLACK_PX - GUT)))
+        fmt_cell(ctx, g, pad=(0, 0, 0, pad_end))
         gb = Box(ctx, g, 0, pad_top=15 if first else 0)
         if first:
             run(ctx, gb.p(), label, "heading", size=11.5, color=PLUM, caps=True, spacing=1.4)

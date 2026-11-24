@@ -1,3 +1,40 @@
+# RESUME HERE - 2026-11-24 feature/word-pages DONE (from feature/defects 2eb5ce5; pushed; NOT merged; main untouched)
+Fixes the 4 English LETTER Word CVs that were 2 pages (open item from feature/defects). Review images:
+Desktop\review-word-pages-2026-11-24\{before,after}\ (Word's own PDFs as PNG + word_pages.csv).
+CAUSES (measured in real Word, paragraph y positions vs the estimate):
+- ats-t5: estimate ~27pt short (achievement lines mix black Archivo into Inter; header) AND the inline
+  Tools/Certifications/Languages labels are class cv-section -> keepNext chain -> the 3 rows move together.
+  The keepNext rule is shared by ats-t5/t11/t14/t15/t16, so it was NOT changed.
+- modern-t19: the "CERTIFICATIONS" gutter label (128px) is wider than its 124px box; the PDF lets the word run into
+  the gap, Word broke it "CERTIFICATION / S" (+1 line the estimate never counted); and the EN estimate is ~18pt short.
+- modern-t1: BOTH columns: main ~40pt short (last Education row) and side (Languages), same table row.
+- modern-t7: side column short (the website line spilled).
+FIXES (each scoped to its template, English only; Arabic output byte-identical):
+- docx_ats.EN_RESERVE_PT {"ats-t5": 40} (CV only, not the letterhead build); the ladder's floor allows the same
+  extra (else a page the reserve pushed past the floor fell back to UNFITTED: the sample spilled at 32).
+- t19: gutter cell end padding gives the widest label WORD what it needs (+4px); MAIN_RESERVE_EN_PT 40.
+- t1: MAIN_RESERVE_EN_PT 72 + SIDE_RESERVE_EN_PT 48. t7: SIDE_RESERVE_EN_PT 36.
+  Sweeps in real Word (demo + sample, Letter): t5 24 spill / 32,40 fit; t19 10 spill / 24,32,40 fit;
+  t7 12 spill / 24..48 fit; t1 main 45 spill / 60 fit, then side 24 spill / 36,48 fit (main alone up to 60 and side
+  alone up to 48 both still spilled - both are needed).
+VERIFIED:
+- Real Word (own PID only, Start-Job): 32/32 one page = 4 templates x demo/sample x EN/AR x Letter/A4 (before: 7 were
+  2 pages - the 4 demo + t19/t1/t7 sample; ats-t5 sample was already 1). The 27 changed files: every cv and letter
+  1 page, every both 2 pages.
+- Word hash, 1176 exports (sample + demo x EN/AR x cv/letter/both x Letter/A4 x 49, fonts masked): 27 differ, ALL in
+  the 4 templates, ALL English, word/document.xml only, 0 outside. Changed beyond the EN Letter CVs: t19 EN A4
+  (demo + sample) and t1 / ats-t5 EN A4 sample (a little gap space), ats-t5 + t19 letter files (the ATS letter takes
+  the CV's fit; t19's letter is its own design).
+  HASH TRAP: docx_dml._ID and docx_design._SHAPE_N are PROCESS-WIDE id counters; extra ladder builds shift every
+  later file's drawing ids (first naive compare: 416 "differences" outside). The hash must reset both before
+  each render, in the before AND after run (baseline from a clean worktree of 2eb5ce5).
+- Fast suite alone: 6304 passed, 1934 skipped, 0 failed. Word test files (19, test_ats_word ... test_stat_chips_word):
+  2155 passed, 53 skipped, 0 failed.
+NOT DONE / OPEN:
+- No e2e run (Word-only change). Longer user content still depends on the estimate, as for every template.
+- Pre-existing, not touched: modern-t1's side start-edge rule in Word spans only the first main row.
+NEEDS THE USER'S MANUAL CHECK: the 4 EN Letter CVs in Word (gaps are a little tighter in t1/t5/t19).
+
 # RESUME HERE - 2026-11-21 feature/defects DONE (from feature/logo-v2 ae0bd29; pushed; NOT merged; main untouched)
 User's defect list (files in Desktop\defects\). Review folder: Desktop\review-defects-2026-11-20\ (1..8 per item).
 USER DECISIONS 2026-11-20: exact Word heights allowed NARROWLY (single-line decorative bands + empty spacers; the

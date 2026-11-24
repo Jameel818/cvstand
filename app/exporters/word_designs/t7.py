@@ -17,6 +17,11 @@ from .common import SidebarPage, Stack, bullets, date_range, joined
 YELLOW, NAVY, INK, GREYBLK = "FFD500", "001D3D", "4A4C4A", "D9D9D9"
 SOFT, TRACK, RULE = "DFDEDD", "123A63", "9F9F9E"
 SIDE_PX, BAND = 330, 300
+#: English side column: what fit_side keeps free below it (pt). At the default
+#: 12 the last contact line (the website) went to a 2nd Letter page in real
+#: Word, demo and sample CVs; 24, 30, 36 and 48 fit (feature/word-pages,
+#: measured). Arabic keeps 12. A4 files are unchanged (the column has room).
+SIDE_RESERVE_EN_PT = 36.0
 
 
 @design("modern-t7")
@@ -91,7 +96,8 @@ def build(ctx: Ctx) -> None:
     contact = [x for x in (c["email"], c["phone"], c["address"], c["site"]) if x]
     contact += [s.get("label") for s in c["social"] if s.get("label")]
     section(t("Contact"), contact, lines(1.85))
-    page.fit_side(heads)       # a full column gives up gaps, never spills
+    # a full column gives up gaps, never spills
+    page.fit_side(heads, reserve_pt=12.0 if ctx.rtl else SIDE_RESERVE_EN_PT)
 
     # ---- main column: the yellow band first (a row at least 300px tall)
     T = page.main_text_px
