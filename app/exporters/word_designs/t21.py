@@ -6,8 +6,9 @@ column of lime pills over entries on a grey start rail (a small line above a
 bold green line, one paragraph), closed by a rounded forest stats card at the
 foot. From modern/t21.j2.
 
-Simplified in Word: the side card's corners are rounded at the top only (its
-foot is wherever the page's rows end)."""
+The side card ends 24px above the page foot, rounded, as the PDF's does,
+on the CV AND the cover letter: a page-anchored rounded card behind the side
+cell (side_card) carries it below the cell, whatever the column holds."""
 from __future__ import annotations
 
 from docx.shared import Pt
@@ -28,6 +29,11 @@ PAD, SIDE_W, GAP = 24, 300, 24
 # lime pill and the stats card (user's .docx, 2026-11-18). Text that the PDF
 # draws in #FDFDFD (the contact bar) keeps PAGE.
 WORD_PAGE = "FFFFFF"
+#: where the side card's cell starts on the page in real Word (px; 254-255
+#: on both papers, both languages, CV and letter - the PDF's is 252, as the
+#: header card is a fixed 212px). The page card starts one corner radius
+#: lower: above that the cell's own fill and its corner masks draw the card.
+SIDE_TOP_PX = 254 + 18
 
 
 @design("modern-t21")
@@ -56,9 +62,12 @@ def build(ctx: Ctx) -> None:
     fmt_cell(ctx, pcell, valign="bottom", pad=(0, 34, 0, 26))
     fmt_cell(ctx, ncell, valign="center", pad=(0, 0, 0, 34))
     # the photo's line runs ~6px taller than the picture in Word: 12, not 18
-    # (the contact bar sat 6px low - measured, run 6)
-    pb = Box(ctx, pcell, 0, pad_top=12)
-    photo_run(ctx, pb.p(line=1.0, after=8), size_px=118, ring_px=5, ring=FOREST,
+    # (the contact bar sat 6px low - measured, run 6). The PDF's 8px under
+    # the photo goes above it here (20 = 12 + 8, after 0): the picture sits at
+    # its line's top, so with the 8 below it the photo drew 9px higher than
+    # the PDF's (feature/word-audit, measured); the cell keeps its height
+    pb = Box(ctx, pcell, 0, pad_top=20)
+    photo_run(ctx, pb.p(line=1.0, after=0), size_px=118, ring_px=5, ring=FOREST,
               placeholder="D8D8D8")
     pb.finish()
     nb = Box(ctx, ncell, 0)
@@ -104,6 +113,7 @@ def build(ctx: Ctx) -> None:
     # ---- the columns
     page = SidebarPage(ctx, SIDE_W, side_fill=FOREST, side_pad=(24, 26, 24, 24),
                        main_pad_x=(GAP, PAD), full_height_fill=False, ind_px=PAD)
+    side_card(ctx)
     side = page.side
     W = SIDE_W - 50
 
@@ -231,3 +241,35 @@ def build(ctx: Ctx) -> None:
             cb.finish()
         card.finish_round()
     page.finish()
+
+
+def side_card(ctx: Ctx) -> None:
+    """The side card below its cell: a rounded FOREST rectangle on the page,
+    behind the text, from SIDE_TOP_PX to 24px above the page foot - the PDF's
+    card (bottom: 24px, radius 18). The cell's shading ended where its
+    content did: the card stopped ~24px short on the CV, cutting under the
+    Languages lines, and at ~1/3 to 2/3 of the page on the cover letter,
+    whose side column holds no content (user's .docx, 2026-11-24). Drawn in
+    the header (every page: Word section = one CV or one letter page) and
+    copied to the body by docx_design.body_page_shapes."""
+    from docx.oxml import parse_xml
+    from ..docx_design import page_h_px
+    from ..docx_dml import Sp, anchored_run
+    top = SIDE_TOP_PX
+    h = page_h_px() - PAD - top
+    x = (850 - PAD - SIDE_W) if ctx.rtl else PAD
+    arc = 18 / (min(SIDE_W, h) / 2)
+    X, Y, W, Hh = pt(x), pt(top), pt(SIDE_W), pt(h)
+    z = 40 - 251658240
+    vml = (f'<v:roundrect id="cvstand_sidecard" o:allowincell="f" '
+           f'style="position:absolute;margin-left:{X:.2f}pt;margin-top:{Y:.2f}pt;'
+           f'width:{W:.2f}pt;height:{Hh:.2f}pt;z-index:{z};'
+           f'mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
+           f'arcsize="{arc:.3f}" fillcolor="#{FOREST}" stroked="f"/>')
+    sp = Sp("roundRect", X, Y, W, Hh, fill=FOREST, radius=arc)
+    header = ctx.doc.sections[0].header
+    header.is_linked_to_previous = False
+    para = header.paragraphs[0]
+    para.paragraph_format.space_after = 0
+    para._p.append(parse_xml(anchored_run("cvstand_sidecard", sp, vml, rel_h="page",
+                                          rel_v="page", z=z, in_cell=False)))

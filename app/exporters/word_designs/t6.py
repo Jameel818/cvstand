@@ -71,6 +71,8 @@ def build(ctx: Ctx) -> None:
                        side_pad=(0, 35, 0, PAD), main_pad_x=(PAD, 34),
                        full_height_fill=False, side_end=True)
     fmt_cell(ctx, page.tbl.rows[0].cells[1], borders={"start": (1, RULE)})
+    # ...and on to the page's bottom padding (48), as the PDF's column does
+    page.rule_to_foot(PAD + COL + 34, RULE, 48, name="t6rule")
     side = page.side
 
     def sh(box, label, before, role="heading"):

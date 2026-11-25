@@ -155,6 +155,14 @@ def test_an_ats_letterhead_is_the_cvs_own_paragraphs(files, key, lang):
     cv = list(_doc(f["cv"]).iter(f"{W}p"))
     n = next(i for i, p in enumerate(lt) if date and date in _text(p))
     assert n >= 1
+    # an empty, unbordered gap paragraph right above the body (docx_ats
+    # _split_side_rules: ats-t18's side rules stop with their section) is
+    # the BODY's space above, not the letterhead's
+    gap = lt[n - 1]
+    if (not _text(gap).strip() and gap.find(f"{W}pPr/{W}pBdr") is None
+            and gap.find(f"{W}pPr/{W}spacing") is not None
+            and gap.find(f"{W}pPr/{W}spacing").get(f"{W}line") == "60"):
+        n -= 1
 
     def sig(p):
         p = etree.fromstring(etree.tostring(p))

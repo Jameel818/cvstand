@@ -102,6 +102,11 @@ def pytest_addoption(parser):
         "--e2e", action="store_true", default=False,
         help="run the Playwright end-to-end suite (slow; needs Chromium installed)",
     )
+    parser.addoption(
+        "--word", action="store_true", default=False,
+        help="run the real-Word audit (tools/word_audit.py; needs Microsoft Word, "
+             "starts and stops its OWN Word process only)",
+    )
 
 
 def pytest_configure(config):
@@ -109,9 +114,16 @@ def pytest_configure(config):
         "markers", "e2e: browser journey test — opt in with --e2e")
     config.addinivalue_line(
         "markers", "slow: runs the whole 49-template catalogue through Chromium")
+    config.addinivalue_line(
+        "markers", "word: real Microsoft Word audit - opt in with --word")
 
 
 def pytest_collection_modifyitems(config, items):
+    if not config.getoption("--word"):
+        skip_w = pytest.mark.skip(reason="real-Word audit: pass --word to run it")
+        for item in items:
+            if "word" in item.keywords:
+                item.add_marker(skip_w)
     if config.getoption("--e2e"):
         return
     skip = pytest.mark.skip(reason="browser suite: pass --e2e to run it")

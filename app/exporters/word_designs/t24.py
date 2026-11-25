@@ -29,6 +29,11 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(PAD + 30))
     page = SidebarPage(ctx, SIDE_W, side_fill=RAIL, side_pad=(30, 26, 30, 26),
                        main_pad_x=(GAP, PAD), full_height_fill=False, ind_px=PAD)
+    if not ctx.rtl:
+        # English: the near-one-page fit keeps 72pt free - at 10-40 the
+        # sample CV's Certifications went to a 2nd Letter page; 56 and 72 fit
+        # (feature/word-audit, measured in real Word, demo + sample)
+        page.main_reserve_pt = 72.0
     page_rects(ctx, [(0, 850, 0, page_h_px(), FRAME), (PAD, SIDE_W, PAD, page_h_px() - 2 * PAD, RAIL)])
     side = page.side
     W = SIDE_W - 52

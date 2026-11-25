@@ -424,6 +424,15 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
                                 or any(a is name_col for a in body.iterancestors())):
         name_col = tpl           # the body is in the name's column: what follows the name may go
     keep_place = [x for x in (band, None if name_col is tpl else name_col) if x is not None]
+    # a photo that SHRINKS with its column's content (flex-shrink, modern-t20:
+    # 108px tall on the A4 Arabic CV, its full 214 once the side column was
+    # emptied) keeps the CV's frame: its column is hidden in place too. Marked
+    # in the template (.cv-photo); a fixed-size photo needs no mark
+    photo = next((e for e in tpl.iter() if isinstance(e.tag, str) and "cv-photo" in _classes(e)), None)
+    if photo is not None:
+        pc = column_of(photo)
+        if pc is not tpl and pc is not col and not any(a is pc for a in col.iterancestors()):
+            keep_place.append(pc)
 
     def take_out(g) -> None:
         p = g.getparent()
@@ -449,7 +458,8 @@ def letterhead_canvas(data: dict[str, Any], template_key: str,
             continue
         if (after and isinstance(el.tag, str) and len(el) == 0 and not _text(el)
                 and not _gone(el) and not any(a is body for a in el.iterancestors())
-                and not _structural(el, tpl) and not _has_media(el)):
+                and (not _structural(el, tpl) or _emptied_section(el, tpl))
+                and not _has_media(el)):
             take_out(el)
     if name_el is not None:
         sign = next((e for e in body.iter() if "cl-sign" in _classes(e)), None)
@@ -538,6 +548,20 @@ def _structural(el, tpl) -> bool:
         if float(m.group(1)) >= 150:
             return True
     return False
+
+
+def _emptied_section(el, tpl) -> bool:
+    """A page-level section box left empty below the body, drawn only by its
+    rule (ats-t5: each section's border-top - the letter kept two of them as
+    grey lines under the signature; feature/word-audit): no fill, no size of
+    its own, nothing else."""
+    import re
+    if el.getparent() is not tpl or _filled(el):
+        return False
+    st = (el.get("style") or "").replace(" ", "")
+    if re.search(r"(?:^|;)(?:width|height|flex):", st) or "position:absolute" in st:
+        return False
+    return bool(re.search(r"(?:^|;)border(?:-top|-bottom)?:", st))
 
 
 def _has_media(el) -> bool:

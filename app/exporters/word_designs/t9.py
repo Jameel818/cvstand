@@ -52,7 +52,10 @@ def build(ctx: Ctx) -> None:
         st = Stack(ctx, side, W)
         b = st.row()
         b.pad_top = 10                       # a spacer paragraph fit_side may shrink
-        tbl = b.table([tw(W)], rows=2, borders={**{e: (2, INK) for e in
+        # 2px short of the column: at its full width Word clipped the box's
+        # END border at the cell's edge - an open box in real Word, English
+        # and Arabic (feature/word-audit, measured: W-2 draws all four sides)
+        tbl = b.table([tw(W - 2)], rows=2, borders={**{e: (2, INK) for e in
                                                   ("top", "bottom", "left", "right")},
                                                "insideH": (2, INK)})
         head, body = tbl.rows[0].cells[0], tbl.rows[1].cells[0]
@@ -112,7 +115,15 @@ def build(ctx: Ctx) -> None:
     # squeezed this column well past what the page needs; 10pt let it spill
     # (measured in Word, run 6)
     if ctx.rtl:
-        page.main_reserve_pt = 20.0
+        # 40: at 20 the sample CV's last block went to a 2nd Letter page
+        # (feature/word-audit: 20 spilled, 40 and 60 fit, demo + sample)
+        page.main_reserve_pt = 40.0
+    else:
+        # English: 72pt free below the main column - the sample CV's last
+        # main row broke to page 2 and took the merged side cell's last boxes
+        # (Tools, Languages) with it; 10-40 spilled, 56 and 72 fit
+        # (feature/word-audit, measured in real Word, demo + sample)
+        page.main_reserve_pt = 72.0
 
     # ---- main column
     T = page.main_text_px

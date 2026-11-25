@@ -36,7 +36,12 @@ def build(ctx: Ctx) -> None:
     # Not below 22px: the picture's paragraph keeps its own text line (~16pt),
     # so a thinner picture saves nothing and the estimate ran short (an empty
     # page 2)
-    page.shrink_side_photo(photo, min_px=22)
+    # reserve -2.5pt: at the default 4 the Word photo came out 9px shorter
+    # than the PDF's (A4 Arabic 99 vs 108, Letter English 164 vs 173 - the
+    # side column's estimate runs ~6.5pt long here; feature/word-audit,
+    # measured in real Word). The letter copies this frame (docx_letter
+    # _photo_like_cv), as the PDF letter keeps the CV's (letter.py, cv-photo)
+    page.shrink_side_photo(photo, min_px=22, reserve_pt=-2.5)
 
     heads = []
 
@@ -121,7 +126,12 @@ def build(ctx: Ctx) -> None:
                 spacing=1, caps=True)
             cb.finish()
 
-    node = 27
+    # the rail's cell: the PDF's rail is the entry's 24px end padding's outer
+    # edge (tl_seg -24), x 810 on the English page, its text 24px short of the
+    # column's end. A 27px cell put the rail at 785 and took 25px more from
+    # the text (feature/word-audit, measured); 3 = the rail on the column's
+    # end, the text's end padding 22 (+3 = the PDF's 24-25)
+    node = 3
     count = [0]
 
     def timeline(label, entries, write, rule_above):

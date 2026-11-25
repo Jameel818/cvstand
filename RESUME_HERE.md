@@ -1,3 +1,74 @@
+# RESUME HERE - 2026-11-25 feature/word-audit (from feature/word-pages 033c791; pushed; NOT merged; main untouched)
+Full Word audit: every Word download vs its PDF in REAL Word (own WINWORD PID only). Review folder:
+Desktop\review-word-audit-2026-11-25\ (before\ = first audit, after*\ = after the fixes, STATUS.md = every failure + status).
+STEP 0: the local server ran feature/word-pages 033c791 (latest); it follows the working tree (Flask reloader).
+STEP 1 (user's files defects\_4 = t21 AR A4, _5 = t20 AR A4), reproduced on 033c791, ALL still failed then:
+  t21 side card cut/short at the CV foot (Word 1153 vs PDF 1177, square corners), t21 letter side column at ~1/3-2/3,
+  t20 photo CV != letter (Word CV 99px, letter 212px; the PDF letter was 212 too), t20 beige column OK (page shape),
+  "lines": t21 minor only; real line defects were elsewhere (below).
+AUDIT TOOL (new, in the repo): tools/word_audit.py + tools/word_com.ps1 + tools/pdf_raster.ps1.
+  `python tools/word_audit.py all <work> [--keys ..] [--src demo,sample,photo] [--ref <earlier work>]`, `sheets <work> <dir>`.
+  Matrix 49 x EN/AR x Letter/A4 x cv/letter/both x demo+sample (+16 photo templates with a magenta test photo) =
+  1368 Word files / 2280 pages, ~80 min. Checks: pages, columns/bands to the foot (fill map), stray/missing rules and
+  dashes, text cut/moved (Latin tokens, Arabic letter counts), text off the page, photo frame vs PDF and CV vs letter,
+  letterhead = CV header. TRAP: Word's ExportAsFixedFormat HUNG on every file until paths went through
+  [IO.Path]::GetFullPath. Line checks are noisy (reflow): every flag triaged by eye on crop galleries.
+RESULTS: run 1 (033c791) 1131 flags / 29 templates; run 2 422 flags; re-audits of the last-changed templates
+  (r3, r4, r5): no page failures anywhere, every remaining flag explained (tests/test_word_audit_real.py ACCEPTED).
+FIXES (each measured in real Word):
+- modern-t21: page-anchored rounded side card (header + body copy) to 24px above the foot, CV AND letter; photo 8px lower.
+- modern-t20: PDF letter keeps the photo's column in place (.cv-photo, app/letter.py) -> photo = CV's; Word letter copies
+  the CV's frame (docx_letter._photo_like_cv); Word CV shrink reserve -2.5 (was 9px short); rail cell 27 -> 3px
+  (rail 25px off, text 25px narrow).
+- modern-t1: side column = the PDF's 236px border-box (text 205, was 236: divider 30px off, main 30px narrow);
+  divider to the page foot (SidebarPage.rule_to_foot). modern-t6: divider to the page foot.
+- modern-t13 (+ latent t1/t6/t19/t21): body_page_shapes CREATED an empty header part (default 14pt paragraph) ->
+  t13's band 17-21px below the paper's top. Now never created; t19's 32 Word pages are pixel-identical (proven).
+- modern-t12: name line 1.0 (Word clipped 10px at 0.9; summary row gives 8px back); letter body beside the contact
+  list, heading row dropped (ctx.doc.cvstand_letter mark). modern-t13 letter: band rule dropped ("unrule" mark).
+- Letters (docx_letter._blank): headline kept when the summary repeats it (t14/t16/t17 AR lost it); blanked tables
+  lose their borders (t8 rule); a FILLED band keeps its blanked lines' height as space BEFORE (Word keeps only the
+  larger of after/next-before) - t17 band was 24px short. Unfilled name boxes (t16/t18/t23) unchanged (PDF removes).
+- modern-t9: side boxes 2px narrower (Word clipped the end border).
+- ATS (docx_ats): div rules keep the gap above (tiny() reset it: t3/t10/t13/t14 rules hugged the line), keep their CSS
+  width (t14 accent 74px), an empty box drawn by borders is written (t9 double rule), side rules split per section by an
+  unbordered gap paragraph (t18 one bar header-to-foot).
+- PDF (app/letter.py): emptied page-level section rules below the letter body removed (ats-t5 two grey lines).
+- One page (sample CV, Letter), sweeps in real Word, demo+sample x Letter+A4, one step past the first fit:
+  ats-t4 EN_RESERVE 40; ats-t10 40 / t12 24 / t6 24 + EN_TYPE_FIT_KEYS (gaps alone ended at 0.85 still over);
+  ats-t7 AR_RESERVE_DELTA -100 (estimate read +172, ladder refused every step); modern-t18 EN main 40, t24 EN main 72,
+  t9 AR main 40, t5/t9 EN main 72 (the side cell is merged down the main rows: a "side" spill was a MAIN spill; a side
+  bias was tried and REVERTED - it shrank the demo's type too).
+SCOPE PROOF (baseline = clean worktree of 033c791, counters reset per render, both runs):
+- HTML (document_html + letter.document_html, 784): only ats-t5 letters (8) and modern-t20 (16) differ.
+- docx (1368): 571 differ, templates: all on the failure list plus ats-t3/ats-t13 (same rule-gap defect: PDF gap
+  22px vs Word 8px, measured), modern-t16 AR letters (same lost-headline defect), modern-t19 (empty header part only:
+  pixel-identical in Word), modern-t11 letters (blank table border element only: 30/30 pages pixel-identical).
+- Goldens: HTML goldens of modern-t20 only (5 files, the added class="cv-photo"); no pixel golden changed.
+TESTS: tests/test_word_audit_docx.py (fast, 256 tests; 51 failed on 033c791 = every test class); tests/
+  test_word_audit_real.py (opt-in `pytest --word`, CVSTAND_WORD_AUDIT_KEYS=...); conftest --word option.
+DOCS: docs/CVSTAND_TEMPLATES_GUIDE.md §8.11-8.21 (all lessons of defects / word-pages / word-audit), §11 checklist +
+  step 3b (the audit before approval), §12 tests, §15 prompt, §16 pitfalls 16-32.
+VERIFIED (2026-11-25/26):
+- Real Word: full audit run 2 (1368 files) + re-audits r3/r4/r5 of the templates changed after it: 0 page failures;
+  every remaining row is in tests/test_word_audit_real.py ACCEPTED with its reason.
+- Fast suite alone: 6562 passed, 289 skipped, 2 failed -> both test_letterhead_word ats-t18 (the new gap paragraph
+  above the letter body counted as letterhead); test fixed, test_letterhead_word 442 passed.
+- Word test files (20 incl. the 2 new): 2272 passed, 50 skipped, 0 failed.
+- e2e, all 51 files one at a time, Word closed: all passed (test_pdf_bounds 2 passed in 626s, alone in the background:
+  one test, cannot be split with -k, exceeds the 10-min foreground cap). Pixel goldens (--e2e): 100 passed.
+NOT VERIFIED: the user's own files (defects\_4, _5) re-downloaded from the app - the same templates/data are covered by
+  the audit (photo variant included), but not those exact files.
+NOT FIXED / OPEN (see STATUS.md):
+- NEEDS THE OWNER'S CALL: the PDF letters of modern-t5 / t8 drop the side "Contact" heading their CV shows; the Word
+  letters keep it (= the CV header). Which is right?
+- modern-t20 AR Letter CV photo: PDF 6px strip vs Word 22px (Word floor). modern-t14 photo under the panel
+  (documented simplification). modern-t18 rail starts under the photo frame (documented).
+- PDF-side quirks not copied: t11 letter accent dash; t16 letter drops the empty photo placeholder; t8 AR letter
+  body at the page edge (PDF too). modern-t8 AR: 1px white hairline under the top strip in Word.
+- User-uploaded photos never print in the PDF (set_content without a base URL; see memory pdf-render-base-url) - the
+  audit inlines its photo; not changed here.
+
 # RESUME HERE - 2026-11-24 feature/word-pages DONE (from feature/defects 2eb5ce5; pushed; NOT merged; main untouched)
 Fixes the 4 English LETTER Word CVs that were 2 pages (open item from feature/defects). Review images:
 Desktop\review-word-pages-2026-11-24\{before,after}\ (Word's own PDFs as PNG + word_pages.csv).

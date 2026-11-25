@@ -26,6 +26,7 @@ from docx.enum.section import WD_SECTION
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Twips
+from docx.text.paragraph import Paragraph
 
 from .. import letter as letter_mod
 from ..schema import lang_of, normalize
@@ -285,12 +286,32 @@ def _band_content(full, data: dict) -> frozenset:
     return frozenset(out)
 
 
-def _blank(doc, data: dict, keep: frozenset) -> None:
+def _blank(doc, data: dict, keep: frozenset, resolved: dict | None = None) -> None:
     """The kept band content as blank lines: every run of it in the name's
-    cell keeps its size (so its line keeps its height) and loses its words."""
+    cell keeps its size (so its line keeps its height) and loses its words.
+    A blanked paragraph that ran over several lines keeps their height as
+    space before it: one blank line stood for the summary's three, and the
+    letter's band came out shorter than the CV's (modern-t17: the CONTACT
+    bar rode ~15px up - feature/word-audit), where the PDF hides the text in
+    place at its full height."""
     box = _band_box(doc)
     if box is None:
         return
+    heights = {}
+    shd = box.find(qn("w:tcPr") + "/" + qn("w:shd")) if box.tag == qn("w:tc") else None
+    filled = shd is not None and (shd.get(qn("w:fill")) or "auto").upper() not in ("AUTO", "FFFFFF")
+    # only a FILLED band keeps the lines' height: the PDF hides its content in
+    # place; beside an unfilled name (modern-t16, t18, t23) the PDF letter
+    # removes the summary, and full-height blank lines put the date ~25px
+    # lower than the PDF letter's (measured in real Word)
+    if resolved is not None and filled:
+        from .docx_measure import Measure
+        m = Measure(resolved)
+        for p in box.iter(qn("w:p")):
+            tc = next((a for a in p.iterancestors() if a.tag == qn("w:tc")), None)
+            if tc is not None and tc.find(qn("w:tcPr")) is not None:
+                w = D._cell_w(tc.find(qn("w:tcPr")))
+                heights[p] = (w, m.paragraph(p, w))
     r = normalize(data)
     words = []
     if "summary" in keep:
@@ -299,10 +320,38 @@ def _blank(doc, data: dict, keep: frozenset) -> None:
         for a in r.get("achievements") or []:
             words += [a.get("metric") or "", a.get("label") or ""]
     words = [w for w in words if w]
+    # the name and the headline stay, even when the summary repeats them: the
+    # Arabic demo's summary opens with its title ("مديرة إبداعية تبني ..."),
+    # and the letter's band lost its headline (modern-t14, t17 -
+    # feature/word-audit)
+    head = {(r.get("name") or "").strip(), (r.get("title") or "").strip()} - {""}
     for t in box.iter(qn("w:t")):
         v = (t.text or "").strip()
-        if v and any(v in w for w in words):
+        if v and v not in head and any(v in w for w in words):
             t.text = " "
+    if heights:
+        for p, (w, h0) in heights.items():
+            if "".join(t.text or "" for t in p.iter(qn("w:t"))).strip():
+                continue                        # not blanked (the name, the title)
+            lost = h0 - m.paragraph(p, w)
+            if lost > 0.5:
+                sp = D._ppr(p).find(qn("w:spacing"))
+                if sp is None:
+                    sp = _w("spacing")
+                    _put(D._ppr(p), sp, PPR_ORDER)
+                # as space BEFORE: Word kept only the larger of this space
+                # after and the next paragraph's space before (t17's band
+                # still came out 24px short in real Word - measured)
+                sp.set(qn("w:before"), str(int(sp.get(qn("w:before"), 0)) + int(round(lost * 20))))
+    # a table left with no words (the stat chips) loses its rules too: the
+    # PDF hides the chips in place, borders and all, and Word drew modern-t8's
+    # pale rule under the blank chips across the letter's band
+    # (feature/word-audit)
+    for tbl in list(box.iter(qn("w:tbl"))):
+        if "".join(t.text or "" for t in tbl.iter(qn("w:t"))).strip():
+            continue
+        for b in list(tbl.iter(qn("w:tblBorders"))) + list(tbl.iter(qn("w:tcBorders"))):
+            b.getparent().remove(b)
 
 
 def _run_colour(doc, text: str) -> str | None:
@@ -516,6 +565,41 @@ def _place_like_cv(doc, full) -> None:
             copy_spacing(p, by_text[text(p)])
 
 
+def _photo_like_cv(doc, full) -> None:
+    """The letter's photo frame is the CV's: same extent, same crop. A side
+    column whose photo gives up height when the column is full (modern-t20's
+    flex-shrink, docx_design.crop_picture_height) drew it full height on
+    the letter, whose column holds no content - a different frame on the two
+    pages (user's .docx, 2026-11-24). The first inline picture of each body
+    is the photo (or its placeholder)."""
+    import copy
+    A = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
+    PIC = "{http://schemas.openxmlformats.org/drawingml/2006/picture}"
+
+    def photo(d):
+        for inl in d.element.body.iter(qn("wp:inline")):
+            if next(inl.iter(PIC + "pic"), None) is not None:
+                return inl
+        return None
+    lt, cv = photo(doc), photo(full)
+    if lt is None or cv is None:
+        return
+    le, ce = lt.find(qn("wp:extent")), cv.find(qn("wp:extent"))
+    if le.get("cx") != ce.get("cx") or le.get("cy") == ce.get("cy"):
+        return
+    old, new = le.get("cy"), ce.get("cy")
+    le.set("cy", new)
+    for a_ext in lt.iter(A + "ext"):
+        if a_ext.get("cy") == old:
+            a_ext.set("cy", new)
+    lf, cf = next(lt.iter(PIC + "blipFill")), next(cv.iter(PIC + "blipFill"))
+    ls_, cs = lf.find(A + "srcRect"), cf.find(A + "srcRect")
+    if ls_ is not None:
+        lf.remove(ls_)
+    if cs is not None:
+        lf.find(A + "blip").addnext(copy.deepcopy(cs))
+
+
 def _design_letter(data, template_key, photo, where, colour, L, size, fit, full=None,
                    keep: frozenset = frozenset()):
     from ..labels import reset_lang, set_lang, t
@@ -523,11 +607,25 @@ def _design_letter(data, template_key, photo, where, colour, L, size, fit, full=
     # drawn with the CV's own fit (an Arabic CV that took a type step to fit
     # its page drew its name smaller - the letter's must match it)
     doc, resolved = D._render(_emptied(data, keep), template_key, photo, *fit)
-    _blank(doc, data, keep)
+    _blank(doc, data, keep, resolved)
     _drop_orphan_labels(doc)
     if full is not None:
         _place_like_cv(doc, full)
+        _photo_like_cv(doc, full)
     cell, width = _main_cell(doc, where)
+    mark = getattr(doc, "cvstand_letter", None) or {}
+    if "cell" in mark:
+        # a design that names its letter column (modern-t12): the body goes
+        # there, and the paragraphs the PDF letter drops shrink to nothing
+        cell, width = mark["cell"], mark["width"]
+    for p in mark.get("drop", ()):
+        for r in p.findall(qn("w:r")):
+            p.remove(r)
+        D.tiny(Paragraph(p, None))
+    for p in mark.get("unrule", ()):
+        # a rule the PDF letter hides with the content it belongs to (t13)
+        for b in p.findall(qn("w:pPr") + "/" + qn("w:pBdr")):
+            b.getparent().remove(b)
     body = doc.element.body
     token = set_lang(lang)
     try:

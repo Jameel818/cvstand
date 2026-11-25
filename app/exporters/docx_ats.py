@@ -204,6 +204,7 @@ class Para:
     shade: str | None = None
     group: int = 0
     rule: bool = False            # an empty hairline paragraph
+    spacer: float = 0.0           # > 0: an empty unbordered gap of this many px
 
 
 class Walk:
@@ -314,8 +315,20 @@ class Walk:
         mark = len(self.paras)
 
         if self.is_rule(el):
-            self.emit(Para([], x0=bx0, x1=bx1, st=st, rule=True,
+            # a rule with a width of its own (ats-t14's 74px accent) is that
+            # long, from its start: Word drew it across the whole measure
+            w = _px(own.get("width"))
+            self.emit(Para([], x0=bx0, x1=min(bx1, bx0 + w) if w else bx1, st=st, rule=True,
                            borders={"bottom": (_px(own["height"]), _colour(own["background"]), 0)}))
+        elif (len(el) == 0 and not (el.text or "").strip() and (bt or bb) and not bg
+              and _px(own.get("height")) is not None):
+            # an empty box drawn by its borders (ats-t9's 3px + 1px double
+            # rule, 4px apart): it wrote nothing at all - no paragraph, so no
+            # borders (feature/word-audit). One empty paragraph: the top
+            # border above it, the bottom border its height below it (the
+            # borders themselves are set below, as on any bordered block)
+            pad["bottom"] = _px(own["height"])
+            self.emit(Para([], x0=bx0, x1=bx1, st=st, rule=True))
         elif self.is_bar(el):
             fill = el[0]
             pct = float(_style(fill)["width"].rstrip("%"))
@@ -527,7 +540,10 @@ def _write(ctx: D.Ctx, faces: Faces, p: Para, margin_s: float, margin_e: float,
     if p.borders:
         _borders(ctx, para, p.borders)
     if p.rule:
-        D.tiny(para)
+        # the gap above the rule stays: tiny() alone reset it to 0, and every
+        # div rule sat on the line above it (ats-t14: 9px under the contact
+        # line, the PDF's 23; ats-t10 10 vs 21 - feature/word-audit, measured)
+        D.tiny(para, before_px=max(0.0, p.before))
         return
     if p.hang:
         it0 = next(it for it in p.items if it.kind == "text")
@@ -749,6 +765,26 @@ def _borders(ctx, para, borders: dict) -> None:
 _SIG = ("font-family", "font-size", "font-weight", "color", "letter-spacing", "text-transform")
 
 
+def _split_side_rules(paras: list) -> list:
+    """Two neighbouring blocks that each carry a start rule (ats-t18: every
+    section's 4px border-inline-start, 14px apart) drew ONE unbroken rule in
+    Word, from the header to the last section: a left border runs through
+    the space between paragraphs, whatever the group (the 1-twip indent
+    trick splits boxes and shading only - feature/word-audit, measured in
+    real Word). The gap between them goes into an empty, unbordered
+    paragraph, so each rule stops where its block does, as in the PDF."""
+    out = []
+    for i, p in enumerate(paras):
+        prev = out[-1] if out else None
+        if (prev is not None and not prev.spacer and "start" in prev.borders
+                and "start" in p.borders and prev.group != p.group
+                and prev.after + p.before > 0):
+            out.append(Para([], x0=p.x0, x1=p.x1, st=p.st, spacer=prev.after + p.before))
+            prev.after = p.before = 0.0
+        out.append(p)
+    return out
+
+
 def _mark_unclassed_headings(paras: list) -> None:
     """A heading the template did not mark .cv-section (ats-t4 joins three
     section names into one head) is still a heading in Word - kept with what
@@ -798,7 +834,8 @@ def build(data: dict, template_key: str, gaps: float = 1.0, type_k: float = 1.0,
     if not paras:
         raise ValueError(f"{template_key}: nothing to write")
     _mark_unclassed_headings(paras)
-    text = [p for p in paras if not p.shade and not p.rule]
+    paras = _split_side_rules(paras)
+    text = [p for p in paras if not p.shade and not p.rule and not p.spacer]
     margin_s = _mode([p.x0 for p in text]) if text else tpad["start"]
     margin_e = CANVAS_W - _mode([p.x1 for p in text]) if text else tpad["end"]
     sec = doc.sections[0]
@@ -827,6 +864,11 @@ def build(data: dict, template_key: str, gaps: float = 1.0, type_k: float = 1.0,
         in_body = False
         was_job = False
         for p in paras:
+            if p.spacer:
+                gap = ctx.doc.add_paragraph()
+                # tiny() draws a ~0.3pt line: the rest of the gap goes above it
+                D.tiny(gap, before_px=max(0.0, p.spacer - 0.4))
+                continue
             heading = any(it.role == "heading" for it in p.items if it.kind == "text")
             in_body = in_body or heading
             js = jobs if in_body else set()
@@ -871,7 +913,22 @@ AR_FLOOR_EXTRA_PT = 60.0
 #: (feature/word-pages, demo + sample, Letter): 24 still spilled, 32 and 40
 #: fit. The ladder's floor allows the same amount, or a page the reserve
 #: pushed past it fell back to unfitted (the sample spilled at 32 before that).
-EN_RESERVE_PT = {"ats-t5": 40.0}
+EN_RESERVE_PT = {"ats-t5": 40.0,
+                 # feature/word-audit, the sample CV on Letter paper, measured
+                 # in real Word: ats-t4 0 spilled, 24-56 fit; ats-t10/t12/t6
+                 # with the type steps (EN_TYPE_FIT_KEYS): t10 0 spilled,
+                 # 24 and 40 fit; t12 and t6 0-40 fit
+                 "ats-t4": 40.0, "ats-t10": 40.0, "ats-t12": 24.0, "ats-t6": 24.0}
+#: English CVs whose gap steps alone cannot seat the page in real Word (the
+#: ladder ends at gaps 0.85 still over): they may take the type steps too,
+#: as Arabic does. Their PDF fits at full size - Word's English lines run
+#: taller (feature/word-audit, the sample CV on Letter paper).
+EN_TYPE_FIT_KEYS: set = {"ats-t10", "ats-t12", "ats-t6"}
+#: Arabic CVs whose estimate runs LONG in real Word (pt added to
+#: AR_RESERVE_PT). ats-t7: the sample CV read +172pt, the ladder's floor
+#: refused every step and the page flowed on unfitted - 3 lines on a 2nd
+#: Letter page. -60 to -140 fit, -170 spilled (feature/word-audit, measured)
+AR_RESERVE_DELTA_PT = {"ats-t7": -100.0}
 
 
 def overflow_pt(doc, resolved, width_pt: float, extra_pt: float = 0.0) -> float:
@@ -880,7 +937,7 @@ def overflow_pt(doc, resolved, width_pt: float, extra_pt: float = 0.0) -> float:
     sec = doc.sections[0]
     avail = D.page_h_pt() - sec.top_margin.pt - sec.bottom_margin.pt
     over = sum(m.paragraph(p, width_pt) for p in doc.element.body.iter(qn("w:p"))) - avail
-    return over + (AR_RESERVE_PT if resolved["lang"] == "ar" else extra_pt)
+    return over + (AR_RESERVE_PT + extra_pt if resolved["lang"] == "ar" else extra_pt)
 
 
 def fitted(data: dict, template_key: str, html: str | None = None, base=None):
@@ -892,7 +949,8 @@ def fitted(data: dict, template_key: str, html: str | None = None, base=None):
     doc, resolved, used, width = build(data, template_key, g0, t0, html=html)
     doc.cvstand_fit = base
     # the CV only: a letter's page holds the letterhead, not this content
-    extra = EN_RESERVE_PT.get(template_key, 0.0) if html is None else 0.0
+    table = AR_RESERVE_DELTA_PT if resolved["lang"] == "ar" else EN_RESERVE_PT
+    extra = table.get(template_key, 0.0) if html is None else 0.0
     over = overflow_pt(doc, resolved, width, extra)
     if D.TYPE_FIT_TRIGGER_PT < over <= D.TYPE_FIT_PAGE_MAX_PT:
         # the PDF's autofit ladder (gaps, then type), as the Modern designs do;
@@ -900,7 +958,7 @@ def fitted(data: dict, template_key: str, html: str | None = None, base=None):
         # English fits by its gaps only, as its PDF does (measured: the PDF's
         # autofit never scaled type on these 50 pages); Arabic runs taller in
         # Word than in the PDF, so it may also take the type steps
-        steps = (D.TYPE_FIT_STEPS if resolved["lang"] == "ar"
+        steps = (D.TYPE_FIT_STEPS if resolved["lang"] == "ar" or template_key in EN_TYPE_FIT_KEYS
                  else tuple(s for s in D.TYPE_FIT_STEPS if s[1] == 1.0))
         if base:
             # only the steps tighter than the one the page starts from
@@ -909,7 +967,8 @@ def fitted(data: dict, template_key: str, html: str | None = None, base=None):
             d2, r2, u2, w2 = build(data, template_key, gaps, type_k, html=html)
             o2 = overflow_pt(d2, r2, w2, extra)
             # the floor tests the RAW estimate: a reserve moves the target only
-            floor = D.TYPE_FIT_FLOOR_OK_PT + (AR_FLOOR_EXTRA_PT if r2["lang"] == "ar" else extra)
+            floor = D.TYPE_FIT_FLOOR_OK_PT + (AR_FLOOR_EXTRA_PT + max(0.0, extra) if r2["lang"] == "ar"
+                                              else extra)
             if o2 <= D.TYPE_FIT_TARGET_PT or (
                     (gaps, type_k) == steps[-1] and o2 <= floor):
                 doc, resolved, used = d2, r2, u2

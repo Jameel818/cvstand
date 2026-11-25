@@ -62,6 +62,10 @@ def build(ctx: Ctx) -> None:
         tiny(rule)
         fmt_p(ctx, rule, before=17 if ar else 22, after=16,
               border={"bottom": (1, BAND_RULE, 0)})
+        # the cover letter (docx_letter) keeps the chips as blank lines, as
+        # the PDF hides them in place - and this rule with them (Word drew it
+        # across the letter's band - feature/word-audit)
+        ctx.doc.cvstand_letter = {"unrule": [rule._p]}
         n = len(r["achievements"])
         st = band.table([tw(T) // n] * n)
         for k, (cell, a) in enumerate(zip(st.rows[0].cells, r["achievements"])):

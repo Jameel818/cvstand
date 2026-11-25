@@ -31,6 +31,11 @@ def build(ctx: Ctx) -> None:
     sec.bottom_margin = Pt(pt(24))
     page = SidebarPage(ctx, SIDE_PX, side_fill=NAVY, side_pad=(0, 0, 24, 0),
                        main_pad_x=(40, 40), full_height_fill=False)
+    if not ctx.rtl:
+        # English: the near-one-page fit keeps 40pt free - at the default 10
+        # the sample CV's Skills went to a 2nd Letter page; 24-72 fit
+        # (feature/word-audit, measured in real Word, demo + sample)
+        page.main_reserve_pt = 40.0
     page_rects(ctx, [(0, SIDE_PX + 1, 0, page_h_px(), NAVY)])
     side = page.side
     H = "role" if ctx.rtl else "bold"

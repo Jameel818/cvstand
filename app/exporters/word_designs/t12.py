@@ -39,7 +39,12 @@ def build(ctx: Ctx) -> None:
     fmt_cell(ctx, b, valign="bottom")
     run(ctx, a.paragraphs[0], r["name"], "name", size=66, color=INK, caps=True, spacing=0.5)
     from ..docx_design import fmt_p
-    fmt_p(ctx, a.paragraphs[0], line=0.9)
+    # English: Word clips the top of a line set under single (0.9): the
+    # Anton caps lost their top 10px (y 44-90 drawn, the PDF's 44-100 -
+    # feature/word-audit, real Word). At 1.0 they draw whole, ~8px lower, so
+    # the summary row gives those 8px back. Arabic (its own name face) was
+    # never clipped and keeps 0.9
+    fmt_p(ctx, a.paragraphs[0], line=0.9 if ctx.rtl else 1.0)
     if r["title"]:
         run(ctx, fmt_p(ctx, b.paragraphs[0], align="end", after=6), r["title"], "name",
             size=24, color=INK, caps=True, spacing=1)
@@ -49,7 +54,7 @@ def build(ctx: Ctx) -> None:
                      gap=16, rule_px=2, before=before, after=after)
 
     if r["summary"]:
-        box = page.main_row(pad_top=20)
+        box = page.main_row(pad_top=20 if ctx.rtl else 12)
         ah(box, t("ABOUT ME"), T, size=32, after=20)
         run(ctx, box.p(line=1.75, align="both"), r["summary"], size=12.5, color=BODY)
     ach = [x for x in r["achievements"] if x["metric"]]
@@ -111,6 +116,12 @@ def build(ctx: Ctx) -> None:
     hrb.finish()
     l, rr = pt_.rows[1].cells
     fmt_cell(ctx, l, pad=(0, 0, 0, GAP))
+    # the cover letter (docx_letter): the PDF letter drops this heading row
+    # and sets its body in the experience column, beside the contact list
+    # (Word put it full width under the list and kept "CONTACT" -
+    # feature/word-audit)
+    ctx.doc.cvstand_letter = {"cell": l, "width": tw(MAIN + GAP),
+                              "drop": [p_._p for c_ in (hl, hr) for p_ in c_.paragraphs]}
     lb = Box(ctx, l, 0)
     if r["experience"]:
         rail(lb, [(j["role"] + paren(j), joined([j["company"], j["location"]], " · "),

@@ -96,6 +96,14 @@ def build(ctx: Ctx) -> None:
                                     for lg in r["languages"]], fill=INK, color="FFFFFF")
 
     page.fit_side(heads)       # a full side column gives up gaps, never spills
+    if not ctx.rtl:
+        # English: the near-one-page fit keeps 72pt free below the main
+        # column. The side cell is merged down the main rows, so when the
+        # sample CV's last main row broke to page 2 the side's Languages went
+        # with it (a "side" spill caused by the MAIN column). 10-40 spilled,
+        # 56 and 72 fit; side reserves / side bias were the wrong knob
+        # (feature/word-audit, measured in real Word, demo + sample)
+        page.main_reserve_pt = 72.0
 
     # ---- main column
     T = page.main_text_px

@@ -14,7 +14,11 @@ from ..docx_design import (
 from .common import SidebarPage, Stack, bullets, date_range, joined
 
 INK, BODY, MUTED, RULE, DOT_OFF, MARK = "16161A", "3A3A42", "5C5C66", "D6D6DA", "B8B8BE", "D8F035"
-PADX, SIDE_TXT = 60, 236
+#: the side column's text: the PDF's column is 236px border-box (its 30px
+#: start padding and the 1px rule inside), so 205 of text, the rule at x 554.
+#: Word had 236 of text, the rule at 524 and a main column 30px narrower than
+#: the PDF's (feature/word-audit, measured in Chromium and real Word)
+PADX, SIDE_TXT = 60, 205
 #: English: what the near-one-page fits keep free below the main column and
 #: the side column (pt). The English estimate runs ~40pt short in real Word:
 #: at the defaults (10 / 12) the demo and sample CVs put the last Education
@@ -82,6 +86,8 @@ def build(ctx: Ctx) -> None:
                        main_pad_x=(PADX, 34), full_height_fill=False, side_end=True)
     side_cell = page.tbl.rows[0].cells[1]
     fmt_cell(ctx, side_cell, borders={"start": (1, RULE)})
+    # ...and on to the page's bottom padding (56), as the PDF's column does
+    page.rule_to_foot(850 - PADX - SIDE_TXT - 30 - 1, RULE, 56, name="t1rule")
     side = page.side
     W = SIDE_TXT
 

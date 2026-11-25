@@ -179,6 +179,45 @@ class SidebarPage:
                 _set_before(first, max(pt(min_gap_px), pt(y_px) - sec.top_margin.pt - above))
         self.ctx.after_lines.append(go)
 
+    def rule_to_foot(self, x_px: float, colour: str, foot_px: float, *, name: str = "colrule",
+                     w_px: float = 1.0, skip_pt: float = 40.0) -> None:
+        """A column rule that runs to the page's bottom padding, as the PDF's
+        flex column's border does. A cell border stops where the cell's text
+        stops (modern-t1/t6: the divider ended at 2/3 of the page in Word,
+        feature/word-audit). Keep the cell border (it starts exactly at the
+        column's top) and call this: a page-anchored strip at logical x_px
+        from `skip_pt` below the column's measured top (an estimate - never
+        above the column) down to foot_px above the page foot. On every page
+        (the header's shapes), copied into the body like the side fills."""
+        from docx.oxml import parse_xml
+        from ..docx_design import page_h_pt, pt, tiny
+        from ..docx_dml import Sp, anchored_run
+        from ..docx_measure import Measure
+        ctx = self.ctx
+        sec = ctx.doc.sections[0]
+
+        def go():
+            m = Measure(ctx.resolved)
+            top = sec.top_margin.pt + self._above(m) + skip_pt
+            bottom = page_h_pt() - pt(foot_px)
+            if bottom - top <= 0:
+                return
+            x = (850 - x_px - w_px) if ctx.rtl else x_px
+            X, W = pt(x), pt(w_px)
+            z = 30 - 251658240
+            vml = (f'<v:rect id="cvstand_{name}" o:allowincell="f" style="position:absolute;'
+                   f'margin-left:{X:.2f}pt;margin-top:{top:.2f}pt;width:{W:.2f}pt;height:{bottom - top:.2f}pt;'
+                   f'z-index:{z};mso-position-horizontal-relative:page;mso-position-vertical-relative:page" '
+                   f'fillcolor="#{colour}" stroked="f"/>')
+            sp = Sp("rect", X, top, W, bottom - top, fill=colour)
+            header = sec.header
+            header.is_linked_to_previous = False
+            para = header.paragraphs[0]
+            tiny(para)              # made after flat_headers(): it must take no room
+            para._p.append(parse_xml(anchored_run(f"cvstand_{name}", sp, vml, rel_h="page",
+                                                  rel_v="page", z=z, in_cell=False)))
+        ctx.after_lines.append(go)
+
     def _above(self, m) -> float:
         """Height of what the body holds BEFORE this page's table (a header
         card or band table, modern-t14/t21): the measured helpers' page starts

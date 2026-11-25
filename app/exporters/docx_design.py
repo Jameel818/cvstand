@@ -1283,6 +1283,15 @@ def body_page_shapes(doc, last_page: bool = True) -> int:
     def shape_runs(hdr):
         return [r for r in hdr._element.iter(qn("w:r"))
                 if r.find(_MC_ALT) is not None or r.find(qn("w:drawing")) is not None]
+    # no header part, no page shapes: reading `header._element` would CREATE
+    # one with Word's default paragraph (~14pt), and every page of a template
+    # without page shapes started that far down (modern-t13's band sat
+    # 17-21px below the paper's top - feature/word-audit; finish_rtl had the
+    # same trap)
+    if sec.header.is_linked_to_previous and not (
+            sec.different_first_page_header_footer
+            and not sec.first_page_header.is_linked_to_previous):
+        return 0
     first_hdr = sec.first_page_header if sec.different_first_page_header_footer else sec.header
     if any(h._element.find(".//" + qn("pic:pic")) is not None
            for h in (first_hdr, sec.header)):

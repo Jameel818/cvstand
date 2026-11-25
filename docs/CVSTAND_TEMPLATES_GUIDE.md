@@ -225,7 +225,7 @@ If Word shows **Calibri** in places, that comes from Microsoft 365 cloud fonts o
 
 ## 8. Word techniques: making Word look like the website
 
-These are the techniques that worked in runs 4–14. Use them for every Modern template.
+These are the techniques that worked in runs 4–14 and the defects / word-pages / word-audit runs (2026-11). Use them for every Modern template; §8.12, §8.18 and §8.20-8.21 apply to ATS templates too.
 
 ### 8.1 Page layout
 - Word page is the CV's paper: **US Letter 612×792pt or A4 595.3×841.9pt** (§3.1). Positions and margins are the template's px through `pt()` / `tw()` (× 0.72 on Letter, × 0.70033 on A4). Full-bleed elements (bands, sidebars) use **DrawingML shapes anchored to the page**, not table cells, so they reach the paper edge.
@@ -262,6 +262,99 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 - Complex skill sliders are simplified (accepted for التقنية المالية).
 - Write the fallback into the template's notes so nobody "fixes" it later.
 
+### 8.11 Bullets and timelines (feature/defects) ✅
+- **HTML:** bullets come from `cv_dot()`; timeline dots from `tl_node(x, d, style)` and line pieces from `tl_seg(...)` (`app/rendering.py`). Never hand-draw a dot or rail in a template.
+- **Word:** the shared `Timeline` helper (`word_designs/common.py`). It places each node level with its entry's FIRST title line, counting the title's space-before. It masks the line above the first node and draws the last entry's stretch only down to its node.
+- **The line starts at the first dot and stops at the last dot**, in HTML, PDF and Word. It never runs past the last entry.
+- **The rail's x is the PDF's.** A rail drawn as a cell's end border sits at that cell's edge. If the node cell is wider than the PDF's offset, the rail moves *and* the text column shrinks. modern-t20 used a 27px node cell, which put the rail 25px in and took 25px off the text; 3px is right (feature/word-audit).
+
+### 8.12 Rules, leaders and thin lines ✅
+- **Heading rules and leaders are drawn in Arial** (`rule_heading`, docx_ats `_rule_tab`). A leader in the body font's underscore draws dashed in many faces (t2 t12 t22 Arabic, ats-t15).
+- **A CSS rule element needs `flex-shrink:0`** in a flex column. Without it the 1–3px rule collapses to 0px on the site and in the PDF (ats-t3 t6 t10 t13 t14, feature/defects).
+- **ATS Word (docx_ats):**
+  - A div rule **keeps the gap above it**. `tiny()` resets spacing, so always pass `before_px`; ats-t10/t14 rules sat on the line above until feature/word-audit.
+  - A div rule **keeps its own CSS width**: ats-t14's 74px accent was drawn full width.
+  - A box drawn only by its borders (ats-t9's 3px + 1px double rule) must still write a paragraph; it used to write nothing.
+  - **A left/right paragraph border runs through the space between paragraphs, whatever the group.** Two sections with `border-inline-start` 14px apart drew ONE unbroken bar (ats-t18). The gap goes into an empty unbordered paragraph (`_split_side_rules`).
+- **Word clips the top of a line set under single spacing** (multiple < 1.0). modern-t12's Anton name lost its top 10px at 0.9. Use ≥ 1.0 and take the space back elsewhere.
+
+### 8.13 Exact heights: the narrow exception ✅
+- Word line spacing is **Auto**, never Exactly, with one exception (user decision 2026-11-20): **an exact row height only on a single-line decorative band** (one text paragraph whose before + 1.51em fits), and an exact line only on a paragraph with no text.
+- `tests/test_docx_flow.py::test_no_exact_spacing_anywhere` enforces it. Don't widen it without the owner's approval.
+
+### 8.14 Rounded corners and masks ✅
+- `round_corners()` puts four small in-front masks on a filled block. **Each mask is the colour BEHIND the block, i.e. the page colour** (`WORD_PAGE`, or the band/column under it), never the block's own colour.
+- Masks overlap the block's edge by `CORNER_OVERLAP_PT`. A mask edge exactly on the cell edge left an anti-aliased hairline in Word's PDF (t5/t21 pills).
+- A header card with rounded **bottom** corners needs its bottom masks on the card's last paragraph, not the paragraph after the table (t21: stray lime wedges at the card's foot).
+- A rounded card that must reach the page foot (modern-t21's side card) is a **page-anchored `roundRect`** (VML + DrawingML) from its top to the page foot minus its margin, placed in the header and copied into the body (`body_page_shapes`). It is not a cell.
+
+### 8.15 Full height on EVERY page, CV AND letter ✅
+- Sidebars, columns, bands and column **rules** that the PDF carries to the page foot must reach it in Word **on every page, in the CV and in the cover letter**.
+- A cell shading or cell border **stops where the cell's text stops**. In the letter the CV content is emptied, so a cell-drawn column shrank to ~1/3 of the page (modern-t21 letter, feature/word-audit).
+- Use page-anchored shapes: `page_rects`, the t21 side card, and `SidebarPage.rule_to_foot(x, colour, foot_px)` for a divider. Keep the cell border for the divider's exact top; the shape continues it to the foot (modern-t1, t6).
+- Put the shape at the **PDF's x**. modern-t1's side column was 30px wider than the PDF's, so the divider sat 30px off and the main column was 30px narrower. Measure the PDF's boxes in Chromium (`getBoundingClientRect`, border-box) and copy them.
+- **Never let a header part exist by accident.** Reading `section.header._element` CREATES a header with Word's default ~14pt paragraph, and every page then starts that far down. modern-t13's band sat 17–21px below the paper's top. `body_page_shapes` and `finish_rtl` check `is_linked_to_previous` first. Shapes added after `flat_headers()` (in `after_lines`) must `tiny()` their header paragraph.
+
+### 8.16 The photo frame is identical in CV, letter and PDF ✅
+- Same size, shape, crop and position as the PDF, and **the same in the CV and the cover letter**.
+- A photo that **shrinks with its column** (flex-shrink, modern-t20) is a different size on every CV:
+  - **HTML:** mark it `class="cv-photo"`. `app/letter.py` keeps its column hidden in place, so the PDF letter's photo is the CV's size; it used to be full size in the letter.
+  - **Word:** the letter copies the CV's frame (`docx_letter._photo_like_cv`). `shrink_side_photo`'s reserve is measured per template in real Word.
+- A photo partly covered by another box (modern-t14's orange panel) is a documented simplification. Write it in the design's docstring.
+
+### 8.17 The cover letter (Word) matches the PDF letter ✅
+- The PDF letter hides CV content in place in the band and in the name's column (`keep_place`). The Word letter does the same with `_blank`.
+- `_blank` must keep the **name and headline** even when the summary repeats them. The Arabic demo summary starts with the title, and t14/t17 lost their headline.
+- A blanked table loses its borders too. modern-t8's pale chip rule stayed in the letter.
+- When the PDF letter puts the body somewhere other than the CV's job column, or drops a heading row or a rule, the design says so with `ctx.doc.cvstand_letter = {"cell", "width", "drop", "unrule"}`. modern-t12 uses it to place the body beside the contact list and drop the heading row; t13 uses it to drop the band rule over the hidden chips.
+- **PDF side (`app/letter.py`):** an emptied page-level section box drawn only by its border is removed below the body. ats-t5 printed two grey lines under the signature.
+
+### 8.18 One page in real Word: per-template reserves ✅
+- The Word page estimate (`docx_measure`) is **not exact**:
+  - English text in real Word runs taller than the estimate (Word's line metrics, mixed metric faces, keep-together rows, labels that cannot break). Arabic can run long *or* short.
+  - So templates carry **measured** reserves: ATS `EN_RESERVE_PT`, `EN_TYPE_FIT_KEYS` and `AR_RESERVE_DELTA_PT` in `docx_ats.py`; Modern `page.main_reserve_pt`, `fit_side(reserve_pt=...)` and `ctx.side_bias_pt`.
+  - Each value is commented with the sweep that chose it.
+- **Measure in real Word, never guess.** Sweep the value over a few steps on the demo AND sample CV, Letter AND A4 (the sample CV on Letter is the hardest page), and take one step past the first value where all four are 1 page.
+  - Tools: the scratch sweep pattern (render each value to docx, convert with `tools/word_com.ps1`, read the page count) or `tools/word_audit.py`.
+- What doesn't move the result:
+  - **Find which column really spills before choosing the knob.** In a `SidebarPage` the side cell is merged down the main column's rows. When the main column's last row breaks to page 2, the side column's last blocks go with it, so a spill that *looks* like a side spill is a MAIN spill: use `main_reserve_pt` (modern-t5/t9 English).
+  - A side bias that forces the type ladder shrinks EVERY CV of the template, the demo included, and leaves an empty column foot. Don't use one for this; it was tried and reverted in feature/word-audit.
+  - A larger **fit_side** reserve only gives up gaps.
+  - An English ATS page that is still over at gaps 0.85 needs the type steps (`EN_TYPE_FIT_KEYS`).
+  - A reserve that pushes the estimate past `TYPE_FIT_PAGE_MAX_PT` switches the fit OFF.
+
+### 8.19 The RTL PDF shift ✅
+- Chromium printed every RTL document 850×(1−scale)px too far LEFT (34px Letter, 57px A4), and every A4 document 1px right. `app/exporters/pdf.py PRINT_ORIGIN` pins the canvas to the page origin.
+- `tests/e2e/test_pdf_bounds.py` and `tools/pdf_bounds.py` check that all 392 PDFs (49 × EN/AR × Letter/A4 × CV/letter) stay on the page. The test takes ~630s, so split it with `-k`.
+
+### 8.20 Proving a Word change touches only what it should (docx hash) ✅
+- Hash every Word export before and after (demo + sample + photo CV × EN/AR × Letter/A4 × cv/letter/both). Mask `docProps/`, `word/fonts/*` and `fontTable.xml`, because the obfuscation key is random.
+- **Reset `docx_dml._ID[0] = 0` and `docx_design._SHAPE_N[0] = 0` before EVERY render, in BOTH runs.** These are process-wide id counters: one extra ladder build shifts every later file's ids (416 false differences the first time).
+- The baseline comes from a clean `git worktree` of the previous commit.
+- Do the same for the PDF side: hash `document_html` and `letter.document_html` for every template.
+
+### 8.21 The real-Word audit (`tools/word_audit.py`) ✅
+- Stages:
+  - `gen`: docx with the counters reset, plus the PDF of the same CV via `_print`.
+  - `word`: real Word through `tools/word_com.ps1`, our own WINWORD PID only.
+  - `raster`: `tools/pdf_raster.ps1`, Windows.Data.Pdf, 850px wide.
+  - `check`: `failures.csv`.
+  - `sheets`: contact sheets PDF | Word per template.
+- Run it as `python tools/word_audit.py all <work> [--keys k1,k2] [--src demo,sample,photo] [--ref <earlier work>]`. `--ref` reuses an earlier run's PDFs after a Word-only fix.
+- Checks per page:
+  - page count (cv 1, letter 1, both 2);
+  - columns/bands start and end where the PDF's do (fill map, ±14px);
+  - stray / missing lines and dashed rows;
+  - text cut off or moved to another page (Latin tokens; Arabic letter counts);
+  - text off the page;
+  - photo frame vs PDF, and CV vs letter;
+  - letterhead = CV header.
+- Word export needs **full normalised paths** (`[IO.Path]::GetFullPath`). With a raw joined path, `ExportAsFixedFormat` hung on every file until the job timed out.
+- Never run two Word jobs at once, and never while the browser suite runs.
+- Known instrument limits:
+  - Windows.Data.Pdf does not draw the PDF's conic-gradient patterns (skill rings in t12/t24), so those show as missing in the PDF image.
+  - Word's line positions shift with text reflow, so a rule's y is compared within ±120px. Check a flagged rule by eye on the contact sheet before fixing it.
+
 ---
 
 ## 9. One page and long CVs
@@ -286,6 +379,11 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 2. **Automated compare:** render the .docx with LibreOffice to PNG, compare it with the PDF page 1, and record a **diff %** per template.
    - Rough guide from the AR review: under ~10% = close; 10–20% = check; over 20% = something big is missing (band, tint, overflow). These are rules of thumb, not formal thresholds.
 3. **Microsoft Word check (required):** LibreOffice findings are hints only. Confirm each issue in **Microsoft Word** before fixing it.
+3b. **The full real-Word audit, BEFORE a new or replaced template is approved** (§8.21):
+   - `python tools/word_audit.py all <work> --keys <id>` covers both papers, both languages, cv / letter / both, and the demo + sample (+ photo) CV.
+   - `failures.csv` must be empty, or every remaining row explained.
+   - Look at the contact sheets (`sheets <work> Desktop\review-word-audit-<date>\`).
+   - Then prove the scope with the docx + HTML hash (§8.20).
 4. **Font-embedding check (before calling fonts "done"):** open the .docx on a **Windows PC where the fonts are NOT installed**. There must be no repair prompt, the fonts must be correct, and typing must keep the font. Record the Word version. A test on the developer PC proves nothing.
 5. **Checklist per template** (tick every row in EN and AR):
 
@@ -294,17 +392,21 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 | One page on **Letter AND A4**: preview, PDF and Word (EN + AR) | |
 | Nothing ends at 1100 on A4: full-height rails and sidebars reach 1202px / the sheet's bottom edge | |
 | Same layout and column widths | |
-| Sidebar reaches the page bottom | |
+| Sidebar / columns / bands / column rules reach the page bottom on EVERY page, **CV AND cover letter** (§8.15) | |
 | Page tint present | |
-| Header band present, correct height | |
-| Timeline line + dots | |
-| Pills rounded | |
+| Header band present, correct height, starting at the paper's top edge (no stray header part) | |
+| Timeline line + dots: dots from `cv_dot()` / `tl_node`, the line from the first dot to the last, rail at the PDF's x (§8.11) | |
+| Pills rounded; corner masks in the page colour; no wedge at a card's foot (§8.14) | |
+| No stray lines, dashes or borders; rules and leaders in Arial; rules keep their gap and width (§8.12) | |
+| Exact row heights only on single-line decorative bands (§8.13) | |
 | Same fonts (names) and sizes (Word pt = CSS px × 0.72 on Letter, × 0.70033 on A4) | |
 | No heading wraps that the website doesn't have | |
-| Same page count | |
+| Same page count: cv 1, letter 1, both 2, demo AND sample CV, measured in real Word (§8.18) | |
+| PDF stays on the page, RTL included (`test_pdf_bounds`, §8.19) | |
 | Phone numbers LTR in Arabic | |
-| Photo frame matches | |
-| Cover letter header = CV header | |
+| Photo frame matches the PDF and is identical in the CV and the letter (§8.16) | |
+| Cover letter header = CV header; the letter body where the PDF letter has it (§8.17) | |
+| `tools/word_audit.py` clean for the template (§8.21); docx + HTML hash: nothing else changed (§8.20) | |
 | Fonts embedded; opens with no repair prompt | |
 
 ---
@@ -320,6 +422,8 @@ These are the techniques that worked in runs 4–14. Use them for every Modern t
 | `test_requirements_cover_imports` | | Every change adding an import |
 | PDF font test (pdffonts/pypdf) | | Font or template change |
 | DOCX mapping + embedding tests | | Font or Word design change |
+| `tests/test_word_audit_docx.py` (page-foot shapes, headers, photo CV = letter, ATS rules, letters) | ~250 | Every Word design change (fast suite) |
+| `pytest --word tests/test_word_audit_real.py` (the real-Word audit, own Word process) | per template | Before approving a new/replaced template |
 
 A step marked "not verified" **blocks the merge**.
 
@@ -359,6 +463,20 @@ Rules:
   Root height is {{ page.h }}px; Word sizes via pt()/tw()/page_h_px(), no literals.
 - Before/after screenshots (website, PDF, Word page 1; EN + AR; Letter + A4) into
   Desktop\review-<id>-<date>\. Report the LibreOffice diff % per variant.
+- Use the shared pieces (§8.11-8.17): cv_dot()/tl_node/tl_seg + the Word Timeline
+  helper; rules and leaders in Arial; flex-shrink:0 on thin rules; corner masks in
+  the page colour; page-anchored shapes (never cell shading) for anything that
+  reaches the page foot - on every page, CV AND letter; a shrinking photo gets
+  class="cv-photo"; exact row heights only on single-line decorative bands.
+- BEFORE approval, the full real-Word audit (own Word process only):
+  python tools/word_audit.py all <work> --keys <id>
+  (both papers, EN + AR, cv/letter/both, demo + sample + photo CV) must be clean:
+  pages, columns to the foot, no stray lines, nothing cut/moved, photo frame =
+  PDF and CV = letter, letterhead = CV header. Contact sheets into
+  Desktop\review-word-audit-<date>\. Per-template reserves measured by a sweep in
+  real Word (§8.18), never guessed.
+- Prove the scope: docx hash (reset docx_dml._ID and docx_design._SHAPE_N before
+  every render, baseline from a clean worktree) and the HTML hash (§8.20).
 - List anything that still needs a Microsoft Word check.
 - No golden updates without my approval: Letter (tests/golden/pixels/) and
   A4 (tests/golden/pixels-a4/, html/a4/) alike. Step 7 calibration stays OFF.
@@ -410,7 +528,24 @@ branch (non-interactive form) → git ls-remote → git status clean. Do NOT pus
 | 13 | Download crashes on Arabic filename | Non-ASCII in Content-Disposition | Strip non-ASCII from the filename ✅ |
 | 14 | Font missing only in production | Font excluded from Docker image | `verify_docker_context.py` (§7.7) |
 | 15 | Everything looks "plain" locally | Old shared single-user mode | Run `run.py` without `--server-store` (§13) |
+| 16 | Arabic PDF sits 34px (Letter) / 57px (A4) left, cut off | Chromium's RTL print origin | `PRINT_ORIGIN` in pdf.py; `test_pdf_bounds` (§8.19) |
+| 17 | Bullet or timeline dot off its line; rail runs past the last entry | Hand-drawn dots, node y without space-before | `cv_dot()`, `tl_node`/`tl_seg`; Word `Timeline` helper (§8.11) |
+| 18 | Heading rule / leader dashed in Word | Body-font underscore leader | Draw rules and leaders in Arial (§8.12) |
+| 19 | Rule missing on the site/PDF | 1–3px rule shrank to 0 in a flex column | `flex-shrink:0` (§8.12) |
+| 20 | Text cut or a band too short in Word | `Exactly` height on a multi-line row | Auto spacing; exact only on single-line decorative bands (§8.13) |
+| 21 | Light wedges / hairlines at rounded corners | Mask in the block's colour, or edge-on-edge | Masks in the page colour, overlap `CORNER_OVERLAP_PT` (§8.14) |
+| 22 | Sidebar / card / divider stops short (often only in the letter) | Cell shading or cell border | Page-anchored shape to the foot, every page, CV and letter (§8.15) |
+| 23 | Band starts ~15–20px below the paper's top | A header part created by accident (default 14pt paragraph) | Check `is_linked_to_previous`; `tiny()` header paragraphs (§8.15) |
+| 24 | English Word CV spills to page 2 (PDF is 1 page) | Word page estimate runs short | Per-template reserve, measured by a real-Word sweep (§8.18) |
+| 25 | Photo a different size in the letter (or vs the PDF) | Flex-shrinking photo, letter re-laid out | `cv-photo` + `keep_place` (PDF), `_photo_like_cv` (Word) (§8.16) |
+| 26 | Section side bars join into one long bar (ATS) | Left/right borders run through paragraph spacing | Gap in an unbordered paragraph (§8.12) |
+| 27 | Rule hugs the line above / runs full width (ATS) | `tiny()` reset the gap; CSS width ignored | `tiny(before_px=...)`; keep the rule's width (§8.12) |
+| 28 | Top of a big name clipped in Word | Line spacing multiple < 1 | ≥ 1.0 (§8.12) |
+| 29 | Box border missing on one side | Nested table as wide as its cell: Word clips the end border | Table 2px narrower than the cell (modern-t9) |
+| 30 | Letter keeps a rule / heading the PDF letter hides, or drops the headline | `_blank` / letter marks | §8.17 |
+| 31 | "Only the files I changed" proof shows hundreds of diffs | Process-wide shape id counters | Reset `_ID` and `_SHAPE_N` per render, both runs (§8.20) |
+| 32 | Word PDF export hangs on every file | Raw joined path to `ExportAsFixedFormat` | `[IO.Path]::GetFullPath` (§8.21) |
 
 ---
 
-*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-10.*
+*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-25 (feature/defects, feature/word-pages, feature/word-audit lessons in §8.11-8.21, §11, §15, §16).*
