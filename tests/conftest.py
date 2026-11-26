@@ -107,6 +107,11 @@ def pytest_addoption(parser):
         help="run the real-Word audit (tools/word_audit.py; needs Microsoft Word, "
              "starts and stops its OWN Word process only)",
     )
+    parser.addoption(
+        "--lock-images", action="store_true", default=False,
+        help="download lock tier 2: every download's page images, PDF and REAL Word "
+             "(tools/lock_downloads.py check --images; ~45 min, before merges)",
+    )
 
 
 def pytest_configure(config):
@@ -116,9 +121,16 @@ def pytest_configure(config):
         "markers", "slow: runs the whole 49-template catalogue through Chromium")
     config.addinivalue_line(
         "markers", "word: real Microsoft Word audit - opt in with --word")
+    config.addinivalue_line(
+        "markers", "lock_images: download lock page images (PDF + real Word) - opt in with --lock-images")
 
 
 def pytest_collection_modifyitems(config, items):
+    if not config.getoption("--lock-images"):
+        skip_l = pytest.mark.skip(reason="download lock images: pass --lock-images to run them")
+        for item in items:
+            if "lock_images" in item.keywords:
+                item.add_marker(skip_l)
     if not config.getoption("--word"):
         skip_w = pytest.mark.skip(reason="real-Word audit: pass --word to run it")
         for item in items:

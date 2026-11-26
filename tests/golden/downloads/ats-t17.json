@@ -1,0 +1,769 @@
+{
+ "_meta": {
+  "approved": "baseline: the word-audit approved state (feature/word-audit 12d9908), owner task 2026-11-25",
+  "based_on": "12d9908",
+  "date": "2026-11-25"
+ },
+ "downloads": {
+  "demo~ar~a4~both": {
+   "docx": "d45640d7e2168b2b503dde9b",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "c8cf771a17b290742efc4a66",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "c9576fce9b53bf31c5a1d34c",
+   "pdf_png": [
+    "c7bf4eea986b562f8d463ddd",
+    "0861a122db18971a8fe44e64"
+   ],
+   "word_png": [
+    "624978f0e8b32813373202c1",
+    "f92f59866fb2b87d46007bfc"
+   ]
+  },
+  "demo~ar~a4~cv": {
+   "docx": "45d2b77921db63e312163fc2",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "edc7ca4f15ba02144f22ed74",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "032b31351636e4b04c5d3c1d",
+   "pdf_png": [
+    "c7bf4eea986b562f8d463ddd"
+   ],
+   "word_png": [
+    "624978f0e8b32813373202c1"
+   ]
+  },
+  "demo~ar~a4~letter": {
+   "docx": "cf9be25fbd47c33856171422",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "b887875d39b3b0f3492395f5",
+    "word/fontTable.xml": "f87a29a1332e2878297bd60b",
+    "word/fonts/font1.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font2.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font3.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "f864c2afefd0a02280f47ffd",
+   "pdf_png": [
+    "0861a122db18971a8fe44e64"
+   ],
+   "word_png": [
+    "f92f59866fb2b87d46007bfc"
+   ]
+  },
+  "demo~ar~letter~both": {
+   "docx": "444ee1ade0d678d2582d4652",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "a35a222663849b9061fca309",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "ffe943f7832a18e4f58b18c5",
+   "pdf_png": [
+    "3d778a46bc9378dbf416ca32",
+    "3b4db1da30c9e47e603b1e84"
+   ],
+   "word_png": [
+    "c2ee80ce807c3a9ea184613e",
+    "f51c50c5f0cd7f5c793caff8"
+   ]
+  },
+  "demo~ar~letter~cv": {
+   "docx": "112ce4a5d1e66aa272be1262",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "f1b6ef189f55f256d73bc81d",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "30072dc4e41fec3fcca13537",
+   "pdf_png": [
+    "3d778a46bc9378dbf416ca32"
+   ],
+   "word_png": [
+    "c2ee80ce807c3a9ea184613e"
+   ]
+  },
+  "demo~ar~letter~letter": {
+   "docx": "3ee6c65dfc4dcaf9c9d696a0",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "07c1440db70eb5b76f2fdd51",
+    "word/fontTable.xml": "f87a29a1332e2878297bd60b",
+    "word/fonts/font1.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font2.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font3.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "8f124211ed03b4c47d54744c",
+   "pdf_png": [
+    "3b4db1da30c9e47e603b1e84"
+   ],
+   "word_png": [
+    "f51c50c5f0cd7f5c793caff8"
+   ]
+  },
+  "demo~en~a4~both": {
+   "docx": "5d44237e692f7ec2c70797bd",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "9cd6e1aec97d03aee657890b",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "01cea259216865a1a79eac90",
+   "pdf_png": [
+    "4122a934e7ba1d667e537bd1",
+    "b430a3f2917aad7111ce59e5"
+   ],
+   "word_png": [
+    "e31bc32e487c0a1c00884518",
+    "5eed19f87ad11a4c513a38bf"
+   ]
+  },
+  "demo~en~a4~cv": {
+   "docx": "f2193cd0c3c5ab26bb637b75",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "29b90cc0fa5af7b69275d673",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "15b9abd3c1959bf7f48caac9",
+   "pdf_png": [
+    "4122a934e7ba1d667e537bd1"
+   ],
+   "word_png": [
+    "e31bc32e487c0a1c00884518"
+   ]
+  },
+  "demo~en~a4~letter": {
+   "docx": "078edac4c1c0f7d3eab5c7e8",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "3c1a4e73d2db0b8fe9b1ac55",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "fc4d8ce5e088444b627ce2b7",
+   "pdf_png": [
+    "b430a3f2917aad7111ce59e5"
+   ],
+   "word_png": [
+    "5eed19f87ad11a4c513a38bf"
+   ]
+  },
+  "demo~en~letter~both": {
+   "docx": "b4edc6eee72671e401229d51",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "30a4617a2e9e68ab673a1311",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "98109a28acaadf9dc5422dde",
+   "pdf_png": [
+    "d0bdf8f4c9ce8e8fafd5549b",
+    "fd10b0b694f6e2c0b20f3155"
+   ],
+   "word_png": [
+    "00cc2e68b8d7c52ff639e244",
+    "da9a4af870360b7af90eea77"
+   ]
+  },
+  "demo~en~letter~cv": {
+   "docx": "0ca25d54d039a25391e1cb56",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "12b6a341959b16ba19000a33",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "32f6adc557a6b68851773add",
+   "pdf_png": [
+    "d0bdf8f4c9ce8e8fafd5549b"
+   ],
+   "word_png": [
+    "00cc2e68b8d7c52ff639e244"
+   ]
+  },
+  "demo~en~letter~letter": {
+   "docx": "ed51617e7d795ac515c42756",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "f55ebc5dc2834f07f177dfad",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "ad6af72abdb6c9ce4218333e",
+   "pdf_png": [
+    "fd10b0b694f6e2c0b20f3155"
+   ],
+   "word_png": [
+    "da9a4af870360b7af90eea77"
+   ]
+  },
+  "sample~ar~a4~both": {
+   "docx": "94a8b4690d4c243ff4a6964d",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "ed75df172c89487c640421e3",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "85817a733119c2fc48e08cee",
+   "pdf_png": [
+    "f31a560210173b471f196eed",
+    "0ca7340b9ab2a74581e631de"
+   ],
+   "word_png": [
+    "cf6e219cfcc1e8f24a379e4f",
+    "752d6a1012a5bd3c6b34dc47"
+   ]
+  },
+  "sample~ar~a4~cv": {
+   "docx": "3084592d06a73c901938a477",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "33d3af8d5f60d8fdde5a4ba3",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "38944bccd92fe0d5710a48e5",
+   "pdf_png": [
+    "f31a560210173b471f196eed"
+   ],
+   "word_png": [
+    "cf6e219cfcc1e8f24a379e4f"
+   ]
+  },
+  "sample~ar~a4~letter": {
+   "docx": "f5a9d7a2976e7327c7370e2b",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "1fb7d781f2ea3e09a75a664b",
+    "word/fontTable.xml": "f87a29a1332e2878297bd60b",
+    "word/fonts/font1.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font2.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font3.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "c952263ee506cfea2f98815a",
+   "pdf_png": [
+    "0ca7340b9ab2a74581e631de"
+   ],
+   "word_png": [
+    "752d6a1012a5bd3c6b34dc47"
+   ]
+  },
+  "sample~ar~letter~both": {
+   "docx": "0121becb16d550098f464200",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "f7c0cf3fff95babc0dbdc1bb",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "babd453b19cd9e5b537c2c3a",
+   "pdf_png": [
+    "918b5453bf8d59f9db9c67ad",
+    "a3d97e8ddd1fd350df72ad11"
+   ],
+   "word_png": [
+    "df5d4ea07ce295bbfddfb1c0",
+    "3d41ab57d35a9732dc0c8f92"
+   ]
+  },
+  "sample~ar~letter~cv": {
+   "docx": "ca19a7e38c53ce4f1f1d8135",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "337c3d5a615dcddb8ef8b7a8",
+    "word/document.xml": "3bcba027e9e5ec2534507978",
+    "word/fontTable.xml": "27f9c08631300e9c3903cab7",
+    "word/fonts/font1.odttf": "c38b880981fe3ed13cc3d371",
+    "word/fonts/font2.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font3.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font4.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "9c8c7607acfb11145021dbfb",
+   "pdf_png": [
+    "918b5453bf8d59f9db9c67ad"
+   ],
+   "word_png": [
+    "df5d4ea07ce295bbfddfb1c0"
+   ]
+  },
+  "sample~ar~letter~letter": {
+   "docx": "0dd9971faacb711759f0a12f",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "42df8826e0e6e9bf5830cbf1",
+    "word/fontTable.xml": "f87a29a1332e2878297bd60b",
+    "word/fonts/font1.odttf": "6f611412270a132bbac838da",
+    "word/fonts/font2.odttf": "691e0c891a38637ae6bbdb69",
+    "word/fonts/font3.odttf": "1a9158458d55f4bb7e2e7797",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "0f7c90223daced421669f1bd",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "f19580c3f0da6a93d9468d4d",
+   "pdf_png": [
+    "a3d97e8ddd1fd350df72ad11"
+   ],
+   "word_png": [
+    "3d41ab57d35a9732dc0c8f92"
+   ]
+  },
+  "sample~en~a4~both": {
+   "docx": "4c2a213a94fb1561c344c073",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "f97b3c811c34fb031eb6e1ae",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "72a78c70dce6aa1bf01eb37a",
+   "pdf_png": [
+    "b30f1e1b2c7e5328f4200a2a",
+    "a84d420cafab6858ca299a21"
+   ],
+   "word_png": [
+    "e35842c9f30c16ad1f4f9d6b",
+    "32844b02edc372f3df7d61ce"
+   ]
+  },
+  "sample~en~a4~cv": {
+   "docx": "2bb87da54f6417a71afcddb6",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "295702a5c4f5deef21e819e5",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "fb9d43c8e8f0b3cb5b0d47c4",
+   "pdf_png": [
+    "b30f1e1b2c7e5328f4200a2a"
+   ],
+   "word_png": [
+    "e35842c9f30c16ad1f4f9d6b"
+   ]
+  },
+  "sample~en~a4~letter": {
+   "docx": "dfe1f7977a07c2ebe7a915be",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "0237df1603f669d56f3b11f2",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "5cbabc107afa076ee24df0fa",
+   "pdf_png": [
+    "a84d420cafab6858ca299a21"
+   ],
+   "word_png": [
+    "32844b02edc372f3df7d61ce"
+   ]
+  },
+  "sample~en~letter~both": {
+   "docx": "88b7353e3d64def00e2646c5",
+   "docx_parts": {
+    "[Content_Types].xml": "33cf62e6ebe1a7dc1f2846bb",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "157ed86827865b095c9c6b39",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "8c5680d48ce6e2e122bb29db",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/footer1.xml": "7820c40aa35805396d2764a5",
+    "word/header1.xml": "03f0d62cd2157735620908b7",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "ed113ac32889525d69168531",
+   "pdf_png": [
+    "87cc0115a388a71fc576cf38",
+    "11238e97c9667b7c64fbe8d8"
+   ],
+   "word_png": [
+    "d6c09ec2f8038eade1e38a54",
+    "4f11480a77f7804f686325d8"
+   ]
+  },
+  "sample~en~letter~cv": {
+   "docx": "9785a8e18b0d8b07d04c8290",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "ef39bfd6f0f4402aa17ecb79",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "de2a5b554eb78b66bfa7de09",
+   "pdf_png": [
+    "87cc0115a388a71fc576cf38"
+   ],
+   "word_png": [
+    "d6c09ec2f8038eade1e38a54"
+   ]
+  },
+  "sample~en~letter~letter": {
+   "docx": "ee39a0ccd4c70e81b0e3b105",
+   "docx_parts": {
+    "[Content_Types].xml": "9559b439bdf6e3c7cfa76041",
+    "_rels/.rels": "a9ae57efe9186f07d48303bc",
+    "customXml/_rels/item1.xml.rels": "1ca6c9a64edcebe24ee703a5",
+    "customXml/item1.xml": "a86086ffc5d8e83ebd6c71a5",
+    "customXml/itemProps1.xml": "c542307b13ec29a8b546217b",
+    "word/_rels/document.xml.rels": "1e7f0eb144a98e199249314f",
+    "word/_rels/fontTable.xml.rels": "8bcff760bdf6e946f796d4bd",
+    "word/document.xml": "d548b9de45f06567151d5118",
+    "word/fontTable.xml": "314f054fafd6bcb1633cffa1",
+    "word/fonts/font1.odttf": "0ed39497ca2797d4dda219a7",
+    "word/fonts/font2.odttf": "29ec8ffa0bdeeae5b3f34e6b",
+    "word/fonts/font3.odttf": "e85cbecb5f2a75bb455cc998",
+    "word/numbering.xml": "70976f19cbcd896e51890859",
+    "word/settings.xml": "d91a9f195b31b03b132aad58",
+    "word/styles.xml": "e192759b27162b2bbfbae872",
+    "word/stylesWithEffects.xml": "463ae0928cf0d84775dbf8cf",
+    "word/theme/theme1.xml": "e3a8ab7db9ca7afca56f5f28",
+    "word/webSettings.xml": "349d36de7434d09f86987ff6"
+   },
+   "pdf": "d9ba7a9d6537b92bee974e7c",
+   "pdf_png": [
+    "11238e97c9667b7c64fbe8d8"
+   ],
+   "word_png": [
+    "4f11480a77f7804f686325d8"
+   ]
+  }
+ }
+}

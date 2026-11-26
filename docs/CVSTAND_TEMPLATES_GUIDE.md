@@ -20,6 +20,8 @@
 | PDF | The same HTML rendered by Playwright/Chromium | Should be pixel-identical to the preview |
 | Word (.docx) | Rebuilt separately with python-docx (per-template Word design) | Visually identical: same layout, colours, fonts, sizes and page count. It must stay editable. |
 
+**Approved downloads are locked (§17).** A change may only touch templates the task names. Run the download-lock test before every commit. Never update the lock without the owner's approval.
+
 Why Word needs the most care: the PDF comes from the **same HTML**, so it nearly matches by default. Word has **no HTML engine**, so every template is drawn a second time in Word's own language (tables, paragraphs, DrawingML shapes). Most of our fidelity bugs were on the Word side.
 
 ---
@@ -384,6 +386,7 @@ These are the techniques that worked in runs 4–14 and the defects / word-pages
    - `failures.csv` must be empty, or every remaining row explained.
    - Look at the contact sheets (`sheets <work> Desktop\review-word-audit-<date>\`).
    - Then prove the scope with the docx + HTML hash (§8.20).
+3c. **The download lock (§17):** `pytest tests/test_download_lock.py` must list ONLY the templates the task names. After the owner approves their new look (`tools/lock_downloads.py sheets --keys <id>`), run `tools/lock_downloads.py update <id> --approved "..."`. A brand-new template is locked with `update` too, after its approval.
 4. **Font-embedding check (before calling fonts "done"):** open the .docx on a **Windows PC where the fonts are NOT installed**. There must be no repair prompt, the fonts must be correct, and typing must keep the font. Record the Word version. A test on the developer PC proves nothing.
 5. **Checklist per template** (tick every row in EN and AR):
 
@@ -408,6 +411,7 @@ These are the techniques that worked in runs 4–14 and the defects / word-pages
 | Cover letter header = CV header; the letter body where the PDF letter has it (§8.17) | |
 | `tools/word_audit.py` clean for the template (§8.21); docx + HTML hash: nothing else changed (§8.20) | |
 | Fonts embedded; opens with no repair prompt | |
+| Download lock (§17): only the named templates differ; the owner approved the new look; `update` run for those templates only | |
 
 ---
 
@@ -424,6 +428,8 @@ These are the techniques that worked in runs 4–14 and the defects / word-pages
 | DOCX mapping + embedding tests | | Font or Word design change |
 | `tests/test_word_audit_docx.py` (page-foot shapes, headers, photo CV = letter, ATS rules, letters) | ~250 | Every Word design change (fast suite) |
 | `pytest --word tests/test_word_audit_real.py` (the real-Word audit, own Word process) | per template | Before approving a new/replaced template |
+| `pytest tests/test_download_lock.py` (download lock tier 1: fingerprints of all 1368 PDF + Word downloads, ~3.5 min) | 1 gate + checks | **Before every commit** (§17) |
+| `pytest --lock-images tests/test_download_lock.py` (tier 2: every page image, PDF + real Word, ~45 min) | 1 | Before every merge (§17) |
 
 A step marked "not verified" **blocks the merge**.
 
@@ -478,6 +484,11 @@ Rules:
 - Prove the scope: docx hash (reset docx_dml._ID and docx_design._SHAPE_N before
   every render, baseline from a clean worktree) and the HTML hash (§8.20).
 - List anything that still needs a Microsoft Word check.
+- Approved downloads are locked (§17). A change may only touch templates the task
+  names. Run the download-lock test (pytest tests/test_download_lock.py) before
+  every commit: it must list ONLY <id>. Never update the lock without my approval;
+  then: tools/lock_downloads.py update <id> --approved "<my approval>". Contact
+  sheets for my approval: tools/lock_downloads.py sheets --keys <id>.
 - No golden updates without my approval: Letter (tests/golden/pixels/) and
   A4 (tests/golden/pixels-a4/, html/a4/) alike. Step 7 calibration stays OFF.
 - Do not touch env vars, secrets, /data, DNS or root Fonts/.
@@ -545,7 +556,45 @@ branch (non-interactive form) → git ls-remote → git status clean. Do NOT pus
 | 30 | Letter keeps a rule / heading the PDF letter hides, or drops the headline | `_blank` / letter marks | §8.17 |
 | 31 | "Only the files I changed" proof shows hundreds of diffs | Process-wide shape id counters | Reset `_ID` and `_SHAPE_N` per render, both runs (§8.20) |
 | 32 | Word PDF export hangs on every file | Raw joined path to `ExportAsFixedFormat` | `[IO.Path]::GetFullPath` (§8.21) |
+| 33 | A "small shared fix" silently moves templates nobody asked about | Shared exporter / CSS / letter code reaches every template | The download lock (§17) names every moved download; scope the fix until only the task's templates differ |
+| 34 | Updating the lock "to make the test green" | Treating the lock as a golden to refresh | Never: only the named templates, only with the owner's approval, one `update` command (§17) |
 
 ---
 
-*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-25 (feature/defects, feature/word-pages, feature/word-audit lessons in §8.11-8.21, §11, §15, §16).*
+## 17. Download lock: approved downloads can never change silently
+
+**Approved downloads are locked. A change may only touch templates the task names. Run the download-lock test before every commit. Never update the lock without the owner's approval.**
+
+What is locked: every download a user can make, which is the word audit's matrix. That is 49 templates × demo / sample
+(/ photo for the 16 photo templates) CV × EN / AR × Letter / A4 × cv / letter / both = **1368 downloads, PDF and
+Word**. The lock is the **current approved state**, known issues included (`docs/KNOWN_TEMPLATE_ISSUES.md`).
+
+| Tier | What it compares | Where the lock lives | When | Time |
+|---|---|---|---|---|
+| 1 fingerprints | PDF: sha256 of exactly what Chromium prints (CV HTML, letter HTML at no fit and at a fixed fit, paper, faces; fonts, CSS and autofit.js are inlined). Word: sha256 of every .docx part, with `docx_dml._ID` / `docx_design._SHAPE_N` reset per file (§8.20), docProps masked, fonts de-obfuscated (the random key is masked, a changed font is not) | `tests/golden/downloads/<template>.json` (git) | **every commit** | ~3.5 min (8 processes) |
+| 2 page images | every page at 100 DPI: the Chromium PDF, and REAL Word (own process only), with the pixel gate's tolerance (8/255, 50 px) | PNGs in `~/cvstand-download-lock/` (outside git, ~190 MB; `CVSTAND_LOCK_DIR`), their hashes in the template's json | **before merges** | ~45 min |
+
+The printer (Chromium, Playwright) and Word versions are in `_printer.json` / `LOCK.md`. A new Chromium is a tier-2
+event: run the images before trusting tier 1.
+
+**On a failure:** the test names every moved download (`template · cv · language · paper · part · PDF|Word`, plus the
+changed .docx parts). It writes `before | after | diff` images to `tests/e2e/artifacts/download-lock/` (Word through
+real Word, own process, first 40 files). Then:
+- the template is **not** named by the task → the change is wrong: scope it;
+- the template **is** named → show the owner (`tools/lock_downloads.py sheets --keys <id>`, Desktop folder), and
+  after their approval:
+  `python tools/lock_downloads.py update <id>[,<id>...] --approved "<who approved what, when>"`.
+  - It refuses no names, `all`, wildcards, more than 5 templates and a missing approval note.
+  - It rewrites only the named templates' json, images and `LOCK.md` rows, and asserts that every other lock file is
+    byte-identical.
+
+**Images lost?** `python tools/lock_downloads.py rebuild-images` restores the store from the commit that last changed
+each template's json (a scratch git worktree), and reports how many page sets match the locked hashes.
+
+**Contact sheets for approval:** `python tools/lock_downloads.py sheets [OUT] [--keys ...]`. It makes one PNG per
+template: rows = CV / language / paper, columns = preview | PDF | Word for the CV, the letter and CV + letter
+(default `Desktop\review-download-lock-<date>\`).
+
+---
+
+*Sources: CVSTAND_FONT_CONTROLS.md (typography spec), CVSTAND_WORD_AR_REVIEW_2026-10-06.md (Arabic Word review), fidelity runs 4–14 and 13b reports, CVSTAND_STATUS.md. Last updated 2026-11-25 (feature/defects, feature/word-pages, feature/word-audit lessons in §8.11-8.21, §11, §15, §16; the download lock in §17, feature/download-lock).*

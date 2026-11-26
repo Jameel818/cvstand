@@ -1,3 +1,35 @@
+# RESUME HERE - 2026-11-26 feature/download-lock (from feature/word-audit 12d9908; pushed; NOT merged; main untouched)
+Download lock: approved PDF/Word downloads can never change silently. Rule (CLAUDE.md, guide section 17): Approved
+downloads are locked. A change may only touch templates the task names. Run the download-lock test before every commit.
+Never update the lock without the owner's approval.
+FILES: tools/lock_downloads.py (check [--images] | update <t1,t2> --approved "..." | init | rebuild-images | sheets),
+  tests/test_download_lock.py, tests/golden/downloads/ (49 <template>.json + _printer.json + LOCK.md, in git),
+  conftest --lock-images, docs/KNOWN_TEMPLATE_ISSUES.md (11 open issues inside the lock), CLAUDE.md, guide sections
+  1/11/12/15/16 + new 17. Page images OUTSIDE git: C:\Users\User\cvstand-download-lock\ (912 PDF + 1824 Word PNGs,
+  158 MB; CVSTAND_LOCK_DIR); lost -> `tools/lock_downloads.py rebuild-images`.
+MATRIX: 49 x demo/sample (+photo for 16) x EN/AR x Letter/A4 x cv/letter/both = 1368 downloads, PDF + Word.
+  Tier 1 (every commit): PDF = sha256 of the printed HTML (CV, letter at no fit + fixed fit, paper, faces); Word = per-part
+  sha256, _ID/_SHAPE_N reset per file, docProps masked, fonts de-obfuscated (random key masked, a swapped font fails).
+  Tier 2 (before merges): every page at 100 DPI, Chromium PDF + REAL Word (own process), 8/255 + 50 px tolerance.
+LOCK: init 2026-11-25 from 12d9908, note "baseline: the word-audit approved state"; Playwright 1.62.0, Chromium
+  151.0.7922.34, Word 16.0.20026.20168. Init took 42m51s (fingerprints 202s, PDF images 494s, Word images 1865s).
+VERIFIED:
+- Tier 1 test: 13 passed, 1 skipped (the opt-in tier 2) in 3m21s. Fingerprints identical forward and reverse order.
+- Calibration: padding:33px in t20.j2 + node=4 in t20.py -> 60 downloads named (36 PDF + 24 Word) with pixel counts and
+  before|after|diff images; passed again after the revert.
+- Update on a throwaway copy (update ats-t1): only ats-t1.json and its LOCK.md row changed; its Word PNGs identical,
+  2 PDF PNG hashes differed by anti-aliasing only (8 px <= 50).
+- Refusals (no names, all, wildcard, 6 templates, no/short note, unknown, init again) + font-key/font-swap/timestamp
+  mask tests pass.
+NOT VERIFIED / PENDING:
+- Tier 2 full image check (`pytest --lock-images tests/test_download_lock.py`, ~45 min): the run was KILLED by the
+  system for low memory early in the PDF stage (4 Chromium processes); not re-run. Option: 2 Chromium processes.
+- Contact sheets for the owner's approval (`tools/lock_downloads.py sheets` -> Desktop\review-download-lock-<date>\): not built.
+- Pre-commit hook running the tier-1 test: not installed.
+- Full suites (fast suite alone, Word test files, test_suite_invariants): not re-run on this branch (no product code
+  changed: only tools/, tests/, docs).
+- The local dev server (127.0.0.1:5000) was also killed for low memory; not restarted.
+
 # RESUME HERE - 2026-11-25 feature/word-audit (from feature/word-pages 033c791; pushed; NOT merged; main untouched)
 Full Word audit: every Word download vs its PDF in REAL Word (own WINWORD PID only). Review folder:
 Desktop\review-word-audit-2026-11-25\ (before\ = first audit, after*\ = after the fixes, STATUS.md = every failure + status).
