@@ -40,9 +40,10 @@ Approved downloads are locked. A change may only touch templates the task names.
 - Before every commit: `venv/Scripts/python -m pytest tests/test_download_lock.py` (~3.5 min; all 1368
   PDF + Word downloads against `tests/golden/downloads/`). A failure names template, CV, language, paper,
   part and PDF|Word, with before|after|diff images in `tests/e2e/artifacts/download-lock/`.
+- The pre-commit hook runs that test and refuses a failing commit: `venv/Scripts/python tools/install_hooks.py`
+  installs it (once per clone).
 - Before merges: `venv/Scripts/python -m pytest --lock-images tests/test_download_lock.py` (page images,
-  PDF + REAL Word, own Word process only; ~45 min).
-- Update ONLY with the owner's approval, ONLY the templates the task names (max 5, never all):
+  PDF + REAL Word, own Word process only; ~45 min).- Update ONLY with the owner's approval, ONLY the templates the task names (max 5, never all):
   `venv/Scripts/python tools/lock_downloads.py update <t1,t2> --approved "<who approved what, when>"`.
 - Review sheets (preview | PDF | Word): `venv/Scripts/python tools/lock_downloads.py sheets`.
 - The lock is the current state, not perfect: docs/KNOWN_TEMPLATE_ISSUES.md.

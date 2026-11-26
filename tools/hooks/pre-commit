@@ -1,0 +1,41 @@
+#!/bin/sh
+# CVStand pre-commit hook: the download lock (feature/download-lock).
+# Installed by `python tools/install_hooks.py`; the tracked source is tools/hooks/pre-commit.
+#
+# Approved downloads are locked. Run the download-lock test before every commit.
+# This runs it (tier 1: all 1368 PDF + Word downloads against
+# tests/golden/downloads/, ~3.5 min) and refuses the commit if any download moved.
+#
+# It checks the WORKING TREE, not only the staged files: commit with a clean tree
+# (no half-staged changes) so what is checked is what is committed.
+# Never skip it with --no-verify unless the owner said so for that commit.
+
+ROOT=$(git rev-parse --show-toplevel) || exit 1
+cd "$ROOT" || exit 1
+
+if [ -x venv/Scripts/python.exe ]; then
+    PY=venv/Scripts/python.exe
+elif [ -x venv/bin/python ]; then
+    PY=venv/bin/python
+else
+    echo "pre-commit: no venv python (venv/Scripts/python.exe or venv/bin/python): commit refused" >&2
+    exit 1
+fi
+
+echo "pre-commit: download lock, tier 1 (all 1368 downloads, PDF + Word; ~3.5 min)..."
+START=$(date +%s)
+"$PY" -m pytest tests/test_download_lock.py -q -p no:cacheprovider </dev/null
+STATUS=$?
+SECS=$(( $(date +%s) - START ))
+
+if [ $STATUS -ne 0 ]; then
+    echo "" >&2
+    echo "pre-commit: DOWNLOAD LOCK FAILED after ${SECS}s - commit refused." >&2
+    echo "  before | after | diff images: tests/e2e/artifacts/download-lock/" >&2
+    echo "  A template the task names + the owner's approval:" >&2
+    echo "    $PY tools/lock_downloads.py update <t1,t2> --approved \"<who approved what, when>\"" >&2
+    echo "  Any other template: the change touched it and must be scoped." >&2
+    exit 1
+fi
+echo "pre-commit: download lock passed in ${SECS}s"
+exit 0

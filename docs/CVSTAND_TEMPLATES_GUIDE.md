@@ -588,6 +588,18 @@ real Word, own process, first 40 files). Then:
   - It rewrites only the named templates' json, images and `LOCK.md` rows, and asserts that every other lock file is
     byte-identical.
 
+**Pre-commit hook:** `python tools/install_hooks.py` installs `tools/hooks/pre-commit`. It runs
+`tests/test_download_lock.py` (tier 1) before every commit and refuses the commit on a failure. A commit takes about
+3.5 min (measured 3m27s, 2026-11-26). It checks the working tree, so commit with no half-staged changes. Use
+`--check` to see whether the hook is installed and up to date.
+
+**The PDF rasteriser is noisy.** `tools/pdf_raster.ps1` does not give the same pixels twice: the SAME PDF file of
+ats-t20 (demo, EN, A4, letter) rasterised to 0, 0 and 71 px against the lock. The first full tier-2 run (2026-11-26,
+48 min) had 18 PDF-only failures (7 templates, 54-227 px, scattered glyph-edge pixels) with tier 1 green and 0 Word
+failures. So tier 2 rasterises a failing PDF page again, up to 3 times (`PDF_RASTER_TRIES`), and fails only if every
+try is over tolerance. A real change fails every try. The PDF stage uses 2 Chromium processes
+(`CVSTAND_LOCK_PDF_JOBS`): 4 got the run killed for low memory.
+
 **Images lost?** `python tools/lock_downloads.py rebuild-images` restores the store from the commit that last changed
 each template's json (a scratch git worktree), and reports how many page sets match the locked hashes.
 

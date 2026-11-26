@@ -70,6 +70,7 @@ WIDTH = {"letter": 850, "a4": 827}          # 8.5in / 8.27in at 100 DPI
 FIXED_FIT = (0.9, 0.95)                     # any fit != None: covers the letter's fit path
 CHANNEL_TOLERANCE = 8                       # tests/test_golden_pixels.py
 MAX_DIFFERING_PIXELS = 50
+PDF_RASTER_TRIES = 3                        # a failing PDF page is rasterised again (the rasteriser is noisy)
 MAX_UPDATE = 5                              # templates per update call
 WORD_DIFF_CAP = 40                          # Word files converted for diff images on a tier-1 failure
 
@@ -342,9 +343,12 @@ def _gen_pdf_group(args):
     return len(labels)
 
 
-def gen_pdfs(work: Path, keys, only=None, jobs: int = 4):
+def gen_pdfs(work: Path, keys, only=None, jobs: int | None = None):
     """Chromium PDFs (cv + letter; "both" is the two joined) of `keys`;
-    `only` = a set of (src, key, lang, paper) to restrict to."""
+    `only` = a set of (src, key, lang, paper) to restrict to.
+    `jobs` Chromium processes: default 2 (CVSTAND_LOCK_PDF_JOBS). 4 got the
+    tier-2 run killed for low memory on 2026-11-25 (16 GB PC, browser open)."""
+    jobs = jobs or int(os.environ.get("CVSTAND_LOCK_PDF_JOBS") or 2)
     (work / "pdf").mkdir(parents=True, exist_ok=True)
     groups = []
     for src in SRCS:
@@ -581,6 +585,20 @@ def check_images(keys) -> list[dict]:
                                       "detail": "image store incomplete: run rebuild-images"})
                         continue
                     probs = diff_pages(locked, now, ARTIFACTS, f"{name}.{kind}")
+                    tries = 1
+                    while probs and kind == "pdf" and tries < PDF_RASTER_TRIES:
+                        # The rasteriser (tools/pdf_raster.ps1) is not deterministic: the SAME
+                        # PDF file gave 0, 0, 71 px against the lock (2026-11-26, ats-t20). Raster
+                        # the same PDFs again; a real change fails every try.
+                        tries += 1
+                        again = work / f"retry{tries}"
+                        stems = ([wa.name_of(src, key, lang, paper, p) for p in ("cv", "letter")]
+                                 if part == "both" else [name])
+                        raster([work / "pdf" / (s + ".pdf") for s in stems], again)
+                        now = [pg for s in stems for pg in pages(again, s)]
+                        probs = diff_pages(locked, now, ARTIFACTS, f"{name}.{kind}")
+                    if probs and tries > 1:
+                        probs.append(f"(every one of {tries} rasterisations)")
                     if probs:
                         fails.append({"key": key, "v": v, "kind": "PDF" if kind == "pdf" else "Word",
                                       "detail": "; ".join(probs)})

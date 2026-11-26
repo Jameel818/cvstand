@@ -1,4 +1,4 @@
-# RESUME HERE - 2026-11-26 feature/download-lock (from feature/word-audit 12d9908; pushed; NOT merged; main untouched)
+# RESUME HERE - 2026-11-26 feature/download-lock (from feature/word-audit 12d9908; pushed; NOT merged; main untouched; hook + tier-2 run added)
 Download lock: approved PDF/Word downloads can never change silently. Rule (CLAUDE.md, guide section 17): Approved
 downloads are locked. A change may only touch templates the task names. Run the download-lock test before every commit.
 Never update the lock without the owner's approval.
@@ -21,14 +21,30 @@ VERIFIED:
   2 PDF PNG hashes differed by anti-aliasing only (8 px <= 50).
 - Refusals (no names, all, wildcard, 6 templates, no/short note, unknown, init again) + font-key/font-swap/timestamp
   mask tests pass.
-NOT VERIFIED / PENDING:
-- Tier 2 full image check (`pytest --lock-images tests/test_download_lock.py`, ~45 min): the run was KILLED by the
-  system for low memory early in the PDF stage (4 Chromium processes); not re-run. Option: 2 Chromium processes.
-- Contact sheets for the owner's approval (`tools/lock_downloads.py sheets` -> Desktop\review-download-lock-<date>\): not built.
-- Pre-commit hook running the tier-1 test: not installed.
-- Full suites (fast suite alone, Word test files, test_suite_invariants): not re-run on this branch (no product code
-  changed: only tools/, tests/, docs).
-- The local dev server (127.0.0.1:5000) was also killed for low memory; not restarted.
+2026-11-26 (second session, same branch; only tools/, tests/, docs, CLAUDE.md changed - no product code, lock untouched):
+- PRE-COMMIT HOOK: tools/hooks/pre-commit (tracked) + tools/install_hooks.py (install | --check; respects
+  core.hooksPath/worktrees; a foreign hook is kept as pre-commit.local-backup). Runs `pytest tests/test_download_lock.py`
+  and refuses the commit on failure. INSTALLED in this clone. Measured: 3m27s per commit (13 passed, 1 skipped).
+  Checks the working tree, not the index: commit with no half-staged changes. tests/test_install_hooks.py (3, fast):
+  real `git commit` in a throwaway repo with a stub python - passes, refuses on failure (nothing committed), reinstall.
+- TIER 2 full run, 2 Chromium processes (gen_pdfs default 2, CVSTAND_LOCK_PDF_JOBS), no dev server, no Word open:
+  48m08s, NOT killed. Word: 0 differences (all 1368 in real Word). PDF: 18 differences, 7 templates (ats-t11, ats-t25,
+  ats-t5, modern-t11/t16/t5, all EN), 54-227 px of scattered glyph-edge pixels, tier 1 green (identical HTML).
+  CAUSE MEASURED: the rasteriser (tools/pdf_raster.ps1, Windows.Data.Pdf / Direct2D) is NOT deterministic: the SAME PDF
+  file rasterised 0, 0, 71 px vs the lock (ats-t20); same print rasterised 0 then 227 (ats-t25). It seems to flip between
+  two fixed outputs (the same counts recur: 71, 64, 59, 55, 54), in streaks. (A first idea - "PDF depends on which
+  templates the browser printed before" - was WRONG: disproved by the same-file test.)
+  FIX in the checker: a failing PDF page is rasterised again up to PDF_RASTER_TRIES=3. Re-run of those 7 + ats-t20:
+  18 -> 3 still failing on all 3 tries (ats-t25 demo EN a4 both p2 71px, modern-t11 photo EN a4 letter 59px, modern-t5
+  demo EN a4 both p2 54px) - the streaks outlast 3 tries. NOT CLEAN. Owner decision needed: (a) a different
+  deterministic rasteriser (Playwright Chromium's PDF viewer works here) = rebuild every locked PDF image = a lock
+  update for all 49 -> needs the owner's explicit approval and the "never all" rule waived; or (b) accept the noise
+  (more tries / a scattered-pixel rule) - weakens the PDF image gate. Word images are unaffected.
+- CONTACT SHEETS: built, C:\Users\User\Desktop\review-download-lock-2026-11-26\ (49 PNG + index.html), 19m55s;
+  spot-checked modern-t20: every cell filled. Awaiting the owner's review.
+- Fast suite alone: 6580 passed, 1932 skipped, 0 failed (21m19s). Word test files (20): 2272 passed, 50 skipped, 0 failed.
+- Not done: test_suite_invariants on its own (it is inside the fast suite: passed there); e2e not re-run (no product
+  code changed). The local dev server (127.0.0.1:5000) is NOT running.
 
 # RESUME HERE - 2026-11-25 feature/word-audit (from feature/word-pages 033c791; pushed; NOT merged; main untouched)
 Full Word audit: every Word download vs its PDF in REAL Word (own WINWORD PID only). Review folder:
