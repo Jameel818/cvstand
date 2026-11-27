@@ -593,12 +593,33 @@ real Word, own process, first 40 files). Then:
 3.5 min (measured 3m27s, 2026-11-26). It checks the working tree, so commit with no half-staged changes. Use
 `--check` to see whether the hook is installed and up to date.
 
-**The PDF rasteriser is noisy.** `tools/pdf_raster.ps1` does not give the same pixels twice: the SAME PDF file of
-ats-t20 (demo, EN, A4, letter) rasterised to 0, 0 and 71 px against the lock. The first full tier-2 run (2026-11-26,
-48 min) had 18 PDF-only failures (7 templates, 54-227 px, scattered glyph-edge pixels) with tier 1 green and 0 Word
-failures. So tier 2 rasterises a failing PDF page again, up to 3 times (`PDF_RASTER_TRIES`), and fails only if every
-try is over tolerance. A real change fails every try. The PDF stage uses 2 Chromium processes
-(`CVSTAND_LOCK_PDF_JOBS`): 4 got the run killed for low memory.
+**PDF pages are rasterised by Chromium's own PDF viewer (since 2026-11-27).** `tools/pdf_raster.ps1`
+(Windows.Data.Pdf) is not deterministic: the SAME PDF file of ats-t20 (demo, EN, A4, letter) rasterised to 0, 0 and
+71 px against the lock. The first full tier-2 run (2026-11-26, 48 min) had 18 PDF-only failures (7 templates, 54-227
+px, scattered glyph-edge pixels) with tier 1 green and 0 Word failures, and 3 of them outlasted 3 retries.
+`raster_pdf()` in `tools/lock_downloads.py` works like this:
+- It opens each PDF in the full Chromium build's PDF viewer (`channel="chromium"`) at zoom 104%, which is 99.84 DPI.
+  The viewer rounds zoom to whole percents.
+- The viewport is taller than the document, so there is no scrollbar and no scrolling.
+- It screenshots once three consecutive shots are identical.
+- It crops each page to a rect calibrated with a solid-colour PDF of the same page size and count, so the crop never
+  depends on the content.
+
+Proof: 34 PDFs, including the failing ones, came out byte-identical over 3 runs and over a 1-process reversed-order
+run. Word pages still go through `pdf_raster.ps1`, and their locked images were kept byte-identical. The owner
+approved re-rasterising the locked PDF images once: `rebuild-pdf-images`, recorded in `_printer.json` and `LOCK.md`.
+The command refuses a second run. The PDF stage uses 2 Chromium processes (`CVSTAND_LOCK_PDF_JOBS`): 4 got the run
+killed for low memory.
+
+**Tier 2 in foreground stages (how it is run from Claude Code).** Claude Code stops background runs when memory is
+low, and a foreground call is capped at 10 min. So `tools/lock_downloads.py stage WORK STEP [I/N]` runs tier 2 as
+short steps over one work folder, with `CVSTAND_LOCK_PDF_JOBS=1`:
+`tier1` → `print 1/6..6/6` (~3-5 min each) → `raster 1/6..6/6` (~3 min) → `word 1/8..8/8` (~4.5 min, own Word
+process) → `compare` (~1.5 min, refused unless `tier1` passed on the same code). Total about 85 min.
+- 2026-11-27, after the rebuild: clean. All 912 PDF pages came out byte-identical to the lock, and every Word page
+  was within tolerance.
+- The one-time PDF image rebuild used the same stages (`tier1`, `print`, `raster`), then
+  `rebuild-write --approved NOTE`.
 
 **Images lost?** `python tools/lock_downloads.py rebuild-images` restores the store from the commit that last changed
 each template's json (a scratch git worktree), and reports how many page sets match the locked hashes.

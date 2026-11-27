@@ -98,6 +98,7 @@ def test_the_lock_covers_every_template_and_download():
     (["update", "modern-t1", "--approved", "ok"], "--approved"),
     (["update", "modern-t99", "--approved", "owner said so"], "unknown template"),
     (["init", "--approved", "again"], "a lock already exists"),
+    (["rebuild-pdf-images", "--approved", "owner said so"], "already rasterised"),   # one-time, 2026-11-27
 ])
 def test_the_update_command_refuses(args, why, tmp_path):
     before = {p.name: p.read_bytes() for p in LOCK.iterdir()}
@@ -105,6 +106,18 @@ def test_the_update_command_refuses(args, why, tmp_path):
     assert r.returncode != 0
     assert why in (r.stdout + r.stderr)
     assert {p.name: p.read_bytes() for p in LOCK.iterdir()} == before
+
+
+def test_the_pdf_images_are_from_the_deterministic_rasteriser():
+    """2026-11-27: tools/pdf_raster.ps1 gave the same PDF 0/0/71 px; the owner approved
+    re-rasterising the locked PDF images with Chromium's PDF viewer, once. The lock
+    records which rasteriser made its PDF images, and LOCK.md records the exception."""
+    from tools import lock_downloads as L
+    pr = json.loads((LOCK / "_printer.json").read_text(encoding="utf-8"))
+    assert pr["pdf_raster"] == L.PDF_RASTER
+    assert [e["date"] for e in pr["exceptions"]] == ["2026-11-27"]
+    md = (LOCK / "LOCK.md").read_text(encoding="utf-8")
+    assert "Exceptions approved by the owner" in md and "rasteriser change only" in md
 
 
 # ------------------------------------------------------------ the fingerprint's masks

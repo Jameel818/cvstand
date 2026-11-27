@@ -1,3 +1,33 @@
+# RESUME HERE - 2026-11-27 feature/download-lock (pushed; NOT merged; main untouched): deterministic PDF rasteriser
+OWNER DECISION (a), 2026-11-27: PDF page images rasterised by Playwright Chromium's PDF viewer, not tools/pdf_raster.ps1.
+ONE-TIME EXCEPTION approved by the owner ("rasteriser change only, no download content changed"): the locked PDF page
+images of all 49 templates rebuilt. Recorded in tests/golden/downloads/_printer.json (pdf_raster, exceptions) and in
+LOCK.md ("Exceptions approved by the owner"). `rebuild-pdf-images` refuses a second run (tested).
+RASTERISER (tools/lock_downloads.py raster_pdf): full Chromium build (channel="chromium"), viewer zoom 104% (it rounds
+  to whole %, 99.84 DPI), viewport taller than the document (no scroll), screenshot once 3 in a row are identical, crop =
+  rects CALIBRATED per (MediaBox, page count) from a solid-colour PDF (page edges sit at fractional px; nothing depends
+  on content). Page images: Letter 848x1097, A4 824x1166. Word pages still use pdf_raster.ps1 (their images kept).
+PROOF OF DETERMINISM: 34 PDFs (incl. ats-t25, modern-t11, modern-t5, ats-t20, ats-t5) x 3 runs: 34/34 byte-identical;
+  a 4th run with 1 process in reverse order: 34/34 identical. After the rebuild, an independent full tier 2 (fresh
+  print + raster): 912/912 PDF pages BYTE-identical to the lock.
+STAGED RUNS (new, foreground, each < 10 min, CVSTAND_LOCK_PDF_JOBS=1): `tools/lock_downloads.py stage WORK
+  tier1 | print I/6 | raster I/6 | word I/8 | compare | rebuild-write --approved NOTE`. tier1 writes WORK/tier1.ok
+  bound to HEAD + the working-tree diff; compare and rebuild-write refuse without it. Reason: the first rebuild ran in
+  the background and was STOPPED by Claude Code for low memory (after tier 1 + printing, before any write: verified
+  nothing changed). Timings: tier1 ~3 min, print 3-5 min x6, raster ~2.7 min x6, word ~4.3 min x8, compare 78 s.
+REBUILD VERIFIED against snapshots taken BEFORE any change (scratchpad copies of tests/golden/downloads + sha256 of
+  every Word PNG): Word store 1824/1824 byte-identical; in all 1368 downloads _meta, pdf, docx, docx_parts, word_png
+  identical, only pdf_png changed; every new pdf_png hash is a store file (912); _printer.json old fields identical.
+TIER 2 FULL (staged, 1 Chromium, after the rebuild): tier 1 0 differences; 912 PDFs + 1368 Word files (1824 pages,
+  own Word process, none left running); compare: "every page of every download matches". CLEAN.
+TESTS: tests/test_download_lock.py + test_install_hooks.py fast part: 17 passed (new: rebuild-pdf-images refusal,
+  test_the_pdf_images_are_from_the_deterministic_rasteriser).
+LEFT ON DISK (outside git, safe to delete once the owner is happy): C:\Users\User\cvstand-download-lock\pdf.backup-2026-11-27-winrt\
+  (the 912 old PDF images), C:\Users\User\cvstand-stage-rebuild\ and C:\Users\User\cvstand-stage-tier2\ (stage work folders).
+NOT RE-RUN: the full fast suite and the Word test files (only tools/, tests/test_download_lock.py, docs changed; the
+  pre-commit hook runs the lock test). The contact sheets (Desktop\review-download-lock-2026-11-26) still show the OLD
+  PDF images: rebuild them with `tools/lock_downloads.py sheets` if wanted.
+
 # RESUME HERE - 2026-11-26 feature/download-lock (from feature/word-audit 12d9908; pushed; NOT merged; main untouched; hook + tier-2 run added)
 Download lock: approved PDF/Word downloads can never change silently. Rule (CLAUDE.md, guide section 17): Approved
 downloads are locked. A change may only touch templates the task names. Run the download-lock test before every commit.
@@ -36,7 +66,7 @@ VERIFIED:
   templates the browser printed before" - was WRONG: disproved by the same-file test.)
   FIX in the checker: a failing PDF page is rasterised again up to PDF_RASTER_TRIES=3. Re-run of those 7 + ats-t20:
   18 -> 3 still failing on all 3 tries (ats-t25 demo EN a4 both p2 71px, modern-t11 photo EN a4 letter 59px, modern-t5
-  demo EN a4 both p2 54px) - the streaks outlast 3 tries. NOT CLEAN. Owner decision needed: (a) a different
+  demo EN a4 both p2 54px) - the streaks outlast 3 tries. NOT CLEAN -> RESOLVED 2026-11-27 (owner chose (a), see above). Owner decision needed: (a) a different
   deterministic rasteriser (Playwright Chromium's PDF viewer works here) = rebuild every locked PDF image = a lock
   update for all 49 -> needs the owner's explicit approval and the "never all" rule waived; or (b) accept the noise
   (more tries / a scattered-pixel rule) - weakens the PDF image gate. Word images are unaffected.

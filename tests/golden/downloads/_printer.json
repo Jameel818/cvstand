@@ -1,5 +1,15 @@
 {
  "playwright": "1.62.0",
  "chromium": "151.0.7922.34",
- "word": "Microsoft Word 16.0.20026.20168"
+ "word": "Microsoft Word 16.0.20026.20168",
+ "pdf_raster": "Chromium PDF viewer (PDFium), zoom 104%, calibrated crop",
+ "exceptions": [
+  {
+   "date": "2026-11-27",
+   "templates": "all 49",
+   "what": "PDF page images only, re-rasterised with Chromium PDF viewer (PDFium), zoom 104%, calibrated crop (was tools/pdf_raster.ps1, not deterministic). Fingerprints and Word images unchanged.",
+   "approved": "owner, 2026-11-27: ONE-TIME exception - rasteriser change only, no download content changed; rebuild only the locked PDF page images of all 49 templates with Playwright Chromium's PDF viewer",
+   "based_on": "04b23d1"
+  }
+ ]
 }

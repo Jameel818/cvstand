@@ -10,6 +10,7 @@ without the owner's approval.
     python tools/lock_downloads.py update KEYS --approved "who approved what, when"
     python tools/lock_downloads.py sheets [OUT] [--keys KEYS]   # preview | PDF | Word, for approval
     python tools/lock_downloads.py rebuild-images [--keys KEYS]  # refill the image store from git
+    python tools/lock_downloads.py rebuild-pdf-images --approved NOTE  # one-time: 2026-11-27 rasteriser change
     python tools/lock_downloads.py init --approved NOTE          # once: the first lock
 
 The matrix is the word audit's (tools/word_audit.py): every template x EN/AR x
@@ -70,7 +71,6 @@ WIDTH = {"letter": 850, "a4": 827}          # 8.5in / 8.27in at 100 DPI
 FIXED_FIT = (0.9, 0.95)                     # any fit != None: covers the letter's fit path
 CHANNEL_TOLERANCE = 8                       # tests/test_golden_pixels.py
 MAX_DIFFERING_PIXELS = 50
-PDF_RASTER_TRIES = 3                        # a failing PDF page is rasterised again (the rasteriser is noisy)
 MAX_UPDATE = 5                              # templates per update call
 WORD_DIFF_CAP = 40                          # Word files converted for diff images on a tier-1 failure
 
@@ -279,8 +279,15 @@ def write_index() -> None:
         "approved state, not a perfect one: known issues are in docs/KNOWN_TEMPLATE_ISSUES.md.\n\n"
         f"Printer: Chromium {pr['chromium']} (Playwright {pr['playwright']}). "
         f"Word: {pr.get('word', '?')}.\n\n"
+        f"PDF page images: {pr.get('pdf_raster', 'tools/pdf_raster.ps1 (Windows.Data.Pdf)')}. "
+        "Word page images: tools/pdf_raster.ps1 (Windows.Data.Pdf).\n\n"
         "| Template | Locked | From commit | Approval |\n|---|---|---|---|\n"
-        + "\n".join(rows) + "\n", encoding="utf-8")
+        + "\n".join(rows) + "\n"
+        + ("\n## Exceptions approved by the owner\n\n| Date | Templates | What | Approval | From commit |\n"
+           "|---|---|---|---|---|\n"
+           + "".join(f"| {e['date']} | {e['templates']} | {e['what']} | {e['approved']} | {e['based_on']} |\n"
+                     for e in pr.get("exceptions", []))
+           if pr.get("exceptions") else ""), encoding="utf-8")
 
 
 def _git(*a) -> str:
@@ -395,6 +402,121 @@ def raster(pdfs: list[Path], out: Path):
             lst.unlink()
 
 
+# ------------------------------------------------------------ PDF images: Chromium's PDF viewer
+# Owner decision 2026-11-27: the Chromium PDFs are rasterised by Chromium's own PDF
+# viewer (PDFium), not by tools/pdf_raster.ps1 (Windows.Data.Pdf), which gave the SAME
+# file 0, 0 and 71 px against the lock. Word pages still use raster() (their locked
+# images are kept byte-identical).
+#   - zoom: the viewer rounds to a whole percent; 104% = 99.84 DPI.
+#   - pages sit at fractional positions, so edge rows blend into the drop shadow. Each
+#     (page size, page count) is CALIBRATED with a PDF of solid colour pages: the crop is
+#     the fully covered rect of every page, cut to one common size. Nothing depends on
+#     the content being cropped.
+#   - the viewport is taller than the document (no scrollbar, no scrolling), and a
+#     screenshot is taken only when three in a row are identical.
+VIEWER_ZOOM = 104
+VIEWER_WIDTH = 1000
+VIEWER_PAGE_SLOT = 1260          # viewport px per page (> page + gap at 104% for Letter and A4)
+_CAL_COLOURS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255), (0, 255, 255), (255, 255, 0)]
+PDF_RASTER = f"Chromium PDF viewer (PDFium), zoom {VIEWER_ZOOM}%, calibrated crop"
+
+
+def _pdf_geometry(blob: bytes) -> tuple[int, str]:
+    """(page count, first MediaBox) of a Chromium/Skia PDF (uncompressed page objects)."""
+    n = len(re.findall(rb"/Type\s*/Page(?![a-zA-Z])", blob))
+    m = re.search(rb"/MediaBox\s*\[\s*([\d.\s-]+)\]", blob)
+    if not n or not m:
+        raise RuntimeError("cannot read the page count / MediaBox of a PDF")
+    return n, " ".join(m.group(1).decode().split())
+
+
+def _viewer_shot(ctx, uri: str, n_pages: int) -> "Image.Image":
+    from PIL import Image
+    page = ctx.new_page()
+    try:
+        page.set_viewport_size({"width": VIEWER_WIDTH, "height": 40 + n_pages * VIEWER_PAGE_SLOT})
+        page.goto(f"{uri}#toolbar=0&navpanes=0&scrollbar=0&zoom={VIEWER_ZOOM}")
+        shots = []
+        for _ in range(150):
+            page.wait_for_timeout(200)
+            shots.append(page.screenshot())
+            if len(shots) >= 3 and shots[-1] == shots[-2] == shots[-3]:
+                return Image.open(io.BytesIO(shots[-1])).convert("RGB")
+        raise RuntimeError(f"the PDF viewer never settled: {uri}")
+    finally:
+        page.close()
+
+
+def _calibrate(ctx, work: Path, box: str, n: int) -> list[tuple[int, int, int, int]]:
+    """Crop rects (x0, y0, x1, y1) of pages 1..n for this MediaBox and page count."""
+    x0, y0, x1, y1 = (float(v) for v in box.split())
+    w_in, h_in = (x1 - x0) / 72, (y1 - y0) / 72
+    cols = [_CAL_COLOURS[i % len(_CAL_COLOURS)] for i in range(n)]
+    html = (f"<style>@page{{size:{w_in}in {h_in}in;margin:0}}body{{margin:0}}"
+            f"div{{width:{w_in}in;height:{h_in}in;break-after:page}}</style>"
+            + "".join(f"<div style='background:rgb{c}'></div>" for c in cols))
+    pg = ctx.new_page()
+    pg.set_content(html)
+    pdf = work / f"_cal_{n}_{abs(hash(box))}.pdf"
+    pdf.write_bytes(pg.pdf(width=f"{w_in}in", height=f"{h_in}in", print_background=True))
+    pg.close()
+    if _pdf_geometry(pdf.read_bytes()) != (n, box):
+        raise RuntimeError(f"calibration PDF has a different geometry than {box} x {n}")
+    im = _viewer_shot(ctx, pdf.as_uri(), n)
+    px = im.load()
+    W, H = im.size
+    rects = []
+    for c in cols:
+        # fully covered rows/columns: a strip through the middle of the page's own colour
+        ys = [y for y in range(H) if px[W // 2, y] == c]
+        mid = (ys[0] + ys[-1]) // 2
+        xs = [x for x in range(W) if px[x, mid] == c]
+        rects.append((xs[0], ys[0], xs[-1] + 1, ys[-1] + 1))
+    w = min(r[2] - r[0] for r in rects)
+    h = min(r[3] - r[1] for r in rects)
+    return [(r[0], r[1], r[0] + w, r[1] + h) for r in rects]
+
+
+def _raster_chromium_group(args):
+    """Worker: rasterise a list of PDFs in one Chromium."""
+    pdfs, out = args
+    from playwright.sync_api import sync_playwright
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    cal = {}
+    with sync_playwright() as p:
+        b = p.chromium.launch(channel="chromium")      # the full build: it has the PDF viewer
+        try:
+            ctx = b.new_context(viewport={"width": VIEWER_WIDTH, "height": 1000}, device_scale_factor=1)
+            for pdf in map(Path, pdfs):
+                n, box = _pdf_geometry(pdf.read_bytes())
+                if (box, n) not in cal:
+                    cal[(box, n)] = _calibrate(ctx, out, box, n)
+                im = _viewer_shot(ctx, pdf.resolve().as_uri(), n)
+                stem = pdf.name[:-4]
+                for i, r in enumerate(cal[(box, n)]):
+                    im.crop(r).save(out / f"{stem}-p{i + 1}.png", optimize=False)
+        finally:
+            b.close()
+    for f in out.glob("_cal_*.pdf"):
+        f.unlink()
+    return len(pdfs)
+
+
+def raster_pdf(pdfs: list[Path], out: Path, jobs: int | None = None):
+    """Every page of the Chromium PDFs `pdfs` -> out/<stem>-pN.png (Chromium's PDF viewer)."""
+    pdfs = [str(p) for p in pdfs]
+    if not pdfs:
+        return
+    jobs = jobs or int(os.environ.get("CVSTAND_LOCK_PDF_JOBS") or 2)
+    chunks = [pdfs[i::jobs] for i in range(jobs) if pdfs[i::jobs]]
+    if len(chunks) == 1:
+        _raster_chromium_group((chunks[0], str(out)))
+        return
+    with ProcessPoolExecutor(len(chunks)) as ex:
+        list(ex.map(_raster_chromium_group, [(c, str(out)) for c in chunks]))
+
+
 def pages(folder: Path, stem: str) -> list[Path]:
     out, i = [], 1
     while (folder / f"{stem}-p{i}.png").exists():
@@ -411,7 +533,7 @@ def build_images(work: Path, keys, only=None, word: bool = True) -> None:
     """PDF (and Word) page images of `keys` into work/png."""
     t = time.time()
     gen_pdfs(work, keys, only={(s, k, l, p) for s, k, l, p, _ in only} if only else None)
-    raster(sorted((work / "pdf").glob("*.pdf")), work / "png")
+    raster_pdf(sorted((work / "pdf").glob("*.pdf")), work / "png")
     print(f"  PDF images: {time.time() - t:.0f}s", flush=True)
     if word:
         t = time.time()
@@ -530,7 +652,7 @@ def image_diffs(diffs: list[dict], out: Path = ARTIFACTS) -> list[str]:
         keys = sorted({k for _, k, *_ in only_pdf | only_word})
         if only_pdf:
             gen_pdfs(work, keys, only=only_pdf)
-            raster(sorted((work / "pdf").glob("*.pdf")), work / "png")
+            raster_pdf(sorted((work / "pdf").glob("*.pdf")), work / "png")
         if only_word:
             if len(only_word) > WORD_DIFF_CAP:
                 notes.append(f"{len(only_word)} Word files changed: diff images for the first {WORD_DIFF_CAP}")
@@ -565,46 +687,11 @@ def image_diffs(diffs: list[dict], out: Path = ARTIFACTS) -> list[str]:
 def check_images(keys) -> list[dict]:
     """Tier 2: render everything, compare every page with the image store."""
     work = Path(tempfile.mkdtemp(prefix="cvstand-lockimg-"))
-    fails = []
     try:
         build_images(work, keys, word=True)
-        for key in keys:
-            lk = read_lock(key)["downloads"]
-            for src, lang, paper, part in variants(key):
-                name = wa.name_of(src, key, lang, paper, part)
-                v = vname(src, lang, paper, part)
-                for kind in ("pdf", "word"):
-                    if kind == "pdf" and part == "both":
-                        now = (pages(work / "png", wa.name_of(src, key, lang, paper, "cv"))
-                               + pages(work / "png", wa.name_of(src, key, lang, paper, "letter")))
-                    else:
-                        now = pages(work / "png", name if kind == "pdf" else name + ".word")
-                    locked = store_pages(name, kind, part)
-                    if len(locked) != len(lk[v].get(f"{kind}_png", [])):
-                        fails.append({"key": key, "v": v, "kind": kind.upper(),
-                                      "detail": "image store incomplete: run rebuild-images"})
-                        continue
-                    probs = diff_pages(locked, now, ARTIFACTS, f"{name}.{kind}")
-                    tries = 1
-                    while probs and kind == "pdf" and tries < PDF_RASTER_TRIES:
-                        # The rasteriser (tools/pdf_raster.ps1) is not deterministic: the SAME
-                        # PDF file gave 0, 0, 71 px against the lock (2026-11-26, ats-t20). Raster
-                        # the same PDFs again; a real change fails every try.
-                        tries += 1
-                        again = work / f"retry{tries}"
-                        stems = ([wa.name_of(src, key, lang, paper, p) for p in ("cv", "letter")]
-                                 if part == "both" else [name])
-                        raster([work / "pdf" / (s + ".pdf") for s in stems], again)
-                        now = [pg for s in stems for pg in pages(again, s)]
-                        probs = diff_pages(locked, now, ARTIFACTS, f"{name}.{kind}")
-                    if probs and tries > 1:
-                        probs.append(f"(every one of {tries} rasterisations)")
-                    if probs:
-                        fails.append({"key": key, "v": v, "kind": "PDF" if kind == "pdf" else "Word",
-                                      "detail": "; ".join(probs)})
+        return compare_images(work, keys)
     finally:
         shutil.rmtree(work, ignore_errors=True)
-    return fails
 
 
 # ------------------------------------------------------------ commands
@@ -810,6 +897,193 @@ def cmd_sheets(out: Path, keys=None) -> None:
         shutil.rmtree(work, ignore_errors=True)
 
 
+# ------------------------------------------------------------ staged runs (foreground, < 10 min each)
+# Background runs get stopped by Claude Code when memory is low (2026-11-26/27), and a
+# foreground call is capped at 10 minutes. So tier 2 and the one-time PDF image rebuild
+# can run as short stages over one persistent work folder, 1 Chromium process each:
+#   stage WORK tier1                      tier 1 (fingerprints); writes WORK/tier1.ok
+#   stage WORK print I/N                  Chromium PDFs of the (cv, lang, paper) groups I::N
+#   stage WORK raster I/N                 PDF pages I::N -> WORK/png (Chromium PDF viewer)
+#   stage WORK word I/N                   templates I::N: .docx -> real Word -> WORK/png (tier 2 only)
+#   stage WORK compare                    tier 2 verdict: every page of WORK/png vs the image store
+#   stage WORK rebuild-write --approved NOTE   the one-time PDF image rebuild from WORK/png
+# Every stage prints its time.
+
+def _code_state() -> str:
+    """HEAD + the working tree's diff: a stage's tier-1 pass is valid only for this code."""
+    return _git("rev-parse", "HEAD") + ":" + _h(subprocess.run(
+        ["git", "diff", "HEAD", "--", ".", ":(exclude)tests/golden/downloads", ":(exclude)RESUME_HERE.md",
+         ":(exclude)docs"], cwd=ROOT, capture_output=True, stdin=subprocess.DEVNULL).stdout)
+
+
+def _part(arg: str, items: list) -> list:
+    i, n = (int(x) for x in arg.split("/"))
+    if not 1 <= i <= n:
+        sys.exit(f"bad part {arg}: use I/N with 1 <= I <= N")
+    return items[i - 1::n]
+
+
+def _pdf_groups() -> list[tuple]:
+    return [(src, lang, paper) for src in SRCS for lang in LANGS for paper in PAPERS]
+
+
+def compare_images(work: Path, keys) -> list[dict]:
+    """Every page in work/png vs the image store (tier 2's verdict)."""
+    fails = []
+    for key in keys:
+        lk = read_lock(key)["downloads"]
+        for src, lang, paper, part in variants(key):
+            name = wa.name_of(src, key, lang, paper, part)
+            v = vname(src, lang, paper, part)
+            for kind in ("pdf", "word"):
+                if kind == "pdf" and part == "both":
+                    now = (pages(work / "png", wa.name_of(src, key, lang, paper, "cv"))
+                           + pages(work / "png", wa.name_of(src, key, lang, paper, "letter")))
+                else:
+                    now = pages(work / "png", name if kind == "pdf" else name + ".word")
+                locked = store_pages(name, kind, part)
+                if len(locked) != len(lk[v].get(f"{kind}_png", [])):
+                    fails.append({"key": key, "v": v, "kind": kind.upper(),
+                                  "detail": "image store incomplete: run rebuild-images"})
+                    continue
+                probs = diff_pages(locked, now, ARTIFACTS, f"{name}.{kind}")
+                if probs:
+                    fails.append({"key": key, "v": v, "kind": "PDF" if kind == "pdf" else "Word",
+                                  "detail": "; ".join(probs)})
+    return fails
+
+
+def cmd_stage(work: Path, step: str, part: str | None, note: str | None) -> int:
+    work.mkdir(parents=True, exist_ok=True)
+    keys = all_keys()
+    t = time.time()
+    if step == "tier1":
+        (work / "tier1.ok").unlink(missing_ok=True)
+        diffs = compare(fingerprints(keys))
+        print(f"tier 1: {len(keys)} templates in {time.time() - t:.0f}s, {len(diffs)} difference(s)")
+        if diffs:
+            print(report(diffs))
+            return 1
+        (work / "tier1.ok").write_text(_code_state(), encoding="utf-8")
+        return 0
+    if step == "print":
+        (work / "pdf").mkdir(exist_ok=True)
+        groups = _part(part, _pdf_groups())
+        for src, lang, paper in groups:          # one Chromium, sequentially
+            ks = [k for k in keys if src != "photo" or k in wa.PHOTO_KEYS]
+            _gen_pdf_group((str(work), src, lang, paper, ks))
+        print(f"print {part}: {len(groups)} groups, {len(list((work / 'pdf').glob('*.pdf')))} PDFs so far, "
+              f"{time.time() - t:.0f}s")
+        return 0
+    if step == "raster":
+        pdfs = _part(part, sorted((work / "pdf").glob("*.pdf")))
+        raster_pdf(pdfs, work / "png", jobs=1)
+        print(f"raster {part}: {len(pdfs)} PDFs in {time.time() - t:.0f}s")
+        return 0
+    if step == "word":
+        ks = _part(part, keys)
+        sub = work / f"word-{part.replace('/', 'of')}"
+        gen_docx(sub, ks)
+        wa.word(sub)
+        raster(sorted((sub / "word").glob("*.word.pdf")), work / "png")
+        print(f"word {part}: {len(ks)} templates, "
+              f"{len(list((sub / 'word').glob('*.word.pdf')))}/{len(list((sub / 'docx').glob('*.docx')))} "
+              f"converted, {time.time() - t:.0f}s")
+        return 0
+    if step == "compare":
+        ok = work / "tier1.ok"
+        if not ok.exists() or ok.read_text(encoding="utf-8") != _code_state():
+            sys.exit("refused: run `stage WORK tier1` first (on this code)")
+        fails = compare_images(work, keys)
+        print(f"tier 2 compare: {time.time() - t:.0f}s")
+        if fails:
+            print(f"DOWNLOAD LOCK: {len(fails)} difference(s)\n" + report(fails))
+            print(f"before | after | diff images: {ARTIFACTS}")
+            return 1
+        print("download lock tier 2: every page of every download matches")
+        return 0
+    if step == "rebuild-write":
+        return rebuild_pdf_images_write(work, note)
+    sys.exit(f"unknown stage {step}")
+
+
+def _rebuild_refusals(note) -> dict:
+    pr = json.loads((LOCK / "_printer.json").read_text(encoding="utf-8"))
+    if pr.get("pdf_raster") == PDF_RASTER:
+        sys.exit(f"refused: the PDF images are already rasterised with: {PDF_RASTER}")
+    if not note or len(note.strip()) < 8:
+        sys.exit("refused: --approved \"<the owner's approval: who, what, when>\" is required")
+    return pr
+
+
+def cmd_rebuild_pdf_images(note: str) -> int:
+    """ONE-TIME owner exception (2026-11-27): the locked PDF page images of every
+    template re-rasterised with Chromium's PDF viewer. Runs as foreground stages."""
+    _rebuild_refusals(note)
+    print("run it in stages (each < 10 min, 1 Chromium process):\n"
+          "  stage WORK tier1\n  stage WORK print 1/6 .. 6/6\n  stage WORK raster 1/4 .. 4/4\n"
+          "  stage WORK rebuild-write --approved NOTE")
+    return 2
+
+
+def rebuild_pdf_images_write(work: Path, note: str) -> int:
+    """The write stage: tier 1 passed on this code, every PDF page rasterised; then
+    only pdf_png changes in the lock files, and the Word store must not change."""
+    pr = _rebuild_refusals(note)
+    ok = work / "tier1.ok"
+    if not ok.exists() or ok.read_text(encoding="utf-8") != _code_state():
+        sys.exit("refused: tier 1 has not passed on this code: run `stage WORK tier1` first")
+    keys = all_keys()
+    word_dir = store() / "word"
+    word_before = {p.name: file_sha(p) for p in word_dir.glob("*.png")}
+    lock_before = {p.name: p.read_bytes() for p in LOCK.glob("*.json") if not p.name.startswith("_")}
+    for name, blob in lock_before.items():      # the json round-trip is byte-exact
+        assert json.dumps(json.loads(blob), indent=1, sort_keys=True).encode() + b"\n" \
+            == blob.replace(b"\r\n", b"\n"), name
+    want_pdfs = {wa.name_of(s, k, l, p, pt) for k in keys for s, l, p, pt in variants(k) if pt != "both"}
+    have = {p.name[:-4] for p in (work / "pdf").glob("*.pdf")}
+    if want_pdfs - have:
+        sys.exit(f"refused: {len(want_pdfs - have)} PDFs not printed, e.g. {sorted(want_pdfs - have)[:3]}")
+    new = {}
+    for k in keys:
+        doc = read_lock(k)
+        ent = image_entry(work, k)
+        for v, e in doc["downloads"].items():
+            if len(ent[v]["pdf_png"]) != len(e.get("pdf_png", [])):
+                sys.exit(f"refused: {k} {v}: {len(e.get('pdf_png', []))} locked PDF pages, "
+                         f"now {len(ent[v]['pdf_png'])} (not rasterised yet?)")
+            e["pdf_png"] = ent[v]["pdf_png"]
+        new[k] = doc
+    pdf_dir = store() / "pdf"
+    for k, doc in new.items():
+        for old in pdf_dir.glob(f"*{wa.SEP}{k}{wa.SEP}*.png"):
+            old.unlink()
+        for p in (work / "png").glob(f"*{wa.SEP}{k}{wa.SEP}*.png"):
+            if ".word-" not in p.name:
+                shutil.copy2(p, pdf_dir / p.name)
+        lock_path(k).write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    # proof: only pdf_png moved, the Word store did not
+    for name, blob in lock_before.items():
+        a, b = json.loads(blob), json.loads((LOCK / name).read_bytes())
+        assert a["_meta"] == b["_meta"], name
+        for v in a["downloads"]:
+            x, y = dict(a["downloads"][v]), dict(b["downloads"][v])
+            x.pop("pdf_png"), y.pop("pdf_png")
+            assert x == y, f"{name} {v}: more than pdf_png changed"
+    assert {p.name: file_sha(p) for p in word_dir.glob("*.png")} == word_before, "the Word image store changed"
+    pr["pdf_raster"] = PDF_RASTER
+    pr.setdefault("exceptions", []).append(
+        {"date": _dt.date.today().isoformat(), "templates": "all 49",
+         "what": "PDF page images only, re-rasterised with " + PDF_RASTER
+                 + " (was tools/pdf_raster.ps1, not deterministic). Fingerprints and Word images unchanged.",
+         "approved": note.strip(), "based_on": _git("rev-parse", "--short", "HEAD")})
+    (LOCK / "_printer.json").write_text(json.dumps(pr, indent=1) + "\n", encoding="utf-8")
+    write_index()
+    print(f"PDF page images rebuilt for {len(keys)} templates "
+          f"({len(list(pdf_dir.glob('*.png')))} PNGs); fingerprints, _meta and Word images unchanged")
+    return 0
+
+
 def main(argv=None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     for stream in (sys.stdout, sys.stderr):
@@ -856,7 +1130,7 @@ def main(argv=None) -> int:
         if any(p for p in LOCK.glob("*.json") if not p.stem.startswith("_")):
             sys.exit("refused: a lock already exists; use `update KEYS --approved NOTE`")
         LOCK.mkdir(parents=True, exist_ok=True)
-        pr = printer()
+        pr = {**printer(), "pdf_raster": PDF_RASTER}
         (LOCK / "_printer.json").write_text(json.dumps(pr, indent=1) + "\n", encoding="utf-8")
         ks = keys or all_keys()
         _lock_templates(ks, note, require_new=True)
@@ -868,6 +1142,10 @@ def main(argv=None) -> int:
     if cmd == "rebuild-images":
         cmd_rebuild_images(keys)
         return 0
+    if cmd == "stage":                 # stage WORK STEP [I/N] [--approved NOTE]
+        return cmd_stage(Path(args[1]), args[2], args[3] if len(args) > 3 else None, note)
+    if cmd == "rebuild-pdf-images":    # one-time owner exception 2026-11-27 (the rasteriser change)
+        return cmd_rebuild_pdf_images(note)
     if cmd == "sheets":
         out = Path(args[1]) if len(args) > 1 else (
             Path.home() / "Desktop" / f"review-download-lock-{_dt.date.today().isoformat()}")
